@@ -114,7 +114,7 @@ export default function DashboardClient() {
         };
 
         // Standard way to handle session reliably
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
+        const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
             if (event === 'SIGNED_OUT') {
                 router.push(`/login?lang=${urlLang}`);
             } else if (session) {
@@ -129,7 +129,55 @@ export default function DashboardClient() {
             }
         });
 
-        return () => subscription.unsubscribe();
+        // Real-time listener for profile updates (especially verification status)
+        const setupProfileSubscription = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                const channel = supabase
+                    .channel(`profile-updates-${session.user.id}`)
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: 'UPDATE',
+                            schema: 'public',
+                            table: 'profiles',
+                            filter: `id=eq.${session.user.id}`
+                        },
+                        (payload: any) => {
+                            console.log('Real-time profile update received:', payload.new);
+                            const updatedProfile = payload.new;
+                            const dbIsVerified = updatedProfile.is_verified === true || updatedProfile.is_verified === 'true';
+                            
+                            setUser((prevUser: any) => {
+                                if (!prevUser) return { ...updatedProfile, is_verified: dbIsVerified };
+                                return {
+                                    ...prevUser,
+                                    ...updatedProfile,
+                                    is_verified: dbIsVerified,
+                                    fullName: updatedProfile.full_name || prevUser.fullName,
+                                    totalEquity: updatedProfile.total_equity || (Number(updatedProfile.balance) + Number(updatedProfile.investment))
+                                };
+                            });
+                        }
+                    )
+                    .subscribe();
+                
+                return channel;
+            }
+            return null;
+        };
+
+        let profileChannel: any = null;
+        setupProfileSubscription().then(channel => {
+            profileChannel = channel;
+        });
+
+        return () => {
+            authSubscription.unsubscribe();
+            if (profileChannel) {
+                supabase.removeChannel(profileChannel);
+            }
+        };
     }, [searchParams, router]);
 
     const formatCurrency = (val: number) => {
