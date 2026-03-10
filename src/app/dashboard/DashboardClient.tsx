@@ -38,6 +38,18 @@ export default function DashboardClient() {
     const [withdrawAmount, setWithdrawAmount] = useState("");
     const [withdrawPIN, setWithdrawPIN] = useState("");
 
+    // KYC Form States
+    const [idPhoto, setIdPhoto] = useState<File | null>(null);
+    const [occupation, setOccupation] = useState("");
+    const [employer, setEmployer] = useState("");
+    const [sourceOfWealth, setSourceOfWealth] = useState("Salary");
+    const [riskProfile, setRiskProfile] = useState("Balanced");
+    const [bankName, setBankName] = useState("");
+    const [accountNumber, setAccountNumber] = useState("");
+    const [signature, setSignature] = useState("");
+    const [kycIsLoading, setKycIsLoading] = useState(false);
+    const [kycShowSuccess, setKycShowSuccess] = useState(false);
+
     useEffect(() => {
         const urlLang = searchParams?.get("lang") || "en";
         setLang(urlLang as "en" | "zh");
@@ -410,6 +422,57 @@ export default function DashboardClient() {
         doc.save(`GV_Statement_${user?.id?.substring(0, 8)}_${monthName}.pdf`);
     };
 
+    const handleKycSubmit = async () => {
+        if (!idPhoto || !signature || !occupation || !bankName || !accountNumber) {
+            alert(lang === "en" ? "Please complete all required fields and upload your ID." : "请填写所有必填字段并上传您的证件照片。");
+            return;
+        }
+
+        setKycIsLoading(true);
+
+        try {
+            // 1. Upload ID Photo to Supabase Storage (agreements bucket)
+            const fileName = `${user.id}_IC_${Date.now()}_${idPhoto.name}`;
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('agreements')
+                .upload(fileName, idPhoto);
+
+            if (uploadError) throw uploadError;
+
+            // 2. Update Profile in Supabase
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({
+                    occupation,
+                    employer,
+                    source_of_wealth: sourceOfWealth,
+                    risk_profile: riskProfile,
+                    bank_name: bankName,
+                    account_number: accountNumber,
+                    kyc_document_url: uploadData.path,
+                    kyc_status: 'Pending',
+                    is_verified: 'Pending',
+                    signed_agreement: true,
+                    full_name: signature 
+                })
+                .eq('id', user.id);
+
+            if (updateError) throw updateError;
+
+            // 3. Show Success
+            setKycShowSuccess(true);
+            setTimeout(() => {
+                setKycShowSuccess(false);
+                // The real-time subscription will update the UI automatically
+            }, 5000);
+
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setKycIsLoading(false);
+        }
+    };
+
     const content = {
         en: {
             welcome: "Welcome back, ",
@@ -496,29 +559,8 @@ export default function DashboardClient() {
     // Strict verification check
     const isUserVerified = user?.is_verified === true;
 
-    if (user && !isUserVerified) {
-        return (
-            <div className="min-h-screen bg-[#121212] text-white flex items-center justify-center p-8 text-center">
-                <div className="max-w-md space-y-8 animate-in fade-in zoom-in-95 duration-700">
-                    <div className="h-24 w-24 bg-gv-gold/10 rounded-full flex items-center justify-center mx-auto border border-gv-gold/20">
-                        <svg className="h-12 w-12 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                    </div>
-                    <div>
-                        <h2 className="text-3xl font-black uppercase tracking-tighter mb-4">Pending Activation</h2>
-                        <p className="text-zinc-500 font-medium text-lg leading-relaxed">
-                            {t.pendingVerification}
-                        </p>
-                    </div>
-                    <button
-                        onClick={() => supabase.auth.signOut().then(() => router.push('/login'))}
-                        className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold py-4 px-8 rounded-2xl uppercase tracking-widest text-xs transition-all"
-                    >
-                        Sign Out
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    // We no longer block access to the dashboard entirely. 
+    // Instead, we will conditionally render the content inside the main area.
 
     return (
         <div className="min-h-screen bg-[#121212] text-white flex font-sans overflow-hidden">
@@ -583,23 +625,102 @@ export default function DashboardClient() {
                         </div>
                     </header>
 
-                    {!user?.kyc_completed && (
-                        <div className="bg-red-500/10 border border-red-500/20 p-8 rounded-[40px] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl animate-in zoom-in-95 duration-500">
-                            <div className="flex items-center gap-5 text-red-500">
-                                <div className="h-12 w-12 bg-red-500/20 rounded-full flex items-center justify-center">
-                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4" /></svg>
-                                </div>
-                                <p className="font-bold text-sm leading-relaxed max-w-md">{t.unverifiedBanner}</p>
-                            </div>
-                            <Link href={`/verify?lang=${lang}`} className="bg-red-500 text-white font-black px-10 py-4 rounded-2xl hover:bg-red-600 transition-all text-sm uppercase tracking-widest shadow-[0_10px_30px_rgba(239,68,68,0.3)]">
-                                {t.verifyNow}
-                            </Link>
-                        </div>
-                    )}
-
                     {activeTab === "overview" ? (
                         <>
-                            <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {!user?.is_verified ? (
+                                (user?.kyc_status === 'Pending' || user?.kyc_status === 'pending') ? (
+                                    <div className="bg-[#1a1a1a] p-10 rounded-[40px] border border-white/5 shadow-xl text-center space-y-8 py-20 animate-in fade-in zoom-in-95 duration-700">
+                                        <div className="h-24 w-24 bg-gv-gold/10 rounded-full flex items-center justify-center mx-auto border border-gv-gold/20">
+                                            <svg className="h-12 w-12 text-gv-gold animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <h2 className="text-3xl font-black uppercase tracking-tighter">Identity Review in Progress</h2>
+                                            <p className="text-zinc-500 font-medium text-lg leading-relaxed max-w-md mx-auto">
+                                                Our compliance team is currently reviewing your identity documents. This process usually takes less than 24 hours.
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="bg-[#1a1a1a] p-10 rounded-[40px] border border-white/5 shadow-xl space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+                                        <div className="space-y-4">
+                                            <h2 className="text-3xl font-black uppercase tracking-tighter">Activate Your Portfolio</h2>
+                                            <p className="text-zinc-500 font-medium leading-relaxed">Please complete your profile and upload your identity document to begin investing.</p>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                            <div className="space-y-8">
+                                                <section className="space-y-6">
+                                                    <h3 className="text-sm font-black uppercase tracking-widest text-gv-gold flex items-center gap-2">
+                                                        <span className="h-6 w-6 rounded-full bg-gv-gold text-black flex items-center justify-center text-[10px]">1</span>
+                                                        Identity Document
+                                                    </h3>
+                                                    <div className="border border-white/10 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-colors cursor-pointer relative group">
+                                                        <svg className="h-10 w-10 text-zinc-600 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /></svg>
+                                                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest text-center">{idPhoto ? idPhoto.name : "Upload Passport / ID Card"}</span>
+                                                        <input type="file" onChange={(e) => setIdPhoto(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                                    </div>
+                                                </section>
+
+                                                <section className="space-y-6">
+                                                    <h3 className="text-sm font-black uppercase tracking-widest text-gv-gold flex items-center gap-2">
+                                                        <span className="h-6 w-6 rounded-full bg-gv-gold text-black flex items-center justify-center text-[10px]">2</span>
+                                                        Financial Profile
+                                                    </h3>
+                                                    <div className="space-y-4">
+                                                        <input type="text" value={occupation} onChange={(e) => setOccupation(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold focus:border-gv-gold/50 outline-none transition-all" placeholder="Occupation / Job Title" />
+                                                        <input type="text" value={employer} onChange={(e) => setEmployer(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold focus:border-gv-gold/50 outline-none transition-all" placeholder="Employer Name" />
+                                                        <select value={sourceOfWealth} onChange={(e) => setSourceOfWealth(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold appearance-none focus:border-gv-gold/50 outline-none transition-all">
+                                                            <option className="bg-[#1a1a1a]">Salary</option>
+                                                            <option className="bg-[#1a1a1a]">Business Profit</option>
+                                                            <option className="bg-[#1a1a1a]">Investments</option>
+                                                            <option className="bg-[#1a1a1a]">Inheritance</option>
+                                                        </select>
+                                                    </div>
+                                                </section>
+                                            </div>
+
+                                            <div className="space-y-8">
+                                                <section className="space-y-6">
+                                                    <h3 className="text-sm font-black uppercase tracking-widest text-gv-gold flex items-center gap-2">
+                                                        <span className="h-6 w-6 rounded-full bg-gv-gold text-black flex items-center justify-center text-[10px]">3</span>
+                                                        Payout Bank Details
+                                                    </h3>
+                                                    <div className="space-y-4">
+                                                        <input type="text" value={bankName} onChange={(e) => setBankName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold focus:border-gv-gold/50 outline-none transition-all" placeholder="Bank Name (e.g., Maybank)" />
+                                                        <input type="text" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold focus:border-gv-gold/50 outline-none transition-all" placeholder="Account Number" />
+                                                    </div>
+                                                </section>
+
+                                                <section className="space-y-6">
+                                                    <h3 className="text-sm font-black uppercase tracking-widest text-gv-gold flex items-center gap-2">
+                                                        <span className="h-6 w-6 rounded-full bg-gv-gold text-black flex items-center justify-center text-[10px]">4</span>
+                                                        Digital Signature
+                                                    </h3>
+                                                    <div className="space-y-4">
+                                                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Type your full legal name to authorize</p>
+                                                        <input type="text" value={signature} onChange={(e) => setSignature(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-black italic tracking-wider text-gv-gold placeholder:text-zinc-700 placeholder:italic focus:border-gv-gold/50 outline-none transition-all" placeholder="Full Name" />
+                                                    </div>
+                                                </section>
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-6 border-t border-white/5 flex flex-col gap-6">
+                                            <button 
+                                                onClick={handleKycSubmit} 
+                                                disabled={kycIsLoading} 
+                                                className="w-full bg-gv-gold text-black font-black text-xl py-6 rounded-[28px] hover:bg-gv-gold/90 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)] uppercase tracking-widest flex items-center justify-center gap-3 disabled:grayscale disabled:opacity-50"
+                                            >
+                                                {kycIsLoading ? <div className="h-6 w-6 border-4 border-black border-t-transparent animate-spin rounded-full"></div> : "Confirm & Sign Documents"}
+                                            </button>
+                                            <p className="text-[10px] text-zinc-600 text-center font-bold uppercase tracking-widest max-w-xl mx-auto leading-relaxed">
+                                                By submitting this form, you consent to GV Capital Trust processing your personal data in accordance with the PDPA 2010 for identity verification.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )
+                            ) : (
+                                <>
+                                    <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalBalance}</p>
                                     <h2 className="text-4xl font-black tracking-tighter">{user?.kyc_completed ? formatCurrency(user?.totalEquity) : "RM 0.00"}</h2>
@@ -761,7 +882,9 @@ export default function DashboardClient() {
                                 </div>
                             </section>
                         </>
-                    ) : activeTab === "statements" ? (
+                    )}
+                </>
+            ) : activeTab === "statements" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
                             <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl overflow-hidden relative group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
@@ -950,14 +1073,18 @@ export default function DashboardClient() {
                 </div>
             )}
 
-            {/* Success Overlay */}
-            {showSuccess && (
-                <div className="fixed inset-0 z-[500] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center text-center animate-in fade-in duration-500">
-                    <div className="h-32 w-32 bg-emerald-500 rounded-full flex items-center justify-center mb-10 shadow-[0_0_60px_rgba(16,185,129,0.3)]">
+            {/* Success Overlays */}
+            {(showSuccess || kycShowSuccess) && (
+                <div className="fixed inset-0 z-[500] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-500 px-8">
+                    <div className="h-32 w-32 bg-emerald-500 rounded-full flex items-center justify-center mb-10 shadow-[0_0_80px_rgba(16,185,129,0.3)] animate-bounce-subtle">
                         <svg className="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
                     </div>
-                    <h2 className="text-5xl font-black mb-4 uppercase tracking-tighter">{t.successTitle}</h2>
-                    <p className="text-zinc-400 max-w-md font-medium text-lg px-8">{t.successDesc}</p>
+                    <h2 className="text-5xl font-black mb-4 uppercase tracking-tighter text-white">
+                        {kycShowSuccess ? "Documents Submitted" : t.successTitle}
+                    </h2>
+                    <p className="text-zinc-400 max-w-md font-medium text-lg leading-relaxed">
+                        {kycShowSuccess ? "Our compliance team will review your account within 24 hours. Your portfolio will activate automatically upon approval." : t.successDesc}
+                    </p>
                 </div>
             )}
         </div>
