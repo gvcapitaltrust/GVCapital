@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ChangeEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import GlobalFooter from "@/components/GlobalFooter";
@@ -663,7 +663,7 @@ export default function DashboardClient() {
                                             </div>
                                             <p className="text-white/80 font-medium">Please re-upload a clear copy of your ID to proceed.</p>
                                             <button 
-                                                onClick={() => setIsReuploading(true)}
+                                                onClick={() => router.push(`/verify?lang=${lang}`)}
                                                 className="bg-white text-red-600 font-black px-10 py-5 rounded-2xl uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all"
                                             >
                                                 Re-upload Documents
@@ -671,81 +671,26 @@ export default function DashboardClient() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="bg-[#1a1a1a] p-10 rounded-[40px] border border-white/5 shadow-xl space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+                                    <div className="bg-[#1a1a1a] p-12 rounded-[40px] border border-white/5 shadow-xl space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700 text-center py-20">
+                                        <div className="h-24 w-24 bg-gv-gold/10 rounded-full flex items-center justify-center mx-auto text-gv-gold shadow-[0_0_50px_rgba(212,175,55,0.1)]">
+                                            <svg className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                        </div>
                                         <div className="space-y-4">
-                                            <h2 className="text-3xl font-black uppercase tracking-tighter">Activate Your Portfolio</h2>
-                                            <p className="text-zinc-500 font-medium leading-relaxed">Please complete your profile and upload your identity document to begin investing.</p>
-                                        </div>
-                                        
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                            <div className="space-y-8">
-                                                <section className="space-y-6">
-                                                    <h3 className="text-sm font-black uppercase tracking-widest text-gv-gold flex items-center gap-2">
-                                                        <span className="h-6 w-6 rounded-full bg-gv-gold text-black flex items-center justify-center text-[10px]">1</span>
-                                                        Identity Document
-                                                    </h3>
-                                                    <div className="border border-white/10 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-colors cursor-pointer relative group">
-                                                        <svg className="h-10 w-10 text-zinc-600 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /></svg>
-                                                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest text-center">{idPhoto ? idPhoto.name : "Upload Passport / ID Card"}</span>
-                                                        <input type="file" onChange={(e) => setIdPhoto(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
-                                                    </div>
-                                                </section>
-
-                                                <section className="space-y-6">
-                                                    <h3 className="text-sm font-black uppercase tracking-widest text-gv-gold flex items-center gap-2">
-                                                        <span className="h-6 w-6 rounded-full bg-gv-gold text-black flex items-center justify-center text-[10px]">2</span>
-                                                        Financial Profile
-                                                    </h3>
-                                                    <div className="space-y-4">
-                                                        <input type="text" value={occupation} onChange={(e) => setOccupation(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold focus:border-gv-gold/50 outline-none transition-all" placeholder="Occupation / Job Title" />
-                                                        <input type="text" value={employer} onChange={(e) => setEmployer(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold focus:border-gv-gold/50 outline-none transition-all" placeholder="Employer Name" />
-                                                        <select value={sourceOfWealth} onChange={(e) => setSourceOfWealth(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold appearance-none focus:border-gv-gold/50 outline-none transition-all">
-                                                            <option className="bg-[#1a1a1a]">Salary</option>
-                                                            <option className="bg-[#1a1a1a]">Business Profit</option>
-                                                            <option className="bg-[#1a1a1a]">Investments</option>
-                                                            <option className="bg-[#1a1a1a]">Inheritance</option>
-                                                        </select>
-                                                    </div>
-                                                </section>
-                                            </div>
-
-                                            <div className="space-y-8">
-                                                <section className="space-y-6">
-                                                    <h3 className="text-sm font-black uppercase tracking-widest text-gv-gold flex items-center gap-2">
-                                                        <span className="h-6 w-6 rounded-full bg-gv-gold text-black flex items-center justify-center text-[10px]">3</span>
-                                                        Payout Bank Details
-                                                    </h3>
-                                                    <div className="space-y-4">
-                                                        <input type="text" value={bankName} onChange={(e) => setBankName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold focus:border-gv-gold/50 outline-none transition-all" placeholder="Bank Name (e.g., Maybank)" />
-                                                        <input type="text" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold focus:border-gv-gold/50 outline-none transition-all" placeholder="Account Number" />
-                                                    </div>
-                                                </section>
-
-                                                <section className="space-y-6">
-                                                    <h3 className="text-sm font-black uppercase tracking-widest text-gv-gold flex items-center gap-2">
-                                                        <span className="h-6 w-6 rounded-full bg-gv-gold text-black flex items-center justify-center text-[10px]">4</span>
-                                                        Digital Signature
-                                                    </h3>
-                                                    <div className="space-y-4">
-                                                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Type your full legal name to authorize</p>
-                                                        <input type="text" value={signature} onChange={(e) => setSignature(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-black italic tracking-wider text-gv-gold placeholder:text-zinc-700 placeholder:italic focus:border-gv-gold/50 outline-none transition-all" placeholder="Full Name" />
-                                                    </div>
-                                                </section>
-                                            </div>
-                                        </div>
-
-                                        <div className="pt-6 border-t border-white/5 flex flex-col gap-6">
-                                            <button 
-                                                onClick={handleKycSubmit} 
-                                                disabled={kycIsLoading} 
-                                                className="w-full bg-gv-gold text-black font-black text-xl py-6 rounded-[28px] hover:bg-gv-gold/90 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)] uppercase tracking-widest flex items-center justify-center gap-3 disabled:grayscale disabled:opacity-50"
-                                            >
-                                                {kycIsLoading ? <div className="h-6 w-6 border-4 border-black border-t-transparent animate-spin rounded-full"></div> : "Confirm & Sign Documents"}
-                                            </button>
-                                            <p className="text-[10px] text-zinc-600 text-center font-bold uppercase tracking-widest max-w-xl mx-auto leading-relaxed">
-                                                By submitting this form, you consent to GV Capital Trust processing your personal data in accordance with the PDPA 2010 for identity verification.
+                                            <h2 className="text-3xl font-black uppercase tracking-tighter">
+                                                {user?.kyc_status === 'Draft' ? "Verification in Progress" : "Complete Your Profile"}
+                                            </h2>
+                                            <p className="text-zinc-500 font-medium leading-relaxed max-w-lg mx-auto">
+                                                {user?.kyc_status === 'Draft' 
+                                                    ? "You have a saved draft. Please complete our 3-step verification process to unlock all features." 
+                                                    : "Please complete our 3-step verification process to unlock investment features and secure your account."}
                                             </p>
                                         </div>
+                                        <Link 
+                                            href={`/verify?lang=${lang}`}
+                                            className="inline-block bg-gv-gold text-black font-black text-xl px-12 py-5 rounded-[28px] hover:bg-gv-gold/90 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)] uppercase tracking-widest"
+                                        >
+                                            {user?.kyc_status === 'Draft' || (user?.kyc_step && user.kyc_step > 1) ? "Resume Verification" : "Start Verification"}
+                                        </Link>
                                     </div>
                                 )
                             ) : (
@@ -788,11 +733,11 @@ export default function DashboardClient() {
                                 <div className="lg:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8">
                                     <h3 className="text-xl font-black uppercase tracking-tighter">{t.dividendTrends}</h3>
                                     <div className="h-64 flex items-end justify-between gap-4 px-4">
-                                        {dividendHistory.length > 0 ? dividendHistory.map((div, i) => (
+                                        {dividendHistory.length > 0 ? dividendHistory.map((div: any, i: number) => (
                                             <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
                                                 <div
                                                     className="w-full bg-gv-gold rounded-t-xl transition-all duration-500 group-hover:brightness-125"
-                                                    style={{ height: `${Math.max(10, (div.amount / (Math.max(...dividendHistory.map(d => d.amount)) || 1)) * 100)}%` }}
+                                                    style={{ height: `${Math.max(10, (div.amount / (Math.max(...dividendHistory.map((d: any) => d.amount)) || 1)) * 100)}%` }}
                                                 ></div>
                                                 <span className="text-[8px] font-black text-zinc-600 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
                                             </div>
@@ -803,14 +748,14 @@ export default function DashboardClient() {
                                 </div>
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] flex flex-col justify-center items-center text-center space-y-6">
                                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{t.latestDeposit}</p>
-                                    {transactions.find(t => t.type === 'Deposit') ? (
+                                    {transactions.find((t: any) => t.type === 'Deposit') ? (
                                         <>
                                             <div className={`h-24 w-24 rounded-full flex items-center justify-center border-2 ${transactions.find(t => t.type === 'Deposit').status === 'Approved' ? 'border-emerald-500/20 text-emerald-500' : transactions.find(t => t.type === 'Deposit').status === 'Rejected' ? 'border-red-500/20 text-red-500' : 'border-amber-500/20 text-amber-500'}`}>
                                                 <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                             </div>
                                             <div>
-                                                <h4 className={`text-2xl font-black uppercase tracking-tighter ${transactions.find(t => t.type === 'Deposit').status === 'Approved' ? 'text-emerald-500' : transactions.find(t => t.type === 'Deposit').status === 'Rejected' ? 'text-red-500' : 'text-amber-500'}`}>{transactions.find(t => t.type === 'Deposit').status}</h4>
-                                                <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1">{formatCurrency(transactions.find(t => t.type === 'Deposit').amount)} Ref: {transactions.find(t => t.type === 'Deposit').ref_id}</p>
+                                                <h4 className={`text-2xl font-black uppercase tracking-tighter ${transactions.find((t: any) => t.type === 'Deposit').status === 'Approved' ? 'text-emerald-500' : transactions.find((t: any) => t.type === 'Deposit').status === 'Rejected' ? 'text-red-500' : 'text-amber-500'}`}>{transactions.find((t: any) => t.type === 'Deposit').status}</h4>
+                                                <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1">{formatCurrency(transactions.find((t: any) => t.type === 'Deposit').amount)} Ref: {transactions.find((t: any) => t.type === 'Deposit').ref_id}</p>
                                             </div>
                                         </>
                                     ) : (
@@ -895,7 +840,7 @@ export default function DashboardClient() {
                                             <tr><th className="px-8 py-6">Date</th><th className="px-8 py-6">Ref ID</th><th className="px-8 py-6">Type</th><th className="px-8 py-6">Amount</th><th className="px-8 py-6 text-right">Status</th></tr>
                                         </thead>
                                         <tbody className="divide-y divide-white/[0.03]">
-                                            {transactions.map((tx, idx) => (
+                                            {transactions.map((tx: any, idx: number) => (
                                                 <tr key={idx} className="text-sm font-bold group hover:bg-white/[0.02] transition-colors">
                                                     <td className="px-8 py-6 text-zinc-500">{new Date(tx.created_at || tx.date).toISOString().split('T')[0]}</td>
                                                     <td className="px-8 py-6 font-mono text-xs text-white/40">{tx.ref_id || tx.ref}</td>
@@ -927,7 +872,7 @@ export default function DashboardClient() {
                                             <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Month</label>
                                             <select
                                                 value={selectedMonth}
-                                                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedMonth(parseInt(e.target.value))}
                                                 className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
                                             >
                                                 {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((m, i) => (
@@ -939,7 +884,7 @@ export default function DashboardClient() {
                                             <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Year</label>
                                             <select
                                                 value={selectedYear}
-                                                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedYear(parseInt(e.target.value))}
                                                 className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
                                             >
                                                 {[2024, 2025, 2026].map(y => (
@@ -1029,14 +974,14 @@ export default function DashboardClient() {
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Amount (MYR)</label>
-                                <input type="number" value={depositAmount} onChange={(e) => setDepositAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                                <input type="number" value={depositAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Bank Receipt (Image/PDF)</label>
                                 <div className="border border-white/10 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-colors cursor-pointer relative group">
                                     <svg className="h-10 w-10 text-zinc-600 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                     <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{depositReceipt ? (depositReceipt as File).name : "Select Document"}</span>
-                                    <input type="file" onChange={(e) => setDepositReceipt(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                    <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositReceipt(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
                                 </div>
                             </div>
                             <button onClick={handleDepositSubmit} disabled={isSubmitting || !depositAmount || !depositReceipt} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50">
@@ -1060,9 +1005,9 @@ export default function DashboardClient() {
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Amount (MYR)</label>
-                                <input type="number" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                                <input type="number" value={withdrawAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                             </div>
-                            <button onClick={handleWithdrawInitiate} disabled={!withdrawAmount} className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50">
+                             <button onClick={() => handleWithdrawInitiate()} disabled={!withdrawAmount} className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50">
                                 Request Withdrawal
                             </button>
                         </div>
@@ -1086,7 +1031,7 @@ export default function DashboardClient() {
                                 type="password"
                                 maxLength={6}
                                 value={withdrawPIN}
-                                onChange={(e) => setWithdrawPIN(e.target.value)}
+                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value)}
                                 className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[1em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold"
                                 autoFocus
                             />

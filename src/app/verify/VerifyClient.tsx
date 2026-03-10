@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import GlobalFooter from "@/components/GlobalFooter";
@@ -15,8 +15,32 @@ export default function VerifyPage() {
     const [showSuccess, setShowSuccess] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
 
+    interface KYCFormData {
+        first_name: string;
+        last_name: string;
+        dob: string;
+        gender: string;
+        address: string;
+        city: string;
+        phone: string;
+        tax_id: string;
+        nationality_match: boolean;
+        account_purpose: string;
+        employment_status: string;
+        industry: string;
+        source_of_wealth: string[];
+        total_wealth: string;
+        annual_income: string;
+        yearly_deposit: string;
+        accuracy_confirmed: boolean;
+        risk_acknowledged: boolean;
+        is_not_pep: boolean;
+        id_type: string;
+        country: string;
+    }
+
     // Form State
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<KYCFormData>({
         first_name: "",
         last_name: "",
         dob: "",
@@ -29,7 +53,7 @@ export default function VerifyPage() {
         account_purpose: "Investment",
         employment_status: "Full-time",
         industry: "Finance",
-        source_of_wealth: [] as string[],
+        source_of_wealth: [],
         total_wealth: "$10k-$50k",
         annual_income: "$10k-$50k",
         yearly_deposit: "$10k-$50k",
@@ -55,15 +79,30 @@ export default function VerifyPage() {
                 router.push(`/register?lang=${l}`);
             } else {
                 setUser(session.user);
-                // Pre-fetch profile if needed
+                // Pre-fetch profile for Resume Logic
                 const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
                 if (profile) {
-                    setFormData(prev => ({
-                        ...prev,
-                        first_name: profile.first_name || "",
-                        last_name: profile.last_name || "",
-                        country: profile.country || "Malaysia"
-                    }));
+                    // Resume Logic: Jump to saved step and fill data
+                    if (profile.kyc_step && profile.kyc_step > 1) {
+                        setCurrentStep(profile.kyc_step);
+                    }
+                    
+                    if (profile.kyc_data) {
+                        setFormData((prev: KYCFormData) => ({
+                            ...prev,
+                            ...profile.kyc_data
+                        }));
+                    } else {
+                        setFormData((prev: KYCFormData) => ({
+                            ...prev,
+                            first_name: profile.first_name || "",
+                            last_name: profile.last_name || "",
+                            country: profile.country || "Malaysia"
+                        }));
+                    }
+                    
+                    if (profile.kyc_id_front) setIdFrontRef(profile.kyc_id_front);
+                    if (profile.kyc_id_back) setIdBackRef(profile.kyc_id_back);
                 }
             }
         };
@@ -80,10 +119,29 @@ export default function VerifyPage() {
         return data.path;
     };
 
+    const syncProgress = async (step: number, data: KYCFormData) => {
+        if (!user) return;
+        try {
+            await supabase
+                .from('profiles')
+                .update({
+                    kyc_step: step,
+                    kyc_data: data
+                })
+                .eq('id', user.id);
+        } catch (err) {
+            console.error("Error syncing progress:", err);
+        }
+    };
+
     const handleFinalSubmit = async (status: 'Pending' | 'Draft') => {
         if (status === 'Pending') {
-            if (!idFront || (!idBack && formData.id_type !== 'Passport')) {
-                alert("Please upload your ID documents.");
+            if (!idFront && !idFrontRef) {
+                alert("Please upload the front of your ID document.");
+                return;
+            }
+            if (!idBack && !idBackRef && formData.id_type !== 'Passport') {
+                alert("Please upload the back of your ID document.");
                 return;
             }
             if (!formData.accuracy_confirmed || !formData.risk_acknowledged || !formData.is_not_pep) {
@@ -106,7 +164,9 @@ export default function VerifyPage() {
                 kyc_id_back: backPath,
                 kyc_status: status,
                 kyc_completed: status === 'Pending',
-                full_name: `${formData.first_name} ${formData.last_name}`
+                full_name: `${formData.first_name} ${formData.last_name}`,
+                kyc_step: currentStep,
+                kyc_data: formData
             };
 
             const { error: updateError } = await supabase
@@ -129,18 +189,22 @@ export default function VerifyPage() {
         }
     };
 
-    const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 3));
-    const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
+    const nextStep = async () => {
+        const next = Math.min(currentStep + 1, 3);
+        setCurrentStep(next);
+        await syncProgress(next, formData);
+    };
+    const prevStep = () => setCurrentStep((prev: number) => Math.max(prev - 1, 1));
 
     const industries = ["Finance", "Tech", "Healthcare", "Manufacturing", "Education", "Real Estate", "Law", "Media", "Travel", "Energy", "Retail", "Other"];
     const wealthSources = ["Salary", "Business Profits", "Savings", "Inheritance", "Investments"];
     const financialTiers = ["<$10k", "$10k-$50k", "$50k-$100k", "$100k-$500k", "$500k+"];
 
     const toggleWealthSource = (source: string) => {
-        setFormData(prev => ({
+        setFormData((prev: KYCFormData) => ({
             ...prev,
             source_of_wealth: prev.source_of_wealth.includes(source)
-                ? prev.source_of_wealth.filter(s => s !== source)
+                ? prev.source_of_wealth.filter((s: string) => s !== source)
                 : [...prev.source_of_wealth, source]
         }));
     };
@@ -161,7 +225,7 @@ export default function VerifyPage() {
 
                     {/* Step Indicator */}
                     <div className="flex items-center gap-4 pt-4 w-full justify-center">
-                        {[1, 2, 3].map(s => (
+                        {[1, 2, 3].map((s: number) => (
                             <div key={s} className="flex items-center gap-2">
                                 <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black transition-all ${currentStep >= s ? 'bg-gv-gold text-black shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'bg-white/5 text-zinc-600 border border-white/10'}`}>
                                     {s}
@@ -185,19 +249,19 @@ export default function VerifyPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">First Name</label>
-                                    <input type="text" value={formData.first_name} onChange={e => setFormData({...formData, first_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter first name" />
+                                    <input type="text" value={formData.first_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, first_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter first name" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Last Name</label>
-                                    <input type="text" value={formData.last_name} onChange={e => setFormData({...formData, last_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter last name" />
+                                    <input type="text" value={formData.last_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, last_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter last name" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Date of Birth</label>
-                                    <input type="date" value={formData.dob} onChange={e => setFormData({...formData, dob: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all [color-scheme:dark]" />
+                                    <input type="date" value={formData.dob} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, dob: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all [color-scheme:dark]" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Gender</label>
-                                    <select value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all">
+                                    <select value={formData.gender} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, gender: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all">
                                         <option value="">Select Gender</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
@@ -206,24 +270,24 @@ export default function VerifyPage() {
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Residential Address</label>
-                                    <input type="text" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Street name, building, unit number" />
+                                    <input type="text" value={formData.address} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, address: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Street name, building, unit number" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">City</label>
-                                    <input type="text" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Enter city" />
+                                    <input type="text" value={formData.city} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, city: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Enter city" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Phone Number</label>
-                                    <input type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="+60 12345678" />
+                                    <input type="tel" value={formData.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, phone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="+60 12345678" />
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Tax Identification Number (TIN)</label>
-                                    <input type="text" value={formData.tax_id} onChange={e => setFormData({...formData, tax_id: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Optional for individual investors" />
+                                    <input type="text" value={formData.tax_id} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, tax_id: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Optional for individual investors" />
                                 </div>
                             </div>
 
                             <label className="flex items-center gap-3 p-5 bg-white/[0.02] border border-white/5 rounded-3xl cursor-pointer group hover:bg-white/[0.04] transition-all">
-                                <input type="checkbox" checked={formData.nationality_match} onChange={e => setFormData({...formData, nationality_match: e.target.checked})} className="h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
+                                <input type="checkbox" checked={formData.nationality_match} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, nationality_match: e.target.checked})} className="h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                 <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-tight">My place of birth and nationality are the same as my country of residence.</span>
                             </label>
 
@@ -242,7 +306,7 @@ export default function VerifyPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Purpose of Account</label>
-                                    <select value={formData.account_purpose} onChange={e => setFormData({...formData, account_purpose: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                    <select value={formData.account_purpose} onChange={(e: any) => setFormData({...formData, account_purpose: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
                                         <option value="Investment">Investment</option>
                                         <option value="Hedging">Hedging</option>
                                         <option value="Speculation">Speculation</option>
@@ -250,7 +314,7 @@ export default function VerifyPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Employment Status</label>
-                                    <select value={formData.employment_status} onChange={e => setFormData({...formData, employment_status: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                    <select value={formData.employment_status} onChange={(e: any) => setFormData({...formData, employment_status: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
                                         <option value="Full-time">Full-time</option>
                                         <option value="Part-time">Part-time</option>
                                         <option value="Freelancer">Freelancer</option>
@@ -262,8 +326,8 @@ export default function VerifyPage() {
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Industry</label>
-                                    <select value={formData.industry} onChange={e => setFormData({...formData, industry: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
-                                        {industries.map(ind => <option key={ind} value={ind}>{ind}</option>)}
+                                    <select value={formData.industry} onChange={(e: any) => setFormData({...formData, industry: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                        {industries.map((ind: string) => <option key={ind} value={ind}>{ind}</option>)}
                                     </select>
                                 </div>
                             </div>
@@ -282,41 +346,41 @@ export default function VerifyPage() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Total Net Worth</label>
-                                    <select value={formData.total_wealth} onChange={e => setFormData({...formData, total_wealth: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
-                                        {financialTiers.map(t => <option key={t} value={t}>{t}</option>)}
+                                    <select value={formData.total_wealth} onChange={(e: any) => setFormData({...formData, total_wealth: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                        {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Annual Net Income</label>
-                                    <select value={formData.annual_income} onChange={e => setFormData({...formData, annual_income: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
-                                        {financialTiers.map(t => <option key={t} value={t}>{t}</option>)}
+                                    <select value={formData.annual_income} onChange={(e: any) => setFormData({...formData, annual_income: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                        {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Expected Yearly Deposit</label>
-                                    <select value={formData.yearly_deposit} onChange={e => setFormData({...formData, yearly_deposit: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
-                                        {financialTiers.map(t => <option key={t} value={t}>{t}</option>)}
+                                    <select value={formData.yearly_deposit} onChange={(e: any) => setFormData({...formData, yearly_deposit: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                        {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                             </div>
 
                             <div className="space-y-4 pt-4">
                                 <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
-                                    <input type="checkbox" checked={formData.accuracy_confirmed} onChange={e => setFormData({...formData, accuracy_confirmed: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
+                                    <input type="checkbox" checked={formData.accuracy_confirmed} onChange={(e: any) => setFormData({...formData, accuracy_confirmed: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-white uppercase tracking-tighter">Information Accuracy</p>
                                         <p className="text-[9px] text-zinc-500 font-bold leading-normal">I hereby confirm that all the information provided above is true and correct.</p>
                                     </div>
                                 </label>
                                 <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
-                                    <input type="checkbox" checked={formData.risk_acknowledged} onChange={e => setFormData({...formData, risk_acknowledged: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
+                                    <input type="checkbox" checked={formData.risk_acknowledged} onChange={(e: any) => setFormData({...formData, risk_acknowledged: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-white uppercase tracking-tighter">Risk Acknowledgement</p>
                                         <p className="text-[9px] text-zinc-500 font-bold leading-normal">I understand and acknowledge the risks associated with high-yield investments.</p>
                                     </div>
                                 </label>
                                 <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
-                                    <input type="checkbox" checked={formData.is_not_pep} onChange={e => setFormData({...formData, is_not_pep: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
+                                    <input type="checkbox" checked={formData.is_not_pep} onChange={(e: any) => setFormData({...formData, is_not_pep: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-white uppercase tracking-tighter">PEP Declaration</p>
                                         <p className="text-[9px] text-zinc-500 font-bold leading-normal">I confirm that I am not a Politically Exposed Person (PEP) or a close associate of one.</p>
@@ -359,7 +423,7 @@ export default function VerifyPage() {
                             <div className="space-y-4 text-center">
                                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 inline-block">Select Document Type</label>
                                 <div className="flex flex-wrap justify-center gap-3">
-                                    {["ID Card", "Driver's License", "Passport", "Military ID", "Residence Permit"].map(type => (
+                                    {["ID Card", "Driver's License", "Passport", "Military ID", "Residence Permit"].map((type: string) => (
                                         <button key={type} onClick={() => setFormData({...formData, id_type: type})} className={`px-6 py-3 rounded-2xl text-[10px] font-black tracking-widest border transition-all ${formData.id_type === type ? 'bg-gv-gold border-gv-gold text-black' : 'bg-[#1a1a1a] border-white/10 text-zinc-500 hover:border-white/20'}`}>
                                             {type}
                                         </button>
@@ -387,7 +451,7 @@ export default function VerifyPage() {
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Upload IC / Image</span>
                                             </div>
                                         )}
-                                        <input type="file" onChange={e => setIdFront(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                        <input type="file" onChange={(e: any) => setIdFront(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
                                     </div>
                                 </div>
                                 <div className="space-y-4">
@@ -409,7 +473,7 @@ export default function VerifyPage() {
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Upload IC / Image</span>
                                             </div>
                                         )}
-                                        <input type="file" onChange={e => setIdBack(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                        <input type="file" onChange={(e: any) => setIdBack(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
                                     </div>
                                 </div>
                             </div>
