@@ -36,6 +36,7 @@ export default function AdminPortal() {
     const [agentReferrals, setAgentReferrals] = useState<any[]>([]);
     const [isLoadingSales, setIsLoadingSales] = useState(false);
     const [rejectionReasons, setRejectionReasons] = useState<{ [key: string]: string }>({});
+    const [verificationLogs, setVerificationLogs] = useState<any[]>([]);
 
     useEffect(() => {
         setMounted(true);
@@ -73,6 +74,12 @@ export default function AdminPortal() {
             setDeposits(txList.filter((t: any) => t.type === 'Deposit' && t.status === 'Pending'));
             setWithdrawals(txList.filter((t: any) => t.type === 'Withdrawal' && t.status === 'Pending'));
         }
+
+        const { data: logs } = await supabase
+            .from('verification_logs')
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (logs) setVerificationLogs(logs);
     };
 
     const fetchForexData = async () => {
@@ -216,6 +223,7 @@ export default function AdminPortal() {
                     admin_id: adminProfile?.id,
                     user_email: userToVerify.email,
                     admin_username: adminProfile?.username || adminProfile?.email?.split('@')[0] || 'Admin',
+                    action: 'Verified',
                     created_at: new Date().toISOString()
                 });
 
@@ -247,6 +255,18 @@ export default function AdminPortal() {
                 .eq('id', userId);
 
             if (updateError) throw updateError;
+
+            // Log the rejection
+            await supabase
+                .from('verification_logs')
+                .insert({
+                    admin_id: adminProfile?.id,
+                    user_email: userToReject.email,
+                    admin_username: adminProfile?.username || adminProfile?.email?.split('@')[0] || 'Admin',
+                    action: 'Rejected',
+                    rejection_reason: reason,
+                    created_at: new Date().toISOString()
+                });
 
             // Clear the reason for this user
             setRejectionReasons(prev => {
@@ -317,7 +337,7 @@ export default function AdminPortal() {
 
                         {/* Tabs Navigation */}
                         <div className="flex gap-4 border-b border-white/10 pb-4 overflow-x-auto">
-                            {["deposits", "kyc", "withdrawals", "users", "sales", "forex", "security"].map(tab => (
+                            {["deposits", "kyc", "withdrawals", "users", "sales", "forex", "audit", "security"].map(tab => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
@@ -588,6 +608,57 @@ export default function AdminPortal() {
                                         {deposits.length === 0 && <tr><td colSpan={4} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No pending deposits</td></tr>}
                                     </tbody>
                                 </table>
+                            )}
+
+                            {activeTab === "audit" && (
+                                <div className="p-8 animate-in fade-in duration-500">
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">System Audit Log</h3>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Tracking Administrative Actions</p>
+                                        </div>
+                                        <button onClick={fetchData} className="text-[10px] font-black uppercase tracking-widest text-gv-gold hover:underline">Refresh Logs</button>
+                                    </div>
+                                    <div className="overflow-hidden border border-white/5 rounded-3xl">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                                <tr>
+                                                    <th className="px-8 py-4">Date/Time</th>
+                                                    <th className="px-8 py-4">Admin</th>
+                                                    <th className="px-8 py-4">Target User</th>
+                                                    <th className="px-8 py-4">Action</th>
+                                                    <th className="px-8 py-4">Reason</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-white/[0.02]">
+                                                {verificationLogs.map((log: any, i: number) => (
+                                                    <tr key={i} className="text-xs font-bold hover:bg-white/[0.01] transition-colors">
+                                                        <td className="px-8 py-4 text-zinc-400 font-mono">{new Date(log.created_at).toLocaleString()}</td>
+                                                        <td className="px-8 py-4 text-white">
+                                                            <div className="flex flex-col">
+                                                                <span>{log.admin_username}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-8 py-4 text-zinc-300">{log.user_email}</td>
+                                                        <td className="px-8 py-4">
+                                                            <span className={`px-2 py-1 rounded-md text-[9px] uppercase font-black ${log.action === 'Verified' ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"}`}>
+                                                                {log.action}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-8 py-4 text-zinc-500 italic max-w-xs truncate overflow-hidden" title={log.rejection_reason}>
+                                                            {log.rejection_reason || "-"}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {verificationLogs.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No audit logs found</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             )}
 
                             {activeTab === "security" && (
