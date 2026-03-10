@@ -48,6 +48,7 @@ export default function DashboardClient() {
                 return;
             }
 
+            // Fetch the latest profile directly from the database using ID (not relying on cached session metadata)
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('*')
@@ -56,12 +57,16 @@ export default function DashboardClient() {
 
             if (profile) {
                 // Ensure we explicitly take the database value for verification
-                const dbIsVerified = profile.is_verified === true || profile.is_verified === 'true';
+                const dbIsVerified = profile.is_verified === true || profile.is_verified === 'true' || profile.is_verified === 'Verified';
+                
+                // Sync kyc_completed with is_verified to ensure the unverified banner correctly disappears
+                const isKycCompleted = profile.kyc_completed === true || profile.kyc_completed === 'true' || dbIsVerified;
 
                 setUser({
                     ...currentSession.user,
                     ...profile,
                     is_verified: dbIsVerified,
+                    kyc_completed: isKycCompleted,
                     fullName: profile.full_name || currentSession.user.user_metadata?.full_name,
                     totalEquity: profile.total_equity || (Number(profile.balance) + Number(profile.investment))
                 });
@@ -113,6 +118,17 @@ export default function DashboardClient() {
             setIsCheckingAuth(false);
         };
 
+        // Explicitly fetch latest data on mount to avoid stale session metadata
+        const initializeDashboard = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                await fetchUserData(session);
+            } else {
+                setIsCheckingAuth(false);
+            }
+        };
+        initializeDashboard();
+
         // Standard way to handle session reliably
         const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
             if (event === 'SIGNED_OUT') {
@@ -146,14 +162,16 @@ export default function DashboardClient() {
                         (payload: any) => {
                             console.log('Real-time profile update received:', payload.new);
                             const updatedProfile = payload.new;
-                            const dbIsVerified = updatedProfile.is_verified === true || updatedProfile.is_verified === 'true';
+                            const dbIsVerified = updatedProfile.is_verified === true || updatedProfile.is_verified === 'true' || updatedProfile.is_verified === 'Verified';
+                            const isKycCompleted = updatedProfile.kyc_completed === true || updatedProfile.kyc_completed === 'true' || dbIsVerified;
                             
                             setUser((prevUser: any) => {
-                                if (!prevUser) return { ...updatedProfile, is_verified: dbIsVerified };
+                                if (!prevUser) return { ...updatedProfile, is_verified: dbIsVerified, kyc_completed: isKycCompleted };
                                 return {
                                     ...prevUser,
                                     ...updatedProfile,
                                     is_verified: dbIsVerified,
+                                    kyc_completed: isKycCompleted,
                                     fullName: updatedProfile.full_name || prevUser.fullName,
                                     totalEquity: updatedProfile.total_equity || (Number(updatedProfile.balance) + Number(updatedProfile.investment))
                                 };
