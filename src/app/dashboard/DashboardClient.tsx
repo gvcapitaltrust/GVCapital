@@ -49,6 +49,7 @@ export default function DashboardClient() {
     const [signature, setSignature] = useState("");
     const [kycIsLoading, setKycIsLoading] = useState(false);
     const [kycShowSuccess, setKycShowSuccess] = useState(false);
+    const [isReuploading, setIsReuploading] = useState(false);
 
     useEffect(() => {
         const urlLang = searchParams?.get("lang") || "en";
@@ -461,6 +462,7 @@ export default function DashboardClient() {
 
             // 3. Show Success
             setKycShowSuccess(true);
+            setIsReuploading(false);
             setTimeout(() => {
                 setKycShowSuccess(false);
                 // The real-time subscription will update the UI automatically
@@ -640,6 +642,32 @@ export default function DashboardClient() {
                                             <p className="text-amber-900 font-bold text-xl leading-relaxed max-w-2xl mx-auto">
                                                 Thank you for choosing GV Capital. Our Compliance Team is currently reviewing your documents. Manual verification typically takes 1 to 3 business days. Once approved, you will have full access to our investment and deposit features.
                                             </p>
+                                        </div>
+                                    </div>
+                                ) : (user?.kyc_status === 'Rejected' || user?.kyc_status === 'rejected') && !isReuploading ? (
+                                    <div className="bg-red-500 p-12 rounded-[40px] text-center space-y-8 py-24 animate-in fade-in zoom-in-95 duration-700 max-w-3xl mx-auto shadow-[0_30px_60px_rgba(239,68,68,0.3)] border border-red-600/20">
+                                        <div className="h-28 w-28 bg-white/20 rounded-full flex items-center justify-center mx-auto border-4 border-white/10">
+                                            <svg className="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                        </div>
+                                        <div className="space-y-6 text-white">
+                                            <h2 className="text-4xl font-black uppercase tracking-tighter">Verification Unsuccessful</h2>
+                                            <div className="bg-white/10 p-6 rounded-3xl border border-white/20 max-w-2xl mx-auto">
+                                                <p className="text-white font-bold text-xl leading-relaxed">
+                                                    Our team was unable to verify your documents for the following reason:<br/>
+                                                    <span className="text-black bg-white/90 px-3 py-1 mt-3 inline-block rounded-xl font-black uppercase tracking-tight">
+                                                        {user?.rejection_reason || "Invalid Document Clarity / Mismatch Information"}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            <p className="text-white/80 font-medium">Please re-upload a clear copy of your ID to proceed.</p>
+                                            <button 
+                                                onClick={() => setIsReuploading(true)}
+                                                className="bg-white text-red-600 font-black px-10 py-5 rounded-2xl uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all"
+                                            >
+                                                Re-upload Documents
+                                            </button>
                                         </div>
                                     </div>
                                 ) : (
