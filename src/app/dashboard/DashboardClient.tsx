@@ -56,17 +56,15 @@ export default function DashboardClient() {
                 .single();
 
             if (profile) {
-                // Ensure we explicitly take the database value for verification
-                const dbIsVerified = profile.is_verified === true || profile.is_verified === 'true' || profile.is_verified === 'Verified';
-                
-                // Sync kyc_completed with is_verified to ensure the unverified banner correctly disappears
-                const isKycCompleted = profile.kyc_completed === true || profile.kyc_completed === 'true' || dbIsVerified;
+                // Verification relies on profile.is_verified or kyc_status, not Supabase email verification
+                const dbIsVerified = profile.is_verified === true || profile.is_verified === 'true' || profile.is_verified === 'Approved' || profile.is_verified === 'Verified';
+                const kycApproved = profile.kyc_status === 'Approved' || profile.kyc_completed === true || profile.kyc_completed === 'true' || dbIsVerified;
 
                 setUser({
                     ...currentSession.user,
                     ...profile,
                     is_verified: dbIsVerified,
-                    kyc_completed: isKycCompleted,
+                    kyc_completed: kycApproved,
                     fullName: profile.full_name || currentSession.user.user_metadata?.full_name,
                     totalEquity: profile.total_equity || (Number(profile.balance) + Number(profile.investment))
                 });
@@ -162,16 +160,16 @@ export default function DashboardClient() {
                         (payload: any) => {
                             console.log('Real-time profile update received:', payload.new);
                             const updatedProfile = payload.new;
-                            const dbIsVerified = updatedProfile.is_verified === true || updatedProfile.is_verified === 'true' || updatedProfile.is_verified === 'Verified';
-                            const isKycCompleted = updatedProfile.kyc_completed === true || updatedProfile.kyc_completed === 'true' || dbIsVerified;
+                            const dbIsVerified = updatedProfile.is_verified === true || updatedProfile.is_verified === 'true' || updatedProfile.is_verified === 'Approved' || updatedProfile.is_verified === 'Verified';
+                            const kycApproved = updatedProfile.kyc_status === 'Approved' || updatedProfile.kyc_completed === true || updatedProfile.kyc_completed === 'true' || dbIsVerified;
                             
                             setUser((prevUser: any) => {
-                                if (!prevUser) return { ...updatedProfile, is_verified: dbIsVerified, kyc_completed: isKycCompleted };
+                                if (!prevUser) return { ...updatedProfile, is_verified: dbIsVerified, kyc_completed: kycApproved };
                                 return {
                                     ...prevUser,
                                     ...updatedProfile,
                                     is_verified: dbIsVerified,
-                                    kyc_completed: isKycCompleted,
+                                    kyc_completed: kycApproved,
                                     fullName: updatedProfile.full_name || prevUser.fullName,
                                     totalEquity: updatedProfile.total_equity || (Number(updatedProfile.balance) + Number(updatedProfile.investment))
                                 };
