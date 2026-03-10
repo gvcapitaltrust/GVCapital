@@ -37,6 +37,8 @@ export default function AdminPortal() {
     const [isLoadingSales, setIsLoadingSales] = useState(false);
     const [rejectionReasons, setRejectionReasons] = useState<{ [key: string]: string }>({});
     const [verificationLogs, setVerificationLogs] = useState<any[]>([]);
+    const [auditSearchQuery, setAuditSearchQuery] = useState("");
+    const [auditStatusFilter, setAuditStatusFilter] = useState("All");
 
     useEffect(() => {
         setMounted(true);
@@ -612,13 +614,42 @@ export default function AdminPortal() {
 
                             {activeTab === "audit" && (
                                 <div className="p-8 animate-in fade-in duration-500">
-                                    <div className="flex items-center justify-between mb-8">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                                         <div>
                                             <h3 className="text-xl font-black uppercase tracking-tighter text-white">System Audit Log</h3>
                                             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Tracking Administrative Actions</p>
                                         </div>
-                                        <button onClick={fetchData} className="text-[10px] font-black uppercase tracking-widest text-gv-gold hover:underline">Refresh Logs</button>
+                                        
+                                        <div className="flex flex-wrap items-center gap-4">
+                                            {/* Search Bar */}
+                                            <div className="relative group">
+                                                <input 
+                                                    type="text"
+                                                    placeholder="Search Email or Admin..."
+                                                    value={auditSearchQuery}
+                                                    onChange={(e) => setAuditSearchQuery(e.target.value)}
+                                                    className="bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all w-full md:w-64"
+                                                />
+                                                <svg className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                            </div>
+
+                                            {/* Status Filter */}
+                                            <select 
+                                                value={auditStatusFilter}
+                                                onChange={(e) => setAuditStatusFilter(e.target.value)}
+                                                className="bg-[#121212] border border-white/10 rounded-xl px-6 py-2.5 text-xs font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 cursor-pointer transition-all"
+                                            >
+                                                <option value="All">All Actions</option>
+                                                <option value="Verified">Verified Only</option>
+                                                <option value="Rejected">Rejected Only</option>
+                                            </select>
+
+                                            <button onClick={fetchData} className="text-zinc-500 hover:text-gv-gold transition-colors p-2">
+                                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                            </button>
+                                        </div>
                                     </div>
+
                                     <div className="overflow-hidden border border-white/5 rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
@@ -631,7 +662,15 @@ export default function AdminPortal() {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
-                                                {verificationLogs.map((log: any, i: number) => (
+                                                {verificationLogs
+                                                    .filter(log => {
+                                                        const query = auditSearchQuery.toLowerCase();
+                                                        const matchesSearch = log.user_email?.toLowerCase().includes(query) || 
+                                                                            log.admin_username?.toLowerCase().includes(query);
+                                                        const matchesFilter = auditStatusFilter === "All" || log.action === auditStatusFilter;
+                                                        return matchesSearch && matchesFilter;
+                                                    })
+                                                    .map((log: any, i: number) => (
                                                     <tr key={i} className="text-xs font-bold hover:bg-white/[0.01] transition-colors">
                                                         <td className="px-8 py-4 text-zinc-400 font-mono">{new Date(log.created_at).toLocaleString()}</td>
                                                         <td className="px-8 py-4 text-white">
@@ -650,9 +689,17 @@ export default function AdminPortal() {
                                                         </td>
                                                     </tr>
                                                 ))}
-                                                {verificationLogs.length === 0 && (
+                                                {verificationLogs.filter(log => {
+                                                    const query = auditSearchQuery.toLowerCase();
+                                                    const matchesSearch = log.user_email?.toLowerCase().includes(query) || 
+                                                                        log.admin_username?.toLowerCase().includes(query);
+                                                    const matchesFilter = auditStatusFilter === "All" || log.action === auditStatusFilter;
+                                                    return matchesSearch && matchesFilter;
+                                                }).length === 0 && (
                                                     <tr>
-                                                        <td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No audit logs found</td>
+                                                        <td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">
+                                                            {verificationLogs.length === 0 ? "No audit logs found" : "No logs found for this search"}
+                                                        </td>
                                                     </tr>
                                                 )}
                                             </tbody>
