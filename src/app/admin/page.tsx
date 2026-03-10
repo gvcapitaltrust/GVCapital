@@ -35,6 +35,7 @@ export default function AdminPortal() {
     const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
     const [agentReferrals, setAgentReferrals] = useState<any[]>([]);
     const [isLoadingSales, setIsLoadingSales] = useState(false);
+    const [rejectionReasons, setRejectionReasons] = useState<{ [key: string]: string }>({});
 
     useEffect(() => {
         setMounted(true);
@@ -224,6 +225,43 @@ export default function AdminPortal() {
             alert(err.message);
         }
     };
+
+    const handleRejectUser = async (userId: string) => {
+        const userToReject = users.find(u => u.id === userId);
+        if (!userToReject) return;
+        const reason = rejectionReasons[userId] || "";
+
+        if (!reason.trim()) {
+            alert("Please provide a rejection reason.");
+            return;
+        }
+
+        try {
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({
+                    kyc_status: 'rejected',
+                    is_verified: false,
+                    rejection_reason: reason
+                })
+                .eq('id', userId);
+
+            if (updateError) throw updateError;
+
+            // Clear the reason for this user
+            setRejectionReasons(prev => {
+                const next = { ...prev };
+                delete next[userId];
+                return next;
+            });
+
+            fetchData();
+            showToast(`User successfully rejected.`);
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
 
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(val || 0).replace("MYR", "RM");
@@ -492,12 +530,29 @@ export default function AdminPortal() {
                                                 </td>
                                                 <td className="px-8 py-6 text-right space-x-3">
                                                     {!u.is_verified ? (
-                                                        <button
-                                                            onClick={() => handleVerifyUser(u.id)}
-                                                            className="bg-emerald-500 text-black px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all"
-                                                        >
-                                                            Manual Verify
-                                                        </button>
+                                                        <div className="flex flex-col md:flex-row items-end md:items-center justify-end gap-3">
+                                                            <input 
+                                                                type="text"
+                                                                placeholder="Rejection Reason..."
+                                                                value={rejectionReasons[u.id] || ""}
+                                                                onChange={(e) => setRejectionReasons({ ...rejectionReasons, [u.id]: e.target.value })}
+                                                                className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[9px] focus:outline-none focus:border-red-500/50 w-full md:w-32"
+                                                            />
+                                                            <div className="flex gap-2">
+                                                                <button
+                                                                    onClick={() => handleVerifyUser(u.id)}
+                                                                    className="bg-emerald-500 text-black px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all whitespace-nowrap"
+                                                                >
+                                                                    Manual Verify
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleRejectUser(u.id)}
+                                                                    className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-red-500/20 hover:scale-105 transition-all whitespace-nowrap"
+                                                                >
+                                                                    Reject
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                     ) : (
                                                         <span className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-500 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase">
                                                             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
