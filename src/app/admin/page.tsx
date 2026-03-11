@@ -314,12 +314,19 @@ export default function AdminPortal() {
 
         setIsUpdatingRate(true);
         try {
+            console.log('Current User Role:', adminProfile?.role);
+            console.log('Attempting Session Refresh...');
+            await supabase.auth.refreshSession();
+
             console.log('Saving settings with:', { key: 'usd_to_myr_rate', value: newForexRate });
             const { error: updateError } = await supabase
                 .from('platform_settings')
                 .upsert({ key: 'usd_to_myr_rate', value: newForexRate }, { onConflict: 'key' });
 
-            if (updateError) throw updateError;
+            if (updateError) {
+                console.error('SUPABASE FOREX UPDATE ERROR:', updateError);
+                throw updateError;
+            }
 
             const { data: { user } } = await supabase.auth.getUser();
             const { error: historyError } = await supabase
@@ -330,7 +337,10 @@ export default function AdminPortal() {
                     changed_by: user?.id || null // MUST use ID for UUID fields
                 }]);
 
-            if (historyError) throw historyError;
+            if (historyError) {
+                console.error('SUPABASE HISTORY INSERT ERROR:', historyError);
+                throw historyError;
+            }
 
             alert("Forex rate updated successfully.");
             fetchForexData();
