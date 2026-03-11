@@ -15,6 +15,8 @@ export default function AdminPortal() {
         email: string;
         balance: number;
         balance_usd: number;
+        total_equity: number;
+        total_assets: number;
         is_verified: boolean;
         kyc_status: 'Pending' | 'Verified' | 'Rejected' | 'Draft' | null;
         kyc_step: number;
@@ -153,6 +155,8 @@ export default function AdminPortal() {
                     full_name: "Admin Bypass",
                     balance: 0,
                     balance_usd: 0,
+                    total_equity: 0,
+                    total_assets: 0,
                     is_verified: true,
                     kyc_status: 'Verified',
                     kyc_step: 3,
@@ -463,35 +467,16 @@ export default function AdminPortal() {
     const handleApproveDeposit = async (tx: any) => {
         if (!confirm(`Approve deposit of RM ${tx.amount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
-            // 1. Update Transaction Status
+            // DATABASE TRIGGER HANDLES BALANCE UPDATES
+            // We only need to set the status to Approved
             const { error: txError } = await supabase
                 .from('transactions')
                 .update({ status: 'Approved' })
                 .eq('id', tx.id);
-            if (txError) throw txError;
-
-            // 2. Fetch latest profile to get current balance accurately
-            const { data: profile, error: profileFetchError } = await supabase
-                .from('profiles')
-                .select('balance, total_equity')
-                .eq('id', tx.user_id)
-                .single();
-            if (profileFetchError) throw profileFetchError;
-
-            // 3. Increment Balances
-            const newBalance = (profile.balance || 0) + Number(tx.amount);
-            const newTotalEquity = (profile.total_equity || 0) + Number(tx.amount);
-
-            const { error: profileUpdateError } = await supabase
-                .from('profiles')
-                .update({ 
-                    balance: newBalance,
-                    total_equity: newTotalEquity
-                })
-                .eq('id', tx.user_id);
-            if (profileUpdateError) throw profileUpdateError;
             
-            showToast("Deposit approved and balance updated!");
+            if (txError) throw txError;
+            
+            showToast("Deposit approved. Trigger processing balances...");
             setIsDepositDrawerOpen(false);
             fetchData();
         } catch (error: any) {
@@ -516,40 +501,16 @@ export default function AdminPortal() {
         const withdrawAmount = Math.abs(tx.amount);
         if (!confirm(`Approve withdrawal of RM ${withdrawAmount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
-            // 1. Update Transaction Status
+            // DATABASE TRIGGER HANDLES BALANCE UPDATES
+            // We only need to set the status to Approved
             const { error: txError } = await supabase
                 .from('transactions')
                 .update({ status: 'Approved' })
                 .eq('id', tx.id);
-            if (txError) throw txError;
-
-            // 2. Fetch latest profile
-            const { data: profile, error: profileFetchError } = await supabase
-                .from('profiles')
-                .select('balance, total_equity')
-                .eq('id', tx.user_id)
-                .single();
-            if (profileFetchError) throw profileFetchError;
-
-            // 3. Decrement Balances (Withdrawal is already negative in tx but we use absolute for subtraction if needed)
-            // Actually, keep it simple: profile.balance - withdrawAmount
-            const newBalance = (profile.balance || 0) - withdrawAmount;
-            const newTotalEquity = (profile.total_equity || 0) - withdrawAmount;
-
-            if (newBalance < 0) {
-                if (!confirm("This will result in a negative balance. Continue?")) return;
-            }
-
-            const { error: profileUpdateError } = await supabase
-                .from('profiles')
-                .update({ 
-                    balance: newBalance,
-                    total_equity: newTotalEquity
-                })
-                .eq('id', tx.user_id);
-            if (profileUpdateError) throw profileUpdateError;
             
-            showToast("Withdrawal approved and balance updated!");
+            if (txError) throw txError;
+            
+            showToast("Withdrawal approved. Trigger processing balances...");
             fetchData();
         } catch (error: any) {
             alert(error.message);
@@ -607,7 +568,7 @@ export default function AdminPortal() {
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
-                                <h2 className="text-2xl font-black text-white">{formatCurrency(users.reduce((acc: number, u: any) => acc + (u.balance || 0), 0))}</h2>
+                                <h2 className="text-2xl font-black text-white">{formatCurrency(users.reduce((acc: number, u: any) => acc + (u.total_assets || 0), 0))}</h2>
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC Pending</p>
@@ -927,7 +888,7 @@ export default function AdminPortal() {
                                     <div className="overflow-hidden border border-white/5 rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                                <tr><th className="px-8 py-6">Client</th><th className="px-8 py-6">Balance (RM)</th><th className="px-8 py-6">Credit (USD)</th><th className="px-8 py-6 text-center">KYC</th><th className="px-8 py-6 text-center">Status</th><th className="px-8 py-6 text-right">Actions</th></tr>
+                                                <tr><th className="px-8 py-6">Client</th><th className="px-8 py-6">Total Equity (RM)</th><th className="px-8 py-6">Balance USD</th><th className="px-8 py-6">Total Assets</th><th className="px-8 py-6 text-center">KYC</th><th className="px-8 py-6 text-center">Status</th><th className="px-8 py-6 text-right">Actions</th></tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
                                                 {users.filter((u: any) => {
@@ -948,8 +909,9 @@ export default function AdminPortal() {
                                                 onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
                                             >
                                                 <td className="px-8 py-6 text-white">{u.full_name || u.email}</td>
-                                                <td className="px-8 py-6 text-emerald-400">{formatCurrency(u.balance)}</td>
+                                                <td className="px-8 py-6 text-emerald-400">{formatCurrency(u.total_equity)}</td>
                                                 <td className="px-8 py-6 text-gv-gold">${(u.balance_usd || 0).toFixed(2)}</td>
+                                                <td className="px-8 py-6 text-white font-black">{formatCurrency(u.total_assets)}</td>
                                                 <td className="px-8 py-6">
                                                     <div className="flex justify-center">
                                                         <span className={`px-3 py-1 rounded-full text-[9px] uppercase font-black text-center ${u.kyc_completed ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-500"}`}>{u.kyc_status || 'KYC Pending'}</span>

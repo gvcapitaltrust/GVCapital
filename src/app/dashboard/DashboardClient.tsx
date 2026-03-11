@@ -556,7 +556,7 @@ export default function DashboardClient() {
             welcome: "Welcome back, ",
             nav: "Dashboard",
             logout: "Log Out",
-            totalBalance: "Total Balance",
+            totalAssets: "Total Assets",
             activeInvestment: "Active Investment",
             totalProfit: "Total Profit",
             deposit: "Deposit",
@@ -593,7 +593,7 @@ export default function DashboardClient() {
             welcome: "欢迎回来，",
             nav: "控制台",
             logout: "退出登录",
-            totalBalance: "总余额",
+            totalAssets: "总资产",
             activeInvestment: "活跃投资",
             totalProfit: "总收益",
             deposit: "入金",
@@ -781,8 +781,8 @@ export default function DashboardClient() {
                                 <>
                                     <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalBalance}</p>
-                                    <h2 className="text-4xl font-black tracking-tighter">{user?.kyc_completed ? formatCurrency(user?.totalEquity) : "RM 0.00"}</h2>
+                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalAssets}</p>
+                                    <h2 className="text-4xl font-black tracking-tighter">{user?.kyc_completed ? formatCurrency(user?.total_assets) : "RM 0.00"}</h2>
                                 </div>
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.activeInvestment}</p>
@@ -800,7 +800,7 @@ export default function DashboardClient() {
                                         <svg className="h-20 w-20 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                     </div>
                                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
-                                    <h3 className="text-3xl font-black text-white">{formatCurrency(user?.totalEquity * monthlyRate)}</h3>
+                                    <h3 className="text-3xl font-black text-white">{formatCurrency(user?.total_assets * monthlyRate)}</h3>
                                     <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Based on {monthlyRate * 100}% Monthly Return</p>
                                 </div>
                                 <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
@@ -808,7 +808,7 @@ export default function DashboardClient() {
                                         <svg className="h-20 w-20 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                     </div>
                                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
-                                    <h3 className="text-3xl font-black text-emerald-500">{formatCurrency(user?.totalEquity * yearlyRate)}</h3>
+                                    <h3 className="text-3xl font-black text-emerald-500">{formatCurrency(user?.total_assets * yearlyRate)}</h3>
                                     <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Yearly Forecast ({(yearlyRate * 100).toFixed(0)}% ROI)</p>
                                 </div>
                             </section>

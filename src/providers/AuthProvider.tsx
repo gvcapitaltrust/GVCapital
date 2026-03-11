@@ -11,6 +11,7 @@ interface AuthContextType {
     kycStep: number;
     balance: number;
     totalEquity: number;
+    totalAssets: number;
     loading: boolean;
     refresh: () => Promise<void>;
 }
@@ -24,6 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [kycStep, setKycStep] = useState(0);
     const [balance, setBalance] = useState(0);
     const [totalEquity, setTotalEquity] = useState(0);
+    const [totalAssets, setTotalAssets] = useState(0);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const pathname = usePathname();
@@ -37,6 +39,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setRole("admin");
             setIsVerified(true);
             setKycStep(3);
+            setBalance(0);
+            setTotalEquity(0);
+            setTotalAssets(0);
             setLoading(false);
             
             console.log("%c MASTER ADMIN BYPASS ACTIVATED ", "background: #d4af37; color: #000; font-weight: bold; padding: 4px;");
@@ -64,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             const { data: profile, error } = await supabase
                 .from('profiles')
-                .select('role, is_verified, kyc_step, balance, total_equity')
+                .select('role, is_verified, kyc_step, balance, total_equity, total_assets')
                 .eq('id', activeUser.id)
                 .single();
 
@@ -81,12 +86,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const resolvedStep = profile?.kyc_step || 0;
             const resolvedBalance = profile?.balance || 0;
             const resolvedEquity = profile?.total_equity || 0;
+            const resolvedAssets = profile?.total_assets || 0;
 
             setRole(resolvedRole);
             setIsVerified(resolvedVerified);
             setKycStep(resolvedStep);
             setBalance(resolvedBalance);
             setTotalEquity(resolvedEquity);
+            setTotalAssets(resolvedAssets);
 
             console.log("=== AUTH STATE AUDIT ===");
             console.table({
@@ -136,7 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [pathname, router]);
 
     return (
-        <AuthContext.Provider value={{ user, role, isVerified, kycStep, balance, totalEquity, loading, refresh }}>
+        <AuthContext.Provider value={{ user, role, isVerified, kycStep, balance, totalEquity, totalAssets, loading, refresh }}>
             {children}
         </AuthContext.Provider>
     );
