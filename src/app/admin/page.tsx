@@ -38,6 +38,7 @@ export default function AdminPortal() {
         is_not_pep: boolean;
         referred_by_username: string;
         role: string;
+        profit?: number;
         verified_at: string;
         created_at?: string;
     }
@@ -1309,14 +1310,31 @@ export default function AdminPortal() {
                                     <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest pt-2">
                                         Account Created: {selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString() : 'N/A'}
                                     </p>
-                                    <div className="mt-6 bg-gv-gold/10 border border-gv-gold/30 p-4 rounded-xl flex items-center justify-between shadow-[0_0_15px_rgba(238,206,128,0.1)]">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-8 w-8 rounded-full bg-gv-gold text-black flex items-center justify-center">
-                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <div className="mt-6 space-y-4">
+                                        <div className="bg-gv-gold/10 border border-gv-gold/30 p-4 rounded-2xl flex items-center justify-between shadow-[0_0_15px_rgba(238,206,128,0.1)]">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 rounded-full bg-gv-gold text-black flex items-center justify-center">
+                                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                </div>
+                                                <span className="text-xs font-black uppercase text-gv-gold tracking-widest">Total Assets</span>
                                             </div>
-                                            <span className="text-xs font-black uppercase text-gv-gold tracking-widest">Total Balance</span>
+                                            <div className="text-right">
+                                                <div className="text-xl font-black text-white">{formatCurrency((Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)) * (parseFloat(currentForexRate) || 1.0))}</div>
+                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)).toLocaleString()})</div>
+                                            </div>
                                         </div>
-                                        <span className="text-2xl font-black text-white">{formatCurrency(selectedUser.balance || 0)}</span>
+                                        <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 rounded-full bg-white/10 text-zinc-400 flex items-center justify-center">
+                                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                                                </div>
+                                                <span className="text-xs font-black uppercase text-zinc-400 tracking-widest">Total Equity</span>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-xl font-black text-white">{formatCurrency((Number(selectedUser.balance || 0)) * (parseFloat(currentForexRate) || 1.0))}</div>
+                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser.balance || 0)).toLocaleString()})</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </header>
                                 
