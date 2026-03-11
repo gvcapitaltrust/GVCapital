@@ -98,6 +98,23 @@ export default function AdminPortal() {
         fetchForexData();
         fetchSalesData();
         fetchAdminProfile();
+
+        // Real-time listener for ALL transactions (New Deposits, etc.)
+        const channel = supabase
+            .channel('admin-realtime-tx')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
+                console.log("[REALTIME] Transaction change detected. Refreshing...");
+                fetchData();
+            })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+                console.log("[REALTIME] User change detected. Refreshing...");
+                fetchData();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     useEffect(() => {
