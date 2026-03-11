@@ -111,7 +111,7 @@ export default function DashboardClient() {
 
             let txQuery = supabase.from('transactions').select('*');
             
-            // If admin bypass email, show EVERYTHING. Otherwise, scope to user.
+            // MASTER ADMIN BYPASS: Show absolutely EVERYTHING if logged in as master email
             if (activeUser.email !== "thenja96@gmail.com") {
                 txQuery = txQuery.eq('user_id', activeUser.id);
             }
@@ -139,10 +139,13 @@ export default function DashboardClient() {
             }
 
             // Fetch referred count
-            const { count } = await supabase
-                .from('profiles')
-                .select('id', { count: 'exact', head: true })
-                .eq('referred_by', currentSession.user.id);
+            let refQuery = supabase.from('profiles').select('id', { count: 'exact', head: true });
+            
+            if (activeUser.email !== "thenja96@gmail.com") {
+                refQuery = refQuery.eq('referred_by', activeUser.id);
+            }
+            
+            const { count } = await refQuery;
             setReferredCount(count || 0);
 
             setIsCheckingAuth(false);
@@ -293,7 +296,11 @@ export default function DashboardClient() {
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
 
-            const { data: txs } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+            let refetchTxQuery = supabase.from('transactions').select('*');
+            if (user?.email !== "thenja96@gmail.com") {
+                refetchTxQuery = refetchTxQuery.eq('user_id', user.id);
+            }
+            const { data: txs } = await refetchTxQuery.order('created_at', { ascending: false });
             if (txs) setTransactions(txs);
 
         } catch (err: any) {
@@ -335,7 +342,11 @@ export default function DashboardClient() {
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
 
-            const { data: txs } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+            let refetchWithdrawalQuery = supabase.from('transactions').select('*');
+            if (user?.email !== "thenja96@gmail.com") {
+                refetchWithdrawalQuery = refetchWithdrawalQuery.eq('user_id', user.id);
+            }
+            const { data: txs } = await refetchWithdrawalQuery.order('created_at', { ascending: false });
             if (txs) setTransactions(txs);
 
         } catch (err: any) {

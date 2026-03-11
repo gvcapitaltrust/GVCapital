@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface AuthGuardProps {
     children: React.ReactNode;
@@ -11,68 +11,33 @@ interface AuthGuardProps {
 
 export default function AuthGuard({ children, requireAdmin = false }: AuthGuardProps) {
     const router = useRouter();
-    const [authorized, setAuthorized] = useState(false);
-    const [forbidden, setForbidden] = useState(false);
+    const { user, role, loading } = useAuth();
+    const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
-        const checkAuth = async (session: any) => {
-            if (!session) {
-                router.push("/login");
-                return;
-            }
+        setIsClient(true);
+    }, []);
 
-            // Force refresh session to get latest JWT claims and role
-            const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
-            const activeUser = refreshedSession?.user || session.user;
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push("/login");
+        }
+    }, [user, loading, router]);
 
-            // Hardcode bypass for specific admin email:
-            if (activeUser.email === "thenja96@gmail.com") {
-                console.log("Admin Bypass Activated for thenja96@gmail.com");
-                setAuthorized(true);
-                return;
-            }
+    if (!isClient || loading) {
+        return (
+            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+                <div className="h-12 w-12 border-4 border-gv-gold border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
-            // Fetch latest profile from DB
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('role, is_verified')
-                .eq('id', activeUser.id)
-                .single();
+    if (!user) return null;
 
-            const role = profile?.role || activeUser.user_metadata?.role || "User";
-            
-            console.log("=== AUTH GUARD DEBUG ===");
-            console.log("Email:", activeUser.email);
-            console.log("Resolved Role:", role);
+    // Email bypass check for master admin
+    const isMasterAdmin = user.email === "thenja96@gmail.com";
 
-            if (requireAdmin && role.toLowerCase() !== "admin") {
-                setForbidden(true);
-                return;
-            }
-
-            setAuthorized(true);
-        };
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_OUT') {
-                router.push("/login");
-            } else if (session) {
-                checkAuth(session);
-            } else {
-                // Double check session to avoid transient nulls
-                const { data: { session: checkSession } } = await supabase.auth.getSession();
-                if (!checkSession) {
-                    router.push("/login");
-                } else {
-                    checkAuth(checkSession);
-                }
-            }
-        });
-
-        return () => subscription.unsubscribe();
-    }, [router, requireAdmin]);
-
-    if (forbidden) {
+    if (requireAdmin && !isMasterAdmin && role.toLowerCase() !== "admin") {
         return (
             <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 bg-[radial-gradient(circle_at_center,_#1a1a1a_0%,_#0a0a0a_100%)]">
                 <div className="max-w-md w-full text-center space-y-8 animate-in zoom-in duration-500">
@@ -98,14 +63,6 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
                         Return to Home
                     </button>
                 </div>
-            </div>
-        );
-    }
-
-    if (!authorized) {
-        return (
-            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-                <div className="h-12 w-12 border-4 border-gv-gold border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
