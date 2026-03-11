@@ -59,8 +59,9 @@ export default function ApprovalsClient() {
     };
 
     const handleApprove = async (tx: any) => {
-        const displayRm = Number(tx.original_currency_amount || (Number(tx.amount || 0) * (forexRate || 4.7)));
-        if (!confirm(`Confirming deposit: RM ${displayRm.toFixed(2)} (Credit: $${Number(tx.amount || 0).toFixed(2)} USD) for ${tx.profiles.full_name}?`)) return;
+        const displayRm = (Number(tx.amount || 0) * (forexRate || 4.7)).toFixed(2);
+        const creditUsd = Number(tx.amount || 0).toFixed(2);
+        if (!confirm(`Confirming deposit of RM ${displayRm} (Credit: $${creditUsd} USD) for ${tx.profiles.full_name}?`)) return;
 
         try {
             // Use RPC for atomic update of transaction and profile balance
@@ -189,11 +190,9 @@ export default function ApprovalsClient() {
                                          <td className="px-8 py-6">
                                              <span className="font-mono text-xs text-zinc-500">{tx.ref_id}</span>
                                          </td>
-                                          <td className="px-8 py-6">
-                                               <div className="flex flex-col">
-                                                   <span className="text-xl tracking-tighter text-emerald-400 font-black">RM {(Number(tx.amount || 0) * (forexRate || 4.7)).toFixed(2)}</span>
-                                                   <span className="text-[10px] text-zinc-400 font-bold tracking-tighter">($${Number(tx.amount || 0).toFixed(2)})</span>
-                                               </div>
+                                          <td className="px-8 py-6 font-bold text-emerald-400">
+                                               RM {(Number(tx.amount || 0) * (forexRate || 4.7)).toFixed(2)}
+                                               <span className="text-xs text-zinc-500 ml-2 font-medium">(${Number(tx.amount || 0).toFixed(2)})</span>
                                           </td>
                                          <td className="px-8 py-6">
                                              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${

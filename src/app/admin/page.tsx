@@ -532,8 +532,9 @@ export default function AdminPortal() {
     };
 
     const handleApproveDeposit = async (tx: any) => {
-        const displayRm = Number(tx.original_currency_amount || (Number(tx.amount || 0) * (parseFloat(currentForexRate) || 4.7)));
-        if (!confirm(`Confirming deposit: User sent RM ${displayRm.toFixed(2)} (Credit: $${Number(tx.amount || 0).toFixed(2)} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        const displayRm = (Number(tx.amount || 0) * (parseFloat(currentForexRate) || 4.7)).toFixed(2);
+        const creditUsd = Number(tx.amount || 0).toFixed(2);
+        if (!confirm(`Confirming deposit of RM ${displayRm} (Credit: $${creditUsd} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             // Use RPC for atomic update of transaction and profile balance
             const { error: rpcError } = await supabase.rpc('approve_deposit', {
@@ -1105,11 +1106,9 @@ export default function AdminPortal() {
                                                         <span className="text-[10px] text-zinc-500 lowercase font-medium">{d.profiles?.email}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-8 py-6">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-emerald-400 font-black text-lg">RM {(Number(d.amount || 0) * (parseFloat(currentForexRate) || 4.7)).toFixed(2)}</span>
-                                                        <span className="text-[10px] text-zinc-400 font-bold tracking-tighter">($${Number(d.amount || 0).toFixed(2)})</span>
-                                                    </div>
+                                                <td className="px-8 py-6 font-bold text-emerald-400">
+                                                    RM {(Number(d.amount || 0) * (parseFloat(currentForexRate) || 4.7)).toFixed(2)}
+                                                    <span className="text-xs text-zinc-500 ml-2 font-medium">(${Number(d.amount || 0).toFixed(2)})</span>
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
