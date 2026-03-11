@@ -190,11 +190,11 @@ export default function ApprovalsClient() {
                                              <span className="font-mono text-xs text-zinc-500">{tx.ref_id}</span>
                                          </td>
                                          <td className="px-8 py-6">
-                                             <div className="flex flex-col">
-                                                 <span className="text-lg tracking-tighter text-emerald-400 font-black">Crediting: ${Number(tx.amount).toFixed(2)} USD</span>
-                                                 <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">User Sent: {tx.original_currency_amount || (tx.amount * forexRate)} RM</span>
-                                             </div>
-                                         </td>
+                                              <div className="flex flex-col">
+                                                  <span className="text-xl tracking-tighter text-emerald-400 font-black">RM {(Number(tx.amount || 0) * (forexRate || 4.7)).toFixed(2)}</span>
+                                                  <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">Crediting: ${Number(tx.amount || 0).toFixed(2)} USD</span>
+                                              </div>
+                                          </td>
                                          <td className="px-8 py-6">
                                              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
                                                  tx.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-500' :

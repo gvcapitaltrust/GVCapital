@@ -532,7 +532,8 @@ export default function AdminPortal() {
     };
 
     const handleApproveDeposit = async (tx: any) => {
-        if (!confirm(`Approve deposit of RM ${tx.amount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        const displayRm = Number(tx.original_currency_amount || (Number(tx.amount || 0) * (parseFloat(currentForexRate) || 4.7)));
+        if (!confirm(`Approve deposit: Client sent RM ${displayRm.toFixed(2)}. Crediting $${Number(tx.amount || 0).toFixed(2)} USD for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             // Use RPC for atomic update of transaction and profile balance
             const { error: rpcError } = await supabase.rpc('approve_deposit', {
@@ -553,7 +554,8 @@ export default function AdminPortal() {
     };
 
     const handleRejectDeposit = async (tx: any) => {
-        if (!confirm(`Reject deposit of RM ${tx.amount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        const displayRm = Number(tx.original_currency_amount || (Number(tx.amount || 0) * (parseFloat(currentForexRate) || 4.7)));
+        if (!confirm(`Reject deposit: Client sent RM ${displayRm.toFixed(2)}. This will void the $${Number(tx.amount || 0).toFixed(2)} USD credit for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             const { error: txError } = await supabase.from('transactions').update({ status: 'Rejected' }).eq('id', tx.id);
             if (txError) throw txError;
@@ -566,8 +568,9 @@ export default function AdminPortal() {
     };
 
     const handleApproveWithdrawal = async (tx: any) => {
-        const withdrawAmount = Math.abs(tx.amount);
-        if (!confirm(`Approve withdrawal of RM ${withdrawAmount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        const withdrawAmountUsd = Math.abs(Number(tx.amount || 0));
+        const withdrawAmountRm = Number(tx.original_currency_amount || (withdrawAmountUsd * (parseFloat(currentForexRate) || 4.7)));
+        if (!confirm(`Approve withdrawal of RM ${withdrawAmountRm.toFixed(2)} ($${withdrawAmountUsd.toFixed(2)} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             // DATABASE TRIGGER HANDLES BALANCE UPDATES
             // We only need to set the status to Approved
@@ -586,7 +589,9 @@ export default function AdminPortal() {
     };
 
     const handleRejectWithdrawal = async (tx: any) => {
-        if (!confirm(`Reject withdrawal of RM ${Math.abs(tx.amount)} for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        const withdrawAmountUsd = Math.abs(Number(tx.amount || 0));
+        const withdrawAmountRm = Number(tx.original_currency_amount || (withdrawAmountUsd * (parseFloat(currentForexRate) || 4.7)));
+        if (!confirm(`Reject withdrawal: Client requested RM ${withdrawAmountRm.toFixed(2)} ($${withdrawAmountUsd.toFixed(2)} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             const { error: txError } = await supabase.from('transactions').update({ status: 'Rejected' }).eq('id', tx.id);
             if (txError) throw txError;
@@ -1082,11 +1087,11 @@ export default function AdminPortal() {
                                                         <span className="text-[10px] text-zinc-500 lowercase font-medium">{d.profiles?.email}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-8 py-4 font-mono text-xs opacity-50">{d.ref_id}</td>
+                                                <td className="px-8 py-6 text-xs opacity-50 font-mono">{d.ref_id}</td>
                                                 <td className="px-8 py-6">
                                                     <div className="flex flex-col">
-                                                        <span className="text-emerald-400 font-black">Crediting: ${(d.amount || 0).toFixed(2)} USD</span>
-                                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">User Sent: {d.original_currency_amount || (d.amount * (parseFloat(currentForexRate) || 4.7))} RM</span>
+                                                        <span className="text-emerald-400 font-black text-lg">RM {(Number(d.amount || 0) * (parseFloat(currentForexRate) || 4.7)).toFixed(2)}</span>
+                                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">Crediting: ${Number(d.amount || 0).toFixed(2)} USD</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6">

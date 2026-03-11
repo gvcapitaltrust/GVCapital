@@ -80,6 +80,7 @@ export default function DepositClient() {
                     amount: amountUsd,
                     original_currency_amount: currentAmountRm,
                     original_currency: 'RM',
+                    metadata: { original_rm_amount: amount },
                     transfer_date: new Date().toISOString(),
                     status: 'Pending',
                     receipt_url: uploadData.path,
