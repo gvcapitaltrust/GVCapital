@@ -140,6 +140,9 @@ export default function AdminPortal() {
                 .single();
             
             if (profile) {
+                if (session.user.email === "thenja96@gmail.com") {
+                    profile.role = "admin";
+                }
                 setAdminProfile(profile as Profile);
             } else {
                 setAdminProfile({ 

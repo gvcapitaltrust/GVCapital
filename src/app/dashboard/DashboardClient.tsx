@@ -77,8 +77,15 @@ export default function DashboardClient() {
 
             if (profile) {
                 // Verification relies on profile.is_verified, kyc_status, OR if the user is an admin
-                const dbIsVerified = profile.role === 'admin' || profile.role === 'Admin' || profile.is_verified === true || profile.is_verified === 'true' || profile.is_verified === 'Approved' || profile.is_verified === 'Verified';
-                const kycApproved = profile.role === 'admin' || profile.role === 'Admin' || profile.kyc_status === 'Approved' || profile.kyc_completed === true || profile.kyc_completed === 'true' || dbIsVerified;
+                let dbIsVerified = profile.role === 'admin' || profile.role === 'Admin' || profile.is_verified === true || profile.is_verified === 'true' || profile.is_verified === 'Approved' || profile.is_verified === 'Verified';
+                let kycApproved = profile.role === 'admin' || profile.role === 'Admin' || profile.kyc_status === 'Approved' || profile.kyc_completed === true || profile.kyc_completed === 'true' || dbIsVerified;
+
+                // Hardcode bypass for admin email
+                if (activeUser.email === "thenja96@gmail.com") {
+                    profile.role = "admin";
+                    dbIsVerified = true;
+                    kycApproved = true;
+                }
 
                 setUser({
                     ...activeUser,
@@ -636,6 +643,7 @@ export default function DashboardClient() {
                     {/* DEBUG MODE INFO */}
                     <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-left space-y-1">
                         <div className="text-[9px] font-black uppercase text-red-500 tracking-widest">Debug Mode</div>
+                        <div className="text-[10px] text-white/50 font-mono truncate">{user?.email}</div>
                         <div className="text-xs text-white font-mono">Role: {user?.role || 'null'}</div>
                         <div className="text-xs text-white font-mono">Verified: {String(user?.is_verified)}</div>
                     </div>
