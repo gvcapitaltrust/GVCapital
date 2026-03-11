@@ -81,6 +81,7 @@ export default function DashboardClient() {
                     ...profile,
                     is_verified: dbIsVerified,
                     kyc_completed: kycApproved,
+                    kyc_step: (profile.role === 'admin' || profile.role === 'Admin') ? 3 : profile.kyc_step,
                     fullName: profile.full_name || currentSession.user.user_metadata?.full_name,
                     totalEquity: profile.total_equity || (Number(profile.balance) + Number(profile.investment))
                 });
@@ -186,6 +187,7 @@ export default function DashboardClient() {
                                     ...updatedProfile,
                                     is_verified: dbIsVerified,
                                     kyc_completed: kycApproved,
+                                    kyc_step: (updatedProfile.role === 'admin' || updatedProfile.role === 'Admin') ? 3 : updatedProfile.kyc_step,
                                     fullName: updatedProfile.full_name || prevUser.fullName,
                                     totalEquity: updatedProfile.total_equity || (Number(updatedProfile.balance) + Number(updatedProfile.investment))
                                 };

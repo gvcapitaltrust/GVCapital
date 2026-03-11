@@ -139,16 +139,21 @@ export default function AdminPortal() {
     };
 
     const fetchData = async () => {
-        const { data: profileList } = await supabase.from('profiles').select('*');
+        const { data: profileList, error: profileError } = await supabase.from('profiles').select('*');
+        console.log('Fetched Profiles Data:', profileList, 'Error:', profileError);
+        
         if (profileList) {
             setUsers(profileList as Profile[]);
             setKycQueue((profileList as Profile[]).filter((p: Profile) => p.kyc_status === 'Pending'));
         }
 
-        const { data: txList } = await supabase
+        const { data: txList, error: txError } = await supabase
             .from('transactions')
             .select('*, profiles(full_name, email, bank_name, bank_account_number)')
             .order('created_at', { ascending: false });
+            
+        console.log('Fetched Transactions Data:', txList, 'Error:', txError);
+        
         if (txList) {
             setDeposits(txList.filter((t: any) => t.type === 'Deposit' && t.status === 'Pending'));
             setWithdrawals(txList.filter((t: any) => t.type === 'Withdrawal' && t.status === 'Pending'));
