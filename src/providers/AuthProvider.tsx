@@ -121,8 +121,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setIsVerified(profile.is_verified === true || profile.is_verified === "Approved");
                     setKycStep(profile.kyc_step || 0);
                     setBalance(profile.balance || 0);
-                    setTotalEquity(profile.total_equity || 0);
-                    setTotalAssets(profile.total_assets || 0);
+                    setTotalEquity(Number(profile.balance || 0) + Number(profile.profit || 0));
+                    setTotalAssets(Number(profile.balance || 0) + Number(profile.profit || 0));
                     setUser({ ...session.user, ...profile });
                 } else {
                     setUser(session.user);
@@ -156,9 +156,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 console.log("[AUTH] Profile Update Received via Realtime:", payload.new);
                 const updated = payload.new as any;
                 if (updated) {
+                    const totalAssetsCalc = Number(updated.balance || 0) + Number(updated.profit || 0);
                     setBalance(updated.balance || 0);
-                    setTotalEquity(updated.total_equity || 0);
-                    setTotalAssets(updated.total_assets || 0);
+                    setTotalEquity(totalAssetsCalc);
+                    setTotalAssets(totalAssetsCalc);
                     setIsVerified(updated.is_verified === true || updated.is_verified === "Approved");
                     setKycStep(updated.kyc_step || 0);
                     setRole(updated.role || "User");

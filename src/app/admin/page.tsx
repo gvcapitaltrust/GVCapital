@@ -635,7 +635,7 @@ export default function AdminPortal() {
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
-                                <h2 className="text-2xl font-black text-white">{formatCurrency(users.reduce((acc: number, u: any) => acc + (u.total_assets || 0), 0))}</h2>
+                                <h2 className="text-2xl font-black text-white">{formatCurrency(users.reduce((acc: number, u: any) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0))}</h2>
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC Pending</p>
@@ -986,9 +986,9 @@ export default function AdminPortal() {
                                                 onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
                                             >
                                                 <td className="px-8 py-6 text-white">{u.full_name || u.email}</td>
-                                                <td className="px-8 py-6 text-emerald-400">{formatCurrency(u.total_equity)}</td>
+                                                <td className="px-8 py-6 text-emerald-400">{formatCurrency(Number(u.balance || 0) + Number(u.profit || 0))}</td>
                                                 <td className="px-8 py-6 text-gv-gold">${(u.balance_usd || 0).toFixed(2)}</td>
-                                                <td className="px-8 py-6 text-white font-black">{formatCurrency(u.total_assets || 0)}</td>
+                                                <td className="px-8 py-6 text-white font-black">{formatCurrency(Number(u.balance || 0) + Number(u.profit || 0))}</td>
                                                 <td className="px-8 py-6">
                                                     <div className="flex justify-center">
                                                         <span className={`px-3 py-1 rounded-full text-[9px] uppercase font-black text-center ${u.kyc_completed ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-500"}`}>{u.kyc_status || 'KYC Pending'}</span>

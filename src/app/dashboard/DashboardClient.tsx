@@ -97,14 +97,15 @@ export default function DashboardClient() {
                         profile.role = "admin";
                     }
 
+                    const totalAssetsCalc = Number(profile.balance || 0) + Number(profile.profit || 0);
                     setUser({
                         ...authUser,
                         ...profile,
                         is_verified: dbIsVerified,
                         kyc_completed: kycApproved,
                         fullName: profile.full_name || authUser.user_metadata?.full_name,
-                        total_assets: profile.total_assets || 0,
-                        totalEquity: profile.total_equity || 0
+                        total_assets: totalAssetsCalc,
+                        totalEquity: totalAssetsCalc
                     });
                 }
 
@@ -147,12 +148,13 @@ export default function DashboardClient() {
                 const p = payload.new;
                 console.log("[REALTIME] Dashboard Profile Update:", p);
                 const verified = p.role === 'admin' || p.is_verified === true || p.is_verified === 'Approved';
+                const totalAssetsCalc = Number(p.balance || 0) + Number(p.profit || 0);
                 setUser((prev: any) => ({ 
                     ...prev, 
                     ...p, 
                     is_verified: verified,
-                    total_assets: p.total_assets || 0,
-                    totalEquity: p.total_equity || 0
+                    total_assets: totalAssetsCalc,
+                    totalEquity: totalAssetsCalc
                 }));
             })
             .subscribe();
