@@ -244,9 +244,9 @@ export default function AdminPortal() {
             .single();
 
         if (!currentRateData || error) {
-            console.error("Forex fetch error, using fallback 1.0:", error);
-            setCurrentForexRate("1.0");
-            setNewForexRate("1.0");
+            console.error("Forex fetch error, using fallback 4.7:", error);
+            setCurrentForexRate("4.7");
+            setNewForexRate("4.7");
             return;
         }
 
@@ -642,7 +642,7 @@ export default function AdminPortal() {
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
-                                <h2 className="text-2xl font-black text-white">{formatCurrency(users.reduce((acc: number, u: any) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0))}</h2>
+                                <h2 className="text-2xl font-black text-white">RM {(users.reduce((acc: number, u: any) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0) * (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC Pending</p>
@@ -1345,7 +1345,7 @@ export default function AdminPortal() {
                                                 <span className="text-xs font-black uppercase text-gv-gold tracking-widest">Total Assets</span>
                                             </div>
                                             <div className="text-right flex flex-col items-end">
-                                                <div className="text-xl font-black text-white">RM {((Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)) * (parseFloat(currentForexRate) || 1.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                <div className="text-xl font-black text-white">RM {((Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)) * (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                                 <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</div>
                                             </div>
                                         </div>
