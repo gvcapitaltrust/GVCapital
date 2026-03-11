@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
         // 2. Parse Payload from Supabase Database Webhook
         const payload = await req.json();
-        
+
         // Supabase webhook payload contains the new row in `record`
         const record = payload.record;
 
@@ -32,8 +32,8 @@ export async function POST(req: Request) {
         // 3. Send Email using Resend
         // send email From/To: gvcapital@gmail.com
         const { error } = await resend.emails.send({
-            from: 'gvcapital@gmail.com',
-            to: 'gvcapital@gmail.com',
+            from: 'onboarding@resend.dev',
+            to: 'gvcapitaltrust@gmail.com',
             subject: 'New KYC Submission: Profile Awaiting Review',
             html: `
                 <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
