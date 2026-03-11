@@ -1060,13 +1060,23 @@ export default function AdminPortal() {
                                             </div>
                                         ) : userKycDocs.length > 0 ? (
                                             userKycDocs.map((doc, idx) => (
-                                                <button key={idx} onClick={() => setViewingDoc(doc.url)} className="w-full flex items-center justify-between p-5 bg-white/5 border border-white/10 rounded-xl hover:border-gv-gold/50 transition-all group">
-                                                    <span className="text-xs font-bold text-white group-hover:text-gv-gold transition-colors truncate pr-4">{doc.name}</span>
-                                                    <svg className="h-4 w-4 text-zinc-500 group-hover:text-gv-gold transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                                </button>
+                                                <div key={idx} className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:border-gv-gold/30 transition-all">
+                                                    <div className="flex items-center gap-3 overflow-hidden">
+                                                        <svg className="h-5 w-5 text-zinc-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                                        <span className="text-xs font-bold text-white truncate pr-4">{doc.name}</span>
+                                                    </div>
+                                                    <a 
+                                                        href={doc.url} 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer" 
+                                                        className="text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-white/10 hover:bg-gv-gold hover:text-black hover:shadow-[0_0_15px_rgba(238,206,128,0.3)] text-white rounded-lg transition-all flex-shrink-0"
+                                                    >
+                                                        View
+                                                    </a>
+                                                </div>
                                             ))
                                         ) : (
-                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-zinc-600">No Documents Uploaded</div>
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-zinc-600">No documents uploaded yet.</div>
                                         )}
                                     </div>
                                 </section>
