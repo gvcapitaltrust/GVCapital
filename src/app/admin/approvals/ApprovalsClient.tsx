@@ -31,7 +31,7 @@ export default function ApprovalsClient() {
         try {
             const { data, error } = await supabase
                 .from('transactions')
-                .select('*, profiles(email, full_name)')
+                .select('*, profiles(email, full_name, role)')
                 .order('created_at', { ascending: false });
 
             console.log('Raw Data from Supabase (Approvals):', data);

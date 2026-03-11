@@ -216,7 +216,7 @@ export default function AdminPortal() {
         console.log('Admin Fetching Transactions from: transactions...');
         const { data: txList, error: txError } = await supabase
             .from('transactions')
-            .select('*, profiles(full_name, email, bank_name, bank_account_number)')
+            .select('*, profiles(email, full_name, role)')
             .order('created_at', { ascending: false });
             
         console.log('Raw Data from Supabase:', txList);
