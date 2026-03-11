@@ -287,6 +287,7 @@ export default function AdminPortal() {
         const newVal = !maintenanceMode;
         setMaintenanceMode(newVal);
         try {
+            console.log('Saving settings with:', { key: 'maintenance_mode', value: String(newVal) });
             const { error } = await supabase.from('settings').upsert({ key: 'maintenance_mode', value: String(newVal) }, { onConflict: 'key' });
             if (error) throw error;
         } catch (err: any) {
@@ -313,18 +314,20 @@ export default function AdminPortal() {
 
         setIsUpdatingRate(true);
         try {
+            console.log('Saving settings with:', { key: 'usd_to_myr_rate', value: newForexRate });
             const { error: updateError } = await supabase
                 .from('platform_settings')
                 .upsert({ key: 'usd_to_myr_rate', value: newForexRate }, { onConflict: 'key' });
 
             if (updateError) throw updateError;
 
+            const { data: { user } } = await supabase.auth.getUser();
             const { error: historyError } = await supabase
                 .from('forex_history')
                 .insert([{
                     old_rate: parseFloat(currentForexRate),
                     new_rate: parseFloat(newForexRate),
-                    changed_by: (await supabase.auth.getUser()).data.user?.email || 'admin'
+                    changed_by: user?.id || null // MUST use ID for UUID fields
                 }]);
 
             if (historyError) throw historyError;
