@@ -75,7 +75,7 @@ export default function DashboardClient() {
             // Fetch the latest profile directly from the database using ID (not relying on cached session metadata)
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('*')
+                .select('*', { count: 'exact' })
                 .eq('id', activeUser.id)
                 .single();
 
@@ -559,6 +559,7 @@ export default function DashboardClient() {
             totalAssets: "Total Assets",
             activeInvestment: "Active Investment",
             totalProfit: "Total Profit",
+            creditUsd: "Credit (USD)",
             deposit: "Deposit",
             withdraw: "Withdraw",
             history: "Transaction History",
@@ -596,6 +597,7 @@ export default function DashboardClient() {
             totalAssets: "总资产",
             activeInvestment: "活跃投资",
             totalProfit: "总收益",
+            creditUsd: "信用额度 (USD)",
             deposit: "入金",
             withdraw: "提款",
             history: "交易历史",
@@ -785,12 +787,12 @@ export default function DashboardClient() {
                                     <h2 className="text-4xl font-black tracking-tighter">{user?.kyc_completed ? formatCurrency(user?.total_assets) : "RM 0.00"}</h2>
                                 </div>
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
-                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.activeInvestment}</p>
-                                    <h2 className="text-4xl font-black tracking-tighter">{user?.kyc_completed ? formatCurrency(user?.investment) : "RM 0.00"}</h2>
+                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.creditUsd}</p>
+                                    <h2 className="text-4xl font-black tracking-tighter text-gv-gold">${(user?.balance_usd || 0).toFixed(2)}</h2>
                                 </div>
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.totalProfit}</p>
-                                    <h2 className="text-4xl font-black tracking-tighter text-gv-gold">{formatCurrency(user?.profit)}</h2>
+                                    <h2 className="text-4xl font-black tracking-tighter text-emerald-500">{formatCurrency(user?.profit)}</h2>
                                 </div>
                             </section>
 

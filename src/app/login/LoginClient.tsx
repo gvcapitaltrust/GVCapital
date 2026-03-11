@@ -29,7 +29,7 @@ export default function LoginPage() {
 
                 // Only redirect if we are authenticated and NOT on the target page
                 if (window.location.pathname === "/login") {
-                    router.push(redirectPath);
+                    window.location.href = redirectPath;
                 }
             }
         });
@@ -99,7 +99,7 @@ export default function LoginPage() {
             if (data.session) {
                 const user = data.session.user;
                 const isAdmin = user.user_metadata?.role === "Admin" || user.email === "admin@gvcapital.trust";
-                router.push(isAdmin ? "/admin" : `/dashboard?lang=${lang}`);
+                window.location.href = isAdmin ? "/admin" : `/dashboard?lang=${lang}`;
             }
         } catch (error: any) {
             setErrorMsg(error.message);
