@@ -532,8 +532,8 @@ export default function AdminPortal() {
     };
 
     const handleApproveDeposit = async (tx: any) => {
-        const displayRm = (Number(tx.amount || 0) * (parseFloat(currentForexRate) || 4.7)).toFixed(2);
-        const creditUsd = Number(tx.amount || 0).toFixed(2);
+        const displayRm = Number(tx.amount || 0).toFixed(2);
+        const creditUsd = (Number(tx.amount || 0) / (parseFloat(currentForexRate) || 4.7)).toFixed(2);
         if (!confirm(`Confirming deposit of RM ${displayRm} (Credit: $${creditUsd} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             // Use RPC for atomic update of transaction and profile balance
@@ -642,13 +642,13 @@ export default function AdminPortal() {
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
                                 {(() => {
-                                    const totalUsd = users.reduce((acc, u) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
+                                    const totalRm = users.reduce((acc, u) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
                                     const rate = parseFloat(currentForexRate) || 4.7;
-                                    console.log('Admin Summary Stats:', { totalUsd, rate, result: totalUsd * rate });
                                     return (
                                         <>
                                             <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
-                                            <h2 className="text-2xl font-black text-white">RM {(totalUsd * rate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                            <h2 className="text-2xl font-black text-white">RM {totalRm.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">(${(totalRm / rate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)</p>
                                         </>
                                     );
                                 })()}
@@ -1011,18 +1011,18 @@ export default function AdminPortal() {
                                             >
                                                 <td className="px-8 py-6 text-white">{u.full_name || u.email}</td>
                                                 <td className="px-8 py-6">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-emerald-400 font-black">RM {(Number(u.balance || 0) * (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${Number(u.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6 text-gv-gold font-mono text-xs">RM {(Number(u.profit || 0) * (parseFloat(currentForexRate) || 4.7)).toFixed(2)}</td>
-                                                <td className="px-8 py-6 text-white font-black">
-                                                    <div className="flex flex-col">
-                                                        <span>RM {((Number(u.balance || 0) + Number(u.profit || 0)) * (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${(Number(u.balance || 0) + Number(u.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
-                                                    </div>
-                                                </td>
+                                                     <div className="flex flex-col">
+                                                         <span className="text-emerald-400 font-black">RM {Number(u.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                         <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${(Number(u.balance || 0) / (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                                                     </div>
+                                                 </td>
+                                                 <td className="px-8 py-6 text-gv-gold font-mono text-xs">RM {Number(u.profit || 0).toFixed(2)}</td>
+                                                 <td className="px-8 py-6 text-white font-black">
+                                                     <div className="flex flex-col">
+                                                         <span>RM {(Number(u.balance || 0) + Number(u.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                         <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${( (Number(u.balance || 0) + Number(u.profit || 0)) / (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                                                     </div>
+                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <div className="flex justify-center">
                                                         <span className={`px-3 py-1 rounded-full text-[9px] uppercase font-black text-center ${u.kyc_completed ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-500"}`}>{u.kyc_status || 'KYC Pending'}</span>
@@ -1116,8 +1116,8 @@ export default function AdminPortal() {
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6 font-bold text-emerald-400">
-                                                    RM {(Number(d.amount || 0) * (parseFloat(currentForexRate) || 4.7)).toFixed(2)}
-                                                    <span className="text-xs text-zinc-500 ml-2 font-medium">(${Number(d.amount || 0).toFixed(2)})</span>
+                                                    RM {Number(d.amount || 0).toFixed(2)}
+                                                    <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(d.amount || 0) / (parseFloat(currentForexRate) || 4.7)).toFixed(2)})</span>
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${

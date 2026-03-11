@@ -698,11 +698,11 @@ export default function DashboardClient() {
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalAssets}</p>
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-4xl font-black tracking-tighter">
-                                            {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${((Number(user?.total_assets) || 0) * (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
+                                            {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
                                         </h2>
                                         {!isCheckingAuth && user?.kyc_completed && (
                                             <p className="text-sm font-bold text-zinc-400">
-                                                (${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                                (${(Number(user?.total_assets || 0) / (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                                             </p>
                                         )}
                                     </div>
@@ -711,11 +711,11 @@ export default function DashboardClient() {
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalEquity}</p>
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-4xl font-black tracking-tighter text-gv-gold">
-                                            {isCheckingAuth ? "..." : `RM ${((Number(user?.balance) || 0) * (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                            {isCheckingAuth ? "..." : `RM ${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                         </h2>
                                         {!isCheckingAuth && (
                                             <p className="text-sm font-bold text-zinc-400">
-                                                (${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                                (${(Number(user?.balance || 0) / (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                                             </p>
                                         )}
                                     </div>
@@ -724,11 +724,11 @@ export default function DashboardClient() {
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.totalProfit}</p>
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-4xl font-black tracking-tighter text-emerald-500">
-                                            {isCheckingAuth ? "..." : `RM ${((Number(user?.profit) || 0) * (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                            {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                         </h2>
                                         {!isCheckingAuth && (
                                             <p className="text-sm font-bold text-zinc-400">
-                                                (${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                                (${(Number(user?.profit || 0) / (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                                             </p>
                                         )}
                                     </div>
