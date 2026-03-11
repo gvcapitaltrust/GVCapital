@@ -31,6 +31,7 @@ export default function DashboardClient() {
     const [isPinModalOpen, setIsPinModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [actionToast, setActionToast] = useState<{message: string, actionUrl?: string, actionText?: string} | null>(null);
 
     // Form States
     const [depositAmount, setDepositAmount] = useState("");
@@ -215,6 +216,23 @@ export default function DashboardClient() {
             currency: 'MYR',
             minimumFractionDigits: 2
         }).format(val || 0).replace("MYR", "RM");
+    };
+
+    const handleProtectedAction = (e: React.MouseEvent, onSuccess: () => void) => {
+        e.preventDefault();
+        if (user?.is_verified) {
+            onSuccess();
+        } else if (user?.kyc_step === 3) {
+            setActionToast({
+                message: "Your documents are under review. Access will be granted shortly."
+            });
+        } else {
+            setActionToast({
+                message: "KYC required",
+                actionText: "Verify Now",
+                actionUrl: `/dashboard/kyc`
+            });
+        }
     };
 
     const handleDepositSubmit = async () => {
@@ -767,15 +785,15 @@ export default function DashboardClient() {
                             <section className="flex flex-col sm:flex-row gap-6">
                                 <Link
                                     href={`/deposit?lang=${lang}`}
-                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.kyc_completed ? "bg-gv-gold text-black hover:bg-gv-gold/90 hover:-translate-y-1 shadow-[0_15px_30px_rgba(212,175,55,0.2)]" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
-                                    onClick={(e) => !user?.kyc_completed && (e.preventDefault(), alert(t.unverifiedBanner))}
+                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gv-gold text-black hover:bg-gv-gold/90 hover:-translate-y-1 shadow-[0_15px_30px_rgba(212,175,55,0.2)]" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
+                                    onClick={(e) => handleProtectedAction(e, () => router.push(`/deposit?lang=${lang}`))}
                                 >
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4v16m8-8H4" /></svg>
                                     {t.deposit}
                                 </Link>
                                 <button
-                                    onClick={() => user?.kyc_completed ? setIsWithdrawModalOpen(true) : alert(t.unverifiedBanner)}
-                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.kyc_completed ? "bg-[#222] text-white hover:bg-[#333] hover:-translate-y-1 border border-white/10" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
+                                    onClick={(e) => handleProtectedAction(e, () => setIsWithdrawModalOpen(true))}
+                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-[#222] text-white hover:bg-[#333] hover:-translate-y-1 border border-white/10" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
                                 >
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                                     {t.withdraw}
@@ -1060,6 +1078,30 @@ export default function DashboardClient() {
                     <p className="text-zinc-400 max-w-md font-medium text-lg leading-relaxed">
                         {kycShowSuccess ? "Our compliance team will review your account within 24 hours. Your portfolio will activate automatically upon approval." : t.successDesc}
                     </p>
+                </div>
+            )}
+            {/* Action Toast */}
+            {actionToast && (
+                <div className="fixed bottom-6 right-6 z-[600] bg-[#1a1a1a] border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 max-w-sm shadow-gv-gold/10">
+                    <div className="flex flex-col gap-5">
+                        <div className="flex items-start justify-between gap-4">
+                            <p className="text-white font-black text-sm uppercase tracking-widest leading-relaxed">{actionToast.message}</p>
+                            <button onClick={() => setActionToast(null)} className="text-zinc-500 hover:text-white transition-colors shrink-0">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                        {actionToast.actionUrl && (
+                            <button
+                                onClick={() => {
+                                    setActionToast(null);
+                                    router.push(actionToast.actionUrl as string);
+                                }}
+                                className="w-full bg-gv-gold text-black font-black py-3 px-6 rounded-xl uppercase tracking-widest text-xs hover:bg-gv-gold/90 transition-all shadow-lg active:scale-95"
+                            >
+                                {actionToast.actionText}
+                            </button>
+                        )}
+                    </div>
                 </div>
             )}
         </div>
