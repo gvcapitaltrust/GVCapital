@@ -9,6 +9,8 @@ interface AuthContextType {
     role: string;
     isVerified: boolean;
     kycStep: number;
+    balance: number;
+    totalEquity: number;
     loading: boolean;
     refresh: () => Promise<void>;
 }
@@ -20,6 +22,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [role, setRole] = useState("User");
     const [isVerified, setIsVerified] = useState(false);
     const [kycStep, setKycStep] = useState(0);
+    const [balance, setBalance] = useState(0);
+    const [totalEquity, setTotalEquity] = useState(0);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const pathname = usePathname();
@@ -60,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             const { data: profile, error } = await supabase
                 .from('profiles')
-                .select('role, is_verified, kyc_step')
+                .select('role, is_verified, kyc_step, balance, total_equity')
                 .eq('id', activeUser.id)
                 .single();
 
@@ -75,10 +79,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const resolvedRole = profile?.role || "User";
             const resolvedVerified = profile?.is_verified === true || profile?.is_verified === "Approved" || profile?.is_verified === "true";
             const resolvedStep = profile?.kyc_step || 0;
+            const resolvedBalance = profile?.balance || 0;
+            const resolvedEquity = profile?.total_equity || 0;
 
             setRole(resolvedRole);
             setIsVerified(resolvedVerified);
             setKycStep(resolvedStep);
+            setBalance(resolvedBalance);
+            setTotalEquity(resolvedEquity);
 
             console.log("=== AUTH STATE AUDIT ===");
             console.table({
@@ -128,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [pathname, router]);
 
     return (
-        <AuthContext.Provider value={{ user, role, isVerified, kycStep, loading, refresh }}>
+        <AuthContext.Provider value={{ user, role, isVerified, kycStep, balance, totalEquity, loading, refresh }}>
             {children}
         </AuthContext.Provider>
     );

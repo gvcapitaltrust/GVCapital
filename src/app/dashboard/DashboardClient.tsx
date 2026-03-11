@@ -80,6 +80,11 @@ export default function DashboardClient() {
                 .single();
 
             if (profile) {
+                console.log('Fetched Current Profile from DB:', {
+                    id: profile.id,
+                    balance: profile.balance,
+                    total_equity: profile.total_equity
+                });
                 // Verification relies on profile.is_verified, kyc_status, OR if the user is an admin
                 let dbIsVerified = profile.role === 'admin' || profile.role === 'Admin' || profile.is_verified === true || profile.is_verified === 'true' || profile.is_verified === 'Approved' || profile.is_verified === 'Verified';
                 let kycApproved = profile.role === 'admin' || profile.role === 'Admin' || profile.kyc_status === 'Approved' || profile.kyc_completed === true || profile.kyc_completed === 'true' || dbIsVerified;

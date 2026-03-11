@@ -463,16 +463,35 @@ export default function AdminPortal() {
     const handleApproveDeposit = async (tx: any) => {
         if (!confirm(`Approve deposit of RM ${tx.amount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
-            // Using a secure atomic backend RPC to ensure deposits accurately reflect balances
-            const { error: rpcError } = await supabase.rpc('approve_deposit', {
-                p_tx_id: tx.id,
-                p_user_id: tx.user_id,
-                p_amount: tx.amount
-            });
+            // 1. Update Transaction Status
+            const { error: txError } = await supabase
+                .from('transactions')
+                .update({ status: 'Approved' })
+                .eq('id', tx.id);
+            if (txError) throw txError;
+
+            // 2. Fetch latest profile to get current balance accurately
+            const { data: profile, error: profileFetchError } = await supabase
+                .from('profiles')
+                .select('balance, total_equity')
+                .eq('id', tx.user_id)
+                .single();
+            if (profileFetchError) throw profileFetchError;
+
+            // 3. Increment Balances
+            const newBalance = (profile.balance || 0) + Number(tx.amount);
+            const newTotalEquity = (profile.total_equity || 0) + Number(tx.amount);
+
+            const { error: profileUpdateError } = await supabase
+                .from('profiles')
+                .update({ 
+                    balance: newBalance,
+                    total_equity: newTotalEquity
+                })
+                .eq('id', tx.user_id);
+            if (profileUpdateError) throw profileUpdateError;
             
-            if (rpcError) throw rpcError;
-            
-            showToast("Deposit approved successfully!");
+            showToast("Deposit approved and balance updated!");
             setIsDepositDrawerOpen(false);
             fetchData();
         } catch (error: any) {
@@ -494,17 +513,43 @@ export default function AdminPortal() {
     };
 
     const handleApproveWithdrawal = async (tx: any) => {
-        if (!confirm(`Approve withdrawal of RM ${Math.abs(tx.amount)} for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        const withdrawAmount = Math.abs(tx.amount);
+        if (!confirm(`Approve withdrawal of RM ${withdrawAmount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
-            const { error: rpcError } = await supabase.rpc('approve_withdrawal', {
-                p_tx_id: tx.id,
-                p_user_id: tx.user_id,
-                p_amount: Math.abs(tx.amount)
-            });
+            // 1. Update Transaction Status
+            const { error: txError } = await supabase
+                .from('transactions')
+                .update({ status: 'Approved' })
+                .eq('id', tx.id);
+            if (txError) throw txError;
+
+            // 2. Fetch latest profile
+            const { data: profile, error: profileFetchError } = await supabase
+                .from('profiles')
+                .select('balance, total_equity')
+                .eq('id', tx.user_id)
+                .single();
+            if (profileFetchError) throw profileFetchError;
+
+            // 3. Decrement Balances (Withdrawal is already negative in tx but we use absolute for subtraction if needed)
+            // Actually, keep it simple: profile.balance - withdrawAmount
+            const newBalance = (profile.balance || 0) - withdrawAmount;
+            const newTotalEquity = (profile.total_equity || 0) - withdrawAmount;
+
+            if (newBalance < 0) {
+                if (!confirm("This will result in a negative balance. Continue?")) return;
+            }
+
+            const { error: profileUpdateError } = await supabase
+                .from('profiles')
+                .update({ 
+                    balance: newBalance,
+                    total_equity: newTotalEquity
+                })
+                .eq('id', tx.user_id);
+            if (profileUpdateError) throw profileUpdateError;
             
-            if (rpcError) throw rpcError;
-            
-            showToast("Withdrawal approved effectively!");
+            showToast("Withdrawal approved and balance updated!");
             fetchData();
         } catch (error: any) {
             alert(error.message);
