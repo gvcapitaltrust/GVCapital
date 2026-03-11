@@ -77,6 +77,8 @@ export default function AdminPortal() {
     const [viewingDoc, setViewingDoc] = useState<string | null>(null);
     const [userKycDocs, setUserKycDocs] = useState<{name: string, url: string}[]>([]);
     const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+    const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+    const [rejectReasonText, setRejectReasonText] = useState("");
 
     useEffect(() => {
         setMounted(true);
@@ -356,7 +358,7 @@ export default function AdminPortal() {
         }
     };
 
-    const handleResetKyc = async (userId: string) => {
+    const handleResetKyc = async (userId: string, reason: string) => {
         const userToReject = users.find((u: any) => u.id === userId);
         if (!userToReject) return;
 
@@ -366,7 +368,8 @@ export default function AdminPortal() {
                 .update({
                     kyc_step: 0,
                     is_verified: false,
-                    kyc_status: 'Rejected'
+                    kyc_status: 'Rejected',
+                    rejection_reason: reason
                 })
                 .eq('id', userId);
 
@@ -380,12 +383,12 @@ export default function AdminPortal() {
                     user_email: userToReject.email,
                     admin_username: adminProfile?.username || adminProfile?.email?.split('@')[0] || 'Admin',
                     action: 'Rejected',
-                    rejection_reason: 'KYC Reset',
+                    rejection_reason: reason,
                     created_at: new Date().toISOString()
                 });
 
             fetchData();
-            showToast(`User KYC has been reset to 0.`);
+            showToast(`User KYC has been reset and rejected.`);
         } catch (err: any) {
             alert(err.message);
         }
@@ -1089,7 +1092,7 @@ export default function AdminPortal() {
                                         Verify User
                                     </button>
                                     <button 
-                                        onClick={() => { handleResetKyc(selectedUser.id); setIsDetailModalOpen(false); }}
+                                        onClick={() => { setRejectReasonText(""); setIsRejectModalOpen(true); }}
                                         className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 font-black py-4 rounded-xl text-xs uppercase tracking-widest transition-all active:scale-95"
                                     >
                                         Reject / Reset KYC
@@ -1116,6 +1119,51 @@ export default function AdminPortal() {
                                     className="w-full h-full object-contain"
                                     alt="Identity Document High-Res"
                                 />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Reject Confirmation Modal */}
+                {isRejectModalOpen && selectedUser && (
+                    <div className="fixed inset-0 z-[800] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={() => setIsRejectModalOpen(false)}>
+                        <div className="bg-[#121212] border border-white/10 shadow-2xl rounded-3xl p-8 max-w-md w-full animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
+                            <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-2">Reject KYC Submission</h2>
+                            <p className="text-zinc-400 text-sm mb-6">Please provide a reason for rejecting <span className="text-white font-bold">{selectedUser.email}</span>'s KYC application.</p>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">Reason for Rejection</label>
+                                    <textarea
+                                        value={rejectReasonText}
+                                        onChange={(e) => setRejectReasonText(e.target.value)}
+                                        placeholder="e.g., ID document is blurred, or details do not match..."
+                                        rows={4}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500/50 transition-all resize-none"
+                                    />
+                                </div>
+                                <div className="flex gap-4 pt-4">
+                                    <button 
+                                        onClick={() => setIsRejectModalOpen(false)}
+                                        className="flex-1 bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button 
+                                        onClick={() => {
+                                            if (!rejectReasonText.trim()) {
+                                                alert("Please enter a rejection reason.");
+                                                return;
+                                            }
+                                            handleResetKyc(selectedUser.id, rejectReasonText);
+                                            setIsRejectModalOpen(false);
+                                            setIsDetailModalOpen(false);
+                                        }}
+                                        className="flex-1 bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-red-500/20 active:scale-95 transition-all"
+                                    >
+                                        Confirm Rejection
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
