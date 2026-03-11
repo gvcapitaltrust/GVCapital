@@ -11,6 +11,15 @@ export default function ApprovalsClient() {
     const [isLoading, setIsLoading] = useState(true);
     const [distributing, setDistributing] = useState(false);
     const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
+    const [forexRate, setForexRate] = useState<number>(4.752);
+
+    useEffect(() => {
+        const fetchRate = async () => {
+            const { data } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
+            if (data) setForexRate(parseFloat(data.value));
+        };
+        fetchRate();
+    }, []);
 
     useEffect(() => {
         fetchPending();
@@ -50,7 +59,8 @@ export default function ApprovalsClient() {
     };
 
     const handleApprove = async (tx: any) => {
-        if (!confirm(`Approve deposit of RM ${tx.amount} for ${tx.profiles.full_name}?`)) return;
+        const displayRm = tx.original_currency_amount || (tx.amount * forexRate);
+        if (!confirm(`Approve deposit: User sent ${displayRm} RM. Crediting $${Number(tx.amount).toFixed(2)} USD to ${tx.profiles.full_name}?`)) return;
 
         try {
             // Use RPC for atomic update of transaction and profile balance
@@ -180,7 +190,10 @@ export default function ApprovalsClient() {
                                              <span className="font-mono text-xs text-zinc-500">{tx.ref_id}</span>
                                          </td>
                                          <td className="px-8 py-6">
-                                             <span className="text-lg tracking-tighter text-emerald-400">{formatCurrency(tx.amount)}</span>
+                                             <div className="flex flex-col">
+                                                 <span className="text-lg tracking-tighter text-emerald-400 font-black">Crediting: ${Number(tx.amount).toFixed(2)} USD</span>
+                                                 <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">User Sent: {tx.original_currency_amount || (tx.amount * forexRate)} RM</span>
+                                             </div>
                                          </td>
                                          <td className="px-8 py-6">
                                              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${

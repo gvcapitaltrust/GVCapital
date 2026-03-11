@@ -69,12 +69,17 @@ export default function DepositClient() {
 
             // 2. Insert into transactions table
             const refId = `DEP-${Math.floor(100000 + Math.random() * 900000)}`;
+            const currentAmountRm = parseFloat(amount);
+            const amountUsd = currentAmountRm / rate;
+
             const { error: insertError } = await supabase
                 .from('transactions')
                 .insert([{
                     user_id: user.id,
                     type: 'Deposit',
-                    amount: parseFloat(amount),
+                    amount: amountUsd,
+                    original_currency_amount: currentAmountRm,
+                    original_currency: 'RM',
                     transfer_date: new Date().toISOString(),
                     status: 'Pending',
                     receipt_url: uploadData.path,

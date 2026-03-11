@@ -1083,7 +1083,12 @@ export default function AdminPortal() {
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-4 font-mono text-xs opacity-50">{d.ref_id}</td>
-                                                <td className="px-8 py-6 text-emerald-400">{formatCurrency(d.amount)}</td>
+                                                <td className="px-8 py-6">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-emerald-400 font-black">Crediting: ${(d.amount || 0).toFixed(2)} USD</span>
+                                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">User Sent: {d.original_currency_amount || (d.amount * (parseFloat(currentForexRate) || 4.7))} RM</span>
+                                                    </div>
+                                                </td>
                                                 <td className="px-8 py-6">
                                                     <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
                                                         d.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-500' :
