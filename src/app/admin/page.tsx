@@ -218,16 +218,22 @@ export default function AdminPortal() {
     };
 
     const fetchForexData = async () => {
-        const { data: currentRateData } = await supabase
+        const { data: currentRateData, error } = await supabase
             .from('platform_settings')
             .select('value')
             .eq('key', 'usd_to_myr_rate')
             .single();
-        if (currentRateData) {
-            setCurrentForexRate(currentRateData.value);
-            setNewForexRate(currentRateData.value);
+
+        if (!currentRateData || error) {
+            console.error("Forex fetch error, using fallback 1.0:", error);
+            setCurrentForexRate("1.0");
+            setNewForexRate("1.0");
+            return;
         }
 
+        const rateStr = parseFloat(currentRateData.value).toString() || "1.0";
+        setCurrentForexRate(rateStr);
+        setNewForexRate(rateStr);
         const { data: historyData } = await supabase
             .from('forex_history')
             .select('*')

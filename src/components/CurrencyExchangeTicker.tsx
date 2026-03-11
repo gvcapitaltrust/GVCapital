@@ -15,16 +15,17 @@ export default function CurrencyExchangeTicker() {
                     .eq('key', 'usd_to_myr_rate')
                     .single();
 
-                if (data && !error) {
-                    setRate(parseFloat(data.value));
-                } else {
-                    // Fallback to a default if not set or table missing
-                    console.warn("Could not fetch usd_to_myr_rate from platform_settings, using fallback.");
-                    setRate(4.752); // Default rate if fetching fails
+                if (!data || error) {
+                    console.warn("Using fallback rate 1.0 due to fetch failure.");
+                    setRate(1.0);
+                    return;
                 }
+
+                const parsedRate = parseFloat(data.value) || 1.0;
+                setRate(parsedRate);
             } catch (err) {
                 console.error("Error fetching rate:", err);
-                setRate(4.752);
+                setRate(1.0);
             }
         };
 

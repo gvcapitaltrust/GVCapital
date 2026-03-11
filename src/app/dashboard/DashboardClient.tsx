@@ -26,6 +26,7 @@ export default function DashboardClient() {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [referredCount, setReferredCount] = useState(0);
+    const [forexRate, setForexRate] = useState(1.0); // Safe fallback as requested
 
     // UI States
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -74,7 +75,12 @@ export default function DashboardClient() {
             console.log("FETCHING DASHBOARD DATA for:", authUser.email);
             
             try {
-                // 1. Fetch Profile
+                // 1. Fetch Forex Rate first for global calculations
+                const { data: psRate, error: psError } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
+                const currentRate = (!psRate || psError) ? 1.0 : parseFloat(psRate.value) || 1.0;
+                setForexRate(currentRate);
+
+                // 2. Fetch Profile
                 const { data: profile } = await supabase
                     .from('profiles')
                     .select('*', { count: 'exact' })
@@ -98,11 +104,12 @@ export default function DashboardClient() {
                         is_verified: dbIsVerified,
                         kyc_completed: kycApproved,
                         fullName: profile.full_name || authUser.user_metadata?.full_name,
-                        totalEquity: profile.total_equity || (Number(profile.balance) + Number(profile.investment))
+                        total_assets: (profile.balance || 0) * currentRate, // Live calculation based on rate
+                        totalEquity: profile.total_equity || (Number(profile.balance || 0) * currentRate + Number(profile.investment || 0))
                     });
                 }
 
-                // 2. Fetch Transactions
+                // 3. Fetch Transactions
                 let txQuery = supabase.from('transactions').select('*');
                 if (authUser.email !== "thenja96@gmail.com") {
                     txQuery = txQuery.eq('user_id', authUser.id);
@@ -113,7 +120,7 @@ export default function DashboardClient() {
                     setDividendHistory(txs.filter((t: any) => t.type === 'Dividend' || t.type === 'bonus').slice(0, 6).reverse());
                 }
 
-                // 3. Fetch Rates & Referrals
+                // 4. Fetch Rates & Referrals
                 const { data: rates } = await supabase.from('settings').select('*').in('key', ['monthly_return_rate', 'yearly_return_rate']);
                 if (rates) {
                     setMonthlyRate(parseFloat(rates.find((r: any) => r.key === 'monthly_return_rate')?.value || "0.08"));
@@ -677,7 +684,7 @@ export default function DashboardClient() {
                                     <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalAssets}</p>
-                                    <h2 className="text-4xl font-black tracking-tighter">{user?.kyc_completed ? formatCurrency(user?.total_assets) : "RM 0.00"}</h2>
+                                    <h2 className="text-4xl font-black tracking-tighter">{user?.kyc_completed ? formatCurrency((user?.balance || 0) * forexRate) : "RM 0.00"}</h2>
                                 </div>
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.creditUsd}</p>
