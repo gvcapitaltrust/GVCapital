@@ -9,8 +9,10 @@ import { supabase } from "@/lib/supabaseClient";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import CurrencyExchangeTicker from "@/components/CurrencyExchangeTicker";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function DashboardClient() {
+    const { user: authUser, role: authRole, isVerified: authVerified, refresh: refreshAuth } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [lang, setLang] = useState<"en" | "zh">("en");
@@ -57,6 +59,8 @@ export default function DashboardClient() {
     useEffect(() => {
         const urlLang = searchParams?.get("lang") || "en";
         setLang(urlLang as "en" | "zh");
+        
+        console.log("Dashboard Client Mounted, Auth state:", { authUser, authRole, authVerified });
 
         const fetchUserData = async (currentSession: any) => {
             if (!currentSession) {
@@ -85,6 +89,9 @@ export default function DashboardClient() {
                     profile.role = "admin";
                     dbIsVerified = true;
                     kycApproved = true;
+                    profile.is_verified = true;
+                    profile.kyc_status = 'Approved';
+                    profile.kyc_step = 3;
                 }
 
                 setUser({
@@ -153,9 +160,21 @@ export default function DashboardClient() {
 
         // Explicitly fetch latest data on mount to avoid stale session metadata
         const initializeDashboard = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
+            console.log("INITIALIZING DASHBOARD: Refreshing session...");
+            const { data: { session }, error } = await supabase.auth.refreshSession();
+            
+            if (error) {
+                console.error("SESSION REFRESH ERROR:", error);
+            }
+
             if (session) {
                 await fetchUserData(session);
+                console.log("AUTH STATE AUDIT (DASHBOARD):");
+                console.table({
+                    email: session.user.email,
+                    role: session.user.user_metadata?.role || "fetching...",
+                    ts: new Date().toISOString()
+                });
             } else {
                 setIsCheckingAuth(false);
             }

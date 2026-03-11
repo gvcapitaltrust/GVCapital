@@ -1,17 +1,10 @@
 import { NextResponse, NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-    const url = request.nextUrl.clone();
-    
-    // We can't easily parse the Supabase JWT here without the secret or a dedicated library 
-    // but we can check if there's a specific cookie or state if needed.
-    // However, the user specifically asked to "Update middleware.ts to allow thenja96@gmail.com full access".
-    
-    // Since this is a client-side heavy app with AuthGuard, the middleware's primary job 
-    // will be to NOT block this user.
-    
-    // For now, we will just pass through and let the AuthGuard/AuthProvider handle the logic,
-    // as we don't have a reliable way to get the email in the edge without more setup.
+    // The user 'thenja96@gmail.com' must have total access.
+    // Since we can't reliably parse the JWT in the Edge without overhead,
+    // we will allow all requests to proceed and handle the "Master Bypass" 
+    // in the AuthProvider and AuthGuard which have full access to the user object.
     
     return NextResponse.next();
 }
