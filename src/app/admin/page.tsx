@@ -147,7 +147,7 @@ export default function AdminPortal() {
 
         const { data: txList } = await supabase
             .from('transactions')
-            .select('*, profiles(full_name, email)')
+            .select('*, profiles(full_name, email, bank_name, bank_account_number)')
             .order('created_at', { ascending: false });
         if (txList) {
             setDeposits(txList.filter((t: any) => t.type === 'Deposit' && t.status === 'Pending'));
@@ -445,6 +445,36 @@ export default function AdminPortal() {
         }
     };
 
+    const handleApproveWithdrawal = async (tx: any) => {
+        if (!confirm(`Approve withdrawal of RM ${Math.abs(tx.amount)} for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        try {
+            const { error: rpcError } = await supabase.rpc('approve_withdrawal', {
+                p_tx_id: tx.id,
+                p_user_id: tx.user_id,
+                p_amount: Math.abs(tx.amount)
+            });
+            
+            if (rpcError) throw rpcError;
+            
+            showToast("Withdrawal approved effectively!");
+            fetchData();
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
+    const handleRejectWithdrawal = async (tx: any) => {
+        if (!confirm(`Reject withdrawal of RM ${Math.abs(tx.amount)} for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        try {
+            const { error: txError } = await supabase.from('transactions').update({ status: 'Rejected' }).eq('id', tx.id);
+            if (txError) throw txError;
+            showToast("Withdrawal rejected.");
+            fetchData();
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(val || 0).replace("MYR", "RM");
     };
@@ -562,20 +592,25 @@ export default function AdminPortal() {
                             {activeTab === "withdrawals" && (
                                 <table className="w-full text-left">
                                     <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                        <tr><th className="px-8 py-6">Name</th><th className="px-8 py-6">Ref ID</th><th className="px-8 py-6">Amount (RM)</th><th className="px-8 py-6 text-right">Action</th></tr>
+                                        <tr><th className="px-8 py-6">Name</th><th className="px-8 py-6">Bank Details</th><th className="px-8 py-6">Ref ID</th><th className="px-8 py-6">Amount (RM)</th><th className="px-8 py-6 text-right">Action</th></tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/[0.02]">
                                         {withdrawals.map((w: any, i: number) => (
                                             <tr key={i} className="text-sm font-bold group hover:bg-white/[0.01]">
                                                 <td className="px-8 py-6 text-white">{w.profiles?.full_name || w.user_id}</td>
+                                                <td className="px-8 py-6">
+                                                    <div className="text-white text-xs">{w.profiles?.bank_name || 'N/A'}</div>
+                                                    <div className="font-mono text-[10px] text-zinc-500">{w.profiles?.bank_account_number || 'N/A'}</div>
+                                                </td>
                                                 <td className="px-8 py-4 font-mono text-xs opacity-50">{w.ref_id}</td>
-                                                <td className="px-8 py-6 text-red-400">{formatCurrency(w.amount * -1)}</td>
-                                                <td className="px-8 py-6 text-right">
-                                                    <button className="bg-red-500 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-red-500/10 hover:-translate-y-0.5 transition-all">Approve Withdrawal</button>
+                                                <td className="px-8 py-6 text-red-400">{formatCurrency(w.amount > 0 ? w.amount : w.amount * -1)}</td>
+                                                <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
+                                                    <button onClick={() => handleRejectWithdrawal(w)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">Reject</button>
+                                                    <button onClick={() => handleApproveWithdrawal(w)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Approve Withdrawal</button>
                                                 </td>
                                             </tr>
                                         ))}
-                                        {withdrawals.length === 0 && <tr><td colSpan={4} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No pending withdrawals</td></tr>}
+                                        {withdrawals.length === 0 && <tr><td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No pending withdrawals</td></tr>}
                                     </tbody>
                                 </table>
                             )}
@@ -1140,19 +1175,28 @@ export default function AdminPortal() {
                                             </div>
                                         ) : userKycDocs.length > 0 ? (
                                             userKycDocs.map((doc, idx) => (
-                                                <div key={idx} className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:border-gv-gold/30 transition-all">
-                                                    <div className="flex items-center gap-3 overflow-hidden">
-                                                        <svg className="h-5 w-5 text-zinc-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                                        <span className="text-xs font-bold text-white truncate pr-4">{doc.name}</span>
+                                                <div key={idx} className="flex flex-col gap-3 p-4 bg-white/5 border border-white/10 rounded-xl hover:border-gv-gold/30 transition-all group">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-3 overflow-hidden">
+                                                            <svg className="h-5 w-5 text-zinc-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                                            <span className="text-xs font-bold text-white truncate pr-4">{doc.name}</span>
+                                                        </div>
+                                                        <a 
+                                                            href={doc.url} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer" 
+                                                            className="text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-white/10 hover:bg-gv-gold hover:text-black hover:shadow-[0_0_15px_rgba(238,206,128,0.3)] text-white rounded-lg transition-all flex-shrink-0"
+                                                        >
+                                                            Open Full
+                                                        </a>
                                                     </div>
-                                                    <a 
-                                                        href={doc.url} 
-                                                        target="_blank" 
-                                                        rel="noopener noreferrer" 
-                                                        className="text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-white/10 hover:bg-gv-gold hover:text-black hover:shadow-[0_0_15px_rgba(238,206,128,0.3)] text-white rounded-lg transition-all flex-shrink-0"
-                                                    >
-                                                        View
-                                                    </a>
+                                                    <div className="w-full mt-2 rounded-lg overflow-hidden border border-white/10 bg-black/50 aspect-video flex items-center justify-center relative">
+                                                         {doc.name.toLowerCase().endsWith('.pdf') ? (
+                                                             <iframe src={doc.url} className="w-full h-full" title={doc.name} />
+                                                         ) : (
+                                                             <img src={doc.url} alt={doc.name} className="w-full h-full object-contain cursor-zoom-in group-hover:scale-105 transition-transform duration-500" onClick={() => window.open(doc.url, '_blank')} />
+                                                         )}
+                                                    </div>
                                                 </div>
                                             ))
                                         ) : (
