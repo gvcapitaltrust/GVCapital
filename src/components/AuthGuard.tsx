@@ -31,6 +31,11 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
                 .single();
 
             const role = profile?.role || user.user_metadata?.role || (user.email === "admin@gvcapital.trust" ? "Admin" : "User");
+            console.log("=== AUTH GUARD DEBUG ===");
+            console.log("Evaluated Role:", role);
+            console.log("DB Role:", profile?.role);
+            console.log("Metadata Role:", user.user_metadata?.role);
+            console.log("Email:", user.email);
 
             if (requireAdmin && role.toLowerCase() !== "admin") {
                 setForbidden(true);
