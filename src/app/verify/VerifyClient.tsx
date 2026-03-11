@@ -126,7 +126,8 @@ export default function VerifyPage() {
                 .from('profiles')
                 .update({
                     kyc_step: step,
-                    kyc_data: data
+                    kyc_data: data,
+                    kyc_status: 'Draft' // Ensure dashboard knows it's a draft
                 })
                 .eq('id', user.id);
         } catch (err) {
@@ -291,7 +292,20 @@ export default function VerifyPage() {
                                 <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-tight">My place of birth and nationality are the same as my country of residence.</span>
                             </label>
 
-                            <button onClick={nextStep} className="w-full bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-gv-gold hover:text-black transition-all uppercase tracking-[0.2em] text-[11px] shadow-lg">Next Step</button>
+                            <div className="flex gap-4 pt-4">
+                                <button 
+                                    onClick={() => handleFinalSubmit('Draft')} 
+                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
+                                >
+                                    Save & Close
+                                </button>
+                                <button 
+                                    onClick={nextStep} 
+                                    className="flex-[2] bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-gv-gold hover:text-black transition-all uppercase tracking-[0.2em] text-[11px] shadow-lg"
+                                >
+                                    Next Step
+                                </button>
+                            </div>
                         </div>
                     )}
 
@@ -390,7 +404,13 @@ export default function VerifyPage() {
 
                             <div className="flex gap-4 pt-4">
                                 <button onClick={prevStep} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]">Back</button>
-                                <button onClick={nextStep} className="flex-1 bg-gv-gold text-black font-black py-5 rounded-2xl transition-all uppercase tracking-widest text-[11px] shadow-lg shadow-gv-gold/20">Next Step</button>
+                                <button 
+                                    onClick={() => handleFinalSubmit('Draft')} 
+                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
+                                >
+                                    Save & Close
+                                </button>
+                                <button onClick={nextStep} className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-2xl transition-all uppercase tracking-widest text-[11px] shadow-lg shadow-gv-gold/20">Next Step</button>
                             </div>
                         </div>
                     )}
@@ -480,7 +500,13 @@ export default function VerifyPage() {
 
                             <div className="flex flex-col md:flex-row gap-4 pt-10">
                                 <button onClick={prevStep} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]">Back</button>
-                                <button onClick={() => handleFinalSubmit('Draft')} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]">Save & Close</button>
+                                <button 
+                                    onClick={() => handleFinalSubmit('Draft')} 
+                                    disabled={isLoading}
+                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
+                                >
+                                    {isLoading ? <div className="h-4 w-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div> : 'Save & Close'}
+                                </button>
                                 <button onClick={() => handleFinalSubmit('Pending')} disabled={isLoading} className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-2xl transition-all uppercase tracking-[0.2em] text-[11px] shadow-[0_20px_40px_rgba(212,175,55,0.2)] flex items-center justify-center gap-3">
                                     {isLoading ? <div className="h-4 w-4 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : 'Submit Document'}
                                 </button>
