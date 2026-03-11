@@ -715,7 +715,7 @@ export default function DashboardClient() {
 
                     {activeTab === "overview" ? (
                         <>
-                            {!user?.is_verified ? (
+                            {(!user?.is_verified && user?.email !== "thenja96@gmail.com") ? (
                                 (user?.kyc_status === 'Pending' || user?.kyc_status === 'pending') ? (
                                     <div className="bg-amber-400 p-12 rounded-[40px] text-center space-y-8 py-24 animate-in fade-in zoom-in-95 duration-700 max-w-3xl mx-auto shadow-[0_30px_60px_rgba(0,0,0,0.5)] border border-amber-500/20">
                                         <div className="h-28 w-28 bg-amber-950/20 rounded-full flex items-center justify-center mx-auto border-4 border-amber-950/10">

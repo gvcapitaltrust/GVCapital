@@ -110,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const refresh = async () => {
+        setLoading(true);
         const { data: { session } } = await supabase.auth.refreshSession();
         await fetchProfile(session);
     };
@@ -131,11 +132,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setRole("User");
                 setIsVerified(false);
                 setKycStep(0);
+                setLoading(false);
                 if (pathname.startsWith('/dashboard') || pathname.startsWith('/admin')) {
                     router.push("/login");
                 }
             } else if (session) {
+                // If we have a session, we stay in loading until profile is fetched
                 await fetchProfile(session);
+            } else if (event === 'INITIAL_SESSION' && !session) {
+                setLoading(false);
             }
         });
 
