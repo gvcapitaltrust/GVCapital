@@ -193,11 +193,13 @@ export default function AdminPortal() {
             .select('*, profiles(full_name, email, bank_name, bank_account_number)')
             .order('created_at', { ascending: false });
             
-        console.log('Fetched Transactions Data:', txList, 'Error:', txError);
+        console.log('Raw Data from Supabase:', txList);
+        if (txError) console.error('Supabase TX Error:', txError);
         
         if (txList) {
-            setDeposits(txList.filter((t: any) => t.type === 'Deposit' && t.status === 'Pending'));
-            setWithdrawals(txList.filter((t: any) => t.type === 'Withdrawal' && t.status === 'Pending'));
+            // REMOVED STATUS FILTER: Show ALL deposits and withdrawals
+            setDeposits(txList.filter((t: any) => t.type === 'Deposit'));
+            setWithdrawals(txList.filter((t: any) => t.type === 'Withdrawal'));
         }
 
         const { data: logs } = await supabase
@@ -659,7 +661,14 @@ export default function AdminPortal() {
                                                 </td>
                                             </tr>
                                         ))}
-                                        {withdrawals.length === 0 && <tr><td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No pending withdrawals</td></tr>}
+                                        {withdrawals.length === 0 && (
+                                            <tr>
+                                                <td colSpan={5} className="px-8 py-20 text-center">
+                                                    <p className="text-zinc-600 font-bold uppercase tracking-widest text-xs">No withdrawals found</p>
+                                                    <p className="text-[10px] text-zinc-800 mt-2 font-black uppercase tracking-widest">No data in state</p>
+                                                </td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             )}
@@ -1001,7 +1010,14 @@ export default function AdminPortal() {
                                                 </td>
                                             </tr>
                                         ))}
-                                        {deposits.length === 0 && <tr><td colSpan={6} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No pending deposits</td></tr>}
+                                        {deposits.length === 0 && (
+                                            <tr>
+                                                <td colSpan={6} className="px-8 py-20 text-center">
+                                                    <p className="text-zinc-600 font-bold uppercase tracking-widest text-xs">No deposits found</p>
+                                                    <p className="text-[10px] text-zinc-800 mt-2 font-black uppercase tracking-widest">No data in state</p>
+                                                </td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             )}

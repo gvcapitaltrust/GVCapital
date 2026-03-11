@@ -15,16 +15,25 @@ export default function ApprovalsClient() {
     }, []);
 
     const fetchPending = async () => {
-        const { data, error } = await supabase
-            .from('transactions')
-            .select('*, profiles(full_name, email)')
-            .eq('type', 'Deposit')
-            .eq('status', 'Pending')
-            .order('created_at', { ascending: false });
+        try {
+            const { data, error } = await supabase
+                .from('transactions')
+                .select('*, profiles(full_name, email)')
+                .eq('type', 'Deposit')
+                // .eq('status', 'Pending') // Removed status filter as requested
+                .order('created_at', { ascending: false });
 
-        if (error) console.error("Error fetching pending deposits", error);
-        else setPendingDeposits(data || []);
-        setIsLoading(false);
+            console.log('Raw Data from Supabase (Approvals):', data);
+            if (error) {
+                console.error("Error fetching deposits", error);
+            } else {
+                setPendingDeposits(data || []);
+            }
+        } catch (err) {
+            console.error("Fatal fetch error", err);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleApprove = async (tx: any) => {
@@ -202,7 +211,8 @@ export default function ApprovalsClient() {
                                                 <div className="h-20 w-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
                                                     <svg className="h-10 w-10 text-zinc-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M5 13l4 4L19 7" /></svg>
                                                 </div>
-                                                <p className="text-zinc-600 font-black uppercase tracking-[0.2em] text-sm">Clear Queue - No Pending Deposits</p>
+                                                <p className="text-zinc-600 font-black uppercase tracking-[0.2em] text-sm">No deposits recorded</p>
+                                                <p className="text-[10px] text-zinc-800 mt-2 font-black uppercase tracking-widest">No data in state</p>
                                             </div>
                                         </td>
                                     </tr>
