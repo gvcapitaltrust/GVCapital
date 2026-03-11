@@ -55,7 +55,7 @@ export default function AdminPortal() {
     };
 
     // Forex Control State
-    const [currentForexRate, setCurrentForexRate] = useState<string>("4.752");
+    const [currentForexRate, setCurrentForexRate] = useState<string>("4.7");
     const [newForexRate, setNewForexRate] = useState<string>("");
     const [forexHistory, setForexHistory] = useState<any[]>([]);
     const [isUpdatingRate, setIsUpdatingRate] = useState(false);
@@ -641,8 +641,17 @@ export default function AdminPortal() {
                         {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
-                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
-                                <h2 className="text-2xl font-black text-white">RM {(users.reduce((acc: number, u: any) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0) * (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                {(() => {
+                                    const totalUsd = users.reduce((acc, u) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
+                                    const rate = parseFloat(currentForexRate) || 4.7;
+                                    console.log('Admin Summary Stats:', { totalUsd, rate, result: totalUsd * rate });
+                                    return (
+                                        <>
+                                            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
+                                            <h2 className="text-2xl font-black text-white">RM {(totalUsd * rate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                        </>
+                                    );
+                                })()}
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC Pending</p>
