@@ -128,7 +128,10 @@ export default function AdminPortal() {
     };
 
     const fetchAdminProfile = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
+        // Force refresh session to get latest JWT claims and role metadata
+        const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+        const session = refreshedSession;
+        
         if (session) {
             const { data: profile } = await supabase
                 .from('profiles')
