@@ -88,8 +88,8 @@ export default function VerifyPage() {
                 const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
                 if (profile) {
                     // Resume Logic: Jump to saved step and fill data
-                    if (profile.kyc_step && profile.kyc_step > 1) {
-                        setCurrentStep(profile.kyc_step);
+                    if (profile.kyc_step !== undefined && profile.kyc_step !== null) {
+                        setCurrentStep(Math.min(profile.kyc_step + 1, 3));
                     }
                     
                     if (profile.kyc_data) {
@@ -141,6 +141,8 @@ export default function VerifyPage() {
     };
 
     const handleFinalSubmit = async (status: 'Pending' | 'Draft') => {
+        if (!user) return;
+
         if (status === 'Pending') {
             if (!idFront && !idFrontRef) {
                 alert("Please upload the front of your ID document.");
@@ -171,7 +173,7 @@ export default function VerifyPage() {
                 kyc_status: status,
                 kyc_completed: status === 'Pending',
                 full_name: `${formData.first_name} ${formData.last_name}`,
-                kyc_step: currentStep,
+                kyc_step: status === 'Pending' ? 3 : Math.max(0, currentStep - 1),
                 kyc_data: formData
             };
 
@@ -196,9 +198,9 @@ export default function VerifyPage() {
     };
 
     const nextStep = async () => {
+        await syncProgress(currentStep, formData);
         const next = Math.min(currentStep + 1, 3);
         setCurrentStep(next);
-        await syncProgress(next, formData);
     };
     const prevStep = () => setCurrentStep((prev: number) => Math.max(prev - 1, 1));
 
