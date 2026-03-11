@@ -395,6 +395,38 @@ export default function AdminPortal() {
     };
 
 
+    const handleApproveDeposit = async (tx: any) => {
+        if (!confirm(`Approve deposit of RM ${tx.amount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        try {
+            const { error: txError } = await supabase.from('transactions').update({ status: 'Approved' }).eq('id', tx.id);
+            if (txError) throw txError;
+            
+            const { data: profile } = await supabase.from('profiles').select('balance, total_equity').eq('id', tx.user_id).single();
+            const newBalance = (profile?.balance || 0) + Number(tx.amount);
+            const newTotalEquity = (profile?.total_equity || 0) + Number(tx.amount);
+            
+            const { error: profileError } = await supabase.from('profiles').update({ balance: newBalance, total_equity: newTotalEquity }).eq('id', tx.user_id);
+            if (profileError) throw profileError;
+            
+            showToast("Deposit approved successfully!");
+            fetchData();
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
+    const handleRejectDeposit = async (tx: any) => {
+        if (!confirm(`Reject deposit of RM ${tx.amount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        try {
+            const { error: txError } = await supabase.from('transactions').update({ status: 'Rejected' }).eq('id', tx.id);
+            if (txError) throw txError;
+            showToast("Deposit rejected.");
+            fetchData();
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(val || 0).replace("MYR", "RM");
     };
@@ -835,21 +867,42 @@ export default function AdminPortal() {
                             {activeTab === "deposits" && (
                                 <table className="w-full text-left">
                                     <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                        <tr><th className="px-8 py-6">Name</th><th className="px-8 py-6">Ref ID</th><th className="px-8 py-6">Paid (RM)</th><th className="px-8 py-6">Credit (USD)</th><th className="px-8 py-6 text-right">Action</th></tr>
+                                        <tr>
+                                            <th className="px-8 py-6">Name</th>
+                                            <th className="px-8 py-6">Ref ID</th>
+                                            <th className="px-8 py-6">Amount (RM)</th>
+                                            <th className="px-8 py-6">Date</th>
+                                            <th className="px-8 py-6">Receipt</th>
+                                            <th className="px-8 py-6 text-right">Action</th>
+                                        </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/[0.02]">
                                         {deposits.map((d: any, i: number) => (
                                             <tr key={i} className="text-sm font-bold group hover:bg-white/[0.01]">
-                                                <td className="px-8 py-6 text-white">{d.profiles?.full_name}</td>
+                                                <td className="px-8 py-6 text-white">{d.profiles?.full_name || "Unknown"}</td>
                                                 <td className="px-8 py-4 font-mono text-xs opacity-50">{d.ref_id}</td>
                                                 <td className="px-8 py-6 text-emerald-400">{formatCurrency(d.amount)}</td>
-                                                <td className="px-8 py-6 text-gv-gold">${(d.amount_usd || 0).toFixed(2)}</td>
-                                                <td className="px-8 py-6 text-right">
-                                                    <button className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Verify & Credit</button>
+                                                <td className="px-8 py-6 text-zinc-400 font-mono text-xs">{d.transfer_date ? new Date(d.transfer_date).toLocaleDateString() : "N/A"}</td>
+                                                <td className="px-8 py-6">
+                                                    {d.receipt_url ? (
+                                                        <button 
+                                                            onClick={() => {
+                                                                const url = supabase.storage.from('agreements').getPublicUrl(d.receipt_url).data.publicUrl;
+                                                                window.open(url, '_blank');
+                                                            }}
+                                                            className="text-gv-gold text-[10px] uppercase tracking-widest hover:underline flex items-center gap-2"
+                                                        >
+                                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg> View
+                                                        </button>
+                                                    ) : <span className="text-zinc-600 text-[10px] uppercase">No File</span>}
+                                                </td>
+                                                <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
+                                                    <button onClick={() => handleRejectDeposit(d)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">Reject</button>
+                                                    <button onClick={() => handleApproveDeposit(d)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Verify & Credit</button>
                                                 </td>
                                             </tr>
                                         ))}
-                                        {deposits.length === 0 && <tr><td colSpan={4} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No pending deposits</td></tr>}
+                                        {deposits.length === 0 && <tr><td colSpan={6} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No pending deposits</td></tr>}
                                     </tbody>
                                 </table>
                             )}
