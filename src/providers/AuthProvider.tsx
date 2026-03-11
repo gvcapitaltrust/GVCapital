@@ -28,28 +28,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [totalAssets, setTotalAssets] = useState(0);
     const [loading, setLoading] = useState(true);
     
-    // Drive profile fetching with a dedicated session state
     const [session, setSession] = useState<any>(null);
-    
     const router = useRouter();
-    const pathname = usePathname();
     
-    // Gate to prevent multiple parallel or redundant fetches for the same user
-    const hasFetchedForId = useRef<string | null>(null);
+    // Singleton Guards
+    const isFetching = useRef(false);
+    const currentUserId = useRef<string | null>(null);
 
-    // 1. Session Management (Minimal Listener)
+    // 1. Stable Identity Listener
     useEffect(() => {
-        console.log("[AUTH] Initializing Session Listener...");
-        
-        // Initial check without triggering a 'TOKEN_REFRESHED' event
-        supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-            setSession(initialSession);
-            if (!initialSession) setLoading(false);
-        });
+        // Initial session grab
+        const initSession = async () => {
+            const { data: { session: s } } = await supabase.auth.getSession();
+            if (s) {
+                currentUserId.current = s.user.id;
+                setSession(s);
+            } else {
+                setLoading(false);
+            }
+        };
+        initSession();
 
-        // Listen for Auth events. This only updates the 'session' state.
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
-            console.log(`[AUTH] Supabase Event: ${event}`);
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
+            console.log(`[AUTH EVENT]: ${event}`);
             
             if (event === 'SIGNED_OUT') {
                 setUser(null);
@@ -59,77 +60,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setBalance(0);
                 setTotalEquity(0);
                 setTotalAssets(0);
-                hasFetchedForId.current = null;
+                currentUserId.current = null;
                 setSession(null);
                 setLoading(false);
-                
                 if (window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/admin')) {
                     router.push("/login");
                 }
-            } else if (newSession) {
-                // If it's a critical change, update session state to trigger profile useEffect
-                if (['SIGNED_IN', 'TOKEN_REFRESHED', 'USER_UPDATED', 'INITIAL_SESSION'].includes(event)) {
-                    setSession(newSession);
-                }
+                return;
+            }
+
+            // Stable Identity Check: Only trigger if the user ID changed or explicitly signed in
+            if (s && (s.user.id !== currentUserId.current || event === 'SIGNED_IN')) {
+                currentUserId.current = s.user.id;
+                setSession(s);
             }
         });
 
-        return () => {
-            console.log("[AUTH] Cleaning up listener...");
-            subscription.unsubscribe();
-        };
+        return () => subscription.unsubscribe();
     }, [router]);
 
-    // 2. Profile Fetching (Strict Gate + Master Bypass)
+    // 2. Atomic Profile Fetcher
     useEffect(() => {
-        const userId = session?.user?.id;
-        const email = session?.user?.email;
+        const fetchProfile = async () => {
+            if (!session?.user) return;
+            if (isFetching.current) return; // Prevent concurrent loops
+            
+            isFetching.current = true;
+            const email = session.user.email;
+            const uid = session.user.id;
 
-        if (!userId) {
-            if (!loading) return; // Already handled by initial session check
-            setLoading(false);
-            return;
-        }
+            console.log(`[AUTH] Singleton Fetching for ${email}...`);
 
-        // PREVENT REDUNDANT FETCHES
-        if (hasFetchedForId.current === userId && user) {
-            setLoading(false);
-            return;
-        }
-
-        const fetchProfileData = async () => {
-            console.log(`[AUTH] Fetching Profile for ${email}...`);
-            setLoading(true);
-
-            // MASTER ADMIN BYPASS (Immediate UI Restore)
+            // Emergency Resolver for Master Admin
+            let emergencyTimer: NodeJS.Timeout | null = null;
             if (email === "thenja96@gmail.com") {
-                setUser(session.user);
-                setRole("admin");
-                setIsVerified(true);
-                setKycStep(3);
-                hasFetchedForId.current = userId;
-                setLoading(false);
-                console.log("[AUTH] Master Admin Bypass Applied Successfully.");
-                return;
+                emergencyTimer = setTimeout(() => {
+                    if (isFetching.current) {
+                        console.warn("[AUTH] Emergency Bypass Triggered for Admin.");
+                        setUser(session.user);
+                        setRole("admin");
+                        setIsVerified(true);
+                        setKycStep(3);
+                        setLoading(false);
+                        isFetching.current = false;
+                    }
+                }, 3000); // 3-second strict resolution
             }
 
             try {
                 const { data: profile, error } = await supabase
                     .from('profiles')
-                    .select('role, is_verified, kyc_step, balance, total_equity, total_assets')
-                    .eq('id', userId)
+                    .select('*')
+                    .eq('id', uid)
                     .single();
 
-                if (error) {
-                    console.error("[AUTH] Profile Sync Error:", error.message);
-                }
+                if (emergencyTimer) clearTimeout(emergencyTimer);
 
                 if (profile) {
-                    const resolvedRole = profile.role || "User";
-                    const resolvedVerified = profile.is_verified === true || profile.is_verified === "Approved" || profile.is_verified === "true";
-                    
-                    setRole(resolvedRole);
-                    setIsVerified(resolvedVerified);
+                    setRole(profile.role || "User");
+                    setIsVerified(profile.is_verified === true || profile.is_verified === "Approved");
                     setKycStep(profile.kyc_step || 0);
                     setBalance(profile.balance || 0);
                     setTotalEquity(profile.total_equity || 0);
@@ -138,32 +127,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 } else {
                     setUser(session.user);
                 }
-                
-                hasFetchedForId.current = userId;
             } catch (err) {
-                console.error("[AUTH] Fatal Fetch Exception:", err);
+                console.error("[AUTH] Fetch Stalled:", err);
             } finally {
                 setLoading(false);
+                isFetching.current = false;
             }
         };
 
-        fetchProfileData();
+        if (session?.user) {
+            fetchProfile();
+        }
+    }, [session]); // Only fetch when session state is explicitly updated by stable listener
 
-        // Fail-safe to ensure loading ends
-        const timer = setTimeout(() => setLoading(false), 5000);
-        return () => clearTimeout(timer);
-
-    }, [session?.user?.id]); // ONLY restart when the user ID changes
-
-    const refresh = async () => {
-        hasFetchedForId.current = null; // Un-gate the fetcher
+    const refreshProfile = async () => {
         setLoading(true);
-        const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
-        setSession(refreshedSession);
+        isFetching.current = false; // Force unlock
+        const { data: { session: s } } = await supabase.auth.refreshSession();
+        setSession(s);
     };
 
     return (
-        <AuthContext.Provider value={{ user, role, isVerified, kycStep, balance, totalEquity, totalAssets, loading, refresh }}>
+        <AuthContext.Provider value={{ user, role, isVerified, kycStep, balance, totalEquity, totalAssets, loading, refresh: refreshProfile }}>
             {children}
         </AuthContext.Provider>
     );
