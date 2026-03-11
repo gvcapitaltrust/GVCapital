@@ -8,10 +8,40 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function AdminPortal() {
     const router = useRouter();
+    interface Profile {
+        id: string;
+        username: string;
+        full_name: string;
+        email: string;
+        balance: number;
+        balance_usd: number;
+        is_verified: boolean;
+        kyc_status: 'Pending' | 'Verified' | 'Rejected' | 'Draft' | null;
+        kyc_step: number;
+        kyc_data: any;
+        kyc_id_front: string;
+        kyc_id_back: string;
+        dob: string;
+        phone: string;
+        tax_id: string;
+        address: string;
+        account_purpose: string;
+        employment_status: string;
+        industry: string;
+        source_of_wealth: string[];
+        annual_income: string;
+        total_wealth: string;
+        risk_acknowledged: boolean;
+        accuracy_confirmed: boolean;
+        is_not_pep: boolean;
+        referred_by_username: string;
+        verified_at: string;
+    }
+
     const [activeTab, setActiveTab] = useState("deposits");
     const [mounted, setMounted] = useState(false);
     const [maintenanceMode, setMaintenanceMode] = useState(false);
-    const [adminProfile, setAdminProfile] = useState<any>(null);
+    const [adminProfile, setAdminProfile] = useState<Profile | null>(null);
     const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: "", visible: false });
 
     const showToast = (msg: string) => {
@@ -26,19 +56,22 @@ export default function AdminPortal() {
     const [isUpdatingRate, setIsUpdatingRate] = useState(false);
 
     // Supabase Data
-    const [kycQueue, setKycQueue] = useState<any[]>([]);
+    const [kycQueue, setKycQueue] = useState<Profile[]>([]);
     const [deposits, setDeposits] = useState<any[]>([]);
     const [withdrawals, setWithdrawals] = useState<any[]>([]);
-    const [users, setUsers] = useState<any[]>([]);
+    const [users, setUsers] = useState<Profile[]>([]);
     const [salesData, setSalesData] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-    const [agentReferrals, setAgentReferrals] = useState<any[]>([]);
+    const [agentReferrals, setAgentReferrals] = useState<Partial<Profile>[]>([]);
     const [isLoadingSales, setIsLoadingSales] = useState(false);
     const [rejectionReasons, setRejectionReasons] = useState<{ [key: string]: string }>({});
     const [verificationLogs, setVerificationLogs] = useState<any[]>([]);
     const [auditSearchQuery, setAuditSearchQuery] = useState("");
     const [auditStatusFilter, setAuditStatusFilter] = useState("All");
+    const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [viewingDoc, setViewingDoc] = useState<string | null>(null);
 
     useEffect(() => {
         setMounted(true);
@@ -64,8 +97,8 @@ export default function AdminPortal() {
     const fetchData = async () => {
         const { data: profileList } = await supabase.from('profiles').select('*');
         if (profileList) {
-            setUsers(profileList);
-            setKycQueue(profileList.filter((p: any) => p.kyc_status === 'Pending'));
+            setUsers(profileList as Profile[]);
+            setKycQueue((profileList as Profile[]).filter((p: Profile) => p.kyc_status === 'Pending'));
         }
 
         const { data: txList } = await supabase
@@ -204,7 +237,7 @@ export default function AdminPortal() {
     };
 
     const handleVerifyUser = async (userId: string) => {
-        const userToVerify = users.find(u => u.id === userId);
+        const userToVerify = users.find((u: any) => u.id === userId);
         if (!userToVerify) return;
 
         try {
@@ -237,7 +270,7 @@ export default function AdminPortal() {
     };
 
     const handleRejectUser = async (userId: string) => {
-        const userToReject = users.find(u => u.id === userId);
+        const userToReject = users.find((u: any) => u.id === userId);
         if (!userToReject) return;
         const reason = rejectionReasons[userId] || "";
 
@@ -271,7 +304,7 @@ export default function AdminPortal() {
                 });
 
             // Clear the reason for this user
-            setRejectionReasons(prev => {
+            setRejectionReasons((prev: any) => {
                 const next = { ...prev };
                 delete next[userId];
                 return next;
@@ -345,13 +378,80 @@ export default function AdminPortal() {
                                     onClick={() => setActiveTab(tab)}
                                     className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
                                 >
-                                    {tab}
+                                    {tab === "kyc" ? `KYC Queue (${kycQueue.length})` : tab}
                                 </button>
                             ))}
                         </div>
 
                         {/* Content Area */}
                         <div className="bg-[#121212] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
+                            {activeTab === "kyc" && (
+                                <table className="w-full text-left">
+                                    <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                        <tr>
+                                            <th className="px-8 py-6">Client</th>
+                                            <th className="px-8 py-6">Submission Date</th>
+                                            <th className="px-8 py-6">Country</th>
+                                            <th className="px-8 py-6 text-center">Status</th>
+                                            <th className="px-8 py-6 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/[0.02]">
+                                        {kycQueue.map((u: any, i: number) => (
+                                            <tr 
+                                                key={i} 
+                                                className="text-sm font-bold group hover:bg-white/[0.01] cursor-pointer"
+                                                onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
+                                            >
+                                                <td className="px-8 py-6">
+                                                    <div className="text-white">{u.full_name || u.email}</div>
+                                                    <div className="text-[10px] text-zinc-500 font-medium">{u.email}</div>
+                                                </td>
+                                                <td className="px-8 py-6 text-zinc-400 font-mono text-xs">
+                                                    {u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A"}
+                                                </td>
+                                                <td className="px-8 py-6 text-zinc-400">{u.country || u.kyc_data?.country || "N/A"}</td>
+                                                <td className="px-8 py-6 text-center">
+                                                    <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[9px] uppercase font-black border border-amber-500/20">
+                                                        {u.kyc_status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-8 py-6 text-right">
+                                                    <button className="text-[10px] font-black uppercase text-gv-gold hover:underline">Review Profile</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {kycQueue.length === 0 && (
+                                            <tr>
+                                                <td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">
+                                                    No pending KYC applications
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            )}
+
+                            {activeTab === "withdrawals" && (
+                                <table className="w-full text-left">
+                                    <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                        <tr><th className="px-8 py-6">Name</th><th className="px-8 py-6">Ref ID</th><th className="px-8 py-6">Amount (RM)</th><th className="px-8 py-6 text-right">Action</th></tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/[0.02]">
+                                        {withdrawals.map((w: any, i: number) => (
+                                            <tr key={i} className="text-sm font-bold group hover:bg-white/[0.01]">
+                                                <td className="px-8 py-6 text-white">{w.profiles?.full_name || w.user_id}</td>
+                                                <td className="px-8 py-4 font-mono text-xs opacity-50">{w.ref_id}</td>
+                                                <td className="px-8 py-6 text-red-400">{formatCurrency(w.amount * -1)}</td>
+                                                <td className="px-8 py-6 text-right">
+                                                    <button className="bg-red-500 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-red-500/10 hover:-translate-y-0.5 transition-all">Approve Withdrawal</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {withdrawals.length === 0 && <tr><td colSpan={4} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No pending withdrawals</td></tr>}
+                                    </tbody>
+                                </table>
+                            )}
                             {activeTab === "sales" && (
                                 <div className="p-8 space-y-8">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -364,7 +464,7 @@ export default function AdminPortal() {
                                                 type="text"
                                                 placeholder="Search Agent Username..."
                                                 value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-gv-gold transition-all"
                                             />
                                         </div>
@@ -469,7 +569,7 @@ export default function AdminPortal() {
                                                     type="number"
                                                     step="0.001"
                                                     value={newForexRate}
-                                                    onChange={(e) => setNewForexRate(e.target.value)}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewForexRate(e.target.value)}
                                                     className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all text-white"
                                                     placeholder="4.752"
                                                 />
@@ -534,7 +634,11 @@ export default function AdminPortal() {
                                     </thead>
                                     <tbody className="divide-y divide-white/[0.02]">
                                         {users.map((u: any, i: number) => (
-                                            <tr key={i} className="text-sm font-bold group hover:bg-white/[0.01]">
+                                            <tr 
+                                                key={i} 
+                                                className="text-sm font-bold group hover:bg-white/[0.01] cursor-pointer"
+                                                onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
+                                            >
                                                 <td className="px-8 py-6 text-white">{u.full_name || u.email}</td>
                                                 <td className="px-8 py-6 text-emerald-400">{formatCurrency(u.balance)}</td>
                                                 <td className="px-8 py-6 text-gv-gold">${(u.balance_usd || 0).toFixed(2)}</td>
@@ -550,14 +654,14 @@ export default function AdminPortal() {
                                                         <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Pending</span>
                                                     )}
                                                 </td>
-                                                <td className="px-8 py-6 text-right space-x-3">
+                                                <td className="px-8 py-6 text-right space-x-3" onClick={(e: React.MouseEvent<HTMLTableCellElement>) => e.stopPropagation()}>
                                                     {!u.is_verified ? (
                                                         <div className="flex flex-col md:flex-row items-end md:items-center justify-end gap-3">
                                                             <input 
                                                                 type="text"
                                                                 placeholder="Rejection Reason..."
                                                                 value={rejectionReasons[u.id] || ""}
-                                                                onChange={(e) => setRejectionReasons({ ...rejectionReasons, [u.id]: e.target.value })}
+                                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRejectionReasons({ ...rejectionReasons, [u.id]: e.target.value })}
                                                                 className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[9px] focus:outline-none focus:border-red-500/50 w-full md:w-32"
                                                             />
                                                             <div className="flex gap-2">
@@ -581,8 +685,6 @@ export default function AdminPortal() {
                                                             Verified
                                                         </span>
                                                     )}
-                                                    <button className="text-[10px] font-black uppercase tracking-tighter text-gv-gold hover:underline">Edit Balance</button>
-                                                    <button className="text-[10px] font-black uppercase tracking-tighter text-emerald-500 hover:underline">Allocate</button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -627,7 +729,7 @@ export default function AdminPortal() {
                                                     type="text"
                                                     placeholder="Search Email or Admin..."
                                                     value={auditSearchQuery}
-                                                    onChange={(e) => setAuditSearchQuery(e.target.value)}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAuditSearchQuery(e.target.value)}
                                                     className="bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all w-full md:w-64"
                                                 />
                                                 <svg className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -636,7 +738,7 @@ export default function AdminPortal() {
                                             {/* Status Filter */}
                                             <select 
                                                 value={auditStatusFilter}
-                                                onChange={(e) => setAuditStatusFilter(e.target.value)}
+                                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setAuditStatusFilter(e.target.value)}
                                                 className="bg-[#121212] border border-white/10 rounded-xl px-6 py-2.5 text-xs font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 cursor-pointer transition-all"
                                             >
                                                 <option value="All">All Actions</option>
@@ -769,7 +871,213 @@ export default function AdminPortal() {
                     </div>
                 )}
 
-                <GlobalFooter />
+                {/* User Detail Modal */}
+                {isDetailModalOpen && selectedUser && (
+                    <div className="fixed inset-0 z-[600] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
+                        <div className="bg-[#121212] border border-white/10 rounded-[40px] w-full max-w-5xl max-h-full overflow-y-auto shadow-[0_0_100px_rgba(0,0,0,0.8)] relative custom-scrollbar">
+                            <button 
+                                onClick={() => setIsDetailModalOpen(false)}
+                                className="absolute top-8 right-8 text-zinc-500 hover:text-white transition-colors"
+                            >
+                                <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+
+                            <div className="p-10 md:p-16 space-y-16">
+                                <header className="flex flex-col md:flex-row justify-between items-start gap-8">
+                                    <div className="space-y-2">
+                                        <p className="text-[10px] text-gv-gold font-black uppercase tracking-[0.2em]">Client Profile Audit</p>
+                                        <h2 className="text-4xl font-black text-white uppercase tracking-tighter">{selectedUser.full_name || selectedUser.email}</h2>
+                                        <div className="flex items-center gap-4 pt-2">
+                                            <span className="text-xs font-mono text-zinc-500">{selectedUser.id}</span>
+                                            <span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase border ${selectedUser.is_verified ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-amber-500/10 text-amber-500 border-amber-500/20"}`}>
+                                                {selectedUser.is_verified ? "Verified" : "Pending Verification"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        {!selectedUser.is_verified && (
+                                            <>
+                                                <button 
+                                                    onClick={() => { handleVerifyUser(selectedUser.id); setIsDetailModalOpen(false); }}
+                                                    className="bg-emerald-500 hover:bg-emerald-600 text-black font-black px-8 py-4 rounded-2xl text-xs uppercase tracking-widest transition-all shadow-xl shadow-emerald-500/10 active:scale-95"
+                                                >
+                                                    Approve Identity
+                                                </button>
+                                                <button 
+                                                    onClick={() => {
+                                                        const reason = prompt("Enter rejection reason:");
+                                                        if (reason) {
+                                                            setRejectionReasons({ ...rejectionReasons, [selectedUser.id]: reason });
+                                                            handleRejectUser(selectedUser.id);
+                                                            setIsDetailModalOpen(false);
+                                                        }
+                                                    }}
+                                                    className="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 font-black px-8 py-4 rounded-2xl text-xs uppercase tracking-widest transition-all active:scale-95"
+                                                >
+                                                    Reject
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                </header>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                                    {/* Section 1: Identity */}
+                                    <section className="space-y-8">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-[1px] flex-1 bg-white/10"></div>
+                                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Identity Details</h3>
+                                            <div className="h-[1px] flex-1 bg-white/10"></div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-y-8 gap-x-4">
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Full Name</p>
+                                                <p className="text-sm font-bold text-white">{selectedUser.full_name || "N/A"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Date of Birth</p>
+                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.dob || "N/A"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Phone Number</p>
+                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.phone || "N/A"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Tax ID (TIN)</p>
+                                                <p className="text-sm font-bold text-white uppercase tracking-tighter">{selectedUser.kyc_data?.tax_id || "None"}</p>
+                                            </div>
+                                            <div className="col-span-2 space-y-1">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Residential Address</p>
+                                                <p className="text-sm font-bold text-white leading-relaxed">
+                                                    {selectedUser.kyc_data?.address}<br/>
+                                                    {selectedUser.kyc_data?.city}, {selectedUser.kyc_data?.country}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    {/* Section 2: Financials */}
+                                    <section className="space-y-8">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-[1px] flex-1 bg-white/10"></div>
+                                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Financial Profile</h3>
+                                            <div className="h-[1px] flex-1 bg-white/10"></div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-y-8 gap-x-4">
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Account Purpose</p>
+                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.account_purpose || "N/A"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Employment Status</p>
+                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.employment_status || "N/A"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Industry</p>
+                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.industry || "N/A"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Primary Wealth Source</p>
+                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.source_of_wealth?.join(', ') || "N/A"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Annual Net Income</p>
+                                                <p className="text-sm font-black text-emerald-400">{selectedUser.kyc_data?.annual_income || "N/A"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Total Net Worth</p>
+                                                <p className="text-sm font-black text-gv-gold">{selectedUser.kyc_data?.total_wealth || "N/A"}</p>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                                    {/* Section 3: Compliance */}
+                                    <section className="space-y-8">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-[1px] flex-1 bg-white/10"></div>
+                                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Compliance & Risk</h3>
+                                            <div className="h-[1px] flex-1 bg-white/10"></div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <div className={`flex items-center gap-3 p-4 rounded-2xl border ${selectedUser.kyc_data?.accuracy_confirmed ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-500" : "bg-white/5 border-white/10 text-zinc-500"}`}>
+                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
+                                                <p className="text-[10px] font-black uppercase tracking-widest">Accuracy Confirmed</p>
+                                            </div>
+                                            <div className={`flex items-center gap-3 p-4 rounded-2xl border ${selectedUser.kyc_data?.risk_acknowledged ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-500" : "bg-white/5 border-white/10 text-zinc-500"}`}>
+                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
+                                                <p className="text-[10px] font-black uppercase tracking-widest">Risk Acknowledged</p>
+                                            </div>
+                                            <div className={`flex items-center gap-3 p-4 rounded-2xl border ${!selectedUser.kyc_data?.is_not_pep ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-500" : "bg-white/5 border-white/10 text-zinc-500"}`}>
+                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
+                                                <p className="text-[10px] font-black uppercase tracking-widest">Not a Politically Exposed Person (PEP)</p>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    {/* Section 4: Documents */}
+                                    <section className="space-y-8">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-[1px] flex-1 bg-white/10"></div>
+                                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Legal Documents</h3>
+                                            <div className="h-[1px] flex-1 bg-white/10"></div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <div className="space-y-3">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest text-center">Front of ID</p>
+                                                <div 
+                                                    className="aspect-[3/2] rounded-2xl bg-white/5 border border-white/10 overflow-hidden cursor-pointer hover:border-gv-gold/50 transition-all group"
+                                                    onClick={() => setViewingDoc(selectedUser.kyc_id_front)}
+                                                >
+                                                    {selectedUser.kyc_id_front ? (
+                                                        <img src={supabase.storage.from('agreements').getPublicUrl(selectedUser.kyc_id_front).data.publicUrl} className="w-full h-full object-cover group-hover:scale-105 transition-all" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-[10px] font-black text-zinc-700">NO UPLOAD</div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest text-center">Back of ID</p>
+                                                <div 
+                                                    className="aspect-[3/2] rounded-2xl bg-white/5 border border-white/10 overflow-hidden cursor-pointer hover:border-gv-gold/50 transition-all group"
+                                                    onClick={() => setViewingDoc(selectedUser.kyc_id_back)}
+                                                >
+                                                    {selectedUser.kyc_id_back ? (
+                                                        <img src={supabase.storage.from('agreements').getPublicUrl(selectedUser.kyc_id_back).data.publicUrl} className="w-full h-full object-cover group-hover:scale-105 transition-all" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-[10px] font-black text-zinc-700">NO UPLOAD</div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Lightbox / Document Viewer */}
+                {viewingDoc && (
+                    <div className="fixed inset-0 z-[700] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-8 md:p-16 animate-in fade-in zoom-in-95 duration-300" onClick={() => setViewingDoc(null)}>
+                        <div className="relative max-w-6xl w-full h-full flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
+                            <button 
+                                onClick={() => setViewingDoc(null)}
+                                className="absolute -top-12 right-0 text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2 hover:text-gv-gold transition-all"
+                            >
+                                Close Viewer <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                            <div className="w-full h-full flex items-center justify-center bg-white/5 rounded-[40px] overflow-hidden border border-white/10">
+                                <img 
+                                    src={supabase.storage.from('agreements').getPublicUrl(viewingDoc).data.publicUrl} 
+                                    className="w-full h-full object-contain"
+                                    alt="Identity Document High-Res"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </AuthGuard>
     );

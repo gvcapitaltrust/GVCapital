@@ -10,7 +10,12 @@ export default function VerifyPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [lang, setLang] = useState<"en" | "zh">("en");
-    const [user, setUser] = useState<any>(null);
+    interface User {
+        id: string;
+        email?: string;
+    }
+
+    const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
@@ -320,7 +325,7 @@ export default function VerifyPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Purpose of Account</label>
-                                    <select value={formData.account_purpose} onChange={(e: any) => setFormData({...formData, account_purpose: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                    <select value={formData.account_purpose} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, account_purpose: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
                                         <option value="Investment">Investment</option>
                                         <option value="Hedging">Hedging</option>
                                         <option value="Speculation">Speculation</option>
@@ -328,7 +333,7 @@ export default function VerifyPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Employment Status</label>
-                                    <select value={formData.employment_status} onChange={(e: any) => setFormData({...formData, employment_status: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                    <select value={formData.employment_status} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, employment_status: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
                                         <option value="Full-time">Full-time</option>
                                         <option value="Part-time">Part-time</option>
                                         <option value="Freelancer">Freelancer</option>
@@ -340,7 +345,7 @@ export default function VerifyPage() {
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Industry</label>
-                                    <select value={formData.industry} onChange={(e: any) => setFormData({...formData, industry: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                    <select value={formData.industry} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, industry: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
                                         {industries.map((ind: string) => <option key={ind} value={ind}>{ind}</option>)}
                                     </select>
                                 </div>
@@ -360,19 +365,19 @@ export default function VerifyPage() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Total Net Worth</label>
-                                    <select value={formData.total_wealth} onChange={(e: any) => setFormData({...formData, total_wealth: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                    <select value={formData.total_wealth} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, total_wealth: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
                                         {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Annual Net Income</label>
-                                    <select value={formData.annual_income} onChange={(e: any) => setFormData({...formData, annual_income: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                    <select value={formData.annual_income} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, annual_income: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
                                         {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Expected Yearly Deposit</label>
-                                    <select value={formData.yearly_deposit} onChange={(e: any) => setFormData({...formData, yearly_deposit: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                    <select value={formData.yearly_deposit} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, yearly_deposit: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
                                         {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
@@ -380,21 +385,21 @@ export default function VerifyPage() {
 
                             <div className="space-y-4 pt-4">
                                 <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
-                                    <input type="checkbox" checked={formData.accuracy_confirmed} onChange={(e: any) => setFormData({...formData, accuracy_confirmed: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
+                                    <input type="checkbox" checked={formData.accuracy_confirmed} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, accuracy_confirmed: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-white uppercase tracking-tighter">Information Accuracy</p>
                                         <p className="text-[9px] text-zinc-500 font-bold leading-normal">I hereby confirm that all the information provided above is true and correct.</p>
                                     </div>
                                 </label>
                                 <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
-                                    <input type="checkbox" checked={formData.risk_acknowledged} onChange={(e: any) => setFormData({...formData, risk_acknowledged: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
+                                    <input type="checkbox" checked={formData.risk_acknowledged} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, risk_acknowledged: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-white uppercase tracking-tighter">Risk Acknowledgement</p>
                                         <p className="text-[9px] text-zinc-500 font-bold leading-normal">I understand and acknowledge the risks associated with high-yield investments.</p>
                                     </div>
                                 </label>
                                 <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
-                                    <input type="checkbox" checked={formData.is_not_pep} onChange={(e: any) => setFormData({...formData, is_not_pep: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
+                                    <input type="checkbox" checked={formData.is_not_pep} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, is_not_pep: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-white uppercase tracking-tighter">PEP Declaration</p>
                                         <p className="text-[9px] text-zinc-500 font-bold leading-normal">I confirm that I am not a Politically Exposed Person (PEP) or a close associate of one.</p>
@@ -471,7 +476,7 @@ export default function VerifyPage() {
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Upload IC / Image</span>
                                             </div>
                                         )}
-                                        <input type="file" onChange={(e: any) => setIdFront(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                        <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdFront(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
                                     </div>
                                 </div>
                                 <div className="space-y-4">
@@ -493,7 +498,7 @@ export default function VerifyPage() {
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Upload IC / Image</span>
                                             </div>
                                         )}
-                                        <input type="file" onChange={(e: any) => setIdBack(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                        <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdBack(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
                                     </div>
                                 </div>
                             </div>
