@@ -415,15 +415,14 @@ export default function AdminPortal() {
     const handleApproveDeposit = async (tx: any) => {
         if (!confirm(`Approve deposit of RM ${tx.amount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
-            const { error: txError } = await supabase.from('transactions').update({ status: 'Approved' }).eq('id', tx.id);
-            if (txError) throw txError;
+            // Using a secure atomic backend RPC to ensure deposits accurately reflect balances
+            const { error: rpcError } = await supabase.rpc('approve_deposit', {
+                p_tx_id: tx.id,
+                p_user_id: tx.user_id,
+                p_amount: tx.amount
+            });
             
-            const { data: profile } = await supabase.from('profiles').select('balance, total_equity').eq('id', tx.user_id).single();
-            const newBalance = (profile?.balance || 0) + Number(tx.amount);
-            const newTotalEquity = (profile?.total_equity || 0) + Number(tx.amount);
-            
-            const { error: profileError } = await supabase.from('profiles').update({ balance: newBalance, total_equity: newTotalEquity }).eq('id', tx.user_id);
-            if (profileError) throw profileError;
+            if (rpcError) throw rpcError;
             
             showToast("Deposit approved successfully!");
             setIsDepositDrawerOpen(false);
@@ -1105,6 +1104,15 @@ export default function AdminPortal() {
                                     <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest pt-2">
                                         Account Created: {selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString() : 'N/A'}
                                     </p>
+                                    <div className="mt-6 bg-gv-gold/10 border border-gv-gold/30 p-4 rounded-xl flex items-center justify-between shadow-[0_0_15px_rgba(238,206,128,0.1)]">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-8 rounded-full bg-gv-gold text-black flex items-center justify-center">
+                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            </div>
+                                            <span className="text-xs font-black uppercase text-gv-gold tracking-widest">Total Balance</span>
+                                        </div>
+                                        <span className="text-2xl font-black text-white">{formatCurrency(selectedUser.balance || 0)}</span>
+                                    </div>
                                 </header>
                                 
                                 <section className="space-y-4">
