@@ -533,7 +533,7 @@ export default function AdminPortal() {
 
     const handleApproveDeposit = async (tx: any) => {
         const displayRm = Number(tx.original_currency_amount || (Number(tx.amount || 0) * (parseFloat(currentForexRate) || 4.7)));
-        if (!confirm(`Approve deposit: Client sent RM ${displayRm.toFixed(2)}. Crediting $${Number(tx.amount || 0).toFixed(2)} USD for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        if (!confirm(`Confirming deposit: User sent RM ${displayRm.toFixed(2)} (Credit: $${Number(tx.amount || 0).toFixed(2)} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             // Use RPC for atomic update of transaction and profile balance
             const { error: rpcError } = await supabase.rpc('approve_deposit', {
@@ -971,7 +971,15 @@ export default function AdminPortal() {
                                     <div className="overflow-hidden border border-white/5 rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                                <tr><th className="px-8 py-6">Client</th><th className="px-8 py-6">Total Equity (RM)</th><th className="px-8 py-6">Balance USD</th><th className="px-8 py-6">Total Assets</th><th className="px-8 py-6 text-center">KYC</th><th className="px-8 py-6 text-center">Status</th><th className="px-8 py-6 text-right">Actions</th></tr>
+                                                <tr>
+                                                    <th className="px-8 py-6">Client</th>
+                                                    <th className="px-8 py-6">Total Balance (RM/USD)</th>
+                                                    <th className="px-8 py-6">Profit Earned</th>
+                                                    <th className="px-8 py-6">Total Assets</th>
+                                                    <th className="px-8 py-6 text-center">KYC</th>
+                                                    <th className="px-8 py-6 text-center">Status</th>
+                                                    <th className="px-8 py-6 text-right">Actions</th>
+                                                </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
                                                 {users.filter((u: any) => {
@@ -992,9 +1000,19 @@ export default function AdminPortal() {
                                                 onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
                                             >
                                                 <td className="px-8 py-6 text-white">{u.full_name || u.email}</td>
-                                                <td className="px-8 py-6 text-emerald-400">{formatCurrency(Number(u.balance || 0) + Number(u.profit || 0))}</td>
-                                                <td className="px-8 py-6 text-gv-gold">${(u.balance_usd || 0).toFixed(2)}</td>
-                                                <td className="px-8 py-6 text-white font-black">{formatCurrency(Number(u.balance || 0) + Number(u.profit || 0))}</td>
+                                                <td className="px-8 py-6">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-emerald-400 font-black">RM {(Number(u.balance || 0) * (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${Number(u.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-8 py-6 text-gv-gold font-mono text-xs">RM {(Number(u.profit || 0) * (parseFloat(currentForexRate) || 4.7)).toFixed(2)}</td>
+                                                <td className="px-8 py-6 text-white font-black">
+                                                    <div className="flex flex-col">
+                                                        <span>RM {((Number(u.balance || 0) + Number(u.profit || 0)) * (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${(Number(u.balance || 0) + Number(u.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                                                    </div>
+                                                </td>
                                                 <td className="px-8 py-6">
                                                     <div className="flex justify-center">
                                                         <span className={`px-3 py-1 rounded-full text-[9px] uppercase font-black text-center ${u.kyc_completed ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-500"}`}>{u.kyc_status || 'KYC Pending'}</span>
@@ -1087,11 +1105,10 @@ export default function AdminPortal() {
                                                         <span className="text-[10px] text-zinc-500 lowercase font-medium">{d.profiles?.email}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-8 py-6 text-xs opacity-50 font-mono">{d.ref_id}</td>
                                                 <td className="px-8 py-6">
                                                     <div className="flex flex-col">
                                                         <span className="text-emerald-400 font-black text-lg">RM {(Number(d.amount || 0) * (parseFloat(currentForexRate) || 4.7)).toFixed(2)}</span>
-                                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">Crediting: ${Number(d.amount || 0).toFixed(2)} USD</span>
+                                                        <span className="text-[10px] text-zinc-400 font-bold tracking-tighter">($${Number(d.amount || 0).toFixed(2)})</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6">
