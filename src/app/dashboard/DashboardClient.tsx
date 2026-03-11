@@ -35,6 +35,7 @@ export default function DashboardClient() {
 
     // Form States
     const [depositAmount, setDepositAmount] = useState("");
+    const [depositDate, setDepositDate] = useState("");
     const [depositReceipt, setDepositReceipt] = useState<File | null>(null);
     const [withdrawAmount, setWithdrawAmount] = useState("");
     const [withdrawPIN, setWithdrawPIN] = useState("");
@@ -257,6 +258,7 @@ export default function DashboardClient() {
                     user_id: user.id,
                     type: 'Deposit',
                     amount: parseFloat(depositAmount),
+                    transfer_date: depositDate || new Date().toISOString(),
                     status: 'Pending',
                     receipt_url: uploadData.path,
                     ref_id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`
@@ -266,6 +268,7 @@ export default function DashboardClient() {
 
             setIsDepositModalOpen(false);
             setDepositAmount("");
+            setDepositDate("");
             setDepositReceipt(null);
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
@@ -995,14 +998,18 @@ export default function DashboardClient() {
                                 <input type="number" value={depositAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                             </div>
                             <div className="space-y-2">
+                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Transfer Date</label>
+                                <input type="date" value={depositDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-black focus:outline-none focus:border-gv-gold transition-all text-white inverted-scheme-date-picker" />
+                            </div>
+                            <div className="space-y-2">
                                 <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Bank Receipt (Image/PDF)</label>
                                 <div className="border border-white/10 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-colors cursor-pointer relative group">
                                     <svg className="h-10 w-10 text-zinc-600 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                     <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{depositReceipt ? (depositReceipt as File).name : "Select Document"}</span>
-                                    <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositReceipt(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                    <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositReceipt(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,.pdf" />
                                 </div>
                             </div>
-                            <button onClick={handleDepositSubmit} disabled={isSubmitting || !depositAmount || !depositReceipt} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50">
+                            <button onClick={handleDepositSubmit} disabled={isSubmitting || !depositAmount || !depositReceipt} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:-translate-y-1">
                                 {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : "Confirm Deposit"}
                             </button>
                         </div>
@@ -1104,6 +1111,13 @@ export default function DashboardClient() {
                     </div>
                 </div>
             )}
+            {/* Global style tag for date pickers avoiding messy classes */}
+            <style jsx>{`
+                .inverted-scheme-date-picker::-webkit-calendar-picker-indicator {
+                    filter: invert(1);
+                    cursor: pointer;
+                }
+            `}</style>
         </div>
     );
 }
