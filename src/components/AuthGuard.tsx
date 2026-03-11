@@ -23,19 +23,32 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
 
             const user = session.user;
 
-            // Try fetching from database for the most accurate role
-            const { data: profile } = await supabase
+            // Optional: force refresh session
+            const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+            const activeUser = refreshedSession?.user || user;
+
+            // Hardcode bypass for specific admin email:
+            if (activeUser.email === "thenja96@gmail.com") {
+                console.log("Admin Bypass Activated for thenja96@gmail.com");
+                setAuthorized(true);
+                return;
+            }
+
+            // Try fetching from database for the most accurate role, bypassing cache
+            const { data: profile, error } = await supabase
                 .from('profiles')
                 .select('role')
-                .eq('id', user.id)
+                .eq('id', activeUser.id)
                 .single();
 
-            const role = profile?.role || user.user_metadata?.role || (user.email === "admin@gvcapital.trust" ? "Admin" : "User");
+            const role = profile?.role || activeUser.user_metadata?.role || (activeUser.email === "admin@gvcapital.trust" ? "Admin" : "User");
+            
             console.log("=== AUTH GUARD DEBUG ===");
             console.log("Evaluated Role:", role);
             console.log("DB Role:", profile?.role);
-            console.log("Metadata Role:", user.user_metadata?.role);
-            console.log("Email:", user.email);
+            console.log("Metadata Role:", activeUser.user_metadata?.role);
+            console.log("Email:", activeUser.email);
+            if (error) console.error("Profile Fetch Error:", error);
 
             if (requireAdmin && role.toLowerCase() !== "admin") {
                 setForbidden(true);
