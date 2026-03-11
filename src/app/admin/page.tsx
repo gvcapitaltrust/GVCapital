@@ -79,6 +79,9 @@ export default function AdminPortal() {
     const [isLoadingDocs, setIsLoadingDocs] = useState(false);
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
     const [rejectReasonText, setRejectReasonText] = useState("");
+    const [isDepositDrawerOpen, setIsDepositDrawerOpen] = useState(false);
+    const [selectedDepositTx, setSelectedDepositTx] = useState<any>(null);
+    const [depositReceiptUrl, setDepositReceiptUrl] = useState<string | null>(null);
 
     useEffect(() => {
         setMounted(true);
@@ -395,6 +398,20 @@ export default function AdminPortal() {
     };
 
 
+    const openDepositReceipt = async (tx: any) => {
+        setSelectedDepositTx(tx);
+        setDepositReceiptUrl(null);
+        setIsDepositDrawerOpen(true);
+        try {
+            const { data, error } = await supabase.storage.from('agreements').createSignedUrl(tx.receipt_url, 3600);
+            if (error || !data) throw error;
+            setDepositReceiptUrl(data.signedUrl);
+        } catch (err: any) {
+            console.error(err);
+            showToast("Failed to load secure receipt document.");
+        }
+    };
+
     const handleApproveDeposit = async (tx: any) => {
         if (!confirm(`Approve deposit of RM ${tx.amount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
@@ -409,6 +426,7 @@ export default function AdminPortal() {
             if (profileError) throw profileError;
             
             showToast("Deposit approved successfully!");
+            setIsDepositDrawerOpen(false);
             fetchData();
         } catch (error: any) {
             alert(error.message);
@@ -421,6 +439,7 @@ export default function AdminPortal() {
             const { error: txError } = await supabase.from('transactions').update({ status: 'Rejected' }).eq('id', tx.id);
             if (txError) throw txError;
             showToast("Deposit rejected.");
+            setIsDepositDrawerOpen(false);
             fetchData();
         } catch (error: any) {
             alert(error.message);
@@ -886,10 +905,7 @@ export default function AdminPortal() {
                                                 <td className="px-8 py-6">
                                                     {d.receipt_url ? (
                                                         <button 
-                                                            onClick={() => {
-                                                                const url = supabase.storage.from('agreements').getPublicUrl(d.receipt_url).data.publicUrl;
-                                                                window.open(url, '_blank');
-                                                            }}
+                                                            onClick={() => openDepositReceipt(d)}
                                                             className="text-gv-gold text-[10px] uppercase tracking-widest hover:underline flex items-center gap-2"
                                                         >
                                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg> View
@@ -1172,6 +1188,94 @@ export default function AdminPortal() {
                                     className="w-full h-full object-contain"
                                     alt="Identity Document High-Res"
                                 />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Deposit Receipt Drawer / Modal */}
+                {isDepositDrawerOpen && selectedDepositTx && (
+                    <div className="fixed inset-0 z-[750] bg-black/80 backdrop-blur-md flex justify-end animate-in fade-in duration-300">
+                        <div className="w-full max-w-xl bg-[#121212] border-l border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.8)] h-full overflow-y-auto animate-in slide-in-from-right-full duration-500 flex flex-col">
+                            <div className="p-8 border-b border-white/10 shrink-0 flex items-center justify-between bg-black/40 sticky top-0 z-10 backdrop-blur-xl">
+                                <div>
+                                    <h2 className="text-xl font-black text-white uppercase tracking-tighter">Deposit Review</h2>
+                                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Ref: {selectedDepositTx.ref_id}</p>
+                                </div>
+                                <button 
+                                    onClick={() => setIsDepositDrawerOpen(false)}
+                                    className="h-10 w-10 bg-white/5 hover:bg-white/10 hover:text-white text-zinc-500 rounded-full flex items-center justify-center transition-all"
+                                >
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
+                            
+                            <div className="p-8 flex-1 flex flex-col">
+                                <div className="space-y-8 flex-1 flex flex-col">
+                                    {/* Image Viewer */}
+                                    <div className="relative group w-full bg-[#0a0a0a] border border-white/10 rounded-3xl flex-1 min-h-[400px] overflow-hidden flex items-center justify-center p-2 shadow-inner">
+                                        {depositReceiptUrl ? (
+                                            <>
+                                                {selectedDepositTx.receipt_url && selectedDepositTx.receipt_url.toLowerCase().endsWith('.pdf') ? (
+                                                    <iframe src={depositReceiptUrl} className="w-full h-full rounded-2xl bg-white"/>
+                                                ) : (
+                                                    <img 
+                                                        src={depositReceiptUrl} 
+                                                        alt="Deposit Receipt" 
+                                                        className="w-full h-full object-contain rounded-2xl group-hover:scale-[1.02] transition-transform duration-700"
+                                                    />
+                                                )}
+                                                <a 
+                                                    href={depositReceiptUrl}
+                                                    download={`Receipt_${selectedDepositTx.ref_id}`}
+                                                    target="_blank" 
+                                                    className="absolute bottom-6 right-6 bg-black/80 hover:bg-gv-gold hover:text-black hover:shadow-[0_0_20px_rgba(238,206,128,0.4)] backdrop-blur-lg border border-white/10 p-4 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all hidden md:flex"
+                                                    title="Download Original"
+                                                >
+                                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                                </a>
+                                            </>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center animate-pulse">
+                                                <div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full mb-6 shadow-[0_0_15px_rgba(238,206,128,0.5)]"></div>
+                                                <p className="text-[10px] font-black uppercase text-zinc-500 tracking-[0.2em]">Initiating Secure Connection...</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Transaction Quick Details */}
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 flex flex-col items-center justify-center shrink-0">
+                                        <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] mb-3">Request Amount</div>
+                                        <h3 className="text-5xl font-black text-emerald-400 tracking-tighter drop-shadow-[0_0_15px_rgba(52,211,153,0.3)]">
+                                            {formatCurrency(selectedDepositTx.amount)}
+                                        </h3>
+                                        <div className="mt-4 flex flex-col items-center gap-1 text-center">
+                                            <div className="text-white text-sm font-bold uppercase tracking-widest">{selectedDepositTx.profiles?.full_name || 'Client'}</div>
+                                            <div className="text-zinc-500 text-[10px] uppercase font-black">
+                                                {selectedDepositTx.transfer_date ? new Date(selectedDepositTx.transfer_date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : "Unknown Date"}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Action Area */}
+                            <div className="p-8 border-t border-white/10 bg-black/40 backdrop-blur-xl shrink-0">
+                                <div className="flex gap-4">
+                                    <button 
+                                        onClick={() => handleRejectDeposit(selectedDepositTx)}
+                                        className="w-1/3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 px-6 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all text-center hover:shadow-[0_0_20px_rgba(239,68,68,0.2)] active:scale-95"
+                                    >
+                                        Reject
+                                    </button>
+                                    <button 
+                                        onClick={() => handleApproveDeposit(selectedDepositTx)}
+                                        className="w-2/3 bg-emerald-500 hover:bg-emerald-600 text-black px-6 py-5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all text-center shadow-[0_0_20px_rgba(52,211,153,0.3)] active:scale-95 flex items-center justify-center gap-3"
+                                    >
+                                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        Approve & Credit
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
