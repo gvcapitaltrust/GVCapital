@@ -76,8 +76,9 @@ export default function DashboardClient() {
             try {
                 // 1. Fetch Forex Rate first for global calculations
                 const { data: psRate, error: psError } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
-                const currentRate = (!psRate || psError) ? 1.0 : parseFloat(psRate.value) || 1.0;
+                const currentRate = (!psRate || psError) ? 4.7 : parseFloat(psRate.value) || 4.7;
                 setForexRate(currentRate);
+                console.log('Effective Forex Rate (Loaded or Fallback):', currentRate);
 
                 // 2. Fetch Profile
                 const { data: profile } = await supabase
@@ -98,6 +99,7 @@ export default function DashboardClient() {
                     }
 
                     const totalAssetsCalc = Number(profile.balance || 0) + Number(profile.profit || 0);
+                    console.log('Balance:', profile.balance, 'Profit:', profile.profit, 'Total Assets Calc:', totalAssetsCalc, 'Rate:', currentRate);
                     setUser({
                         ...authUser,
                         ...profile,
@@ -107,6 +109,8 @@ export default function DashboardClient() {
                         total_assets: totalAssetsCalc,
                         totalEquity: totalAssetsCalc
                     });
+                } else {
+                    console.warn("No profile found for ID:", authUser.id);
                 }
 
                 // 3. Fetch Transactions
@@ -694,9 +698,9 @@ export default function DashboardClient() {
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalAssets}</p>
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-4xl font-black tracking-tighter">
-                                            {user?.kyc_completed ? `RM ${((user?.total_assets || 0) * (forexRate || 1.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00"}
+                                            {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${((Number(user?.total_assets) || 0) * (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
                                         </h2>
-                                        {user?.kyc_completed && (
+                                        {!isCheckingAuth && user?.kyc_completed && (
                                             <p className="text-sm font-bold text-zinc-400">
                                                 (${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                                             </p>
@@ -707,22 +711,26 @@ export default function DashboardClient() {
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalEquity}</p>
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-4xl font-black tracking-tighter text-gv-gold">
-                                            RM {((user?.balance || 0) * (forexRate || 1.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            {isCheckingAuth ? "..." : `RM ${((Number(user?.balance) || 0) * (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                         </h2>
-                                        <p className="text-sm font-bold text-zinc-400">
-                                            (${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
-                                        </p>
+                                        {!isCheckingAuth && (
+                                            <p className="text-sm font-bold text-zinc-400">
+                                                (${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.totalProfit}</p>
                                     <div className="flex flex-col gap-2">
                                         <h2 className="text-4xl font-black tracking-tighter text-emerald-500">
-                                            RM {((user?.profit || 0) * (forexRate || 1.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            {isCheckingAuth ? "..." : `RM ${((Number(user?.profit) || 0) * (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                         </h2>
-                                        <p className="text-sm font-bold text-zinc-400">
-                                            (${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
-                                        </p>
+                                        {!isCheckingAuth && (
+                                            <p className="text-sm font-bold text-zinc-400">
+                                                (${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </section>
