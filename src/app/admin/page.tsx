@@ -1318,9 +1318,9 @@ export default function AdminPortal() {
                                                 </div>
                                                 <span className="text-xs font-black uppercase text-gv-gold tracking-widest">Total Assets</span>
                                             </div>
-                                            <div className="text-right">
-                                                <div className="text-xl font-black text-white">{formatCurrency((Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)) * (parseFloat(currentForexRate) || 1.0))}</div>
-                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)).toLocaleString()})</div>
+                                            <div className="text-right flex flex-col items-end">
+                                                <div className="text-xl font-black text-white">RM {((Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)) * (parseFloat(currentForexRate) || 1.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</div>
                                             </div>
                                         </div>
                                         <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between">
@@ -1330,9 +1330,9 @@ export default function AdminPortal() {
                                                 </div>
                                                 <span className="text-xs font-black uppercase text-zinc-400 tracking-widest">Total Equity</span>
                                             </div>
-                                            <div className="text-right">
-                                                <div className="text-xl font-black text-white">{formatCurrency((Number(selectedUser.balance || 0)) * (parseFloat(currentForexRate) || 1.0))}</div>
-                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser.balance || 0)).toLocaleString()})</div>
+                                            <div className="text-right flex flex-col items-end">
+                                                <div className="text-xl font-black text-white">RM {(Number(selectedUser.balance || 0) * (parseFloat(currentForexRate) || 1.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser.balance || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</div>
                                             </div>
                                         </div>
                                     </div>

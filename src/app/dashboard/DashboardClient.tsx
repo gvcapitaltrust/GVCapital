@@ -692,27 +692,38 @@ export default function DashboardClient() {
                                     <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalAssets}</p>
-                                    <div className="space-y-1">
+                                    <div className="flex flex-col gap-2">
                                         <h2 className="text-4xl font-black tracking-tighter">
-                                            {user?.kyc_completed ? formatCurrency((user?.total_assets || 0) * forexRate) : "RM 0.00"}
+                                            {user?.kyc_completed ? `RM ${((user?.total_assets || 0) * (forexRate || 1.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00"}
                                         </h2>
                                         {user?.kyc_completed && (
-                                            <p className="text-sm font-bold text-zinc-500">(${Number(user?.total_assets || 0).toLocaleString()})</p>
+                                            <p className="text-sm font-bold text-zinc-400">
+                                                (${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                            </p>
                                         )}
                                     </div>
                                 </div>
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalEquity}</p>
-                                    <div className="space-y-1">
+                                    <div className="flex flex-col gap-2">
                                         <h2 className="text-4xl font-black tracking-tighter text-gv-gold">
-                                            {formatCurrency((user?.balance || 0) * forexRate)}
+                                            RM {((user?.balance || 0) * (forexRate || 1.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </h2>
-                                        <p className="text-sm font-bold text-zinc-500">(${Number(user?.balance || 0).toLocaleString()})</p>
+                                        <p className="text-sm font-bold text-zinc-400">
+                                            (${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.totalProfit}</p>
-                                    <h2 className="text-4xl font-black tracking-tighter text-emerald-500">{formatCurrency((user?.profit || 0) * forexRate)}</h2>
+                                    <div className="flex flex-col gap-2">
+                                        <h2 className="text-4xl font-black tracking-tighter text-emerald-500">
+                                            RM {((user?.profit || 0) * (forexRate || 1.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </h2>
+                                        <p className="text-sm font-bold text-zinc-400">
+                                            (${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                        </p>
+                                    </div>
                                 </div>
                             </section>
 
