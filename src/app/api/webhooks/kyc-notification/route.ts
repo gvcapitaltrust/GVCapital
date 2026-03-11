@@ -1,58 +1,57 @@
-import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { NextRequest, NextResponse } from 'next/server';
 
-// Use exact API Key
-const resend = new Resend('re_CSb8jWvb_GWNjGcxSmpifFFZeMHEzywde');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
-        // 1. Verify Webhook Secret
-        const secretHeader = req.headers.get('x-webhook-secret');
-        const expectedSecret = 'Gvcapital2026!';
+        // 1. Log Headers (To check the Secret)
+        const secret = req.headers.get('x-webhook-secret');
+        console.log("DEBUG: Secret Received:", secret);
 
-        // Match exact specification: Verify header matches
-        if (!secretHeader || secretHeader !== expectedSecret) {
-            console.error('Webhook unauthorized attempt');
-            return new NextResponse('Unauthorized', { status: 401 });
+        if (secret !== process.env.KYC_WEBHOOK_SECRET) {
+            console.error("DEBUG: 401 Unauthorized - Secret Mismatch");
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // 2. Parse Payload from Supabase Database Webhook
-        const payload = await req.json();
+        // 2. Capture the Raw Body first
+        const rawBody = await req.text();
+        console.log("DEBUG: Raw Body String:", rawBody);
 
-        // Supabase webhook payload contains the new row in `record`
-        const record = payload.record;
-
-        if (!record || !record.email) {
-            console.error('Webhook received invalid payload structure', payload);
-            return new NextResponse('Invalid payload missing email', { status: 400 });
+        if (!rawBody) {
+            return NextResponse.json({ error: 'Empty payload' }, { status: 400 });
         }
 
-        const userEmail = record.email;
+        // 3. Try to parse it
+        const body = JSON.parse(rawBody);
+        const email = body.email;
+        const userId = body.user_id;
 
-        // 3. Send Email using Resend
-        // send email From/To: gvcapital@gmail.com
-        const { error } = await resend.emails.send({
+        console.log("DEBUG: Parsed Email:", email);
+
+        // 4. Send Email (using the fallback if email is still null)
+        const { data, error } = await resend.emails.send({
             from: 'onboarding@resend.dev',
             to: 'gvcapitaltrust@gmail.com',
-            subject: 'New KYC Submission: Profile Awaiting Review',
+            subject: `🔔 KYC Step 3: ${email || 'New User'}`,
             html: `
-                <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
-                    <p style="color: #333; font-size: 16px;">
-                        KYC Step 3 Completed. User Email: <strong>${userEmail}</strong>. Please log in to the Admin Panel to review.
-                    </p>
-                </div>
-            `
+        <h3>KYC Completion Alert</h3>
+        <p><strong>Email:</strong> ${email || 'Not provided'}</p>
+        <p><strong>User ID:</strong> ${userId || 'Not provided'}</p>
+        <hr />
+        <p>Raw Data for Debugging: <code>${rawBody}</code></p>
+      `
         });
 
         if (error) {
-            console.error('Resend Error:', error);
-            return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
+            console.error("Resend API Error:", error);
+            return NextResponse.json({ error }, { status: 500 });
         }
 
-        return NextResponse.json({ success: true, message: 'KYC Admin notification sent successfully' });
+        return NextResponse.json({ success: true });
 
-    } catch (error) {
-        console.error('Webhook processing error:', error);
-        return new NextResponse('Internal Server Error', { status: 500 });
+    } catch (err: any) {
+        console.error("WEBHOOK CRASH:", err.message);
+        return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
