@@ -72,9 +72,9 @@ export default function DashboardClient() {
                 .single();
 
             if (profile) {
-                // Verification relies on profile.is_verified or kyc_status, not Supabase email verification
-                const dbIsVerified = profile.is_verified === true || profile.is_verified === 'true' || profile.is_verified === 'Approved' || profile.is_verified === 'Verified';
-                const kycApproved = profile.kyc_status === 'Approved' || profile.kyc_completed === true || profile.kyc_completed === 'true' || dbIsVerified;
+                // Verification relies on profile.is_verified, kyc_status, OR if the user is an admin
+                const dbIsVerified = profile.role === 'admin' || profile.role === 'Admin' || profile.is_verified === true || profile.is_verified === 'true' || profile.is_verified === 'Approved' || profile.is_verified === 'Verified';
+                const kycApproved = profile.role === 'admin' || profile.role === 'Admin' || profile.kyc_status === 'Approved' || profile.kyc_completed === true || profile.kyc_completed === 'true' || dbIsVerified;
 
                 setUser({
                     ...currentSession.user,
@@ -176,8 +176,8 @@ export default function DashboardClient() {
                         (payload: any) => {
                             console.log('Real-time profile update received:', payload.new);
                             const updatedProfile = payload.new;
-                            const dbIsVerified = updatedProfile.is_verified === true || updatedProfile.is_verified === 'true' || updatedProfile.is_verified === 'Approved' || updatedProfile.is_verified === 'Verified';
-                            const kycApproved = updatedProfile.kyc_status === 'Approved' || updatedProfile.kyc_completed === true || updatedProfile.kyc_completed === 'true' || dbIsVerified;
+                            const dbIsVerified = updatedProfile.role === 'admin' || updatedProfile.role === 'Admin' || updatedProfile.is_verified === true || updatedProfile.is_verified === 'true' || updatedProfile.is_verified === 'Approved' || updatedProfile.is_verified === 'Verified';
+                            const kycApproved = updatedProfile.role === 'admin' || updatedProfile.role === 'Admin' || updatedProfile.kyc_status === 'Approved' || updatedProfile.kyc_completed === true || updatedProfile.kyc_completed === 'true' || dbIsVerified;
                             
                             setUser((prevUser: any) => {
                                 if (!prevUser) return { ...updatedProfile, is_verified: dbIsVerified, kyc_completed: kycApproved };
