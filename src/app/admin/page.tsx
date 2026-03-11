@@ -279,12 +279,33 @@ export default function AdminPortal() {
     };
 
     const toggleMaintenance = async () => {
+        if (adminProfile?.role !== 'admin' && adminProfile?.email !== 'thenja96@gmail.com') {
+            showToast("You do not have permission to change system settings.");
+            return;
+        }
+
         const newVal = !maintenanceMode;
         setMaintenanceMode(newVal);
-        await supabase.from('settings').upsert({ key: 'maintenance_mode', value: String(newVal) }, { onConflict: 'key' });
+        try {
+            const { error } = await supabase.from('settings').upsert({ key: 'maintenance_mode', value: String(newVal) }, { onConflict: 'key' });
+            if (error) throw error;
+        } catch (err: any) {
+            if (err.code === '42501' || err.status === 403) {
+                showToast("You do not have permission to change system settings.");
+            } else {
+                alert(err.message);
+            }
+            // Revert state if failed
+            setMaintenanceMode(!newVal);
+        }
     };
 
     const handleUpdateForexRate = async () => {
+        if (adminProfile?.role !== 'admin' && adminProfile?.email !== 'thenja96@gmail.com') {
+            showToast("You do not have permission to change system settings.");
+            return;
+        }
+
         if (!newForexRate || isNaN(parseFloat(newForexRate))) {
             alert("Please enter a valid rate.");
             return;
@@ -311,7 +332,11 @@ export default function AdminPortal() {
             alert("Forex rate updated successfully.");
             fetchForexData();
         } catch (err: any) {
-            alert(err.message);
+            if (err.code === '42501' || err.status === 403) {
+                showToast("You do not have permission to change system settings.");
+            } else {
+                alert(err.message);
+            }
         } finally {
             setIsUpdatingRate(false);
         }
@@ -791,6 +816,15 @@ export default function AdminPortal() {
                             )}
 
                             {activeTab === "forex" && (
+                                adminProfile?.role !== 'admin' && adminProfile?.email !== 'thenja96@gmail.com' ? (
+                                    <div className="min-h-[400px] flex items-center justify-center text-center p-12">
+                                        <div className="space-y-4">
+                                            <div className="text-4xl">🔐</div>
+                                            <h3 className="text-xl font-bold text-white uppercase tracking-tighter">Access Restricted</h3>
+                                            <p className="text-zinc-500 text-sm max-w-xs">You do not have the necessary permissions to access global pricing controls.</p>
+                                        </div>
+                                    </div>
+                                ) : (
                                 <div className="p-10 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="max-w-md space-y-6">
                                         <h3 className="text-xl font-black uppercase tracking-tighter text-white">Global Pricing Control</h3>
@@ -861,6 +895,7 @@ export default function AdminPortal() {
                                         </div>
                                     </div>
                                 </div>
+                                )
                             )}
 
                             {activeTab === "users" && (
