@@ -76,7 +76,7 @@ export default function DashboardClient() {
             try {
                 // 1. Fetch Forex Rate first for global calculations
                 const { data: psRate, error: psError } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
-                const currentRate = (!psRate || psError) ? 4.7 : parseFloat(psRate.value) || 4.7;
+                const currentRate = (!psRate || psError) ? 4.0 : parseFloat(psRate.value) || 4.0;
                 setForexRate(currentRate);
                 console.log('Effective Forex Rate (Loaded or Fallback):', currentRate);
 
@@ -169,11 +169,7 @@ export default function DashboardClient() {
     }, [authUser, searchParams]);
 
     const formatCurrency = (val: number) => {
-        return new Intl.NumberFormat('en-MY', {
-            style: 'currency',
-            currency: 'MYR',
-            minimumFractionDigits: 2
-        }).format(val || 0).replace("MYR", "RM");
+        return `RM ${Number(val || 0).toFixed(2)}`;
     };
 
     const handleProtectedAction = (e: React.MouseEvent, onSuccess: () => void) => {
@@ -702,7 +698,7 @@ export default function DashboardClient() {
                                         </h2>
                                         {!isCheckingAuth && user?.kyc_completed && (
                                             <p className="text-sm font-bold text-zinc-400">
-                                                (${(Number(user?.total_assets || 0) / (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                                (${(Number(user?.total_assets || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                                             </p>
                                         )}
                                     </div>
@@ -715,7 +711,7 @@ export default function DashboardClient() {
                                         </h2>
                                         {!isCheckingAuth && (
                                             <p className="text-sm font-bold text-zinc-400">
-                                                (${(Number(user?.balance || 0) / (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                                (${(Number(user?.balance || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                                             </p>
                                         )}
                                     </div>
@@ -728,7 +724,7 @@ export default function DashboardClient() {
                                         </h2>
                                         {!isCheckingAuth && (
                                             <p className="text-sm font-bold text-zinc-400">
-                                                (${(Number(user?.profit || 0) / (forexRate || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                                (${(Number(user?.profit || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                                             </p>
                                         )}
                                     </div>
@@ -740,16 +736,15 @@ export default function DashboardClient() {
                                     <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
                                         <svg className="h-20 w-20 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                     </div>
-                                    <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
-                                    <h3 className="text-3xl font-black text-white">{formatCurrency(user?.total_assets * monthlyRate)}</h3>
-                                    <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Based on {monthlyRate * 100}% Monthly Return</p>
+                                    <h3 className="text-3xl font-black text-white">RM {(user?.total_assets * monthlyRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
+                                    <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Based on {(monthlyRate * 100).toFixed(0)}% Monthly Return</p>
                                 </div>
                                 <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
                                         <svg className="h-20 w-20 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                     </div>
                                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
-                                    <h3 className="text-3xl font-black text-emerald-500">{formatCurrency(user?.total_assets * yearlyRate)}</h3>
+                                    <h3 className="text-3xl font-black text-emerald-500">RM {(user?.total_assets * yearlyRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
                                     <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Yearly Forecast ({(yearlyRate * 100).toFixed(0)}% ROI)</p>
                                 </div>
                             </section>
@@ -870,7 +865,12 @@ export default function DashboardClient() {
                                                     <td className="px-8 py-6 text-zinc-500">{new Date(tx.created_at || tx.date).toISOString().split('T')[0]}</td>
                                                     <td className="px-8 py-6 font-mono text-xs text-white/40">{tx.ref_id || tx.ref}</td>
                                                     <td className="px-8 py-6 uppercase tracking-widest text-[10px]">{tx.type}</td>
-                                                    <td className={`px-8 py-6 text-lg tracking-tighter ${Number(tx.amount) >= 0 ? "text-emerald-400" : "text-white"}`}>{formatCurrency(Number(tx.amount))}</td>
+                                                    <td className={`px-8 py-6 text-lg tracking-tighter ${Number(tx.amount) >= 0 ? "text-emerald-400" : "text-white"}`}>
+                                                        <div className="flex flex-col">
+                                                            <span>RM {Number(tx.amount || 0).toFixed(2)}</span>
+                                                            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
+                                                        </div>
+                                                    </td>
                                                     <td className="px-8 py-6 text-right"><span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' : tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>{tx.status}</span></td>
                                                 </tr>
                                             ))}

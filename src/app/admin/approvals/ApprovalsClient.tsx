@@ -11,12 +11,13 @@ export default function ApprovalsClient() {
     const [isLoading, setIsLoading] = useState(true);
     const [distributing, setDistributing] = useState(false);
     const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
-    const [forexRate, setForexRate] = useState<number>(4.752);
+    const [forexRate, setForexRate] = useState<number>(4.0);
 
     useEffect(() => {
         const fetchRate = async () => {
             const { data } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
             if (data) setForexRate(parseFloat(data.value));
+            else setForexRate(4.0);
         };
         fetchRate();
     }, []);
@@ -60,7 +61,7 @@ export default function ApprovalsClient() {
 
     const handleApprove = async (tx: any) => {
         const displayRm = Number(tx.amount || 0).toFixed(2);
-        const creditUsd = (Number(tx.amount || 0) / (forexRate || 4.7)).toFixed(2);
+        const creditUsd = (Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2);
         if (!confirm(`Confirming deposit of RM ${displayRm} (Credit: $${creditUsd} USD) for ${tx.profiles.full_name}?`)) return;
 
         try {
@@ -127,7 +128,7 @@ export default function ApprovalsClient() {
     };
 
     const formatCurrency = (val: number) => {
-        return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(val || 0).replace("MYR", "RM");
+        return `RM ${Number(val || 0).toFixed(2)}`;
     };
 
     const getReceiptUrl = (path: string) => {
@@ -192,7 +193,7 @@ export default function ApprovalsClient() {
                                          </td>
                                           <td className="px-8 py-6 font-bold text-emerald-400">
                                                RM {Number(tx.amount || 0).toFixed(2)}
-                                               <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(tx.amount || 0) / (forexRate || 4.7)).toFixed(2)})</span>
+                                               <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
                                           </td>
                                          <td className="px-8 py-6">
                                              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${

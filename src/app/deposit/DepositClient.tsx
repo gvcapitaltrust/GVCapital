@@ -19,7 +19,7 @@ export default function DepositClient() {
     // Form States
     const [amount, setAmount] = useState("");
     const [receipt, setReceipt] = useState<File | null>(null);
-    const [rate, setRate] = useState<number>(4.752); // Fallback rate
+    const [rate, setRate] = useState<number>(4.0); // Fallback rate
 
     useEffect(() => {
         const l = searchParams?.get("lang") || "en";
@@ -41,6 +41,8 @@ export default function DepositClient() {
                 .single();
             if (data && !error) {
                 setRate(parseFloat(data.value));
+            } else {
+                setRate(4.0);
             }
         };
 

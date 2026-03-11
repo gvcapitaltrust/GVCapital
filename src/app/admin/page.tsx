@@ -55,7 +55,7 @@ export default function AdminPortal() {
     };
 
     // Forex Control State
-    const [currentForexRate, setCurrentForexRate] = useState<string>("4.7");
+    const [currentForexRate, setCurrentForexRate] = useState<string>("4.0");
     const [newForexRate, setNewForexRate] = useState<string>("");
     const [forexHistory, setForexHistory] = useState<any[]>([]);
     const [isUpdatingRate, setIsUpdatingRate] = useState(false);
@@ -244,9 +244,9 @@ export default function AdminPortal() {
             .single();
 
         if (!currentRateData || error) {
-            console.error("Forex fetch error, using fallback 4.7:", error);
-            setCurrentForexRate("4.7");
-            setNewForexRate("4.7");
+            console.error("Forex fetch error, using fallback 4.0:", error);
+            setCurrentForexRate("4.0");
+            setNewForexRate("4.0");
             return;
         }
 
@@ -555,8 +555,9 @@ export default function AdminPortal() {
     };
 
     const handleRejectDeposit = async (tx: any) => {
-        const displayRm = Number(tx.original_currency_amount || (Number(tx.amount || 0) * (parseFloat(currentForexRate) || 4.7)));
-        if (!confirm(`Reject deposit: Client sent RM ${displayRm.toFixed(2)}. This will void the $${Number(tx.amount || 0).toFixed(2)} USD credit for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        const amountRm = Number(tx.amount || 0);
+        const amountUsd = amountRm / (parseFloat(currentForexRate) || 4.0);
+        if (!confirm(`Reject deposit: Client sent RM ${amountRm.toFixed(2)}. This will void the $${amountUsd.toFixed(2)} USD credit for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             const { error: txError } = await supabase.from('transactions').update({ status: 'Rejected' }).eq('id', tx.id);
             if (txError) throw txError;
@@ -569,9 +570,9 @@ export default function AdminPortal() {
     };
 
     const handleApproveWithdrawal = async (tx: any) => {
-        const withdrawAmountUsd = Math.abs(Number(tx.amount || 0));
-        const withdrawAmountRm = Number(tx.original_currency_amount || (withdrawAmountUsd * (parseFloat(currentForexRate) || 4.7)));
-        if (!confirm(`Approve withdrawal of RM ${withdrawAmountRm.toFixed(2)} ($${withdrawAmountUsd.toFixed(2)} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        const amountRm = Math.abs(Number(tx.amount || 0));
+        const amountUsd = amountRm / (parseFloat(currentForexRate) || 4.0);
+        if (!confirm(`Approve withdrawal of RM ${amountRm.toFixed(2)} ($${amountUsd.toFixed(2)} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             // DATABASE TRIGGER HANDLES BALANCE UPDATES
             // We only need to set the status to Approved
@@ -590,9 +591,9 @@ export default function AdminPortal() {
     };
 
     const handleRejectWithdrawal = async (tx: any) => {
-        const withdrawAmountUsd = Math.abs(Number(tx.amount || 0));
-        const withdrawAmountRm = Number(tx.original_currency_amount || (withdrawAmountUsd * (parseFloat(currentForexRate) || 4.7)));
-        if (!confirm(`Reject withdrawal: Client requested RM ${withdrawAmountRm.toFixed(2)} ($${withdrawAmountUsd.toFixed(2)} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
+        const amountRm = Math.abs(Number(tx.amount || 0));
+        const amountUsd = amountRm / (parseFloat(currentForexRate) || 4.0);
+        if (!confirm(`Reject withdrawal: Client requested RM ${amountRm.toFixed(2)} ($${amountUsd.toFixed(2)} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             const { error: txError } = await supabase.from('transactions').update({ status: 'Rejected' }).eq('id', tx.id);
             if (txError) throw txError;
@@ -604,7 +605,7 @@ export default function AdminPortal() {
     };
 
     const formatCurrency = (val: number) => {
-        return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(val || 0).replace("MYR", "RM");
+        return `RM ${Number(val || 0).toFixed(2)}`;
     };
 
     if (!mounted) return null;
@@ -643,7 +644,7 @@ export default function AdminPortal() {
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
                                 {(() => {
                                     const totalRm = users.reduce((acc, u) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
-                                    const rate = parseFloat(currentForexRate) || 4.7;
+                                    const rate = parseFloat(currentForexRate) || 4.0;
                                     return (
                                         <>
                                             <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
@@ -743,7 +744,12 @@ export default function AdminPortal() {
                                                     <div className="font-mono text-[10px] text-zinc-500">{w.profiles?.bank_account_number || 'N/A'}</div>
                                                 </td>
                                                 <td className="px-8 py-4 font-mono text-xs opacity-50">{w.ref_id}</td>
-                                                <td className="px-8 py-6 text-red-400">{formatCurrency(w.amount > 0 ? w.amount : w.amount * -1)}</td>
+                                                <td className="px-8 py-6 text-red-400">
+                                                    <div className="flex flex-col">
+                                                        <span>RM {Math.abs(Number(w.amount || 0)).toFixed(2)}</span>
+                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(w.amount || 0)) / (parseFloat(currentForexRate) || 4.0)).toFixed(2)})</span>
+                                                    </div>
+                                                </td>
                                                 <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
                                                     <button onClick={() => handleRejectWithdrawal(w)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">Reject</button>
                                                     <button onClick={() => handleApproveWithdrawal(w)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Approve Withdrawal</button>
@@ -811,7 +817,12 @@ export default function AdminPortal() {
                                                                     <div className="font-black text-white group-hover:text-gv-gold transition-colors">{agent.agent_username}</div>
                                                                 </td>
                                                                 <td className="px-6 py-5 font-bold text-zinc-400">{agent.total_referrals}</td>
-                                                                <td className="px-6 py-5 font-black text-emerald-400">{formatCurrency(agent.total_referred_capital)}</td>
+                                                                <td className="px-6 py-5 font-black text-emerald-400">
+                                                                    <div className="flex flex-col">
+                                                                        <span>RM {Number(agent.total_referred_capital || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(agent.total_referred_capital || 0) / (parseFloat(currentForexRate) || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                                                                    </div>
+                                                                </td>
                                                             </tr>
                                                         ))
                                                     }
@@ -841,8 +852,10 @@ export default function AdminPortal() {
                                                                         <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">@{ref.username}</div>
                                                                     </div>
                                                                     <div className="text-right">
-                                                                        <div className="text-xs font-black text-emerald-400">{formatCurrency(ref.balance)}</div>
-                                                                        <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">${(ref.balance_usd || 0).toFixed(2)} USD</div>
+                                                                        <div className="flex flex-col items-end">
+                                                                            <span className="text-xs font-black text-emerald-400">RM {Number(ref.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                            <span className="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(ref.balance || 0) / (parseFloat(currentForexRate) || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             ))}
@@ -1013,14 +1026,14 @@ export default function AdminPortal() {
                                                 <td className="px-8 py-6">
                                                      <div className="flex flex-col">
                                                          <span className="text-emerald-400 font-black">RM {Number(u.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                         <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${(Number(u.balance || 0) / (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                                                         <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${(Number(u.balance || 0) / (parseFloat(currentForexRate) || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
                                                      </div>
                                                  </td>
                                                  <td className="px-8 py-6 text-gv-gold font-mono text-xs">RM {Number(u.profit || 0).toFixed(2)}</td>
                                                  <td className="px-8 py-6 text-white font-black">
                                                      <div className="flex flex-col">
                                                          <span>RM {(Number(u.balance || 0) + Number(u.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                         <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${( (Number(u.balance || 0) + Number(u.profit || 0)) / (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                                                         <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${( (Number(u.balance || 0) + Number(u.profit || 0)) / (parseFloat(currentForexRate) || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
                                                      </div>
                                                  </td>
                                                 <td className="px-8 py-6">
@@ -1117,7 +1130,7 @@ export default function AdminPortal() {
                                                 </td>
                                                 <td className="px-8 py-6 font-bold text-emerald-400">
                                                     RM {Number(d.amount || 0).toFixed(2)}
-                                                    <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(d.amount || 0) / (parseFloat(currentForexRate) || 4.7)).toFixed(2)})</span>
+                                                    <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(d.amount || 0) / (parseFloat(currentForexRate) || 4.0)).toFixed(2)})</span>
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
@@ -1354,8 +1367,8 @@ export default function AdminPortal() {
                                                 <span className="text-xs font-black uppercase text-gv-gold tracking-widest">Total Assets</span>
                                             </div>
                                             <div className="text-right flex flex-col items-end">
-                                                <div className="text-xl font-black text-white">RM {((Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)) * (parseFloat(currentForexRate) || 4.7)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</div>
+                                                <div className="text-xl font-black text-white">RM {(Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                <div className="text-[10px] font-bold text-zinc-500">(${( (Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)) / (parseFloat(currentForexRate) || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)</div>
                                             </div>
                                         </div>
                                         <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between">
@@ -1366,8 +1379,8 @@ export default function AdminPortal() {
                                                 <span className="text-xs font-black uppercase text-zinc-400 tracking-widest">Total Equity</span>
                                             </div>
                                             <div className="text-right flex flex-col items-end">
-                                                <div className="text-xl font-black text-white">RM {(Number(selectedUser.balance || 0) * (parseFloat(currentForexRate) || 1.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser.balance || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</div>
+                                                <div className="text-xl font-black text-white">RM {(Number(selectedUser.balance || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser.balance || 0) / (parseFloat(currentForexRate) || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)</div>
                                             </div>
                                         </div>
                                     </div>
@@ -1522,8 +1535,11 @@ export default function AdminPortal() {
                                     <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 flex flex-col items-center justify-center shrink-0">
                                         <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] mb-3">Request Amount</div>
                                         <h3 className="text-5xl font-black text-emerald-400 tracking-tighter drop-shadow-[0_0_15px_rgba(52,211,153,0.3)]">
-                                            {formatCurrency(selectedDepositTx.amount)}
+                                            RM {Number(selectedDepositTx.amount || 0).toFixed(2)}
                                         </h3>
+                                        <div className="text-sm text-zinc-500 font-bold uppercase tracking-widest mt-2">
+                                            (${(Number(selectedDepositTx.amount || 0) / (parseFloat(currentForexRate) || 4.0)).toFixed(2)} USD)
+                                        </div>
                                         <div className="mt-4 flex flex-col items-center gap-1 text-center">
                                             <div className="text-white text-sm font-bold uppercase tracking-widest">{selectedDepositTx.profiles?.full_name || 'Client'}</div>
                                             <div className="text-zinc-500 text-[10px] uppercase font-black">
