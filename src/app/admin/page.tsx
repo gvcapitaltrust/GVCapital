@@ -86,7 +86,12 @@ export default function AdminPortal() {
     const [selectedDepositTx, setSelectedDepositTx] = useState<any>(null);
     const [depositReceiptUrl, setDepositReceiptUrl] = useState<string | null>(null);
 
+    const hasFetchedRef = React.useRef(false);
+
     useEffect(() => {
+        if (hasFetchedRef.current) return;
+        hasFetchedRef.current = true;
+
         setMounted(true);
         fetchData();
         checkMaintenance();
@@ -130,9 +135,8 @@ export default function AdminPortal() {
     };
 
     const fetchAdminProfile = async () => {
-        // Force refresh session to get latest JWT claims and role metadata
-        const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
-        const session = refreshedSession;
+        // Use getSession to avoid triggering an infinite auth event loop
+        const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
             const { data: profile } = await supabase

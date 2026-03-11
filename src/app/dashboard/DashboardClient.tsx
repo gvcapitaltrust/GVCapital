@@ -56,205 +56,98 @@ export default function DashboardClient() {
     const [kycShowSuccess, setKycShowSuccess] = useState(false);
     const [isReuploading, setIsReuploading] = useState(false);
 
+    const fetchedRef = React.useRef<string | null>(null);
+
     useEffect(() => {
         const urlLang = searchParams?.get("lang") || "en";
         setLang(urlLang as "en" | "zh");
         
-        console.log("Dashboard Client Mounted, Auth state:", { authUser, authRole, authVerified });
+        if (!authUser) {
+            if (!isCheckingAuth) setIsCheckingAuth(false);
+            return;
+        }
 
-        const fetchUserData = async (currentSession: any) => {
-            if (!currentSession) {
-                router.push(`/login?lang=${urlLang}`);
-                return;
-            }
+        // Prevent infinite loops by checking if we already fetched for this user ID
+        if (fetchedRef.current === authUser.id) return;
 
-            // Force refresh session to guarantee we have the absolute newest token
-            const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
-            const activeUser = refreshedSession?.user || currentSession.user;
+        const fetchUserData = async () => {
+            console.log("FETCHING DASHBOARD DATA for:", authUser.email);
+            
+            try {
+                // 1. Fetch Profile
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('*', { count: 'exact' })
+                    .eq('id', authUser.id)
+                    .single();
 
-            // Fetch the latest profile directly from the database using ID (not relying on cached session metadata)
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('*', { count: 'exact' })
-                .eq('id', activeUser.id)
-                .single();
+                if (profile) {
+                    let dbIsVerified = profile.role === 'admin' || profile.is_verified === true || profile.is_verified === 'Approved' || profile.is_verified === 'true';
+                    let kycApproved = dbIsVerified || profile.kyc_status === 'Approved' || profile.kyc_completed === true;
 
-            if (profile) {
-                console.log('Fetched Current Profile from DB:', {
-                    id: profile.id,
-                    balance: profile.balance,
-                    total_equity: profile.total_equity
-                });
-                // Verification relies on profile.is_verified, kyc_status, OR if the user is an admin
-                let dbIsVerified = profile.role === 'admin' || profile.role === 'Admin' || profile.is_verified === true || profile.is_verified === 'true' || profile.is_verified === 'Approved' || profile.is_verified === 'Verified';
-                let kycApproved = profile.role === 'admin' || profile.role === 'Admin' || profile.kyc_status === 'Approved' || profile.kyc_completed === true || profile.kyc_completed === 'true' || dbIsVerified;
+                    // Master Bypass
+                    if (authUser.email === "thenja96@gmail.com") {
+                        dbIsVerified = true;
+                        kycApproved = true;
+                        profile.role = "admin";
+                    }
 
-                // Hardcode bypass for admin email
-                if (activeUser.email === "thenja96@gmail.com") {
-                    profile.role = "admin";
-                    dbIsVerified = true;
-                    kycApproved = true;
-                    profile.is_verified = true;
-                    profile.kyc_status = 'Approved';
-                    profile.kyc_step = 3;
+                    setUser({
+                        ...authUser,
+                        ...profile,
+                        is_verified: dbIsVerified,
+                        kyc_completed: kycApproved,
+                        fullName: profile.full_name || authUser.user_metadata?.full_name,
+                        totalEquity: profile.total_equity || (Number(profile.balance) + Number(profile.investment))
+                    });
                 }
 
-                setUser({
-                    ...activeUser,
-                    ...profile,
-                    is_verified: dbIsVerified,
-                    kyc_completed: kycApproved,
-                    kyc_step: (profile.role === 'admin' || profile.role === 'Admin') ? 3 : profile.kyc_step,
-                    fullName: profile.full_name || activeUser.user_metadata?.full_name,
-                    totalEquity: profile.total_equity || (Number(profile.balance) + Number(profile.investment))
-                });
-            } else {
-                setUser({
-                    ...activeUser,
-                    fullName: activeUser.user_metadata?.full_name,
-                    balance: 0,
-                    investment: 0,
-                    profit: 0,
-                    totalEquity: 0,
-                    kyc_completed: false,
-                    is_verified: false
-                });
-            }
+                // 2. Fetch Transactions
+                let txQuery = supabase.from('transactions').select('*');
+                if (authUser.email !== "thenja96@gmail.com") {
+                    txQuery = txQuery.eq('user_id', authUser.id);
+                }
+                const { data: txs } = await txQuery.order('created_at', { ascending: false });
+                if (txs) {
+                    setTransactions(txs);
+                    setDividendHistory(txs.filter((t: any) => t.type === 'Dividend' || t.type === 'bonus').slice(0, 6).reverse());
+                }
 
-            let txQuery = supabase.from('transactions').select('*');
-            
-            // MASTER ADMIN BYPASS: Show absolutely EVERYTHING if logged in as master email
-            if (activeUser.email !== "thenja96@gmail.com") {
-                txQuery = txQuery.eq('user_id', activeUser.id);
-            }
+                // 3. Fetch Rates & Referrals
+                const { data: rates } = await supabase.from('settings').select('*').in('key', ['monthly_return_rate', 'yearly_return_rate']);
+                if (rates) {
+                    setMonthlyRate(parseFloat(rates.find((r: any) => r.key === 'monthly_return_rate')?.value || "0.08"));
+                    setYearlyRate(parseFloat(rates.find((r: any) => r.key === 'yearly_return_rate')?.value || "0.96"));
+                }
 
-            const { data: txs, error: txError } = await txQuery.order('created_at', { ascending: false });
-            console.log('Fetched Dashboard Transactions:', txs, 'Error:', txError);
+                const { count } = await supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('referred_by', authUser.id);
+                setReferredCount(count || 0);
 
-            if (txs) {
-                setTransactions(txs);
-                // Filter last 6 months of dividends
-                const divs = txs
-                    .filter((t: any) => (t.type === 'Dividend' || t.type === 'bonus'))
-                    .slice(0, 6)
-                    .reverse();
-                setDividendHistory(divs);
-            }
-
-            // Fetch Rates from Settings
-            const { data: rates } = await supabase.from('settings').select('*').in('key', ['monthly_return_rate', 'yearly_return_rate']);
-            if (rates) {
-                const mRate = rates.find((r: any) => r.key === 'monthly_return_rate')?.value;
-                const yRate = rates.find((r: any) => r.key === 'yearly_return_rate')?.value;
-                if (mRate) setMonthlyRate(parseFloat(mRate));
-                if (yRate) setYearlyRate(parseFloat(yRate));
-            }
-
-            // Fetch referred count
-            let refQuery = supabase.from('profiles').select('id', { count: 'exact', head: true });
-            
-            if (activeUser.email !== "thenja96@gmail.com") {
-                refQuery = refQuery.eq('referred_by', activeUser.id);
-            }
-            
-            const { count } = await refQuery;
-            setReferredCount(count || 0);
-
-            setIsCheckingAuth(false);
-        };
-
-        // Explicitly fetch latest data on mount to avoid stale session metadata
-        const initializeDashboard = async () => {
-            console.log("INITIALIZING DASHBOARD: Refreshing session...");
-            const { data: { session }, error } = await supabase.auth.refreshSession();
-            
-            if (error) {
-                console.error("SESSION REFRESH ERROR:", error);
-            }
-
-            if (session) {
-                await fetchUserData(session);
-                console.log("AUTH STATE AUDIT (DASHBOARD):");
-                console.table({
-                    email: session.user.email,
-                    role: session.user.user_metadata?.role || "fetching...",
-                    ts: new Date().toISOString()
-                });
-            } else {
+                fetchedRef.current = authUser.id;
+            } catch (err) {
+                console.error("Dashboard Fetch Error:", err);
+            } finally {
                 setIsCheckingAuth(false);
             }
         };
-        initializeDashboard();
 
-        // Standard way to handle session reliably
-        const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
-            if (event === 'SIGNED_OUT') {
-                router.push(`/login?lang=${urlLang}`);
-            } else if (session) {
-                fetchUserData(session);
-            } else {
-                const { data: { session: checkSession } } = await supabase.auth.getSession();
-                if (!checkSession) {
-                    router.push(`/login?lang=${urlLang}`);
-                } else {
-                    fetchUserData(checkSession);
-                }
-            }
-        });
+        fetchUserData();
 
-        // Real-time listener for profile updates (especially verification status)
-        const setupProfileSubscription = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                const channel = supabase
-                    .channel(`profile-updates-${session.user.id}`)
-                    .on(
-                        'postgres_changes',
-                        {
-                            event: 'UPDATE',
-                            schema: 'public',
-                            table: 'profiles',
-                            filter: `id=eq.${session.user.id}`
-                        },
-                        (payload: any) => {
-                            console.log('Real-time profile update received:', payload.new);
-                            const updatedProfile = payload.new;
-                            const dbIsVerified = updatedProfile.role === 'admin' || updatedProfile.role === 'Admin' || updatedProfile.is_verified === true || updatedProfile.is_verified === 'true' || updatedProfile.is_verified === 'Approved' || updatedProfile.is_verified === 'Verified';
-                            const kycApproved = updatedProfile.role === 'admin' || updatedProfile.role === 'Admin' || updatedProfile.kyc_status === 'Approved' || updatedProfile.kyc_completed === true || updatedProfile.kyc_completed === 'true' || dbIsVerified;
-                            
-                            setUser((prevUser: any) => {
-                                if (!prevUser) return { ...updatedProfile, is_verified: dbIsVerified, kyc_completed: kycApproved };
-                                return {
-                                    ...prevUser,
-                                    ...updatedProfile,
-                                    is_verified: dbIsVerified,
-                                    kyc_completed: kycApproved,
-                                    kyc_step: (updatedProfile.role === 'admin' || updatedProfile.role === 'Admin') ? 3 : updatedProfile.kyc_step,
-                                    fullName: updatedProfile.full_name || prevUser.fullName,
-                                    totalEquity: updatedProfile.total_equity || (Number(updatedProfile.balance) + Number(updatedProfile.investment))
-                                };
-                            });
-                        }
-                    )
-                    .subscribe();
-                
-                return channel;
-            }
-            return null;
-        };
-
-        let profileChannel: any = null;
-        setupProfileSubscription().then(channel => {
-            profileChannel = channel;
-        });
+        // Real-time listener
+        const channel = supabase
+            .channel(`profile-updates-${authUser.id}`)
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${authUser.id}` }, 
+            (payload: any) => {
+                const p = payload.new;
+                const verified = p.role === 'admin' || p.is_verified === true;
+                setUser((prev: any) => ({ ...prev, ...p, is_verified: verified }));
+            })
+            .subscribe();
 
         return () => {
-            authSubscription.unsubscribe();
-            if (profileChannel) {
-                supabase.removeChannel(profileChannel);
-            }
+            supabase.removeChannel(channel);
         };
-    }, [searchParams, router]);
+    }, [authUser, searchParams]);
 
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-MY', {

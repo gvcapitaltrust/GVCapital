@@ -115,12 +115,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await fetchProfile(session);
     };
 
+    const hasInitialized = React.useRef(false);
+
     useEffect(() => {
+        if (hasInitialized.current) return;
+        hasInitialized.current = true;
+
         const initAuth = async () => {
             setLoading(true);
-            // Ensure session is fresh on every app load
-            const { data: { session } } = await supabase.auth.refreshSession();
-            await fetchProfile(session);
+            // Get current session without forcing a refresh event if possible
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                await fetchProfile(session);
+            } else {
+                setLoading(false);
+            }
         };
 
         initAuth();
@@ -137,8 +146,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     router.push("/login");
                 }
             } else if (session) {
-                // If we have a session, we stay in loading until profile is fetched
-                await fetchProfile(session);
+                // Only fetch if it's a critical auth event (Login, Refresh, Initial)
+                if (['SIGNED_IN', 'TOKEN_REFRESHED', 'USER_UPDATED', 'INITIAL_SESSION'].includes(event)) {
+                    await fetchProfile(session);
+                }
             } else if (event === 'INITIAL_SESSION' && !session) {
                 setLoading(false);
             }
