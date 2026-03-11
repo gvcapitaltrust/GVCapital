@@ -31,6 +31,7 @@ export default function DashboardClient() {
     const [isPinModalOpen, setIsPinModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [successRefId, setSuccessRefId] = useState("");
     const [actionToast, setActionToast] = useState<{message: string, actionUrl?: string, actionText?: string} | null>(null);
 
     // Form States
@@ -252,16 +253,17 @@ export default function DashboardClient() {
 
             if (uploadError) throw uploadError;
 
+            const refId = `TXN-${Math.floor(1000 + Math.random() * 9000)}`;
             const { error: insertError } = await supabase
                 .from('transactions')
                 .insert([{
                     user_id: user.id,
                     type: 'Deposit',
                     amount: parseFloat(depositAmount),
-                    transfer_date: depositDate || new Date().toISOString(),
+                    transfer_date: depositDate ? new Date(depositDate).toISOString() : new Date().toISOString(),
                     status: 'Pending',
                     receipt_url: uploadData.path,
-                    ref_id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`
+                    ref_id: refId
                 }]);
 
             if (insertError) throw insertError;
@@ -270,6 +272,7 @@ export default function DashboardClient() {
             setDepositAmount("");
             setDepositDate("");
             setDepositReceipt(null);
+            setSuccessRefId(refId);
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
 
@@ -1082,9 +1085,14 @@ export default function DashboardClient() {
                     <h2 className="text-5xl font-black mb-4 uppercase tracking-tighter text-white">
                         {kycShowSuccess ? "Documents Submitted" : t.successTitle}
                     </h2>
-                    <p className="text-zinc-400 max-w-md font-medium text-lg leading-relaxed">
+                    <p className="text-zinc-400 max-w-md font-medium text-lg leading-relaxed mb-6">
                         {kycShowSuccess ? "Our compliance team will review your account within 24 hours. Your portfolio will activate automatically upon approval." : t.successDesc}
                     </p>
+                    {successRefId && !kycShowSuccess && (
+                        <div className="bg-white/10 px-8 py-4 rounded-full border border-emerald-500/30 text-emerald-400 font-black tracking-widest uppercase text-lg animate-in zoom-in-95 delay-150 duration-500 text-center flex items-center gap-3">
+                           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>Ref: {successRefId}
+                        </div>
+                    )}
                 </div>
             )}
             {/* Action Toast */}

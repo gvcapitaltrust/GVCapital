@@ -14,6 +14,7 @@ export default function DepositClient() {
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [successRefId, setSuccessRefId] = useState("");
 
     // Form States
     const [amount, setAmount] = useState("");
@@ -68,20 +69,22 @@ export default function DepositClient() {
             if (uploadError) throw uploadError;
 
             // 2. Insert into transactions table
+            const refId = `DEP-${Math.floor(100000 + Math.random() * 900000)}`;
             const { error: insertError } = await supabase
                 .from('transactions')
                 .insert([{
                     user_id: user.id,
                     type: 'Deposit',
                     amount: parseFloat(amount),
-                    transfer_date: transferDate,
+                    transfer_date: new Date(transferDate).toISOString(),
                     status: 'Pending',
                     receipt_url: uploadData.path,
-                    ref_id: `DEP-${Math.floor(100000 + Math.random() * 900000)}`
+                    ref_id: refId
                 }]);
 
             if (insertError) throw insertError;
 
+            setSuccessRefId(refId);
             setShowSuccess(true);
             setTimeout(() => {
                 router.push(`/dashboard?lang=${lang}`);
@@ -227,7 +230,12 @@ export default function DepositClient() {
                         <svg className="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
                     </div>
                     <h2 className="text-5xl font-black mb-4 uppercase tracking-tighter">{t.successTitle}</h2>
-                    <p className="text-zinc-400 font-medium text-lg px-8">{t.successDesc}</p>
+                    <p className="text-zinc-400 font-medium text-lg px-8 mb-4">{t.successDesc}</p>
+                    {successRefId && (
+                        <div className="bg-white/10 px-6 py-3 rounded-full border border-emerald-500/30 text-emerald-400 font-black tracking-widest uppercase text-sm animate-in zoom-in-95 delay-150 duration-500">
+                            Ref: {successRefId}
+                        </div>
+                    )}
                 </div>
             )}
 
