@@ -12,15 +12,26 @@ export default function ApprovalsClient() {
 
     useEffect(() => {
         fetchPending();
+
+        const channel = supabase
+            .channel('approvals-realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
+                console.log("[REALTIME] Change in approvals detected...");
+                fetchPending();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     const fetchPending = async () => {
+        console.log('Admin Fetching Transactions from: transactions...');
         try {
             const { data, error } = await supabase
                 .from('transactions')
-                .select('*, profiles(full_name, email)')
-                .eq('type', 'Deposit')
-                // .eq('status', 'Pending') // Removed status filter as requested
+                .select('*, profiles(email, full_name)')
                 .order('created_at', { ascending: false });
 
             console.log('Raw Data from Supabase (Approvals):', data);

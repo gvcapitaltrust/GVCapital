@@ -213,6 +213,7 @@ export default function AdminPortal() {
             setKycQueue((profileList as Profile[]).filter((p: Profile) => p.kyc_status === 'Pending'));
         }
 
+        console.log('Admin Fetching Transactions from: transactions...');
         const { data: txList, error: txError } = await supabase
             .from('transactions')
             .select('*, profiles(full_name, email, bank_name, bank_account_number)')
