@@ -64,11 +64,15 @@ export default function DashboardClient() {
                 return;
             }
 
+            // Force refresh session to guarantee we have the absolute newest token
+            const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+            const activeUser = refreshedSession?.user || currentSession.user;
+
             // Fetch the latest profile directly from the database using ID (not relying on cached session metadata)
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', currentSession.user.id)
+                .eq('id', activeUser.id)
                 .single();
 
             if (profile) {
@@ -77,18 +81,18 @@ export default function DashboardClient() {
                 const kycApproved = profile.role === 'admin' || profile.role === 'Admin' || profile.kyc_status === 'Approved' || profile.kyc_completed === true || profile.kyc_completed === 'true' || dbIsVerified;
 
                 setUser({
-                    ...currentSession.user,
+                    ...activeUser,
                     ...profile,
                     is_verified: dbIsVerified,
                     kyc_completed: kycApproved,
                     kyc_step: (profile.role === 'admin' || profile.role === 'Admin') ? 3 : profile.kyc_step,
-                    fullName: profile.full_name || currentSession.user.user_metadata?.full_name,
+                    fullName: profile.full_name || activeUser.user_metadata?.full_name,
                     totalEquity: profile.total_equity || (Number(profile.balance) + Number(profile.investment))
                 });
             } else {
                 setUser({
-                    ...currentSession.user,
-                    fullName: currentSession.user.user_metadata?.full_name,
+                    ...activeUser,
+                    fullName: activeUser.user_metadata?.full_name,
                     balance: 0,
                     investment: 0,
                     profit: 0,
@@ -98,11 +102,15 @@ export default function DashboardClient() {
                 });
             }
 
-            const { data: txs } = await supabase
-                .from('transactions')
-                .select('*')
-                .eq('user_id', currentSession.user.id)
-                .order('created_at', { ascending: false });
+            let txQuery = supabase.from('transactions').select('*');
+            
+            // If admin bypass email, show EVERYTHING. Otherwise, scope to user.
+            if (activeUser.email !== "thenja96@gmail.com") {
+                txQuery = txQuery.eq('user_id', activeUser.id);
+            }
+
+            const { data: txs, error: txError } = await txQuery.order('created_at', { ascending: false });
+            console.log('Fetched Dashboard Transactions:', txs, 'Error:', txError);
 
             if (txs) {
                 setTransactions(txs);
@@ -625,6 +633,13 @@ export default function DashboardClient() {
                     </nav>
                 </div>
                 <div className="space-y-4">
+                    {/* DEBUG MODE INFO */}
+                    <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-left space-y-1">
+                        <div className="text-[9px] font-black uppercase text-red-500 tracking-widest">Debug Mode</div>
+                        <div className="text-xs text-white font-mono">Role: {user?.role || 'null'}</div>
+                        <div className="text-xs text-white font-mono">Verified: {String(user?.is_verified)}</div>
+                    </div>
+
                     <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/5 transition-all text-zinc-400">
                         {lang === "en" ? "切换至 简体中文" : "Switch to English"}
                     </button>

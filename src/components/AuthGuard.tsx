@@ -21,11 +21,9 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
                 return;
             }
 
-            const user = session.user;
-
-            // Optional: force refresh session
-            const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
-            const activeUser = refreshedSession?.user || user;
+            // Force refresh session to get latest JWT claims and role
+            const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+            const activeUser = refreshedSession?.user || session.user;
 
             // Hardcode bypass for specific admin email:
             if (activeUser.email === "thenja96@gmail.com") {
@@ -34,21 +32,18 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
                 return;
             }
 
-            // Try fetching from database for the most accurate role, bypassing cache
-            const { data: profile, error } = await supabase
+            // Fetch latest profile from DB
+            const { data: profile } = await supabase
                 .from('profiles')
-                .select('role')
+                .select('role, is_verified')
                 .eq('id', activeUser.id)
                 .single();
 
-            const role = profile?.role || activeUser.user_metadata?.role || (activeUser.email === "admin@gvcapital.trust" ? "Admin" : "User");
+            const role = profile?.role || activeUser.user_metadata?.role || "User";
             
             console.log("=== AUTH GUARD DEBUG ===");
-            console.log("Evaluated Role:", role);
-            console.log("DB Role:", profile?.role);
-            console.log("Metadata Role:", activeUser.user_metadata?.role);
             console.log("Email:", activeUser.email);
-            if (error) console.error("Profile Fetch Error:", error);
+            console.log("Resolved Role:", role);
 
             if (requireAdmin && role.toLowerCase() !== "admin") {
                 setForbidden(true);

@@ -35,6 +35,7 @@ export default function AdminPortal() {
         accuracy_confirmed: boolean;
         is_not_pep: boolean;
         referred_by_username: string;
+        role: string;
         verified_at: string;
         created_at?: string;
     }
@@ -134,7 +135,41 @@ export default function AdminPortal() {
                 .select('*')
                 .eq('id', session.user.id)
                 .single();
-            setAdminProfile(profile || { id: session.user.id, username: session.user.email?.split('@')[0] });
+            
+            if (profile) {
+                setAdminProfile(profile as Profile);
+            } else {
+                setAdminProfile({ 
+                    id: session.user.id, 
+                    email: session.user.email || "", 
+                    role: "Bypassed",
+                    username: session.user.email?.split('@')[0] || "Admin",
+                    full_name: "Admin Bypass",
+                    balance: 0,
+                    balance_usd: 0,
+                    is_verified: true,
+                    kyc_status: 'Verified',
+                    kyc_step: 3,
+                    kyc_data: {},
+                    kyc_id_front: "",
+                    kyc_id_back: "",
+                    dob: "",
+                    phone: "",
+                    tax_id: "",
+                    address: "",
+                    account_purpose: "",
+                    employment_status: "",
+                    industry: "",
+                    source_of_wealth: [],
+                    annual_income: "",
+                    total_wealth: "",
+                    risk_acknowledged: true,
+                    accuracy_confirmed: true,
+                    is_not_pep: true,
+                    referred_by_username: "",
+                    verified_at: new Date().toISOString()
+                } as Profile);
+            }
         }
     };
 
@@ -496,7 +531,10 @@ export default function AdminPortal() {
                         <img src="/logo.png" className="h-[40px] w-auto mix-blend-screen" />
                         <div>
                             <h1 className="text-xl font-bold text-white uppercase tracking-tighter">Master Control</h1>
-                            <p className="text-[10px] text-gv-gold font-black tracking-widest uppercase">Admin System Core</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-[10px] text-gv-gold font-black tracking-widest uppercase">Admin System Core</p>
+                                <span className="text-[8px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded border border-red-500/20 font-mono">DEBUG: {adminProfile?.role || 'Bypassed'} | {adminProfile?.email}</span>
+                            </div>
                         </div>
                     </div>
                     <div className="flex items-center gap-8">
