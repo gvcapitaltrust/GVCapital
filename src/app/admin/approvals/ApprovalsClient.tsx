@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function ApprovalsClient() {
+    const router = useRouter();
     const [pendingDeposits, setPendingDeposits] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [distributing, setDistributing] = useState(false);
@@ -62,6 +64,7 @@ export default function ApprovalsClient() {
 
             alert("Deposit approved successfully!");
             fetchPending();
+            router.refresh();
         } catch (error: any) {
             alert(error.message);
         }

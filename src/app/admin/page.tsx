@@ -545,6 +545,7 @@ export default function AdminPortal() {
             showToast("Deposit approved successfully.");
             setIsDepositDrawerOpen(false);
             fetchData();
+            router.refresh(); // Optimistic server refresh
         } catch (error: any) {
             alert(error.message);
         }

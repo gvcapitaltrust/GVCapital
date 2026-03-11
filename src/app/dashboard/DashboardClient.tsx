@@ -68,8 +68,7 @@ export default function DashboardClient() {
             return;
         }
 
-        // Prevent infinite loops by checking if we already fetched for this user ID
-        if (fetchedRef.current === authUser.id) return;
+
 
         const fetchUserData = async () => {
             console.log("FETCHING DASHBOARD DATA for:", authUser.email);
@@ -104,8 +103,8 @@ export default function DashboardClient() {
                         is_verified: dbIsVerified,
                         kyc_completed: kycApproved,
                         fullName: profile.full_name || authUser.user_metadata?.full_name,
-                        total_assets: (profile.balance || 0) * currentRate, // Live calculation based on rate
-                        totalEquity: profile.total_equity || (Number(profile.balance || 0) * currentRate + Number(profile.investment || 0))
+                        total_assets: profile.total_assets || 0,
+                        totalEquity: profile.total_equity || 0
                     });
                 }
 
@@ -146,8 +145,15 @@ export default function DashboardClient() {
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${authUser.id}` }, 
             (payload: any) => {
                 const p = payload.new;
-                const verified = p.role === 'admin' || p.is_verified === true;
-                setUser((prev: any) => ({ ...prev, ...p, is_verified: verified }));
+                console.log("[REALTIME] Dashboard Profile Update:", p);
+                const verified = p.role === 'admin' || p.is_verified === true || p.is_verified === 'Approved';
+                setUser((prev: any) => ({ 
+                    ...prev, 
+                    ...p, 
+                    is_verified: verified,
+                    total_assets: p.total_assets || 0,
+                    totalEquity: p.total_equity || 0
+                }));
             })
             .subscribe();
 

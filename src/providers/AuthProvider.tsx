@@ -140,6 +140,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }, [session]); // Only fetch when session state is explicitly updated by stable listener
 
+    // 3. Real-time Profile Sync
+    useEffect(() => {
+        if (!session?.user?.id) return;
+
+        const uid = session.user.id;
+        const channel = supabase
+            .channel(`profile-updates-${uid}`)
+            .on('postgres_changes', { 
+                event: 'UPDATE', 
+                schema: 'public', 
+                table: 'profiles', 
+                filter: `id=eq.${uid}` 
+            }, (payload) => {
+                console.log("[AUTH] Profile Update Received via Realtime:", payload.new);
+                const updated = payload.new as any;
+                if (updated) {
+                    setBalance(updated.balance || 0);
+                    setTotalEquity(updated.total_equity || 0);
+                    setTotalAssets(updated.total_assets || 0);
+                    setIsVerified(updated.is_verified === true || updated.is_verified === "Approved");
+                    setKycStep(updated.kyc_step || 0);
+                    setRole(updated.role || "User");
+                    setUser((prev: any) => prev ? ({ ...prev, ...updated }) : updated);
+                }
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [session?.user?.id]);
+
     const refreshProfile = async () => {
         setLoading(true);
         isFetching.current = false; // Force unlock
