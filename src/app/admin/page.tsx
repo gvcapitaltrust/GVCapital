@@ -1065,6 +1065,7 @@ export default function AdminPortal() {
                                             <th className="px-8 py-6">Name</th>
                                             <th className="px-8 py-6">Ref ID</th>
                                             <th className="px-8 py-6">Amount (RM)</th>
+                                            <th className="px-8 py-6">Status</th>
                                             <th className="px-8 py-6">Date</th>
                                             <th className="px-8 py-6">Receipt</th>
                                             <th className="px-8 py-6 text-right">Action</th>
@@ -1073,10 +1074,26 @@ export default function AdminPortal() {
                                     <tbody className="divide-y divide-white/[0.02]">
                                         {deposits.map((d: any, i: number) => (
                                             <tr key={i} className="text-sm font-bold group hover:bg-white/[0.01]">
-                                                <td className="px-8 py-6 text-white">{d.profiles?.full_name || "Unknown"}</td>
+                                                <td className="px-8 py-6 text-white">
+                                                    <div className="flex flex-col">
+                                                        <span>{d.profiles?.full_name || d.profiles?.email || "Unknown"}</span>
+                                                        <span className="text-[10px] text-zinc-500 lowercase font-medium">{d.profiles?.email}</span>
+                                                    </div>
+                                                </td>
                                                 <td className="px-8 py-4 font-mono text-xs opacity-50">{d.ref_id}</td>
                                                 <td className="px-8 py-6 text-emerald-400">{formatCurrency(d.amount)}</td>
-                                                <td className="px-8 py-6 text-zinc-400 font-mono text-xs">{d.transfer_date ? new Date(d.transfer_date).toLocaleDateString() : "N/A"}</td>
+                                                <td className="px-8 py-6">
+                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                                        d.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-500' :
+                                                        d.status === 'Rejected' ? 'bg-red-500/20 text-red-500' :
+                                                        'bg-amber-500/20 text-amber-500'
+                                                    }`}>
+                                                        {d.status || 'Pending'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-8 py-6 text-zinc-400 font-mono text-xs whitespace-nowrap">
+                                                    {d.created_at ? new Date(d.created_at).toLocaleString() : "N/A"}
+                                                </td>
                                                 <td className="px-8 py-6">
                                                     {d.receipt_url ? (
                                                         <button 
@@ -1088,8 +1105,12 @@ export default function AdminPortal() {
                                                     ) : <span className="text-zinc-600 text-[10px] uppercase">No File</span>}
                                                 </td>
                                                 <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
-                                                    <button onClick={() => handleRejectDeposit(d)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">Reject</button>
-                                                    <button onClick={() => handleApproveDeposit(d)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Verify & Credit</button>
+                                                    {d.status === 'Pending' && (
+                                                        <>
+                                                            <button onClick={() => handleRejectDeposit(d)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">Reject</button>
+                                                            <button onClick={() => handleApproveDeposit(d)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Verify & Credit</button>
+                                                        </>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}

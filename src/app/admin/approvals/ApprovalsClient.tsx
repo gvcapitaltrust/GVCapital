@@ -176,35 +176,49 @@ export default function ApprovalsClient() {
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-[#1a1a1a] text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-white/5">
                                 <tr>
-                                    <th className="px-8 py-6">Client Details</th>
-                                    <th className="px-8 py-6">Reference ID</th>
-                                    <th className="px-8 py-6">Amount (RM)</th>
-                                    <th className="px-8 py-6">Receipt</th>
-                                    <th className="px-8 py-6 text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/[0.03]">
-                                {pendingDeposits.map((tx) => (
-                                    <tr key={tx.id} className="text-sm font-bold hover:bg-white/[0.01] transition-colors border-b border-white/[0.02]">
-                                        <td className="px-8 py-6">
-                                            <div className="text-white mb-1 uppercase tracking-tight">{tx.profiles.full_name}</div>
-                                            <div className="text-[10px] text-zinc-600 lowercase font-medium">{tx.profiles.email}</div>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <span className="font-mono text-xs text-zinc-500">{tx.ref_id}</span>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <span className="text-lg tracking-tighter text-emerald-400">{formatCurrency(tx.amount)}</span>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <button
-                                                onClick={() => setViewingReceipt(tx.receipt_url)}
-                                                className="bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-black uppercase px-4 py-2 rounded-xl transition-all flex items-center gap-2"
-                                            >
-                                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                                View Slip
-                                            </button>
-                                        </td>
+                                     <th className="px-8 py-6">Client Details</th>
+                                     <th className="px-8 py-6">Reference ID</th>
+                                     <th className="px-8 py-6">Amount (RM)</th>
+                                     <th className="px-8 py-6">Status</th>
+                                     <th className="px-8 py-6">Date</th>
+                                     <th className="px-8 py-6">Receipt</th>
+                                     <th className="px-8 py-6 text-right">Action</th>
+                                 </tr>
+                             </thead>
+                             <tbody className="divide-y divide-white/[0.03]">
+                                 {pendingDeposits.map((tx) => (
+                                     <tr key={tx.id} className="text-sm font-bold hover:bg-white/[0.01] transition-colors border-b border-white/[0.02]">
+                                         <td className="px-8 py-6">
+                                             <div className="text-white mb-1 uppercase tracking-tight">{tx.profiles?.full_name || tx.profiles?.email || "Unknown"}</div>
+                                             <div className="text-[10px] text-zinc-600 lowercase font-medium">{tx.profiles?.email}</div>
+                                         </td>
+                                         <td className="px-8 py-6">
+                                             <span className="font-mono text-xs text-zinc-500">{tx.ref_id}</span>
+                                         </td>
+                                         <td className="px-8 py-6">
+                                             <span className="text-lg tracking-tighter text-emerald-400">{formatCurrency(tx.amount)}</span>
+                                         </td>
+                                         <td className="px-8 py-6">
+                                             <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                                 tx.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-500' :
+                                                 tx.status === 'Rejected' ? 'bg-red-500/20 text-red-500' :
+                                                 'bg-amber-500/20 text-amber-500'
+                                             }`}>
+                                                 {tx.status || 'Pending'}
+                                             </span>
+                                         </td>
+                                         <td className="px-8 py-6 text-zinc-400 font-mono text-xs whitespace-nowrap">
+                                             {tx.created_at ? new Date(tx.created_at).toLocaleString() : "N/A"}
+                                         </td>
+                                         <td className="px-8 py-6">
+                                             <button
+                                                 onClick={() => setViewingReceipt(tx.receipt_url)}
+                                                 className="bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-black uppercase px-4 py-2 rounded-xl transition-all flex items-center gap-2"
+                                             >
+                                                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                 View Slip
+                                             </button>
+                                         </td>
                                         <td className="px-8 py-6 text-right">
                                             <button
                                                 onClick={() => handleApprove(tx)}
