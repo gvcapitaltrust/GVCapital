@@ -36,6 +36,7 @@ export default function AdminPortal() {
         is_not_pep: boolean;
         referred_by_username: string;
         verified_at: string;
+        created_at?: string;
     }
 
     const [activeTab, setActiveTab] = useState("deposits");
@@ -62,6 +63,8 @@ export default function AdminPortal() {
     const [users, setUsers] = useState<Profile[]>([]);
     const [salesData, setSalesData] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [userSearchQuery, setUserSearchQuery] = useState("");
+    const [userStatusFilter, setUserStatusFilter] = useState("All");
     const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
     const [agentReferrals, setAgentReferrals] = useState<Partial<Profile>[]>([]);
     const [isLoadingSales, setIsLoadingSales] = useState(false);
@@ -72,6 +75,8 @@ export default function AdminPortal() {
     const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [viewingDoc, setViewingDoc] = useState<string | null>(null);
+    const [userKycDocs, setUserKycDocs] = useState<{name: string, url: string}[]>([]);
+    const [isLoadingDocs, setIsLoadingDocs] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -81,6 +86,40 @@ export default function AdminPortal() {
         fetchSalesData();
         fetchAdminProfile();
     }, []);
+
+    useEffect(() => {
+        if (selectedUser && isDetailModalOpen) {
+            fetchUserDocs(selectedUser.id);
+        } else {
+            setUserKycDocs([]);
+        }
+    }, [selectedUser, isDetailModalOpen]);
+
+    const fetchUserDocs = async (userId: string) => {
+        setIsLoadingDocs(true);
+        try {
+            const { data, error } = await supabase.storage.from('kyc-documents').list(userId);
+            if (error) throw error;
+            
+            if (data && data.length > 0) {
+                const validFiles = data.filter(f => f.name !== '.emptyFolderPlaceholder' && f.name !== '.gitkeep');
+                const docs = await Promise.all(
+                    validFiles.map(async (file) => {
+                        const { data: urlData } = await supabase.storage.from('kyc-documents').createSignedUrl(`${userId}/${file.name}`, 3600);
+                        return { name: file.name, url: urlData?.signedUrl || "" };
+                    })
+                );
+                setUserKycDocs(docs.filter(d => d.url !== ""));
+            } else {
+                setUserKycDocs([]);
+            }
+        } catch (error) {
+            console.error('Error fetching docs:', error);
+            setUserKycDocs([]);
+        } finally {
+            setIsLoadingDocs(false);
+        }
+    };
 
     const fetchAdminProfile = async () => {
         const { data: { session } } = await supabase.auth.getSession();
@@ -312,6 +351,41 @@ export default function AdminPortal() {
 
             fetchData();
             showToast(`User successfully rejected.`);
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleResetKyc = async (userId: string) => {
+        const userToReject = users.find((u: any) => u.id === userId);
+        if (!userToReject) return;
+
+        try {
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({
+                    kyc_step: 0,
+                    is_verified: false,
+                    kyc_status: 'Rejected'
+                })
+                .eq('id', userId);
+
+            if (updateError) throw updateError;
+
+            // Log the rejection
+            await supabase
+                .from('verification_logs')
+                .insert({
+                    admin_id: adminProfile?.id,
+                    user_email: userToReject.email,
+                    admin_username: adminProfile?.username || adminProfile?.email?.split('@')[0] || 'Admin',
+                    action: 'Rejected',
+                    rejection_reason: 'KYC Reset',
+                    created_at: new Date().toISOString()
+                });
+
+            fetchData();
+            showToast(`User KYC has been reset to 0.`);
         } catch (err: any) {
             alert(err.message);
         }
@@ -628,12 +702,55 @@ export default function AdminPortal() {
                             )}
 
                             {activeTab === "users" && (
-                                <table className="w-full text-left">
-                                    <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                        <tr><th className="px-8 py-6">Client</th><th className="px-8 py-6">Balance (RM)</th><th className="px-8 py-6">Credit (USD)</th><th className="px-8 py-6 text-center">KYC</th><th className="px-8 py-6 text-center">Status</th><th className="px-8 py-6 text-right">Actions</th></tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-white/[0.02]">
-                                        {users.map((u: any, i: number) => (
+                                <div className="p-8 space-y-6 animate-in fade-in duration-500">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                        <div>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">Client Directory</h3>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Global User Management</p>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-4">
+                                            {/* Search Bar */}
+                                            <div className="relative group w-full md:w-64">
+                                                <input 
+                                                    type="text"
+                                                    placeholder="Search Email..."
+                                                    value={userSearchQuery}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserSearchQuery(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all text-white"
+                                                />
+                                                <svg className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                            </div>
+                                            {/* Status Filter */}
+                                            <select 
+                                                value={userStatusFilter}
+                                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setUserStatusFilter(e.target.value)}
+                                                className="bg-[#121212] border border-white/10 rounded-xl px-6 py-2.5 text-xs font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 cursor-pointer transition-all"
+                                            >
+                                                <option value="All">All Users</option>
+                                                <option value="Verified">Fully Verified</option>
+                                                <option value="KYC Pending">KYC Pending</option>
+                                                <option value="Unverified">Unverified</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="overflow-hidden border border-white/5 rounded-3xl">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                                <tr><th className="px-8 py-6">Client</th><th className="px-8 py-6">Balance (RM)</th><th className="px-8 py-6">Credit (USD)</th><th className="px-8 py-6 text-center">KYC</th><th className="px-8 py-6 text-center">Status</th><th className="px-8 py-6 text-right">Actions</th></tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-white/[0.02]">
+                                                {users.filter((u: any) => {
+                                                    const matchesSearch = (u.email || "").toLowerCase().includes(userSearchQuery.toLowerCase());
+                                                    let matchesFilter = true;
+                                                    if (userStatusFilter === "Verified") {
+                                                        matchesFilter = u.is_verified === true;
+                                                    } else if (userStatusFilter === "KYC Pending") {
+                                                        matchesFilter = !u.is_verified && u.kyc_step === 3;
+                                                    } else if (userStatusFilter === "Unverified") {
+                                                        matchesFilter = !u.is_verified && (u.kyc_step || 0) < 3;
+                                                    }
+                                                    return matchesSearch && matchesFilter;
+                                                }).map((u: any, i: number) => (
                                             <tr 
                                                 key={i} 
                                                 className="text-sm font-bold group hover:bg-white/[0.01] cursor-pointer"
@@ -687,9 +804,29 @@ export default function AdminPortal() {
                                                     )}
                                                 </td>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                                ))}
+                                                {users.filter((u: any) => {
+                                                    const matchesSearch = (u.email || "").toLowerCase().includes(userSearchQuery.toLowerCase());
+                                                    let matchesFilter = true;
+                                                    if (userStatusFilter === "Verified") {
+                                                        matchesFilter = u.is_verified === true;
+                                                    } else if (userStatusFilter === "KYC Pending") {
+                                                        matchesFilter = !u.is_verified && u.kyc_step === 3;
+                                                    } else if (userStatusFilter === "Unverified") {
+                                                        matchesFilter = !u.is_verified && (u.kyc_step || 0) < 3;
+                                                    }
+                                                    return matchesSearch && matchesFilter;
+                                                }).length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={6} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">
+                                                            No users found
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             )}
 
                             {activeTab === "deposits" && (
@@ -871,191 +1008,86 @@ export default function AdminPortal() {
                     </div>
                 )}
 
-                {/* User Detail Modal */}
+                {/* User Detail Slide-over */}
                 {isDetailModalOpen && selectedUser && (
-                    <div className="fixed inset-0 z-[600] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
-                        <div className="bg-[#121212] border border-white/10 rounded-[40px] w-full max-w-5xl max-h-full overflow-y-auto shadow-[0_0_100px_rgba(0,0,0,0.8)] relative custom-scrollbar">
+                    <>
+                        {/* Backdrop */}
+                        <div 
+                            className="fixed inset-0 z-[500] bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
+                            onClick={() => setIsDetailModalOpen(false)}
+                        ></div>
+                        
+                        {/* Drawer */}
+                        <div className="fixed inset-y-0 right-0 z-[600] w-full max-w-md bg-[#121212] border-l border-white/10 shadow-2xl p-8 overflow-y-auto animate-in slide-in-from-right duration-300">
                             <button 
                                 onClick={() => setIsDetailModalOpen(false)}
-                                className="absolute top-8 right-8 text-zinc-500 hover:text-white transition-colors"
+                                className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors"
                             >
-                                <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
-
-                            <div className="p-10 md:p-16 space-y-16">
-                                <header className="flex flex-col md:flex-row justify-between items-start gap-8">
-                                    <div className="space-y-2">
-                                        <p className="text-[10px] text-gv-gold font-black uppercase tracking-[0.2em]">Client Profile Audit</p>
-                                        <h2 className="text-4xl font-black text-white uppercase tracking-tighter">{selectedUser.full_name || selectedUser.email}</h2>
-                                        <div className="flex items-center gap-4 pt-2">
-                                            <span className="text-xs font-mono text-zinc-500">{selectedUser.id}</span>
-                                            <span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase border ${selectedUser.is_verified ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-amber-500/10 text-amber-500 border-amber-500/20"}`}>
-                                                {selectedUser.is_verified ? "Verified" : "Pending Verification"}
-                                            </span>
+                            
+                            <div className="mt-8 space-y-10">
+                                <header className="space-y-2">
+                                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter">{selectedUser.full_name || "User Details"}</h2>
+                                    <p className="text-zinc-400 text-sm font-medium">{selectedUser.email}</p>
+                                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest pt-2">
+                                        Account Created: {selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString() : 'N/A'}
+                                    </p>
+                                </header>
+                                
+                                <section className="space-y-4">
+                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold">Current Status</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-white/5 border border-white/10 p-5 rounded-xl">
+                                            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC Step</p>
+                                            <p className="text-2xl font-black text-white">{selectedUser.kyc_step || 0} / 3</p>
+                                        </div>
+                                        <div className="bg-white/5 border border-white/10 p-5 rounded-xl">
+                                            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Verification</p>
+                                            <p className={`text-sm font-black uppercase mt-2 ${selectedUser.is_verified ? "text-emerald-500" : "text-amber-500"}`}>
+                                                {selectedUser.is_verified ? "Verified" : "Unverified"}
+                                            </p>
                                         </div>
                                     </div>
-                                    <div className="flex gap-4">
-                                        {!selectedUser.is_verified && (
-                                            <>
-                                                <button 
-                                                    onClick={() => { handleVerifyUser(selectedUser.id); setIsDetailModalOpen(false); }}
-                                                    className="bg-emerald-500 hover:bg-emerald-600 text-black font-black px-8 py-4 rounded-2xl text-xs uppercase tracking-widest transition-all shadow-xl shadow-emerald-500/10 active:scale-95"
-                                                >
-                                                    Approve Identity
+                                </section>
+
+                                <section className="space-y-4">
+                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold">Compliance Documents</h3>
+                                    <div className="space-y-3">
+                                        {isLoadingDocs ? (
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-zinc-500 animate-pulse">
+                                                Loading documents...
+                                            </div>
+                                        ) : userKycDocs.length > 0 ? (
+                                            userKycDocs.map((doc, idx) => (
+                                                <button key={idx} onClick={() => setViewingDoc(doc.url)} className="w-full flex items-center justify-between p-5 bg-white/5 border border-white/10 rounded-xl hover:border-gv-gold/50 transition-all group">
+                                                    <span className="text-xs font-bold text-white group-hover:text-gv-gold transition-colors truncate pr-4">{doc.name}</span>
+                                                    <svg className="h-4 w-4 text-zinc-500 group-hover:text-gv-gold transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                 </button>
-                                                <button 
-                                                    onClick={() => {
-                                                        const reason = prompt("Enter rejection reason:");
-                                                        if (reason) {
-                                                            setRejectionReasons({ ...rejectionReasons, [selectedUser.id]: reason });
-                                                            handleRejectUser(selectedUser.id);
-                                                            setIsDetailModalOpen(false);
-                                                        }
-                                                    }}
-                                                    className="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 font-black px-8 py-4 rounded-2xl text-xs uppercase tracking-widest transition-all active:scale-95"
-                                                >
-                                                    Reject
-                                                </button>
-                                            </>
+                                            ))
+                                        ) : (
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-zinc-600">No Documents Uploaded</div>
                                         )}
                                     </div>
-                                </header>
+                                </section>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-                                    {/* Section 1: Identity */}
-                                    <section className="space-y-8">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-[1px] flex-1 bg-white/10"></div>
-                                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Identity Details</h3>
-                                            <div className="h-[1px] flex-1 bg-white/10"></div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-y-8 gap-x-4">
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Full Name</p>
-                                                <p className="text-sm font-bold text-white">{selectedUser.full_name || "N/A"}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Date of Birth</p>
-                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.dob || "N/A"}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Phone Number</p>
-                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.phone || "N/A"}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Tax ID (TIN)</p>
-                                                <p className="text-sm font-bold text-white uppercase tracking-tighter">{selectedUser.kyc_data?.tax_id || "None"}</p>
-                                            </div>
-                                            <div className="col-span-2 space-y-1">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Residential Address</p>
-                                                <p className="text-sm font-bold text-white leading-relaxed">
-                                                    {selectedUser.kyc_data?.address}<br/>
-                                                    {selectedUser.kyc_data?.city}, {selectedUser.kyc_data?.country}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </section>
-
-                                    {/* Section 2: Financials */}
-                                    <section className="space-y-8">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-[1px] flex-1 bg-white/10"></div>
-                                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Financial Profile</h3>
-                                            <div className="h-[1px] flex-1 bg-white/10"></div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-y-8 gap-x-4">
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Account Purpose</p>
-                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.account_purpose || "N/A"}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Employment Status</p>
-                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.employment_status || "N/A"}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Industry</p>
-                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.industry || "N/A"}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Primary Wealth Source</p>
-                                                <p className="text-sm font-bold text-white">{selectedUser.kyc_data?.source_of_wealth?.join(', ') || "N/A"}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Annual Net Income</p>
-                                                <p className="text-sm font-black text-emerald-400">{selectedUser.kyc_data?.annual_income || "N/A"}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Total Net Worth</p>
-                                                <p className="text-sm font-black text-gv-gold">{selectedUser.kyc_data?.total_wealth || "N/A"}</p>
-                                            </div>
-                                        </div>
-                                    </section>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-                                    {/* Section 3: Compliance */}
-                                    <section className="space-y-8">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-[1px] flex-1 bg-white/10"></div>
-                                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Compliance & Risk</h3>
-                                            <div className="h-[1px] flex-1 bg-white/10"></div>
-                                        </div>
-                                        <div className="space-y-4">
-                                            <div className={`flex items-center gap-3 p-4 rounded-2xl border ${selectedUser.kyc_data?.accuracy_confirmed ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-500" : "bg-white/5 border-white/10 text-zinc-500"}`}>
-                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
-                                                <p className="text-[10px] font-black uppercase tracking-widest">Accuracy Confirmed</p>
-                                            </div>
-                                            <div className={`flex items-center gap-3 p-4 rounded-2xl border ${selectedUser.kyc_data?.risk_acknowledged ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-500" : "bg-white/5 border-white/10 text-zinc-500"}`}>
-                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
-                                                <p className="text-[10px] font-black uppercase tracking-widest">Risk Acknowledged</p>
-                                            </div>
-                                            <div className={`flex items-center gap-3 p-4 rounded-2xl border ${!selectedUser.kyc_data?.is_not_pep ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-500" : "bg-white/5 border-white/10 text-zinc-500"}`}>
-                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
-                                                <p className="text-[10px] font-black uppercase tracking-widest">Not a Politically Exposed Person (PEP)</p>
-                                            </div>
-                                        </div>
-                                    </section>
-
-                                    {/* Section 4: Documents */}
-                                    <section className="space-y-8">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-[1px] flex-1 bg-white/10"></div>
-                                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Legal Documents</h3>
-                                            <div className="h-[1px] flex-1 bg-white/10"></div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-6">
-                                            <div className="space-y-3">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest text-center">Front of ID</p>
-                                                <div 
-                                                    className="aspect-[3/2] rounded-2xl bg-white/5 border border-white/10 overflow-hidden cursor-pointer hover:border-gv-gold/50 transition-all group"
-                                                    onClick={() => setViewingDoc(selectedUser.kyc_id_front)}
-                                                >
-                                                    {selectedUser.kyc_id_front ? (
-                                                        <img src={supabase.storage.from('agreements').getPublicUrl(selectedUser.kyc_id_front).data.publicUrl} className="w-full h-full object-cover group-hover:scale-105 transition-all" />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-[10px] font-black text-zinc-700">NO UPLOAD</div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="space-y-3">
-                                                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest text-center">Back of ID</p>
-                                                <div 
-                                                    className="aspect-[3/2] rounded-2xl bg-white/5 border border-white/10 overflow-hidden cursor-pointer hover:border-gv-gold/50 transition-all group"
-                                                    onClick={() => setViewingDoc(selectedUser.kyc_id_back)}
-                                                >
-                                                    {selectedUser.kyc_id_back ? (
-                                                        <img src={supabase.storage.from('agreements').getPublicUrl(selectedUser.kyc_id_back).data.publicUrl} className="w-full h-full object-cover group-hover:scale-105 transition-all" />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-[10px] font-black text-zinc-700">NO UPLOAD</div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </section>
+                                <div className="pt-8 border-t border-white/10 space-y-4">
+                                    <button 
+                                        onClick={() => { handleVerifyUser(selectedUser.id); setIsDetailModalOpen(false); }}
+                                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-black py-4 rounded-xl text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
+                                    >
+                                        Verify User
+                                    </button>
+                                    <button 
+                                        onClick={() => { handleResetKyc(selectedUser.id); setIsDetailModalOpen(false); }}
+                                        className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 font-black py-4 rounded-xl text-xs uppercase tracking-widest transition-all active:scale-95"
+                                    >
+                                        Reject / Reset KYC
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </>
                 )}
 
                 {/* Lightbox / Document Viewer */}
@@ -1070,7 +1102,7 @@ export default function AdminPortal() {
                             </button>
                             <div className="w-full h-full flex items-center justify-center bg-white/5 rounded-[40px] overflow-hidden border border-white/10">
                                 <img 
-                                    src={supabase.storage.from('agreements').getPublicUrl(viewingDoc).data.publicUrl} 
+                                    src={viewingDoc} 
                                     className="w-full h-full object-contain"
                                     alt="Identity Document High-Res"
                                 />
