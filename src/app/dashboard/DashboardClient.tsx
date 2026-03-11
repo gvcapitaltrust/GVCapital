@@ -684,7 +684,7 @@ export default function DashboardClient() {
                                     <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalAssets}</p>
-                                    <h2 className="text-4xl font-black tracking-tighter">{user?.kyc_completed ? formatCurrency((user?.balance || 0) * forexRate) : "RM 0.00"}</h2>
+                                    <h2 className="text-4xl font-black tracking-tighter">{user?.kyc_completed ? formatCurrency(user?.total_assets || 0) : "RM 0.00"}</h2>
                                 </div>
                                 <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.creditUsd}</p>

@@ -51,33 +51,14 @@ export default function ApprovalsClient() {
         if (!confirm(`Approve deposit of RM ${tx.amount} for ${tx.profiles.full_name}?`)) return;
 
         try {
-            // 1. Update Transaction
-            const { error: txError } = await supabase
-                .from('transactions')
-                .update({ status: 'Approved' })
-                .eq('id', tx.id);
+            // Use RPC for atomic update of transaction and profile balance
+            const { error: rpcError } = await supabase.rpc('approve_deposit', {
+                p_tx_id: tx.id,
+                p_user_id: tx.user_id,
+                p_amount: Number(tx.amount)
+            });
 
-            if (txError) throw txError;
-
-            // 2. Add to User profile (balance and total_equity)
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('balance, total_equity')
-                .eq('id', tx.user_id)
-                .single();
-
-            const newBalance = (profile?.balance || 0) + Number(tx.amount);
-            const newTotalEquity = (profile?.total_equity || 0) + Number(tx.amount);
-
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .update({
-                    balance: newBalance,
-                    total_equity: newTotalEquity
-                })
-                .eq('id', tx.user_id);
-
-            if (profileError) throw profileError;
+            if (rpcError) throw rpcError;
 
             alert("Deposit approved successfully!");
             fetchPending();
@@ -204,7 +185,7 @@ export default function ApprovalsClient() {
                                                  tx.status === 'Rejected' ? 'bg-red-500/20 text-red-500' :
                                                  'bg-amber-500/20 text-amber-500'
                                              }`}>
-                                                 {tx.status || 'Pending'}
+                                                 { (tx.status === 'Approved' || tx.status === 'Rejected') ? tx.status : 'Pending' }
                                              </span>
                                          </td>
                                          <td className="px-8 py-6 text-zinc-400 font-mono text-xs whitespace-nowrap">

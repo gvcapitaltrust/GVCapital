@@ -18,7 +18,6 @@ export default function DepositClient() {
 
     // Form States
     const [amount, setAmount] = useState("");
-    const [transferDate, setTransferDate] = useState("");
     const [receipt, setReceipt] = useState<File | null>(null);
     const [rate, setRate] = useState<number>(4.752); // Fallback rate
 
@@ -51,8 +50,8 @@ export default function DepositClient() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!amount || !transferDate || !receipt || !user) {
-            alert("Please fill in all fields and upload a receipt.");
+        if (!amount || !receipt || !user) {
+            alert("Please fill in amount and upload a receipt.");
             return;
         }
 
@@ -76,7 +75,7 @@ export default function DepositClient() {
                     user_id: user.id,
                     type: 'Deposit',
                     amount: parseFloat(amount),
-                    transfer_date: new Date(transferDate).toISOString(),
+                    transfer_date: new Date().toISOString(),
                     status: 'Pending',
                     receipt_url: uploadData.path,
                     ref_id: refId
@@ -102,7 +101,6 @@ export default function DepositClient() {
             title: "Deposit Funds",
             subtitle: "Top up your GV Capital investment account",
             amount: "Amount (RM)",
-            date: "Date of Transfer",
             receipt: "Upload Bank Receipt (Image/PDF)",
             button: "Confirm Deposit",
             back: "Back to Dashboard",
@@ -115,7 +113,6 @@ export default function DepositClient() {
             title: "资金充值",
             subtitle: "充值您的 GV 资本投资账户",
             amount: "金额 (RM)",
-            date: "转账日期",
             receipt: "上传银行收据 (图片/PDF)",
             button: "确认存款",
             back: "返回控制台",
@@ -177,16 +174,7 @@ export default function DepositClient() {
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.date}</label>
-                                <input
-                                    type="date"
-                                    required
-                                    value={transferDate}
-                                    onChange={(e) => setTransferDate(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all text-white inverted-scheme-date-picker"
-                                />
-                            </div>
+
 
                             <div className="space-y-2">
                                 <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.receipt}</label>

@@ -533,16 +533,16 @@ export default function AdminPortal() {
     const handleApproveDeposit = async (tx: any) => {
         if (!confirm(`Approve deposit of RM ${tx.amount} for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
-            // DATABASE TRIGGER HANDLES BALANCE UPDATES
-            // We only need to set the status to Approved
-            const { error: txError } = await supabase
-                .from('transactions')
-                .update({ status: 'Approved' })
-                .eq('id', tx.id);
+            // Use RPC for atomic update of transaction and profile balance
+            const { error: rpcError } = await supabase.rpc('approve_deposit', {
+                p_tx_id: tx.id,
+                p_user_id: tx.user_id,
+                p_amount: Number(tx.amount)
+            });
             
-            if (txError) throw txError;
+            if (rpcError) throw rpcError;
             
-            showToast("Deposit approved. Trigger processing balances...");
+            showToast("Deposit approved successfully.");
             setIsDepositDrawerOpen(false);
             fetchData();
         } catch (error: any) {
@@ -641,8 +641,8 @@ export default function AdminPortal() {
                                 <h2 className="text-2xl font-black text-gv-gold">{kycQueue.length}</h2>
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
-                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Unpaid Checks</p>
-                                <h2 className="text-2xl font-black text-emerald-500">{deposits.length}</h2>
+                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Pending Deposit Approval</p>
+                                <h2 className="text-2xl font-black text-emerald-500">{deposits.filter((d: any) => d.status === 'pending' || d.status === 'Pending').length}</h2>
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Clients</p>
@@ -987,7 +987,7 @@ export default function AdminPortal() {
                                                 <td className="px-8 py-6 text-white">{u.full_name || u.email}</td>
                                                 <td className="px-8 py-6 text-emerald-400">{formatCurrency(u.total_equity)}</td>
                                                 <td className="px-8 py-6 text-gv-gold">${(u.balance_usd || 0).toFixed(2)}</td>
-                                                <td className="px-8 py-6 text-white font-black">{formatCurrency(u.total_assets)}</td>
+                                                <td className="px-8 py-6 text-white font-black">{formatCurrency(u.total_assets || 0)}</td>
                                                 <td className="px-8 py-6">
                                                     <div className="flex justify-center">
                                                         <span className={`px-3 py-1 rounded-full text-[9px] uppercase font-black text-center ${u.kyc_completed ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-500"}`}>{u.kyc_status || 'KYC Pending'}</span>
@@ -1088,7 +1088,7 @@ export default function AdminPortal() {
                                                         d.status === 'Rejected' ? 'bg-red-500/20 text-red-500' :
                                                         'bg-amber-500/20 text-amber-500'
                                                     }`}>
-                                                        {d.status || 'Pending'}
+                                                        { (d.status === 'Approved' || d.status === 'Rejected') ? d.status : 'Pending' }
                                                     </span>
                                                 </td>
                                                 <td className="px-8 py-6 text-zinc-400 font-mono text-xs whitespace-nowrap">
