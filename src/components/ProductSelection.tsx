@@ -10,9 +10,16 @@ interface ProductSelectionProps {
   onSelect?: (amount: number) => void;
   lang: "en" | "zh";
   onOpenComparison: () => void;
+  forexRate: number;
 }
 
-export default function ProductSelection({ currentInvestment, onSelect, lang, onOpenComparison }: ProductSelectionProps) {
+export default function ProductSelection({ 
+  currentInvestment, 
+  onSelect, 
+  lang, 
+  onOpenComparison,
+  forexRate 
+}: ProductSelectionProps) {
   const [amount, setAmount] = useState(Math.max(1, currentInvestment));
   const activeTier = getTierByAmount(amount);
   const qualifiedTier = getTierByAmount(currentInvestment);
@@ -64,9 +71,14 @@ export default function ProductSelection({ currentInvestment, onSelect, lang, on
             <div className="space-y-4">
               <div className="flex justify-between items-end">
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">{t.sliderLabel}</label>
-                <span className="text-4xl font-black text-gv-gold tracking-tighter">
-                  {formatUSD(amount)}
-                </span>
+                <div className="flex flex-col items-end">
+                  <span className="text-4xl font-black text-gv-gold tracking-tighter">
+                    {formatUSD(amount)}
+                  </span>
+                  <span className="text-xs font-bold text-zinc-500">
+                    ≈ RM {(amount * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
               </div>
               <input
                 type="range"
@@ -90,9 +102,14 @@ export default function ProductSelection({ currentInvestment, onSelect, lang, on
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">{t.monthlyReturn}</p>
-                <p className="text-2xl font-black text-emerald-500 tracking-tight">
-                  {formatUSD(dividendRange.min)} - {formatUSD(dividendRange.max)}
-                </p>
+                <div className="flex flex-col">
+                  <p className="text-2xl font-black text-emerald-500 tracking-tight">
+                    {formatUSD(dividendRange.min)} - {formatUSD(dividendRange.max)}
+                  </p>
+                  <p className="text-[10px] font-bold text-emerald-500/60 uppercase">
+                    ≈ RM {(dividendRange.min * forexRate).toLocaleString()} - RM {(dividendRange.max * forexRate).toLocaleString()}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -110,7 +127,9 @@ export default function ProductSelection({ currentInvestment, onSelect, lang, on
               {amount > currentInvestment && (
                 <div className="pt-2 border-t border-gv-gold/10">
                   <p className="text-[10px] text-gv-gold/60 font-black uppercase">Potential Upgrade</p>
-                  <p className="text-white text-sm font-bold italic">Increase by {formatUSD(amount - currentInvestment)} to reach {activeTier.name}</p>
+                  <p className="text-white text-sm font-bold italic">
+                    Increase by {formatUSD(amount - currentInvestment)} (≈ RM {((amount - currentInvestment) * forexRate).toLocaleString()}) to reach {activeTier.name}
+                  </p>
                 </div>
               )}
             </div>

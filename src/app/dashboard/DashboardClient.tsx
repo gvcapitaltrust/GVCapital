@@ -980,6 +980,7 @@ export default function DashboardClient() {
                             currentInvestment={Number(user?.balance || 0) / (forexRate || 4.0)}
                             lang={lang}
                             onOpenComparison={() => setIsComparisonOpen(true)}
+                            forexRate={forexRate}
                         />
                     ) : activeTab === "statements" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
