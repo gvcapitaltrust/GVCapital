@@ -19,6 +19,8 @@ export default function ProfileClient() {
     // Form states
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [country, setCountry] = useState("");
 
     // Identify account level
     const [accountLevel, setAccountLevel] = useState("Basic");
@@ -52,6 +54,8 @@ export default function ProfileClient() {
                     setProfile(profileData);
                     setFullName(profileData.full_name || "");
                     setEmail(authUser.email || "");
+                    setPhoneNumber(profileData.phone_number || profileData.phone || "");
+                    setCountry(profileData.country || "");
 
                     // 3. Level Calculation (based on total assets converted to USD)
                     const assetsRM = Number(profileData.balance || 0) + Number(profileData.profit || 0);
@@ -83,7 +87,11 @@ export default function ProfileClient() {
         try {
             const { error } = await supabase
                 .from('profiles')
-                .update({ full_name: fullName })
+                .update({ 
+                    full_name: fullName,
+                    phone_number: phoneNumber,
+                    country: country
+                })
                 .eq('id', authUser.id);
 
             if (error) throw error;
@@ -202,7 +210,7 @@ export default function ProfileClient() {
                                             value={fullName}
                                             onChange={(e) => setFullName(e.target.value)}
                                             placeholder="Enter your full name"
-                                            className="w-full bg-[#0a0a0a] border border-white/10 rounded-[28px] px-8 py-5 text-lg font-black focus:outline-none focus:border-gv-gold/50 focus:shadow-[0_0_30px_rgba(201,168,76,0.1)] transition-all placeholder:text-zinc-800"
+                                            className="w-full bg-[#0a0a0a] border border-[#c9a84c]/30 rounded-[28px] px-8 py-5 text-lg font-black focus:outline-none focus:border-[#c9a84c] focus:shadow-[0_0_30px_rgba(201,168,76,0.1)] transition-all placeholder:text-zinc-800"
                                             required
                                         />
                                     </div>
@@ -213,9 +221,32 @@ export default function ProfileClient() {
                                             type="email"
                                             value={email}
                                             disabled
-                                            className="w-full bg-white/[0.03] border border-white/5 rounded-[28px] px-8 py-5 text-lg font-black text-zinc-500 cursor-not-allowed opacity-50 font-mono"
+                                            className="w-full bg-[#0a0a0a] border border-white/5 rounded-[28px] px-8 py-5 text-lg font-black text-zinc-500 cursor-not-allowed opacity-50 font-mono"
                                         />
-                                        <p className="text-[9px] text-zinc-700 font-bold uppercase tracking-widest ml-4">Contact support to change email</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    <div className="space-y-3">
+                                        <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 ml-4">Phone Number</label>
+                                        <input
+                                            type="text"
+                                            value={phoneNumber}
+                                            onChange={(e) => setPhoneNumber(e.target.value)}
+                                            placeholder="e.g. +60 123 4567"
+                                            className="w-full bg-[#0a0a0a] border border-[#c9a84c]/30 rounded-[28px] px-8 py-5 text-lg font-black focus:outline-none focus:border-[#c9a84c] focus:shadow-[0_0_30px_rgba(201,168,76,0.1)] transition-all placeholder:text-zinc-800"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 ml-4">Country</label>
+                                        <input
+                                            type="text"
+                                            value={country}
+                                            onChange={(e) => setCountry(e.target.value)}
+                                            placeholder="Enter your country"
+                                            className="w-full bg-[#0a0a0a] border border-[#c9a84c]/30 rounded-[28px] px-8 py-5 text-lg font-black focus:outline-none focus:border-[#c9a84c] focus:shadow-[0_0_30px_rgba(201,168,76,0.1)] transition-all placeholder:text-zinc-800"
+                                        />
                                     </div>
                                 </div>
 
@@ -248,7 +279,7 @@ export default function ProfileClient() {
                                     <button
                                         type="submit"
                                         disabled={isUpdating}
-                                        className="w-full md:w-auto bg-[#c9a84c] text-black font-black text-xs uppercase tracking-[0.3em] px-12 py-6 rounded-2xl shadow-xl shadow-[#c9a84c]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+                                        className="btn-primary w-full md:w-auto bg-[#c9a84c] text-black font-black text-xs uppercase tracking-[0.3em] px-12 py-6 rounded-2xl shadow-xl shadow-[#c9a84c]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 border border-[#c9a84c]/50"
                                     >
                                         {isUpdating ? 'Saving...' : 'Update Profile'}
                                     </button>
