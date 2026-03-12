@@ -137,14 +137,14 @@ export default function AdminPortal() {
             if (error) throw error;
             
             if (data && data.length > 0) {
-                const validFiles = data.filter(f => f.name !== '.emptyFolderPlaceholder' && f.name !== '.gitkeep');
+                const validFiles = data.filter((f: { name: string }) => f.name !== '.emptyFolderPlaceholder' && f.name !== '.gitkeep');
                 const docs = await Promise.all(
-                    validFiles.map(async (file) => {
+                    validFiles.map(async (file: { name: string }) => {
                         const { data: urlData } = await supabase.storage.from('kyc-documents').createSignedUrl(`${userId}/${file.name}`, 3600);
                         return { name: file.name, url: urlData?.signedUrl || "" };
                     })
                 );
-                setUserKycDocs(docs.filter(d => d.url !== ""));
+                setUserKycDocs(docs.filter((d: { url: string }) => d.url !== ""));
             } else {
                 setUserKycDocs([]);
             }
@@ -647,7 +647,7 @@ export default function AdminPortal() {
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
                                 {(() => {
-                                    const totalRm = users.reduce((acc, u) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
+                                    const totalRm = users.reduce((acc: number, u: Profile) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
                                     const rate = parseFloat(currentForexRate) || 4.0;
                                     return (
                                         <>

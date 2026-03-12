@@ -148,7 +148,7 @@ export default function ForexControlPanel() {
                                                 type="number"
                                                 step="0.0001"
                                                 value={newRate}
-                                                onChange={(e) => setNewRate(e.target.value)}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewRate(e.target.value)}
                                                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all text-white placeholder-zinc-700"
                                                 placeholder="4.000"
                                             />
@@ -185,7 +185,7 @@ export default function ForexControlPanel() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/[0.02]">
-                                        {history.map((h, i) => {
+                                        {history.map((h: any, i: number) => {
                                             const oldR = parseFloat(h.old_rate);
                                             const newR = parseFloat(h.new_rate);
                                             const change = ((newR - oldR) / oldR) * 100;
