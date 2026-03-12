@@ -36,6 +36,7 @@ export default function DashboardClient() {
     const [showSuccess, setShowSuccess] = useState(false);
     const [successRefId, setSuccessRefId] = useState("");
     const [actionToast, setActionToast] = useState<{message: string, actionUrl?: string, actionText?: string} | null>(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Form States
     const [depositAmount, setDepositAmount] = useState("");
@@ -603,17 +604,88 @@ export default function DashboardClient() {
                 </div>
             </aside>
 
+            {/* Mobile Sidebar (Slide-in) */}
+            <div
+                className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+                    isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
+                }`}
+                onClick={() => setIsSidebarOpen(false)}
+            />
+            <aside
+                className={`fixed inset-y-0 left-0 z-[60] w-72 bg-[#0a0a0a] border-r border-white/10 p-6 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden ${
+                    isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
+            >
+                <div className="space-y-12">
+                    <div className="flex items-center justify-between">
+                        <img src="/logo.png" alt="GV Capital" className="h-[50px] w-auto object-contain mix-blend-screen" />
+                        <button
+                            onClick={() => setIsSidebarOpen(false)}
+                            className="p-2 rounded-full border border-white/10 text-white"
+                        >
+                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+
+                    <nav className="space-y-2">
+                        <button
+                            onClick={() => { setActiveTab("overview"); setIsSidebarOpen(false); }}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "overview" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                        >
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                            {t.nav}
+                        </button>
+                        <button
+                            onClick={() => { setActiveTab("statements"); setIsSidebarOpen(false); }}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "statements" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                        >
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            Statements
+                        </button>
+                        <button
+                            onClick={() => { setActiveTab("security"); setIsSidebarOpen(false); }}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "security" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                        >
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            Security
+                        </button>
+                    </nav>
+                </div>
+                <div className="space-y-4">
+                    <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/5 transition-all text-zinc-400">
+                        {lang === "en" ? "切换至 简体中文" : "Switch to English"}
+                    </button>
+                    <button onClick={handleLogout} className="w-full text-zinc-500 hover:text-red-400 transition-colors text-sm font-medium flex items-center gap-3 px-4 py-2">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
+                        {t.logout}
+                    </button>
+                </div>
+            </aside>
+
             <main className="flex-1 overflow-y-auto bg-[#121212] relative flex flex-col">
+                <div className="flex items-center justify-between p-4 border-b border-white/5 md:hidden bg-[#0a0a0a]">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsSidebarOpen(true)}
+                            className="p-2 rounded-xl bg-white/5 border border-white/10 text-white"
+                        >
+                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        </button>
+                        <img src="/logo.png" alt="GV" className="h-8 w-auto mix-blend-screen" />
+                    </div>
+                    {user && <NotificationBell userId={user.id} />}
+                </div>
+
                 <CurrencyExchangeTicker />
-                <div className="max-w-7xl mx-auto w-full space-y-12 flex-1 pb-20 p-8 md:p-12">
-                    <header className="flex justify-between items-center">
+                <div className="max-w-7xl mx-auto w-full space-y-12 flex-1 pb-20 p-6 md:p-12">
+                    <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
                         <div>
-                            <p className="text-zinc-500 text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
-                            <h1 className="text-4xl font-black">
+                            <p className="text-zinc-500 text-[10px] sm:text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
+                            <h1 className="text-3xl sm:text-4xl font-black">
                                 {t.welcome}<span className="text-gv-gold tracking-tighter">{user?.fullName || "Member"}</span>
                             </h1>
                         </div>
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-6 hidden sm:flex">
                             {user && <NotificationBell userId={user.id} />}
                             <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-xl border border-gv-gold/30 shadow-lg capitalize">
                                 {user?.fullName?.[0] || user?.email?.[0] || "U"}

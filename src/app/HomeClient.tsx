@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import GlobalFooter from "@/components/GlobalFooter";
+import Navigation from "@/components/Navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function HomeClient() {
@@ -63,87 +64,51 @@ export default function HomeClient() {
     const t = content[lang];
 
     return (
-        <div className="min-h-screen bg-[#121212] text-white selection:bg-gv-gold selection:text-black flex flex-col">
+        <div className="min-h-screen bg-[#121212] text-white selection:bg-gv-gold selection:text-black flex flex-col overflow-x-hidden">
             {/* Navigation */}
-            <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#121212]/80 backdrop-blur-md">
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-                    <div className="flex items-center gap-2">
-                        <Link href={`/?lang=${lang}`} className="flex items-center">
-                            <img
-                                src="/logo.png"
-                                alt="GV Capital Trust Logo"
-                                className="h-[40px] sm:h-[60px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_6px_rgba(212,175,55,0.4)]"
-                            />
-                        </Link>
-                    </div>
-
-                    <div className="flex items-center gap-8">
-                        <div className="hidden items-center gap-6 text-sm font-medium text-zinc-400 md:flex">
-                            <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.services}</Link>
-                            <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
-                            <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => setLang(lang === "en" ? "zh" : "en")}
-                                className="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold hover:bg-white/10 transition-all"
-                            >
-                                {lang === "en" ? "简体中文" : "English"}
-                            </button>
-
-                            <Link
-                                href={`/login?lang=${lang}`}
-                                className="rounded-full bg-gv-gold px-5 py-2 text-sm font-bold text-black hover:bg-gv-gold/90 transition-all active:scale-95"
-                            >
-                                {t.nav.login}
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <Navigation lang={lang} setLang={setLang} user={null} />
 
             {/* Hero Section */}
-            <main className="relative flex flex-col items-center justify-center pt-32 pb-20 px-6 text-center flex-1">
+            <main className="relative flex flex-col items-center justify-center pt-40 pb-20 px-6 text-center flex-1">
                 {/* Decorative background element */}
-                <div className="absolute top-1/2 left-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gv-gold/10 blur-[120px]"></div>
+                <div className="absolute top-1/2 left-1/2 -z-10 h-[300px] w-[300px] sm:h-[500px] sm:w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gv-gold/10 blur-[80px] sm:blur-[120px]"></div>
 
-                <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                    <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.3em] text-gv-gold">
+                <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000 max-w-4xl mx-auto">
+                    <h2 className="mb-4 text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] text-gv-gold">
                         {t.hero.slogan}
                     </h2>
-                    <h1 className="mb-8 text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl">
-                        <span className="block text-white">{t.hero.title}</span>
+                    <h1 className="mb-6 sm:mb-8 text-4xl font-black tracking-tight sm:text-7xl lg:text-9xl leading-[1.1]">
+                        <span className="block text-white uppercase">{t.hero.title}</span>
                     </h1>
-                    <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-zinc-400 sm:text-xl">
+                    <p className="mx-auto mb-10 max-w-2xl text-base sm:text-lg leading-relaxed text-zinc-400 font-medium">
                         {t.hero.description}
                     </p>
 
-                    <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:justify-center px-4">
                         <Link
                             href={`/register?lang=${lang}`}
-                            className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gv-gold px-10 py-4 text-lg font-bold text-black transition-all hover:pr-12"
+                            className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gv-gold px-8 sm:px-12 py-4 text-sm sm:text-lg font-black text-black transition-all hover:pr-14 active:scale-95 shadow-[0_20px_40px_rgba(212,175,55,0.2)]"
                         >
-                            <span className="relative">{t.cta}</span>
+                            <span className="relative z-10 uppercase tracking-widest">{t.cta}</span>
                             <svg
-                                className="absolute right-4 h-5 w-5 -translate-x-4 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                                className="absolute right-5 h-5 w-5 -translate-x-4 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
                             >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </Link>
-                        <button className="rounded-full border border-white/20 px-10 py-4 text-lg font-bold text-white hover:bg-white/5 transition-all">
+                        <button className="rounded-full border border-white/10 bg-white/5 px-8 sm:px-12 py-4 text-sm sm:text-lg font-black text-white hover:bg-white/10 transition-all active:scale-95 uppercase tracking-widest">
                             {t.nav.about}
                         </button>
                     </div>
                 </div>
 
-                {/* Feature Grid placeholder */}
-                <div className="mt-32 grid grid-cols-1 gap-8 sm:grid-cols-3 max-w-6xl w-full">
+                {/* Feature Grid */}
+                <div className="mt-24 sm:mt-32 grid grid-cols-1 gap-6 sm:gap-8 sm:grid-cols-3 max-w-6xl w-full">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="group rounded-2xl border border-white/5 bg-white/5 p-8 transition-all hover:border-gv-gold/30 hover:bg-white/10">
+                        <div key={i} className="group rounded-[32px] border border-white/5 bg-[#1a1a1a] p-8 sm:p-10 transition-all hover:border-gv-gold/30 hover:-translate-y-2 duration-500 shadow-xl">
                             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gv-gold/20 text-gv-gold">
                                 <div className="h-6 w-6 border-2 border-gv-gold rounded-full"></div>
                             </div>
