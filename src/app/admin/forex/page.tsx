@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -202,7 +202,7 @@ export default function ForexControlPanel() {
                                                     <td className="px-10 py-6 text-white text-lg font-black tracking-tight">RM {newR.toFixed(4)}</td>
                                                     <td className={`px-10 py-6 ${change >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                                                         <div className="flex items-center gap-1">
-                                                            <span>{change >= 0 ? "鈻? : "鈻?}</span>
+                                                            <span>{change >= 0 ? "▲" : "▼"}</span>
                                                             <span className="font-mono">{Math.abs(change).toFixed(2)}%</span>
                                                         </div>
                                                     </td>

@@ -130,7 +130,7 @@ export default function HomeClient() {
                                     }}
                                     className="w-full text-left py-2 hover:text-gv-gold transition-colors"
                                 >
-                                    {lang === "en" ? "鍒囨崲鑷充腑鏂? : "SWITCH TO ENGLISH"}
+                                    {lang === "en" ? "切换至中文" : "SWITCH TO ENGLISH"}
                                 </button>
                                 <Link
                                     href={`/login?lang=${lang}`}
@@ -189,11 +189,11 @@ export default function HomeClient() {
                             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gv-gold/20 text-gv-gold">
                                 <div className="h-6 w-6 border-2 border-gv-gold rounded-lg"></div>
                             </div>
-                            <h3 className="mb-2 text-xl font-bold">{lang === "en" ? `Premium Service ${i}` : `鍗撹秺鏈嶅姟 ${i}`}</h3>
+                            <h3 className="mb-2 text-xl font-bold">{lang === "en" ? `Premium Service ${i}` : `卓越服务 ${i}`}</h3>
                             <p className="text-zinc-400 text-sm leading-relaxed">
                                 {lang === "en"
                                     ? "Global asset allocation and wealth protection strategies tailored to your specific financial goals."
-                                    : "閽堝鎮ㄧ殑鐗瑰畾璐㈠姟鐩爣閲忚韩瀹氬埗鐨勫叏鐞冭祫浜ч厤缃拰璐㈠瘜淇濇姢绛栫暐銆?}
+                                    : "针对您的特定财务目标量身定制的全球资产配置和财富保护策略。"}
                             </p>
                         </div>
                     ))}
