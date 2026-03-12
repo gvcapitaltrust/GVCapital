@@ -890,11 +890,11 @@ export default function DashboardClient() {
                                         <div className="flex items-center gap-4 mt-8">
                                             <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl">
                                                 <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-1">Your Code</p>
-                                                <p className="text-xl font-black text-gv-gold tracking-widest">{user?.id}</p>
+                                                <p className="text-xl font-black text-gv-gold tracking-widest">{user?.username}</p>
                                             </div>
                                             <button
                                                 onClick={() => {
-                                                    navigator.clipboard.writeText(user?.id);
+                                                    navigator.clipboard.writeText(user?.username);
                                                     alert(t.copied);
                                                 }}
                                                 className="h-full px-6 py-4 bg-gv-gold text-black font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-gv-gold/90 transition-all shadow-lg"
@@ -910,7 +910,7 @@ export default function DashboardClient() {
                                         </div>
                                         <button
                                             onClick={() => {
-                                                const url = typeof window !== 'undefined' ? `${window.location.origin}/register?ref=${user?.id}` : `https://gvcapital.com/register?ref=${user?.id}`;
+                                                const url = typeof window !== 'undefined' ? `${window.location.origin}/register?ref=${user?.username}` : `https://gvcapital.com/register?ref=${user?.username}`;
                                                 window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t.referSubtitle + " " + url)}`);
                                             }}
                                             className="flex items-center gap-3 bg-[#25D366] text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl"

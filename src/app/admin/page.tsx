@@ -725,7 +725,12 @@ export default function AdminPortal() {
                                     <tbody className="divide-y divide-white/[0.02]">
                                         {withdrawals.map((w: any, i: number) => (
                                             <tr key={i} className="text-sm font-bold group hover:bg-white/[0.01]">
-                                                <td className="px-8 py-6 text-white">{w.profiles?.full_name || w.user_id}</td>
+                                                <td className="px-8 py-6 text-white">
+                                                    <div className="flex flex-col">
+                                                        <span>{w.profiles?.full_name || w.profiles?.email || w.user_id}</span>
+                                                        <span className="text-[10px] text-zinc-500 lowercase font-medium">{w.profiles?.email}</span>
+                                                    </div>
+                                                </td>
                                                 <td className="px-8 py-6">
                                                     <div className="text-white text-xs">{w.profiles?.bank_name || 'N/A'}</div>
                                                     <div className="font-mono text-[10px] text-zinc-500">{w.profiles?.bank_account_number || 'N/A'}</div>
