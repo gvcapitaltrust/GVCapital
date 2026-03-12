@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     // The user 'thenja96@gmail.com' must have total access.
     // Since we can't reliably parse the JWT in the Edge without overhead,
     // we will allow all requests to proceed and handle the "Master Bypass" 
