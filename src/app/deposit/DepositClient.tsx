@@ -150,14 +150,15 @@ export default function DepositClient() {
                 </div>
             </header>
 
-            <main className="flex-1 flex flex-col items-center justify-center p-6">
+            <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-6">
                 <div className="w-full max-w-xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-                    <div className="text-center mb-10">
-                        <h1 className="text-4xl font-black uppercase tracking-tighter mb-2">{t.title}</h1>
-                        <p className="text-zinc-500 font-medium">{t.subtitle}</p>
+                    <div className="text-center mb-6 md:mb-10">
+                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-2">{t.title}</h1>
+                        <p className="text-zinc-500 font-medium text-sm md:text-base">{t.subtitle}</p>
                     </div>
 
-                    <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                    <div className="bg-[#1a1a1a] border border-white/5 p-6 md:p-10 rounded-[30px] md:rounded-[40px] shadow-2xl relative overflow-hidden group">
+
                         <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-700"></div>
 
                         <form onSubmit={handleSubmit} className="space-y-8 relative z-10">

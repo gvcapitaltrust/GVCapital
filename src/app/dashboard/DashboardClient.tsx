@@ -28,6 +28,8 @@ export default function DashboardClient() {
     const [referredCount, setReferredCount] = useState(0);
     const [forexRate, setForexRate] = useState(1.0); // Safe fallback as requested
 
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    
     // UI States
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
     const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
@@ -551,10 +553,22 @@ export default function DashboardClient() {
     // Instead, we will conditionally render the content inside the main area.
 
     return (
-        <div className="min-h-screen bg-[#121212] text-white flex font-sans overflow-hidden">
+        <div className="min-h-screen bg-[#121212] text-white flex font-sans overflow-hidden relative">
             <title>{`Dashboard | GV Capital Trust`}</title>
 
-            <aside className="w-64 border-r border-white/10 p-6 flex flex-col justify-between hidden md:flex bg-[#0a0a0a]">
+            {/* Mobile Menu Overlay */}
+            {isMobileMenuOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] md:hidden"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                ></div>
+            )}
+
+            <aside className={`
+                fixed md:relative z-[101] h-full w-64 border-r border-white/10 p-6 flex flex-col justify-between 
+                bg-[#0a0a0a] transition-transform duration-300 md:translate-x-0
+                ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+            `}>
                 <div className="space-y-12">
                     <div className="flex items-center gap-2">
                         <img src="/logo.png" alt="GV Capital" className="h-[60px] w-auto object-contain mix-blend-screen" />
@@ -603,9 +617,9 @@ export default function DashboardClient() {
                 </div>
             </aside>
 
-            <main className="flex-1 overflow-y-auto bg-[#121212] relative flex flex-col">
+            <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#121212] relative flex flex-col">
                 <CurrencyExchangeTicker />
-                <div className="max-w-7xl mx-auto w-full space-y-12 flex-1 pb-20 p-8 md:p-12">
+                <div className="max-w-7xl mx-auto w-full space-y-12 flex-1 pb-20 p-4 md:p-12">
                     <header className="flex justify-between items-center">
                         <div>
                             <p className="text-zinc-500 text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
@@ -614,6 +628,12 @@ export default function DashboardClient() {
                             </h1>
                         </div>
                         <div className="flex items-center gap-6">
+                            <button 
+                                onClick={() => setIsMobileMenuOpen(true)}
+                                className="md:hidden h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10"
+                            >
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+                            </button>
                             {user && <NotificationBell userId={user.id} />}
                             <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-xl border border-gv-gold/30 shadow-lg capitalize">
                                 {user?.fullName?.[0] || user?.email?.[0] || "U"}
@@ -848,14 +868,15 @@ export default function DashboardClient() {
                                     <h3 className="text-2xl font-black uppercase tracking-tighter">{t.history}</h3>
                                     <button
                                         onClick={() => generateStatement()}
-                                        className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black text-xs py-3 px-6 rounded-xl uppercase tracking-widest transition-all flex items-center gap-2"
+                                        className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black text-xs py-3 px-6 rounded-xl uppercase tracking-widest transition-all flex items-center gap-2 w-full sm:w-auto justify-center"
                                     >
                                         <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
                                         {t.downloadStatement}
                                     </button>
                                 </div>
-                                <div className="border border-white/10 rounded-[40px] overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
-                                    <table className="w-full text-left">
+                                <div className="border border-white/10 rounded-[30px] md:rounded-[40px] overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left min-w-[600px] md:min-w-0">
                                         <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
                                             <tr><th className="px-8 py-6">Date</th><th className="px-8 py-6">Ref ID</th><th className="px-8 py-6">Type</th><th className="px-8 py-6">Amount</th><th className="px-8 py-6 text-right">Status</th></tr>
                                         </thead>
@@ -880,6 +901,8 @@ export default function DashboardClient() {
                                         </tbody>
                                     </table>
                                 </div>
+                            </div>
+
                             </section>
                         </>
                     )}
@@ -988,8 +1011,8 @@ export default function DashboardClient() {
 
             {/* Deposit Modal */}
             {isDepositModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[30px] md:rounded-[40px] p-6 md:p-10 max-w-lg w-full space-y-6 md:space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300 overflow-y-auto max-h-[90vh]">
                         <div className="flex justify-between items-center">
                             <h2 className="text-3xl font-black text-gv-gold tracking-tighter uppercase">Deposit</h2>
                             <button onClick={() => setIsDepositModalOpen(false)} className="text-zinc-600 hover:text-white transition-colors">

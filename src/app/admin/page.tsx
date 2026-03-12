@@ -43,7 +43,8 @@ export default function AdminPortal() {
         created_at?: string;
     }
 
-    const [activeTab, setActiveTab] = useState("deposits");
+    const [activeTab, setActiveTab] = useState<string>("deposits");
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [adminProfile, setAdminProfile] = useState<Profile | null>(null);
@@ -616,32 +617,53 @@ export default function AdminPortal() {
 
     return (
         <AuthGuard requireAdmin={true}>
-            <div className="min-h-screen bg-[#0a0a0a] text-zinc-300 font-sans flex flex-col selection:bg-gv-gold selection:text-black">
+            <div className="flex h-screen bg-[#0a0a0a] text-white font-sans overflow-hidden relative">
                 <title>{`Admin Portal | GV Capital Trust`}</title>
 
-                <header className="border-b border-white/10 bg-[#121212] px-8 py-4 flex items-center justify-between sticky top-0 z-50">
-                    <div className="flex items-center gap-4">
+                {/* Mobile Menu Overlay */}
+                {isMobileMenuOpen && (
+                    <div 
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] md:hidden"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    ></div>
+                )}
+
+                {/* Sidebar */}
+                <aside className={`
+                    fixed md:relative z-[101] h-full w-72 border-r border-white/5 bg-[#0a0a0a] flex flex-col transition-transform duration-300
+                    ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+                `}>
+                    <div className="p-8 border-b border-white/10 flex items-center gap-4">
                         <img src="/logo.png" className="h-[40px] w-auto mix-blend-screen" />
                         <div>
                             <h1 className="text-xl font-bold text-white uppercase tracking-tighter">Master Control</h1>
-                            <div className="flex items-center gap-2">
-                                <p className="text-[10px] text-gv-gold font-black tracking-widest uppercase">Admin System Core</p>
-                                <span className="text-[8px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded border border-red-500/20 font-mono">DEBUG: {adminProfile?.role || 'Bypassed'} | {adminProfile?.email}</span>
-                            </div>
+                            <p className="text-[10px] text-gv-gold font-black tracking-widest uppercase">Admin System Core</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-8">
-                        <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Maintenance</span>
-                            <button onClick={toggleMaintenance} className={`h-6 w-12 rounded-full relative transition-all ${maintenanceMode ? "bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]" : "bg-white/10"}`}>
-                                <div className={`h-4 w-4 bg-white rounded-full absolute top-1 transition-all ${maintenanceMode ? "right-1" : "left-1"}`}></div>
+                    <div className="flex-1 p-6 space-y-2">
+                        {["deposits", "kyc", "withdrawals", "users", "sales", "forex", "audit", "security"].map(tab => (
+                            <button
+                                key={tab}
+                                onClick={() => { setActiveTab(tab); setIsMobileMenuOpen(false); }}
+                                className={`w-full flex items-center gap-3 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? "bg-gv-gold text-black" : "text-zinc-500 hover:text-white"}`}
+                            >
+                                {tab}
                             </button>
-                        </div>
-                        <button onClick={() => { supabase.auth.signOut(); router.push("/login"); }} className="bg-white/5 border border-white/10 px-6 py-2 rounded-xl text-xs font-black uppercase hover:text-red-500 transition-all">Logout</button>
+                        ))}
                     </div>
-                </header>
+                    <div className="p-8 border-t border-white/5">
+                        <button onClick={() => { supabase.auth.signOut(); router.push("/login"); }} className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-xl text-xs font-black uppercase hover:text-red-500 transition-all">Logout</button>
+                    </div>
+                </aside>
 
-                <main className="flex-1 p-8 overflow-y-auto">
+                <main className="flex-1 p-4 md:p-8 overflow-x-hidden overflow-y-auto relative">
+                    <button 
+                        onClick={() => setIsMobileMenuOpen(true)}
+                        className="md:hidden mb-6 h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10"
+                    >
+                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+
                     <div className="max-w-7xl mx-auto space-y-12 pb-20">
                         {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -790,8 +812,8 @@ export default function AdminPortal() {
                                     </div>
 
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                        <div className="lg:col-span-2 overflow-hidden border border-white/5 rounded-3xl">
-                                            <table className="w-full text-left">
+                                        <div className="lg:col-span-2 overflow-x-auto border border-white/5 rounded-3xl">
+                                            <table className="w-full text-left min-w-[600px]">
                                                 <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                     <tr>
                                                         <th className="px-6 py-4">Rank</th>
@@ -995,8 +1017,8 @@ export default function AdminPortal() {
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="overflow-hidden border border-white/5 rounded-3xl">
-                                        <table className="w-full text-left">
+                                    <div className="overflow-x-auto border border-white/5 rounded-3xl">
+                                        <table className="w-full text-left min-w-[800px]">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
                                                     <th className="px-8 py-6">Client</th>
@@ -1110,8 +1132,9 @@ export default function AdminPortal() {
                                 </div>
                             )}
 
-                            {activeTab === "deposits" && (
-                                <table className="w-full text-left">
+                             {activeTab === "deposits" && (
+                                <div className="overflow-x-auto border border-white/5 rounded-3xl">
+                                    <table className="w-full text-left min-w-[900px]">
                                     <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                         <tr>
                                             <th className="px-8 py-6">Name</th>
@@ -1178,7 +1201,9 @@ export default function AdminPortal() {
                                         )}
                                     </tbody>
                                 </table>
-                            )}
+                            </div>
+                        )}
+
 
                             {activeTab === "audit" && (
                                 <div className="p-8 animate-in fade-in duration-500">
@@ -1218,8 +1243,9 @@ export default function AdminPortal() {
                                         </div>
                                     </div>
 
-                                    <div className="overflow-hidden border border-white/5 rounded-3xl">
-                                        <table className="w-full text-left">
+                                    <div className="overflow-x-auto border border-white/5 rounded-3xl">
+                                        <table className="w-full text-left min-w-[800px]">
+
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
                                                     <th className="px-8 py-4">Date/Time</th>
