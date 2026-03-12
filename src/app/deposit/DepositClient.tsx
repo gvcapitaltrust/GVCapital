@@ -123,7 +123,7 @@ export default function DepositClient() {
             receipt: "上传银行收据 (图片/PDF)",
             button: "确认存款",
             back: "返回控制台",
-            note: "您的存款正在由 GV 资本管理团队验证。这通常需要 1-2 小时。",
+            note: "您的存款正在由 GV 资本管理员团队验证。 这通常需要 1-2 小时。",
             successTitle: "存款已提交",
             successDesc: "正在为您跳转到控制台...",
             estimatedCredit: "预计信用额度",
@@ -133,15 +133,15 @@ export default function DepositClient() {
     const t = content[lang];
 
     if (!user) {
-        return <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center p-6"><div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
+        return <div className="min-h-screen bg-[#121212] flex items-center justify-center p-6"><div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
     }
 
     return (
-        <div className="min-h-screen bg-[#0F0F0F] text-white flex flex-col selection:bg-gv-gold selection:text-black">
-            <header className="border-b border-white/10 bg-[#0F0F0F]/80 backdrop-blur-md sticky top-0 z-50">
-                <div className="main-container px-6 py-4 flex justify-between items-center h-20">
+        <div className="min-h-screen bg-[#121212] text-white flex flex-col selection:bg-gv-gold selection:text-black">
+            <header className="border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md sticky top-0 z-50">
+                <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <Link href={`/dashboard?lang=${lang}`} className="flex items-center gap-2">
-                        <img src="/logo.png" alt="GV Capital" className="max-h-[48px] w-auto object-contain mix-blend-screen" />
+                        <img src="/logo.png" alt="GV Capital" className="h-12 w-auto object-contain mix-blend-screen" />
                     </Link>
                     <Link href={`/dashboard?lang=${lang}`} className="text-zinc-500 hover:text-white transition-colors text-sm font-black uppercase tracking-widest flex items-center gap-2">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M15 19l-7-7 7-7" /></svg>
@@ -150,16 +150,15 @@ export default function DepositClient() {
                 </div>
             </header>
 
-            <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-6">
+            <main className="flex-1 flex flex-col items-center justify-center p-6">
                 <div className="w-full max-w-xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-                    <div className="text-center mb-6 md:mb-10">
-                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-2">{t.title}</h1>
-                        <p className="text-zinc-500 font-medium text-sm md:text-base">{t.subtitle}</p>
+                    <div className="text-center mb-10">
+                        <h1 className="text-4xl font-black uppercase tracking-tighter mb-2">{t.title}</h1>
+                        <p className="text-zinc-500 font-medium">{t.subtitle}</p>
                     </div>
 
-                    <div className="bg-[#1a1a1a] border border-white/5 p-6 md:p-10 rounded-[30px] md:rounded-[40px] shadow-2xl relative overflow-hidden group">
-
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-300 duration-700"></div>
+                    <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-700"></div>
 
                         <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
                             <div className="space-y-2">
@@ -169,14 +168,14 @@ export default function DepositClient() {
                                     required
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all duration-300"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all"
                                     placeholder="0.00"
                                 />
                                 {amount && (
                                     <div className="mt-3 flex items-center gap-2 px-1 animate-in fade-in slide-in-from-left-2 duration-300">
                                         <div className="h-2 w-2 rounded-full bg-gv-gold animate-pulse"></div>
                                         <p className="text-gv-gold font-black text-sm uppercase tracking-tighter">
-                                            {t.estimatedCredit}: 鈮?${(parseFloat(amount) / rate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                                            {t.estimatedCredit}: ≈ ${(parseFloat(amount) / rate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                                         </p>
                                     </div>
                                 )}
@@ -186,7 +185,7 @@ export default function DepositClient() {
 
                             <div className="space-y-2">
                                 <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.receipt}</label>
-                                <div className="relative group/upload border border-white/10 border-dashed rounded-lg p-10 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-all duration-300 cursor-pointer">
+                                <div className="relative group/upload border border-white/10 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-all cursor-pointer">
                                     <svg className="h-12 w-12 text-zinc-600 mb-4 group-hover/upload:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
@@ -210,7 +209,7 @@ export default function DepositClient() {
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="w-full bg-gv-gold text-black font-black py-6 rounded-lg flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl hover:shadow-gv-gold/20 hover:-translate-y-1 transition-all duration-300 active:scale-95 disabled:opacity-50"
+                                    className="w-full bg-gv-gold text-black font-black py-6 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl hover:shadow-gv-gold/20 hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50"
                                 >
                                     {isSubmitting ? <div className="h-6 w-6 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
                                 </button>

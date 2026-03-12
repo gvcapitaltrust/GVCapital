@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -95,9 +95,9 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={handleToggle}
-                className="relative p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-gv-gold/30 transition-all duration-300 group"
+                className="relative p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-gv-gold/30 transition-all group"
             >
-                <svg className={`h-6 w-6 transition-all duration-300 ${unreadCount > 0 ? "text-gv-gold" : "text-zinc-500 group-hover:text-white"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg className={`h-6 w-6 transition-all ${unreadCount > 0 ? "text-gv-gold" : "text-zinc-500 group-hover:text-white"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 {unreadCount > 0 && (
@@ -111,7 +111,7 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-4 w-80 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-2xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="absolute right-0 mt-4 w-80 bg-[#1a1a1a] border border-white/10 rounded-[32px] shadow-2xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="p-6 border-b border-white/10 flex justify-between items-center bg-[#121212]/50">
                         <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">Notifications</h3>
                         {unreadCount > 0 && <span className="text-[10px] bg-gv-gold text-black font-black px-2 py-0.5 rounded-full">{unreadCount} New</span>}

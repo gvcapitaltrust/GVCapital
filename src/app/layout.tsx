@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
-import { Inter, Montserrat } from "next/font/google";
+import { Cormorant_Garamond, Outfit } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const cormorantGaramond = Cormorant_Garamond({
+  variable: "--font-heading",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
+const outfit = Outfit({
+  variable: "--font-body",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -19,7 +21,7 @@ export const metadata: Metadata = {
   },
   description: "Secure private investment platform providing trustworthy wealth management solutions in Malaysia.",
   icons: {
-    icon: "/favicon.png",
+    icon: "/logo.png",
   },
 };
 
@@ -33,14 +35,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${montserrat.variable} antialiased`}
+        className={`${cormorantGaramond.variable} ${outfit.variable} antialiased`}
       >
         <AuthProvider>
-          <div className="main-container">
-            {children}
-          </div>
+          {children}
         </AuthProvider>
       </body>
     </html>
   );
 }
+

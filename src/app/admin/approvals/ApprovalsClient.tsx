@@ -142,12 +142,12 @@ export default function ApprovalsClient() {
     };
 
     if (isLoading) {
-        return <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center p-6"><div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
+        return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6"><div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
     }
 
     return (
-        <div className="min-h-screen bg-[#0F0F0F] text-zinc-300 font-sans p-8">
-            <header className="main-container mb-12 flex justify-between items-end">
+        <div className="min-h-screen bg-[#0a0a0a] text-zinc-300 font-sans p-8">
+            <header className="max-w-7xl mx-auto mb-12 flex justify-between items-end">
                 <div>
                     <Link href="/admin" className="text-zinc-600 hover:text-white transition-colors text-xs font-black uppercase tracking-widest mb-4 inline-block">← Back to Master Control</Link>
                     <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Approval Center</h1>
@@ -158,15 +158,15 @@ export default function ApprovalsClient() {
                     <button
                         onClick={handleDistributeDividends}
                         disabled={distributing}
-                        className="bg-emerald-500 hover:bg-emerald-600 text-black font-black px-8 py-4 rounded-lg flex items-center gap-3 uppercase tracking-widest text-xs transition-all duration-300 shadow-xl active:scale-95 disabled:opacity-50"
+                        className="bg-emerald-500 hover:bg-emerald-600 text-black font-black px-8 py-4 rounded-2xl flex items-center gap-3 uppercase tracking-widest text-xs transition-all shadow-xl active:scale-95 disabled:opacity-50"
                     >
                         {distributing ? "Distributing..." : "Distribute 1% Monthly Dividends"}
                     </button>
-                    <button onClick={fetchPending} className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black px-6 py-4 rounded-lg uppercase tracking-widest text-xs transition-all duration-300">Refresh</button>
+                    <button onClick={fetchPending} className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black px-6 py-4 rounded-2xl uppercase tracking-widest text-xs transition-all">Refresh</button>
                 </div>
             </header>
 
-            <main className="main-container">
+            <main className="max-w-7xl mx-auto">
                 <div className="bg-[#121212] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
                     <div className="p-8 border-b border-white/10 flex items-center justify-between">
                         <h2 className="text-xl font-black text-white uppercase tracking-tight">Pending Deposit Review</h2>
@@ -215,7 +215,7 @@ export default function ApprovalsClient() {
                                          <td className="px-8 py-6">
                                              <button
                                                  onClick={() => setViewingReceipt(tx.receipt_url)}
-                                                 className="bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-black uppercase px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2"
+                                                 className="bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-black uppercase px-4 py-2 rounded-xl transition-all flex items-center gap-2"
                                              >
                                                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                  View Slip
@@ -224,7 +224,7 @@ export default function ApprovalsClient() {
                                         <td className="px-8 py-6 text-right">
                                             <button
                                                 onClick={() => handleApprove(tx)}
-                                                className="bg-gv-gold hover:bg-gv-gold/90 text-black px-8 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-xl shadow-gv-gold/10 active:scale-95 transition-all duration-300"
+                                                className="bg-gv-gold hover:bg-gv-gold/90 text-black px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-gv-gold/10 active:scale-95 transition-all"
                                             >
                                                 Approve
                                             </button>
@@ -266,7 +266,7 @@ export default function ApprovalsClient() {
                         <img
                             src={getReceiptUrl(viewingReceipt)}
                             alt="Bank Receipt"
-                            className="w-full h-full object-contain rounded-lg shadow-[0_0_80px_rgba(212,175,55,0.15)] bg-white/5"
+                            className="w-full h-full object-contain rounded-2xl shadow-[0_0_80px_rgba(212,175,55,0.15)] bg-white/5"
                         />
                     </div>
                 </div>

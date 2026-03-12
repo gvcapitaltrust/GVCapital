@@ -29,56 +29,46 @@ export default function GlobalFooter() {
     const t = content[lang];
 
     return (
-        <footer className="w-full border-t border-white/5 bg-[#0F0F0F] py-20 px-6 mt-auto">
-            <div className="main-container">
-                <div className="flex flex-col md:flex-row justify-between items-start gap-16 mb-16">
-                    {/* Left Column: Logo only as requested */}
-                    <div className="flex-shrink-0">
-                        <div className="flex items-center gap-4 opacity-40 grayscale hover:opacity-100 hover:grayscale-0 transition-all">
+        <footer className="w-full border-t border-white/5 bg-[#0a0a0a]/50 backdrop-blur-sm py-12 px-6 mt-auto">
+            <div className="mx-auto max-w-7xl">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-8">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 grayscale opacity-50">
                             <img
                                 src="/logo.png"
                                 alt="GV Capital Trust Logo"
-                                className="max-h-[48px] w-auto object-contain mix-blend-screen"
+                                className="h-[24px] w-auto object-contain mix-blend-screen"
                             />
-                            <div className="flex flex-col">
-                                <span className="text-[12px] font-black tracking-[0.3em] text-white">GV CAPITAL</span>
-                                <span className="text-[8px] font-bold tracking-[0.4em] text-gv-gold/60">TRUST MONACO</span>
-                            </div>
+                            <span className="text-sm font-bold tracking-tighter text-white/50">GV CAPITAL TRUST</span>
                         </div>
+                        <p className="text-[10px] text-zinc-500 max-w-md leading-relaxed font-medium uppercase tracking-wider">
+                            {t.disclaimer}
+                        </p>
                     </div>
 
-                    {/* Right Column: Links and Disclaimer grouped to maintain 60px logic but keeping mandatory info */}
-                    <div className="flex flex-col items-center md:items-end gap-10 flex-1 min-w-[300px]" style={{ marginLeft: '60px' }}>
-                        <div className="flex flex-wrap justify-center md:justify-end gap-10 text-[12px] font-bold uppercase tracking-[0.1em] text-zinc-500">
+                    <div className="flex flex-col items-start md:items-end gap-4">
+                        <div className="flex flex-wrap gap-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.privacy}</Link>
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.terms}</Link>
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.risk}</Link>
                         </div>
-
-                        <div className="flex flex-col items-center md:items-end gap-6 w-full">
-                            <p className="text-[10px] text-zinc-600 max-w-xl text-center md:text-right leading-relaxed font-bold uppercase tracking-widest">
-                                {t.disclaimer}
-                            </p>
-                            
-                            <div className="flex items-center gap-3 text-zinc-500 bg-white/5 px-6 py-3 rounded-lg border border-white/5 transition-all duration-300">
-                                <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span className="text-[12px] font-bold uppercase tracking-[0.1em]">{t.location}</span>
-                            </div>
-
-                            <p className="text-[9px] text-zinc-700 max-w-sm text-center md:text-right leading-loose font-bold uppercase tracking-[0.2em] pt-6 border-t border-white/5">
-                                {lang === "en"
-                                    ? "Personal Data Protection Act 2010 (PDPA) Compliance: By using this site, you consent to the collection and processing of your personal data for investment management purposes."
-                                    : "2010 年个人数据保护法 (PDPA) 合规性：使用本网站即表示您同意为投资管理之目的收集和处理您的个人数据。"}
-                            </p>
+                        <div className="flex items-center gap-2 text-zinc-600">
+                            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t.location}</span>
                         </div>
+                        <p className="text-[8px] text-zinc-700 max-w-xs text-left md:text-right leading-tight font-bold uppercase tracking-widest mt-2 border-t border-white/5 pt-4">
+                            {lang === "en"
+                                ? "Personal Data Protection Act 2010 (PDPA) Compliance: By using this site, you consent to the collection and processing of your personal data."
+                                : "2010 年个人数据保护法 (PDPA) 合规性：使用本网站即表示您同意收集和处理您的个人数据。"}
+                        </p>
                     </div>
                 </div>
 
                 <div className="pt-8 border-t border-white/[0.02] flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-[12px] text-zinc-600 font-bold uppercase tracking-[0.1em]">
+                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
                         {t.copyright}
                     </p>
                     <div className="flex items-center gap-2 text-zinc-700 opacity-50">
@@ -93,10 +83,10 @@ export default function GlobalFooter() {
             <a
                 href="https://wa.me/60162737286?text=Hi%20GV%20Capital,%20I%20need%20assistance%20with%20my%20account."
                 target="_blank"
-                className="fixed bottom-10 right-10 h-16 w-16 bg-[#25D366] rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(37,211,102,0.4)] hover:scale-110 active:scale-95 transition-all duration-300 z-[90] group"
+                className="fixed bottom-10 right-10 h-16 w-16 bg-[#25D366] rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(37,211,102,0.4)] hover:scale-110 active:scale-95 transition-all z-[90] group"
                 aria-label="Contact Support via WhatsApp"
             >
-                <div className="absolute right-full mr-4 bg-white text-black text-[10px] font-black uppercase tracking-widest py-2 px-4 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl border border-black/5 whitespace-nowrap mb-2">
+                <div className="absolute right-full mr-4 bg-white text-black text-[10px] font-black uppercase tracking-widest py-2 px-4 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl border border-black/5 whitespace-nowrap mb-2">
                     {lang === "en" ? "Contact Support via WhatsApp" : "通过 WhatsApp 联系支持"}
                 </div>
                 <svg className="h-8 w-8 text-white fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>

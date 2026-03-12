@@ -84,11 +84,11 @@ export default function ForexControlPanel() {
 
     return (
         <AuthGuard requireAdmin={true}>
-            <div className="min-h-screen bg-[#0F0F0F] text-zinc-300 font-sans flex flex-col selection:bg-gv-gold selection:text-black">
+            <div className="min-h-screen bg-[#0a0a0a] text-zinc-300 font-sans flex flex-col selection:bg-gv-gold selection:text-black">
                 <title>{`Forex Control | Admin Portal`}</title>
 
                 {/* Header */}
-                <header className="border-b border-white/10 bg-[#0F0F0F] px-8 py-4 flex items-center justify-between sticky top-0 z-50">
+                <header className="border-b border-white/10 bg-[#121212] px-8 py-4 flex items-center justify-between sticky top-0 z-50">
                     <div className="flex items-center gap-4">
                         <Link href="/admin">
                             <img src="/logo.png" className="h-[40px] w-auto mix-blend-screen cursor-pointer hover:opacity-80 transition-opacity" />
@@ -99,8 +99,8 @@ export default function ForexControlPanel() {
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Link href="/admin" className="bg-white/5 border border-white/10 px-6 py-2 rounded-lg text-xs font-black uppercase hover:text-gv-gold transition-all duration-300 flex items-center gap-2">
-                            <span>鈫?Back to Dashboard</span>
+                        <Link href="/admin" className="bg-white/5 border border-white/10 px-6 py-2 rounded-xl text-xs font-black uppercase hover:text-gv-gold transition-all flex items-center gap-2">
+                            <span>← Back to Dashboard</span>
                         </Link>
                     </div>
                 </header>
@@ -110,7 +110,7 @@ export default function ForexControlPanel() {
 
                         {/* Status Message */}
                         {message && (
-                            <div className={`p-4 rounded-lg border ${message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'} animate-in fade-in slide-in-from-top-2 duration-300`}>
+                            <div className={`p-4 rounded-2xl border ${message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'} animate-in fade-in slide-in-from-top-2 duration-300`}>
                                 <div className="flex items-center gap-3">
                                     <div className={`h-2 w-2 rounded-full ${message.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'} animate-pulse`} />
                                     <p className="text-xs font-black uppercase tracking-widest">{message.text}</p>
@@ -120,7 +120,7 @@ export default function ForexControlPanel() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* Current Rate Card */}
-                            <div className="bg-[#0F0F0F] border border-white/5 rounded-lg p-10 flex flex-col justify-center items-center text-center space-y-4 shadow-2xl relative overflow-hidden group">
+                            <div className="bg-[#121212] border border-white/5 rounded-[40px] p-10 flex flex-col justify-center items-center text-center space-y-4 shadow-2xl relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
                                     <div className="text-9xl font-black text-gv-gold tracking-tighter">$</div>
                                 </div>
@@ -137,7 +137,7 @@ export default function ForexControlPanel() {
                             </div>
 
                             {/* Update Tool Card */}
-                            <div className="bg-[#0F0F0F] border border-white/5 rounded-lg p-10 space-y-8 shadow-2xl border-t border-t-gv-gold/20">
+                            <div className="bg-[#121212] border border-white/5 rounded-[40px] p-10 space-y-8 shadow-2xl border-t border-t-gv-gold/20">
                                 <h3 className="text-xl font-black uppercase tracking-tighter text-white">Modify Global Rate</h3>
                                 <div className="space-y-6">
                                     <div className="space-y-2">
@@ -149,7 +149,7 @@ export default function ForexControlPanel() {
                                                 step="0.0001"
                                                 value={newRate}
                                                 onChange={(e) => setNewRate(e.target.value)}
-                                                className="w-full bg-white/5 border border-white/10 rounded-lg py-5 pl-16 pr-6 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all duration-300 text-white placeholder-zinc-700"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all text-white placeholder-zinc-700"
                                                 placeholder="4.000"
                                             />
                                         </div>
@@ -157,7 +157,7 @@ export default function ForexControlPanel() {
                                     <button
                                         onClick={handleUpdate}
                                         disabled={isLoading}
-                                        className="w-full bg-gv-gold text-black font-black py-6 rounded-lg uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/20 transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:translate-y-0 group overflow-hidden relative"
+                                        className="w-full bg-gv-gold text-black font-black py-6 rounded-2xl uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/20 transition-all active:scale-95 disabled:opacity-50 disabled:translate-y-0 group overflow-hidden relative"
                                     >
                                         <span className="relative z-10">{isLoading ? "Propagating Global Updates..." : "Propagate New Rate"}</span>
                                         {isLoading && <div className="absolute inset-0 bg-white/10 animate-[shimmer_2s_infinite]" />}
@@ -168,7 +168,7 @@ export default function ForexControlPanel() {
                         </div>
 
                         {/* Audit Table Section */}
-                        <div className="bg-[#0F0F0F] border border-white/5 rounded-lg overflow-hidden shadow-2xl">
+                        <div className="bg-[#121212] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
                             <div className="p-10 border-b border-white/5 flex items-center justify-between">
                                 <h3 className="text-xl font-black uppercase tracking-tighter text-white">Rate Audit Matrix</h3>
                                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{history.length} Entries Recorded</span>

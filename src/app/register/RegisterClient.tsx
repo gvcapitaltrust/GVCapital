@@ -135,7 +135,12 @@ export default function RegisterPage() {
         modalReject: string;
         referralLabel: string;
         referralNote: string;
-        referralInva    const content: Record<"en" | "zh", ContentItem> = {
+        referralInvalid: string;
+        pdpaNote: string;
+        agreementBody: string;
+    }
+
+    const content: Record<"en" | "zh", ContentItem> = {
         en: {
             title: "Open Account",
             subtitle: "Join GV Capital Trust network",
@@ -183,7 +188,7 @@ export default function RegisterPage() {
             agreementPrefix: "我同意 ",
             agreementLink: "私人投资协议",
             button: "创建账户",
-            footer: "已经有账户了？",
+            footer: "已经有账户了？ ",
             link: "登录",
             placeholder_name: "张三",
             placeholder_email: "name@example.com",
@@ -205,25 +210,7 @@ export default function RegisterPage() {
 
                 3. 陈述：客户陈述并保证他们是合格投资者，具备评估私人投资风险和优点的财务知识。
 
-                4. 资产保护：GV 资本信托采用严格风险 management 协议和全球化多元配置，以减轻资产波动。
-            `
-        },
-    };��们是合格投资者，具备评估私人投资风险和优点的财务知识。
-
-                4. 资产保护：GV 资本信托采用严格风险管理协议和全球化多元配置，以减轻资产波动。
-            `
-        },PA) 澶勭悊鎮ㄧ殑涓汉鏁版嵁锛岀敤浜庤韩浠介獙璇佸拰鎶曡祫绠＄悊鐩殑銆?,
-            agreementBody: `
-                GV 璧勬湰淇℃墭
-                绉佷汉鎶曡祫鍗忚 (V.2024.01)
-
-                1. 鎶曡祫鎬ц川锛氬鎴锋壙璁わ紝鐢变俊鎵樼鐞嗙殑鎶曡祫娑夊強绉佸嫙鑲℃潈鍜岄珮鏀剁泭宸ュ叿锛岃繖浜涘伐鍏峰叿鏈夊浐鏈夌殑甯傚満椋庨櫓銆傝繃寰€涓氱哗涓嶄繚璇佹湭鏉ョ粨鏋溿€?
-
-                2. 淇濆瘑鎬э細瀹㈡埛鍚屾剰瀵逛俊鎵樼殑鎶曡祫绛栫暐銆佹姇璧勭粍鍚堟瀯鎴愬拰鍐呴儴璐㈠姟鏁版嵁涓ユ牸淇濆瘑銆傛湭缁忎功闈㈠悓鎰忥紝绂佹杩涜浠讳綍鎶湶銆?
-
-                3. 闄堣堪锛氬鎴烽檲杩板苟淇濊瘉浠栦滑鏄悎鏍兼姇璧勮€咃紝鍏峰璇勪及绉佷汉鎶曡祫椋庨櫓鍜屼紭鐐圭殑璐㈠姟鐭ヨ瘑銆?
-
-                4. 璧勪骇淇濇姢锛欸V 璧勬湰淇℃墭閲囩敤涓ユ牸鐨勯闄╃鐞嗗崗璁拰鍏ㄧ悆鍖栧鍏冮厤缃紝浠ュ噺杞昏祫浜ф尝鍔ㄣ€?
+                4. 资产保护：GV 资本信托采用严格的风险管理协议和全球化多元配置，以减轻资产波动。
             `
         },
     };
@@ -283,13 +270,13 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0F0F0F] flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
+        <div className="min-h-screen bg-[#121212] flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
             <title>{`Register | GV Capital Trust`}</title>
 
             <div className="absolute top-8 right-8">
                 <button
                     onClick={() => setLang(lang === "en" ? "zh" : "en")}
-                    className="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold text-white/50 hover:bg-white/10 transition-all duration-300 uppercase tracking-widest"
+                    className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/50 hover:bg-white/10 transition-all uppercase tracking-widest"
                 >
                     {lang === "en" ? "简体中文" : "English"}
                 </button>
@@ -301,14 +288,14 @@ export default function RegisterPage() {
                         <img
                             src="/logo.png"
                             alt="GV Capital Trust Logo"
-                            className="h-[50px] md:h-[80px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
+                            className="h-[80px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
                         />
                     </Link>
                     <h1 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">{t.title}</h1>
                     <p className="text-zinc-500 font-medium tracking-wide">{t.subtitle}</p>
                 </div>
 
-                {errorMsg && <div className="w-full bg-red-500/20 border border-red-500/50 p-4 rounded-lg text-red-500 text-sm mb-6">{errorMsg}</div>}
+                {errorMsg && <div className="w-full bg-red-500/20 border border-red-500/50 p-4 rounded-xl text-red-500 text-sm mb-6">{errorMsg}</div>}
 
                 <form onSubmit={handleSubmit} className="w-full space-y-6">
                     <div className="space-y-2">
@@ -318,7 +305,7 @@ export default function RegisterPage() {
                             required
                             value={fullName}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
-                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
+                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_name}
                         />
                     </div>
@@ -330,7 +317,7 @@ export default function RegisterPage() {
                             required
                             value={email}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
+                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_email}
                         />
                     </div>
@@ -342,7 +329,7 @@ export default function RegisterPage() {
                             required
                             value={password}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
+                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_pass}
                         />
                     </div>
@@ -354,7 +341,7 @@ export default function RegisterPage() {
                             required
                             value={ownUsername}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOwnUsername(e.target.value.replace(/\s+/g, '').toLowerCase())}
-                            className={`w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all duration-300 font-medium ${!isUsernameValid ? 'border-red-500/50 ring-red-500/20' : 'focus:ring-gv-gold/50'}`}
+                            className={`w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all font-medium ${!isUsernameValid ? 'border-red-500/50 ring-red-500/20' : 'focus:ring-gv-gold/50'}`}
                             placeholder={t.usernamePlaceholder}
                         />
                         {usernameCheckMsg && <p className="text-[10px] text-red-500 font-bold px-1 uppercase tracking-widest">{usernameCheckMsg}</p>}
@@ -368,7 +355,7 @@ export default function RegisterPage() {
                             value={referralCode}
                             readOnly={isRefReadOnly}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setReferralCode(e.target.value)}
-                            className={`w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all duration-300 font-medium ${isRefReadOnly ? 'opacity-50 cursor-not-allowed border-gv-gold/30 ring-1 ring-gv-gold/20' : (isReferralValid ? 'focus:ring-emerald-500/50' : 'focus:ring-red-500/50')}`}
+                            className={`w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all font-medium ${isRefReadOnly ? 'opacity-50 cursor-not-allowed border-gv-gold/30 ring-1 ring-gv-gold/20' : (isReferralValid ? 'focus:ring-emerald-500/50' : 'focus:ring-red-500/50')}`}
                             placeholder="Code Required"
                         />
                         <p className="text-[10px] text-zinc-600 font-bold px-1 italic">
@@ -405,7 +392,7 @@ export default function RegisterPage() {
                     <button
                         type="submit"
                         disabled={isLoading || !isAgreed || !isReferralValid || isValidatingReferral || !isUsernameValid || isValidatingUsername || !ownUsername}
-                        className="w-full bg-gv-gold-gradient metallic-shine text-black font-black text-lg py-5 rounded-lg hover:brightness-110 transition-all duration-300 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest flex items-center justify-center gap-2"
+                        className="w-full bg-gv-gold text-black font-black text-lg py-5 rounded-2xl hover:bg-gv-gold/90 transition-all shadow-[0_10px_30px_rgba(212,175,55,0.2)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest flex items-center justify-center gap-2"
                     >
                         {isLoading || isValidatingReferral || isValidatingUsername ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
                     </button>
@@ -442,7 +429,7 @@ export default function RegisterPage() {
                             </button>
                             <button
                                 onClick={() => { setIsAgreed(true); setIsModalOpen(false); }}
-                                className="flex-1 bg-gv-gold text-black font-black py-4 rounded-lg shadow-[0_10px_30px_rgba(212,175,55,0.2)] uppercase tracking-widest text-xs transition-all duration-300"
+                                className="flex-1 bg-gv-gold text-black font-black py-4 rounded-xl shadow-[0_10px_30px_rgba(212,175,55,0.2)] uppercase tracking-widest text-xs"
                             >
                                 {t.modalAgree}
                             </button>
