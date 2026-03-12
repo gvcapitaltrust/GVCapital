@@ -165,29 +165,29 @@ export default function ProductsClient() {
     }[lang];
 
     return (
-        <div className="min-h-screen bg-[#0F0F0F] text-white selection:bg-gv-gold selection:text-black flex flex-col">
+        <div className="min-h-screen bg-[var(--bg-primary)] text-white selection:bg-gv-gold selection:text-black flex flex-col font-body">
             {/* --- NAVIGATION --- */}
-            <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0F0F0F]/80 backdrop-blur-md">
+            <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[var(--bg-primary)]/80 backdrop-blur-md">
                 <div className="main-container flex items-center justify-between py-4 md:h-20">
                     <div className="flex items-center">
                         <Link href={`/?lang=${lang}`} className="flex items-center shrink-0">
-                            <img src="/logo.png" alt="GV Capital Trust Logo" className="max-h-[48px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]" />
+                            <img src="/logo.png" alt="GV Capital Trust Logo" className="h-[34px] sm:max-h-[48px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]" />
                         </Link>
                     </div>
 
                     <div className="flex items-center gap-12">
                         {/* Desktop Navigation Grouped with Buttons for "Perfect Horizontal Line" */}
-                        <div className="hidden md:flex items-center gap-10 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                        <div className="hidden md:flex items-center gap-10 text-[11px] font-heading font-light uppercase tracking-[0.2em] text-zinc-500">
                             <Link href={`/products?lang=${lang}`} className="text-gv-gold transition-colors">{t.nav.services}</Link>
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
                         </div>
 
                         <div className="hidden md:flex items-center gap-6">
-                            <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="hidden lg:block rounded-lg border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all duration-300 text-zinc-500">
+                            <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="hidden lg:block rounded-xl border border-white/20 px-4 py-2 text-[10px] font-heading font-light uppercase tracking-widest hover:bg-white/10 transition-all duration-300 text-zinc-500">
                                 {lang === "en" ? "中文" : "EN"}
                             </button>
-                            <Link href={`/login?lang=${lang}`} className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-lg text-[11px] font-black uppercase tracking-widest text-black shadow-lg hover:-translate-y-1 transition-all duration-300 active:scale-95 whitespace-nowrap">
+                            <Link href={`/login?lang=${lang}`} className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-xl text-[11px] font-heading font-light uppercase tracking-widest text-black shadow-lg hover:-translate-y-1 transition-all duration-300 active:scale-95 whitespace-nowrap">
                                 {t.nav.login}
                             </Link>
                         </div>
@@ -208,10 +208,10 @@ export default function ProductsClient() {
                             <Link href="#" onClick={() => setIsMenuOpen(false)} className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
                             <div className="h-px bg-white/5 w-full my-2"></div>
                             <div className="flex flex-col gap-4">
-                                <button onClick={() => { setLang(lang === "en" ? "zh" : "en"); setIsMenuOpen(false); }} className="w-full text-left py-2 hover:text-gv-gold transition-colors">
+                            <button onClick={() => { setLang(lang === "en" ? "zh" : "en"); setIsMenuOpen(false); }} className="w-full text-left py-2 hover:text-gv-gold transition-colors font-heading font-light">
                                     {lang === "en" ? "切换至简体中文" : "SWITCH TO ENGLISH"}
                                 </button>
-                                <Link href={`/login?lang=${lang}`} onClick={() => setIsMenuOpen(false)} className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-lg text-center text-[10px] font-black uppercase tracking-widest text-black shadow-lg hover:shadow-gv-gold/20 transition-all duration-300 duration-300">
+                                <Link href={`/login?lang=${lang}`} onClick={() => setIsMenuOpen(false)} className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-xl text-center text-[10px] font-heading font-light uppercase tracking-widest text-black shadow-lg hover:shadow-gv-gold/20 transition-all duration-300">
                                     {t.nav.login}
                                 </Link>
                             </div>
@@ -226,18 +226,18 @@ export default function ProductsClient() {
                 <div className="absolute top-40 left-1/2 -z-10 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-gv-gold/5 blur-[140px]"></div>
 
                 <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                    <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.3em] text-gv-gold">GV Capital Trust</h2>
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6">{t.hero}</h1>
-                    <p className="mx-auto max-w-2xl text-zinc-400 text-lg leading-relaxed">{t.heroSub}</p>
+                    <h2 className="mb-3 text-xs font-heading font-light uppercase tracking-[0.3em] text-gv-gold">GV Capital Trust</h2>
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-light tracking-tight mb-6">{t.hero}</h1>
+                    <p className="mx-auto max-w-2xl text-zinc-400 text-lg leading-relaxed font-body font-light">{t.heroSub}</p>
                 </div>
 
                 {/* 鈹€鈹€鈹€ CALCULATOR INPUT 鈹€鈹€鈹€ */}
                 <div className="max-w-xl mx-auto mb-20 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-                    <label className="block text-center text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-4">
+                    <label className="block text-center text-[10px] font-heading font-light uppercase tracking-[0.3em] text-zinc-500 mb-4">
                         {t.inputLabel}
                     </label>
                     <div className="relative group">
-                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-gv-gold/60 pointer-events-none">$</span>
+                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-heading font-light text-gv-gold/60 pointer-events-none">$</span>
                         <input
                             id="investment-amount"
                             type="text"
@@ -245,21 +245,21 @@ export default function ProductsClient() {
                             value={rawInput}
                             onChange={e => setRawInput(e.target.value)}
                             placeholder={t.inputPlaceholder}
-                            className="w-full bg-white/[0.03] border-2 border-white/10 rounded-lg pl-14 pr-6 py-6 text-3xl font-black text-white text-center focus:outline-none focus:border-gv-gold/50 focus:shadow-[0_0_40px_rgba(212,175,55,0.15)] transition-all duration-300 placeholder:text-zinc-700 placeholder:text-xl"
+                            className="w-full bg-[var(--bg-card)] border border-[rgba(201,168,76,0.1)] rounded-[12px] pl-14 pr-6 py-6 text-3xl font-heading font-light text-white text-center focus:outline-none focus:border-gv-gold/50 focus:shadow-[0_0_40px_rgba(212,175,55,0.15)] transition-all duration-300 placeholder:text-zinc-700 placeholder:text-xl"
                         />
                     </div>
 
                     {/* Live estimate display */}
                     {estimate && (
                         <div className="mt-6 text-center animate-in fade-in zoom-in-95 duration-500">
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-2">{t.estLabel}</p>
-                            <div className="inline-flex items-baseline gap-2 bg-white/5 border border-gv-gold/20 rounded-lg px-8 py-4">
-                                <span className="text-3xl font-black text-gv-gold">{formatCurrency(estimate.low)}</span>
-                                <span className="text-zinc-500 text-sm font-bold">-</span>
-                                <span className="text-3xl font-black text-gv-gold">{formatCurrency(estimate.high)}</span>
-                                <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest ml-1">{t.perMonth}</span>
+                            <p className="text-[10px] font-heading font-light uppercase tracking-[0.3em] text-zinc-500 mb-2">{t.estLabel}</p>
+                            <div className="inline-flex items-baseline gap-2 bg-[var(--bg-card)] border border-[rgba(201,168,76,0.1)] rounded-xl px-8 py-4">
+                                <span className="text-3xl font-heading font-light text-gv-gold">{formatCurrency(estimate.low)}</span>
+                                <span className="text-zinc-500 text-sm font-body font-light">-</span>
+                                <span className="text-3xl font-heading font-light text-gv-gold">{formatCurrency(estimate.high)}</span>
+                                <span className="text-zinc-500 text-xs font-heading font-light uppercase tracking-widest ml-1">{t.perMonth}</span>
                             </div>
-                            <p className="mt-3 text-zinc-600 text-xs font-bold uppercase tracking-widest">
+                            <p className="mt-3 text-zinc-600 text-xs font-heading font-light uppercase tracking-widest">
                                 {estimate.tier.name} Tier &middot; {estimate.tier.dividendMin}% - {estimate.tier.dividendMax}% {t.range}
                             </p>
                         </div>
@@ -293,10 +293,10 @@ export default function ProductsClient() {
                                 ></div>
 
                                 <div
-                                    className={`relative h-full rounded-lg p-8 lg:p-10 transition-all duration-300 duration-500 ${
+                                    className={`relative h-full rounded-[12px] p-8 lg:p-10 transition-all duration-300 duration-500 ${
                                         isActive
-                                            ? "bg-[#141414]"
-                                            : "bg-[#0b0b0b] hover:bg-[#141414]"
+                                            ? "bg-[var(--bg-card)]"
+                                            : "bg-[var(--bg-primary)] hover:bg-[var(--bg-card)]"
                                     }`}
                                 >
                                     {/* Tier badge */}
@@ -306,29 +306,29 @@ export default function ProductsClient() {
                                             : "bg-white/5 text-zinc-500"
                                     }`}>
                                         {tier.icon}
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{tier.name}</span>
+                                        <span className="text-[10px] font-heading font-light uppercase tracking-[0.2em]">{tier.name}</span>
                                     </div>
 
                                     {/* Price range */}
                                     <div className="mb-6">
-                                        <p className={`text-3xl font-black tracking-tight transition-colors duration-500 ${
+                                        <p className={`text-3xl font-heading font-light tracking-tight transition-colors duration-500 ${
                                             isActive ? "text-white" : "text-zinc-300"
                                         }`}>
                                             {formatCurrency(tier.minUSD)}
-                                            <span className="text-zinc-600 mx-2 text-lg">-</span>
+                                            <span className="text-zinc-600 mx-2 text-lg font-body font-light">-</span>
                                             {formatCurrency(tier.maxUSD)}
                                         </p>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mt-1">Investment Range</p>
+                                        <p className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-600 mt-1">Investment Range</p>
                                     </div>
 
                                     {/* Dividend rate */}
-                                    <div className={`rounded-lg p-5 mb-8 transition-all duration-300 duration-500 ${
+                                    <div className={`rounded-[12px] p-5 mb-8 transition-all duration-300 duration-500 ${
                                         isActive
                                             ? "bg-gv-gold/10 border border-gv-gold/20"
                                             : "bg-white/[0.02] border border-white/5"
                                     }`}>
-                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-1">Monthly Dividend</p>
-                                        <p className={`text-2xl font-black transition-colors duration-500 ${
+                                        <p className="text-[10px] font-heading font-light uppercase tracking-[0.2em] text-zinc-500 mb-1">Monthly Dividend</p>
+                                        <p className={`text-2xl font-heading font-light transition-colors duration-500 ${
                                             isActive ? "text-gv-gold" : "text-zinc-400"
                                         }`}>
                                             {tier.dividendMin}% - {tier.dividendMax}%
@@ -337,8 +337,8 @@ export default function ProductsClient() {
                                         {/* Show live calculation when active */}
                                         {isActive && amount > 0 && (
                                             <div className="mt-3 pt-3 border-t border-gv-gold/10 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-gv-gold/60 mb-1">Your Estimate</p>
-                                                <p className="text-lg font-black text-gv-gold">
+                                                <p className="text-[10px] font-heading font-light uppercase tracking-widest text-gv-gold/60 mb-1">Your Estimate</p>
+                                                <p className="text-lg font-heading font-light text-gv-gold">
                                                     {formatCurrency((amount * tier.dividendMin) / 100)} - {formatCurrency((amount * tier.dividendMax) / 100)}
                                                     <span className="text-xs text-gv-gold/50 ml-1">/mo</span>
                                                 </p>
@@ -348,13 +348,13 @@ export default function ProductsClient() {
 
                                     {/* Features */}
                                     <div className="space-y-3 mb-8">
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600">{t.features}</p>
+                                        <p className="text-[9px] font-heading font-light uppercase tracking-[0.2em] text-zinc-600">{t.features}</p>
                                         {tier.features.map((feature, i) => (
                                             <div key={i} className="flex items-center gap-3">
                                                 <div className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
                                                     isActive ? "bg-gv-gold" : "bg-zinc-700"
                                                 }`}></div>
-                                                <span className={`text-sm font-medium transition-colors duration-500 ${
+                                                <span className={`text-sm font-body font-light transition-colors duration-500 ${
                                                     isActive ? "text-zinc-300" : "text-zinc-600"
                                                 }`}>{feature}</span>
                                             </div>
@@ -364,7 +364,7 @@ export default function ProductsClient() {
                                     {/* CTA */}
                                     <Link
                                         href={`/register?lang=${lang}`}
-                                        className={`block w-full text-center py-4 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 duration-300 ${
+                                        className={`block w-full text-center py-4 rounded-[12px] text-[10px] font-heading font-light uppercase tracking-[0.2em] transition-all duration-300 ${
                                             isActive
                                                 ? "bg-gv-gold-gradient metallic-shine text-black shadow-lg hover:-translate-y-1"
                                                 : "border border-white/10 text-zinc-500 hover:border-gv-gold/30 hover:text-gv-gold"

@@ -107,14 +107,14 @@ export default function ProfileClient() {
 
     if (authLoading || loading) {
         return (
-            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 text-white">
+            <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-6 text-white font-body">
                 <div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-gv-gold selection:text-black font-body">
+        <div className="min-h-screen bg-[var(--bg-primary)] text-white selection:bg-gv-gold selection:text-black font-body">
             <title>Account Profile | GV Capital Trust</title>
 
             {/* Background elements */}
@@ -128,12 +128,12 @@ export default function ProfileClient() {
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
                     <div className="space-y-4">
-                        <Link href="/dashboard" className="inline-flex items-center gap-2 text-zinc-500 hover:text-gv-gold transition-colors text-sm font-black uppercase tracking-widest mb-4">
+                        <Link href="/dashboard" className="inline-flex items-center gap-2 text-zinc-500 hover:text-gv-gold transition-colors text-sm font-heading font-light uppercase tracking-widest mb-4">
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M15 19l-7-7 7-7"/></svg>
                             Back to Dashboard
                         </Link>
-                        <h2 className="text-gv-gold text-xs font-black uppercase tracking-[0.4em]">Account Overview</h2>
-                        <h1 className="text-4xl md:text-6xl font-black font-heading tracking-tight">Profile Management</h1>
+                        <h2 className="text-gv-gold text-xs font-heading font-light uppercase tracking-[0.4em]">Account Overview</h2>
+                        <h1 className="text-4xl md:text-6xl font-heading font-light tracking-tight">Profile Management</h1>
                     </div>
                 </div>
 
@@ -141,48 +141,40 @@ export default function ProfileClient() {
                     
                     {/* Level Card */}
                     <div className="lg:col-span-1 space-y-6">
-                        <div className="bg-[#111] border border-white/5 p-8 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                        <div className="bg-[var(--bg-card)] border border-[rgba(201,168,76,0.1)] p-8 rounded-[12px] shadow-2xl relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-all">
                                 <svg className="h-24 w-24 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
                                     <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                 </svg>
                             </div>
                             
-                            <h3 className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-12">Account Verification</h3>
+                            <h3 className="text-zinc-500 text-[10px] font-heading font-light uppercase tracking-widest mb-12">Account Verification</h3>
                             
                             <div className="flex items-center gap-6 mb-8">
-                                <div className="h-20 w-20 rounded-3xl bg-[#c9a84c]/10 border border-[#c9a84c]/20 flex items-center justify-center text-[#c9a84c] shadow-[0_0_40px_rgba(201,168,76,0.1)]">
+                                <div className="h-20 w-20 rounded-xl bg-[rgba(201,168,76,0.1)] border border-[rgba(201,168,76,0.2)] flex items-center justify-center text-[#c9a84c] shadow-[0_0_40px_rgba(201,168,76,0.1)]">
                                     {accountLevel === "Platinum" ? (
                                         <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                             <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                                         </svg>
-                                    ) : accountLevel === "Gold" ? (
-                                        <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                            <path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-                                        </svg>
-                                    ) : accountLevel === "Silver" ? (
-                                        <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                            <path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
-                                        </svg>
                                     ) : (
                                         <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                            <path d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            <path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                                         </svg>
                                     )}
                                 </div>
                                 <div className="space-y-1">
-                                    <h4 className="text-3xl font-black font-heading tracking-tight text-white">{accountLevel} Member</h4>
-                                    <p className="text-xs text-zinc-500 font-black uppercase tracking-widest">Growth Path</p>
+                                    <h4 className="text-3xl font-heading font-light tracking-tight text-white">{accountLevel} Member</h4>
+                                    <p className="text-xs text-zinc-500 font-heading font-light uppercase tracking-widest">Growth Path</p>
                                 </div>
                             </div>
 
-                            <p className="text-zinc-500 text-sm leading-relaxed mb-6 font-medium">
+                            <p className="text-zinc-500 text-sm leading-relaxed mb-6 font-body font-light">
                                 Level is determined by your total assets. Invest more to unlock higher dividend tiers.
                             </p>
 
                             <div className="space-y-3">
                                 {['Basic', 'Silver', 'Gold', 'Platinum'].map((lvl) => (
-                                    <div key={lvl} className={`flex items-center justify-between text-[10px] font-black uppercase tracking-widest px-4 py-3 rounded-2xl border transition-all ${accountLevel === lvl ? 'bg-[#c9a84c] text-black border-[#c9a84c] shadow-lg shadow-[#c9a84c]/20' : 'border-white/5 text-zinc-600 bg-white/[0.02]'}`}>
+                                    <div key={lvl} className={`flex items-center justify-between text-[10px] font-heading font-light uppercase tracking-widest px-4 py-3 rounded-xl border transition-all ${accountLevel === lvl ? 'bg-[#c9a84c] text-black border-[#c9a84c] shadow-lg shadow-[#c9a84c]/20' : 'border-white/5 text-zinc-600 bg-white/[0.02]'}`}>
                                         <span>{lvl} TIERS</span>
                                         <svg className={`h-4 w-4 ${accountLevel === lvl ? 'opacity-100' : 'opacity-20'}`} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
                                     </div>
@@ -193,7 +185,7 @@ export default function ProfileClient() {
 
                     {/* Form Section */}
                     <div className="lg:col-span-2">
-                        <div className="bg-[#1a1a1a] border border-white/5 p-8 md:p-12 rounded-[50px] shadow-2xl">
+                        <div className="bg-[var(--bg-card)] border border-[rgba(201,168,76,0.1)] p-8 md:p-12 rounded-[12px] shadow-2xl">
                             <form onSubmit={handleUpdateProfile} className="space-y-10">
                                 
                                 {message && (
@@ -204,13 +196,13 @@ export default function ProfileClient() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                     <div className="space-y-3">
-                                        <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 ml-4">Full Legal Name</label>
+                                        <label className="block text-[10px] font-heading font-light uppercase tracking-[0.3em] text-zinc-500 ml-4">Full Legal Name</label>
                                         <input
                                             type="text"
                                             value={fullName}
                                             onChange={(e) => setFullName(e.target.value)}
                                             placeholder="Enter your full name"
-                                            className="w-full bg-[#0a0a0a] border border-[#c9a84c]/30 rounded-[28px] px-8 py-5 text-lg font-black focus:outline-none focus:border-[#c9a84c] focus:shadow-[0_0_30px_rgba(201,168,76,0.1)] transition-all placeholder:text-zinc-800"
+                                            className="w-full bg-[var(--bg-primary)] border border-[#c9a84c]/30 rounded-[12px] px-8 py-5 text-lg font-body font-light focus:outline-none focus:border-[#c9a84c] focus:shadow-[0_0_30px_rgba(201,168,76,0.1)] transition-all placeholder:text-zinc-800"
                                             required
                                         />
                                     </div>
@@ -273,13 +265,13 @@ export default function ProfileClient() {
                                 </div>
 
                                 <div className="pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
-                                    <p className="text-zinc-600 text-xs font-medium max-w-sm">
+                                    <p className="text-zinc-600 text-xs font-body font-light max-w-sm">
                                         Keep your details up to date to ensure accurate reporting and verification for withdrawals.
                                     </p>
                                     <button
                                         type="submit"
                                         disabled={isUpdating}
-                                        className="btn-primary w-full md:w-auto bg-[#c9a84c] text-black font-black text-xs uppercase tracking-[0.3em] px-12 py-6 rounded-2xl shadow-xl shadow-[#c9a84c]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 border border-[#c9a84c]/50"
+                                        className="btn-primary w-full md:w-auto bg-[#c9a84c] text-black font-heading font-light text-xs uppercase tracking-[0.3em] px-12 py-6 rounded-xl shadow-xl shadow-[#c9a84c]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 border border-[#c9a84c]/50"
                                     >
                                         {isUpdating ? 'Saving...' : 'Update Profile'}
                                     </button>

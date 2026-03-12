@@ -616,28 +616,28 @@ export default function AdminPortal() {
 
     return (
         <AuthGuard requireAdmin={true}>
-            <div className="min-h-screen bg-[#0a0a0a] text-zinc-300 font-sans flex flex-col selection:bg-gv-gold selection:text-black">
+            <div className="min-h-screen bg-[var(--bg-primary)] text-zinc-300 font-body flex flex-col selection:bg-gv-gold selection:text-black">
                 <title>{`Admin Portal | GV Capital Trust`}</title>
 
-                <header className="border-b border-white/10 bg-[#121212] px-8 py-4 flex items-center justify-between sticky top-0 z-50">
+                <header className="border-b border-white/10 bg-[var(--bg-card)] px-8 py-4 flex items-center justify-between sticky top-0 z-50">
                     <div className="flex items-center gap-4">
                         <img src="/logo.png" className="h-[40px] w-auto mix-blend-screen" />
                         <div>
-                            <h1 className="text-xl font-bold text-white uppercase tracking-tighter">Master Control</h1>
+                            <h1 className="text-xl font-heading font-light text-white uppercase tracking-tighter">Master Control</h1>
                             <div className="flex items-center gap-2">
-                                <p className="text-[10px] text-gv-gold font-black tracking-widest uppercase">Admin System Core</p>
+                                <p className="text-[10px] text-gv-gold font-heading font-light tracking-widest uppercase">Admin System Core</p>
                                 <span className="text-[8px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded border border-red-500/20 font-mono">DEBUG: {adminProfile?.role || 'Bypassed'} | {adminProfile?.email}</span>
                             </div>
                         </div>
                     </div>
                     <div className="flex items-center gap-8">
                         <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Maintenance</span>
+                            <span className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500">Maintenance</span>
                             <button onClick={toggleMaintenance} className={`h-6 w-12 rounded-full relative transition-all ${maintenanceMode ? "bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]" : "bg-white/10"}`}>
                                 <div className={`h-4 w-4 bg-white rounded-full absolute top-1 transition-all ${maintenanceMode ? "right-1" : "left-1"}`}></div>
                             </button>
                         </div>
-                        <button onClick={() => { supabase.auth.signOut(); router.push("/login"); }} className="bg-white/5 border border-white/10 px-6 py-2 rounded-xl text-xs font-black uppercase hover:text-red-500 transition-all">Logout</button>
+                        <button onClick={() => { supabase.auth.signOut(); router.push("/login"); }} className="bg-white/5 border border-white/10 px-6 py-2 rounded-xl text-xs font-heading font-light uppercase hover:text-red-500 transition-all">Logout</button>
                     </div>
                 </header>
 
@@ -645,30 +645,30 @@ export default function AdminPortal() {
                     <div className="max-w-7xl mx-auto space-y-12 pb-20">
                         {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
+                            <div className="bg-[var(--bg-card)] border border-[rgba(201,168,76,0.1)] p-6 rounded-[12px] hover:border-gv-gold/20 transition-all">
                                 {(() => {
                                     const totalRm = users.reduce((acc, u) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
                                     const rate = parseFloat(currentForexRate) || 4.0;
                                     return (
                                         <>
-                                            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
-                                            <h2 className="text-2xl font-black text-white">RM {totalRm.toFixed(2)}</h2>
-                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">(${(totalRm / rate).toFixed(2)} USD)</p>
+                                            <p className="text-[10px] font-heading font-light text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
+                                            <h2 className="text-2xl font-heading font-light text-white">RM {totalRm.toFixed(2)}</h2>
+                                            <p className="text-[10px] text-zinc-500 font-body font-light uppercase tracking-widest mt-1">(${(totalRm / rate).toFixed(2)} USD)</p>
                                         </>
                                     );
                                 })()}
                             </div>
-                            <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
-                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC Pending</p>
-                                <h2 className="text-2xl font-black text-gv-gold">{kycQueue.length}</h2>
+                            <div className="bg-[var(--bg-card)] border border-[rgba(201,168,76,0.1)] p-6 rounded-[12px]">
+                                <p className="text-[10px] font-heading font-light text-zinc-500 uppercase tracking-widest mb-1">KYC Pending</p>
+                                <h2 className="text-2xl font-heading font-light text-gv-gold">{kycQueue.length}</h2>
                             </div>
-                            <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
-                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Pending Deposit Approval</p>
-                                <h2 className="text-2xl font-black text-emerald-500">{deposits.filter((d: any) => d.status === 'pending' || d.status === 'Pending').length}</h2>
+                            <div className="bg-[var(--bg-card)] border border-[rgba(201,168,76,0.1)] p-6 rounded-[12px]">
+                                <p className="text-[10px] font-heading font-light text-zinc-500 uppercase tracking-widest mb-1">Pending Deposit Approval</p>
+                                <h2 className="text-2xl font-heading font-light text-[#0a8b6d]">{deposits.filter((d: any) => d.status === 'pending' || d.status === 'Pending').length}</h2>
                             </div>
-                            <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
-                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Clients</p>
-                                <h2 className="text-2xl font-black text-white">{users.length}</h2>
+                            <div className="bg-[var(--bg-card)] border border-[rgba(201,168,76,0.1)] p-6 rounded-[12px]">
+                                <p className="text-[10px] font-heading font-light text-zinc-500 uppercase tracking-widest mb-1">Total Clients</p>
+                                <h2 className="text-2xl font-heading font-light text-white">{users.length}</h2>
                             </div>
                         </div>
 
@@ -678,7 +678,7 @@ export default function AdminPortal() {
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
+                                    className={`px-8 py-3 rounded-xl text-[10px] font-heading font-light uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
                                 >
                                     {tab === "kyc" ? `KYC Queue (${kycQueue.length})` : tab}
                                 </button>
@@ -686,10 +686,10 @@ export default function AdminPortal() {
                         </div>
 
                         {/* Content Area */}
-                        <div className="bg-[#121212] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
+                        <div className="bg-[var(--bg-card)] border border-[rgba(201,168,76,0.1)] rounded-[12px] overflow-hidden shadow-2xl">
                             {activeTab === "kyc" && (
                                 <table className="w-full text-left">
-                                    <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                    <thead className="bg-white/5 border-b border-white/10 text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500">
                                         <tr>
                                             <th className="px-8 py-6">Client</th>
                                             <th className="px-8 py-6">Submission Date</th>
@@ -702,30 +702,30 @@ export default function AdminPortal() {
                                         {kycQueue.map((u: any, i: number) => (
                                             <tr 
                                                 key={i} 
-                                                className="text-sm font-bold group hover:bg-white/[0.01] cursor-pointer"
+                                                className="border-b border-white/[0.02] hover:bg-white/[0.01] cursor-pointer group"
                                                 onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
                                             >
                                                 <td className="px-8 py-6">
-                                                    <div className="text-white">{u.full_name || u.email}</div>
-                                                    <div className="text-[10px] text-zinc-500 font-medium">{u.email}</div>
+                                                    <div className="text-white font-heading font-light">{u.full_name || u.email}</div>
+                                                    <div className="text-[10px] text-zinc-500 font-body font-light">{u.email}</div>
                                                 </td>
                                                 <td className="px-8 py-6 text-zinc-400 font-mono text-xs">
                                                     {u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A"}
                                                 </td>
-                                                <td className="px-8 py-6 text-zinc-400">{u.country || u.kyc_data?.country || "N/A"}</td>
+                                                <td className="px-8 py-6 text-zinc-400 font-body font-light">{u.country || u.kyc_data?.country || "N/A"}</td>
                                                 <td className="px-8 py-6 text-center">
-                                                    <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[9px] uppercase font-black border border-amber-500/20">
+                                                    <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[9px] uppercase font-heading font-light border border-amber-500/20">
                                                         {u.kyc_status}
                                                     </span>
                                                 </td>
                                                 <td className="px-8 py-6 text-right">
-                                                    <button className="text-[10px] font-black uppercase text-gv-gold hover:underline">Review Profile</button>
+                                                    <button className="text-[10px] font-heading font-light uppercase text-gv-gold hover:underline">Review Profile</button>
                                                 </td>
                                             </tr>
                                         ))}
                                         {kycQueue.length === 0 && (
                                             <tr>
-                                                <td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">
+                                                <td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-heading font-light uppercase tracking-widest">
                                                     No pending KYC applications
                                                 </td>
                                             </tr>
