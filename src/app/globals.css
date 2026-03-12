@@ -1,67 +1,63 @@
 @import "tailwindcss";
 
 :root {
-  /* Core brand colors - EXACT VALUES REQUIRED */
+  /* Background colors */
   --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+
+  /* Brand colors */
   --gold: #c9a84c;
-  --text-primary: #f0ece4;
-  --bg-card: #161616;
-  
-  /* System assignments */
+  --gold-light: #e0c872;
+
+  /* Legacy Fallbacks */
   --background: var(--bg-primary);
-  --foreground: var(--text-primary);
+  --foreground: #ededed;
 }
 
 @theme {
-  --color-gold: var(--gold);
   --color-bg-primary: var(--bg-primary);
-  --color-text-primary: var(--text-primary);
-  --color-bg-card: var(--bg-card);
-
-  /* Font mappings - Ensure Cormorant Garamond for headings and Outfit for body */
-  --font-heading: 'Cormorant Garamond', serif;
-  --font-body: 'Outfit', sans-serif;
+  --color-bg-secondary: var(--bg-secondary);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
 }
 
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-body);
-  overflow-x: hidden;
+  background: var(--bg-primary);
+  color: var(--foreground);
+  font-family: var(--font-body), sans-serif;
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-/* Force Cormorant Garamond for all headings with weight 300 */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  font-weight: 300;
-  letter-spacing: -0.02em;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading), serif;
+  font-weight: 600;
 }
 
 .container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
-/* Core utilities */
-.text-gold {
-  color: var(--gold);
+@media (min-width: 640px) {
+  .container {
+    padding: 0 1.5rem;
+  }
 }
 
-.bg-gold {
-  background-color: var(--gold);
-}
-
-.border-gold {
-  border-color: var(--gold);
-}
-
-.font-heading {
-  font-family: var(--font-heading);
-}
-
-.font-body {
-  font-family: var(--font-body);
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 2rem;
+  }
 }

@@ -270,7 +270,7 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black font-body">
+        <div className="min-h-screen bg-[#121212] flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
             <title>{`Register | GV Capital Trust`}</title>
 
             <div className="absolute top-8 right-8">
@@ -291,78 +291,78 @@ export default function RegisterPage() {
                             className="h-[80px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
                         />
                     </Link>
-                    <h1 className="text-4xl font-heading font-light text-white uppercase tracking-tighter mb-2">{t.title}</h1>
-                    <p className="text-zinc-500 font-body font-light tracking-wide">{t.subtitle}</p>
+                    <h1 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">{t.title}</h1>
+                    <p className="text-zinc-500 font-medium tracking-wide">{t.subtitle}</p>
                 </div>
 
                 {errorMsg && <div className="w-full bg-red-500/20 border border-red-500/50 p-4 rounded-xl text-red-500 text-sm mb-6">{errorMsg}</div>}
 
                 <form onSubmit={handleSubmit} className="w-full space-y-6">
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-heading font-light uppercase tracking-widest px-1">{t.name}</label>
+                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.name}</label>
                         <input
                             type="text"
                             required
                             value={fullName}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
-                            className="w-full bg-[var(--bg-card)] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-gv-gold/50 transition-all font-body font-light"
+                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_name}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-heading font-light uppercase tracking-widest px-1">{t.emailLabel}</label>
+                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.emailLabel}</label>
                         <input
                             type="email"
                             required
                             value={email}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                            className="w-full bg-[var(--bg-card)] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-gv-gold/50 transition-all font-body font-light"
+                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_email}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-heading font-light uppercase tracking-widest px-1">{t.passwordLabel}</label>
+                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.passwordLabel}</label>
                         <input
                             type="password"
                             required
                             value={password}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                            className="w-full bg-[var(--bg-card)] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-gv-gold/50 transition-all font-body font-light"
+                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_pass}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-heading font-light uppercase tracking-widest px-1">{t.usernameLabel}</label>
+                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.usernameLabel}</label>
                         <input
                             type="text"
                             required
                             value={ownUsername}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOwnUsername(e.target.value.replace(/\s+/g, '').toLowerCase())}
-                            className={`w-full bg-[var(--bg-card)] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 transition-all font-body font-light ${!isUsernameValid ? 'border-red-500/50 ring-red-500/20' : 'focus:ring-gv-gold/50'}`}
+                            className={`w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all font-medium ${!isUsernameValid ? 'border-red-500/50 ring-red-500/20' : 'focus:ring-gv-gold/50'}`}
                             placeholder={t.usernamePlaceholder}
                         />
-                        {usernameCheckMsg && <p className="text-[10px] text-red-500 font-heading font-light px-1 uppercase tracking-widest">{usernameCheckMsg}</p>}
+                        {usernameCheckMsg && <p className="text-[10px] text-red-500 font-bold px-1 uppercase tracking-widest">{usernameCheckMsg}</p>}
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-heading font-light uppercase tracking-widest px-1">{t.referralLabel}</label>
+                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.referralLabel}</label>
                         <input
                             type="text"
                             required
                             value={referralCode}
                             readOnly={isRefReadOnly}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setReferralCode(e.target.value)}
-                            className={`w-full bg-[var(--bg-card)] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 transition-all font-body font-light ${isRefReadOnly ? 'opacity-50 cursor-not-allowed border-gv-gold/30 ring-1 ring-gv-gold/20' : (isReferralValid ? 'focus:ring-[#0a8b6d]/50' : 'focus:ring-red-500/50')}`}
+                            className={`w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all font-medium ${isRefReadOnly ? 'opacity-50 cursor-not-allowed border-gv-gold/30 ring-1 ring-gv-gold/20' : (isReferralValid ? 'focus:ring-emerald-500/50' : 'focus:ring-red-500/50')}`}
                             placeholder="Code Required"
                         />
-                        <p className="text-[10px] text-zinc-600 font-body font-light px-1 italic">
+                        <p className="text-[10px] text-zinc-600 font-bold px-1 italic">
                             {t.referralNote}
                         </p>
                         {referralCheckMsg && (
-                            <p className={`text-[10px] font-heading font-light uppercase tracking-widest px-1 mt-1 ${isReferralValid ? 'text-[#0a8b6d]' : 'text-red-500'}`}>
+                            <p className={`text-[10px] font-black uppercase tracking-widest px-1 mt-1 ${isReferralValid ? 'text-emerald-500' : 'text-red-500'}`}>
                                 {referralCheckMsg}
                             </p>
                         )}
@@ -392,7 +392,7 @@ export default function RegisterPage() {
                     <button
                         type="submit"
                         disabled={isLoading || !isAgreed || !isReferralValid || isValidatingReferral || !isUsernameValid || isValidatingUsername || !ownUsername}
-                        className="w-full bg-gv-gold text-black font-heading font-light text-lg py-5 rounded-xl hover:bg-gv-gold/90 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest flex items-center justify-center gap-2"
+                        className="w-full bg-gv-gold text-black font-black text-lg py-5 rounded-2xl hover:bg-gv-gold/90 transition-all shadow-[0_10px_30px_rgba(212,175,55,0.2)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest flex items-center justify-center gap-2"
                     >
                         {isLoading || isValidatingReferral || isValidatingUsername ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
                     </button>
@@ -405,7 +405,7 @@ export default function RegisterPage() {
                     </Link>
                 </p>
 
-                <p className="mt-10 text-[10px] text-zinc-600 text-center leading-relaxed font-body font-light uppercase tracking-widest">
+                <p className="mt-10 text-[10px] text-zinc-600 text-center leading-relaxed font-bold uppercase tracking-widest">
                     {t.pdpaNote}
                 </p>
             </div>
@@ -415,21 +415,21 @@ export default function RegisterPage() {
             {/* Agreement Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-[var(--bg-card)] border border-[rgba(201,168,76,0.1)] rounded-[12px] p-8 max-w-2xl w-full max-h-[80vh] flex flex-col shadow-2xl">
-                        <h2 className="text-2xl font-heading font-light text-white mb-6 uppercase tracking-tighter">{t.modalTitle}</h2>
-                        <div className="overflow-y-auto pr-4 text-zinc-400 text-sm leading-relaxed mb-6 font-body font-light whitespace-pre-line">
+                    <div className="bg-[#1a1a1a] border border-white/10 rounded-[32px] p-8 max-w-2xl w-full max-h-[80vh] flex flex-col shadow-2xl">
+                        <h2 className="text-2xl font-black text-white mb-6 uppercase tracking-tighter">{t.modalTitle}</h2>
+                        <div className="overflow-y-auto pr-4 text-zinc-400 text-sm leading-relaxed mb-6 font-medium whitespace-pre-line">
                             {t.agreementBody}
                         </div>
                         <div className="flex gap-4 pt-4 mt-auto">
                             <button
                                 onClick={() => { setIsAgreed(false); setIsModalOpen(false); }}
-                                className="flex-1 py-4 text-zinc-500 font-heading font-light hover:text-white transition-colors uppercase tracking-widest text-xs"
+                                className="flex-1 py-4 text-zinc-500 font-bold hover:text-white transition-colors uppercase tracking-widest text-xs"
                             >
                                 {t.modalReject}
                             </button>
                             <button
                                 onClick={() => { setIsAgreed(true); setIsModalOpen(false); }}
-                                className="flex-1 bg-gv-gold text-black font-heading font-light py-4 rounded-xl shadow-xl uppercase tracking-widest text-xs"
+                                className="flex-1 bg-gv-gold text-black font-black py-4 rounded-xl shadow-[0_10px_30px_rgba(212,175,55,0.2)] uppercase tracking-widest text-xs"
                             >
                                 {t.modalAgree}
                             </button>

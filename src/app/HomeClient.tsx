@@ -63,22 +63,22 @@ export default function HomeClient() {
     const t = content[lang];
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] text-white selection:bg-gv-gold selection:text-black flex flex-col font-body">
+        <div className="min-h-screen bg-[#121212] text-white selection:bg-gv-gold selection:text-black flex flex-col">
             {/* Navigation */}
-            <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[var(--bg-primary)]/80 backdrop-blur-md">
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+            <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#121212]/80 backdrop-blur-md">
+                <div className="container flex items-center justify-between py-4">
                     <div className="flex items-center gap-2">
                         <Link href={`/?lang=${lang}`} className="flex items-center">
                             <img
                                 src="/logo.png"
                                 alt="GV Capital Trust Logo"
-                                className="h-[34px] sm:h-[60px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_6px_rgba(212,175,55,0.4)]"
+                                className="h-[40px] sm:h-[60px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_6px_rgba(212,175,55,0.4)]"
                             />
                         </Link>
                     </div>
 
                     <div className="flex items-center gap-8">
-                        <div className="hidden items-center gap-6 text-sm font-heading font-light text-zinc-400 md:flex">
+                        <div className="hidden items-center gap-6 text-sm font-medium text-zinc-400 md:flex">
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.services}</Link>
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
@@ -109,20 +109,20 @@ export default function HomeClient() {
                 <div className="absolute top-1/2 left-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gv-gold/10 blur-[120px]"></div>
 
                 <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                    <h2 className="mb-4 text-xs font-heading font-light uppercase tracking-[0.3em] text-gv-gold">
+                    <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.3em] text-gv-gold">
                         {t.hero.slogan}
                     </h2>
-                    <h1 className="mb-8 text-5xl font-heading font-light tracking-tight sm:text-7xl lg:text-8xl">
+                    <h1 className="mb-8 text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl">
                         <span className="block text-white">{t.hero.title}</span>
                     </h1>
-                    <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-zinc-400 sm:text-xl font-body font-light">
+                    <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-zinc-400 sm:text-xl">
                         {t.hero.description}
                     </p>
 
                     <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
                         <Link
                             href={`/register?lang=${lang}`}
-                            className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gv-gold px-10 py-4 text-lg font-heading font-light text-black transition-all hover:pr-12"
+                            className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gv-gold px-10 py-4 text-lg font-bold text-black transition-all hover:pr-12"
                         >
                             <span className="relative">{t.cta}</span>
                             <svg
@@ -134,21 +134,21 @@ export default function HomeClient() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </Link>
-                        <button className="rounded-full border border-white/20 px-10 py-4 text-lg font-heading font-light text-white hover:bg-white/5 transition-all">
+                        <button className="rounded-full border border-white/20 px-10 py-4 text-lg font-bold text-white hover:bg-white/5 transition-all">
                             {t.nav.about}
                         </button>
                     </div>
                 </div>
 
                 {/* Feature Grid placeholder */}
-                <div className="mt-32 grid grid-cols-1 gap-8 sm:grid-cols-3 max-w-6xl w-full">
+                <div className="mt-32 grid grid-cols-1 gap-8 sm:grid-cols-3 container">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="group rounded-[12px] border border-[rgba(201,168,76,0.1)] bg-[var(--bg-card)] p-8 transition-all hover:border-gv-gold/30 hover:bg-white/10">
+                        <div key={i} className="group rounded-2xl border border-white/5 bg-white/5 p-8 transition-all hover:border-gv-gold/30 hover:bg-white/10">
                             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gv-gold/20 text-gv-gold">
                                 <div className="h-6 w-6 border-2 border-gv-gold rounded-full"></div>
                             </div>
-                            <h3 className="mb-2 text-xl font-heading font-light">{lang === "en" ? `Premium Service ${i}` : `卓越服务 ${i}`}</h3>
-                            <p className="text-zinc-400 text-sm leading-relaxed font-body font-light">
+                            <h3 className="mb-2 text-xl font-bold">{lang === "en" ? `Premium Service ${i}` : `卓越服务 ${i}`}</h3>
+                            <p className="text-zinc-400 text-sm leading-relaxed">
                                 {lang === "en"
                                     ? "Global asset allocation and wealth protection strategies tailored to your specific financial goals."
                                     : "针对您的特定财务目标量身定制的全球资产配置和财富保护策略。"}

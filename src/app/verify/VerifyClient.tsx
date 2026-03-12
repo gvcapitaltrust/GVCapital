@@ -218,24 +218,24 @@ export default function VerifyPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] text-zinc-300 flex flex-col items-center selection:bg-gv-gold selection:text-black font-body">
+        <div className="min-h-screen bg-[#0d0d0d] text-zinc-300 flex flex-col items-center selection:bg-gv-gold selection:text-black">
             <title>{`KYC Verification | GV Capital Trust`}</title>
 
             <div className="w-full max-w-3xl px-6 py-12 space-y-12">
                 <header className="flex flex-col items-center text-center space-y-6">
                     <Link href={`/dashboard?lang=${lang}`}>
-                        <img src="/logo.png" className="h-[34px] sm:h-[60px] w-auto mix-blend-screen brightness-110" />
+                        <img src="/logo.png" className="h-[60px] w-auto mix-blend-screen brightness-110" />
                     </Link>
                     <div className="space-y-2">
-                        <h1 className="text-3xl font-heading font-light text-white uppercase tracking-tighter">Identity Verification</h1>
-                        <p className="text-[10px] text-gv-gold font-heading font-light tracking-[0.2em] uppercase">Investor Onboarding Portal</p>
+                        <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Identity Verification</h1>
+                        <p className="text-[10px] text-gv-gold font-black tracking-[0.2em] uppercase">Investor Onboarding Portal</p>
                     </div>
 
                     {/* Step Indicator */}
                     <div className="flex items-center gap-4 pt-4 w-full justify-center">
                         {[1, 2, 3].map((s: number) => (
                             <div key={s} className="flex items-center gap-2">
-                                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-heading font-light transition-all ${currentStep >= s ? 'bg-gv-gold text-black shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'bg-white/5 text-zinc-600 border border-white/10'}`}>
+                                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black transition-all ${currentStep >= s ? 'bg-gv-gold text-black shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'bg-white/5 text-zinc-600 border border-white/10'}`}>
                                     {s}
                                 </div>
                                 {s < 3 && <div className={`h-[1px] w-8 md:w-16 ${currentStep > s ? 'bg-gv-gold' : 'bg-white/10'}`} />}
@@ -244,7 +244,7 @@ export default function VerifyPage() {
                     </div>
                 </header>
 
-                <main className="bg-[var(--bg-card)] border border-[rgba(201,168,76,0.1)] rounded-[12px] p-8 md:p-12 shadow-2xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <main className="bg-[#141414] border border-white/5 rounded-[48px] p-8 md:p-12 shadow-2xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     
                     {/* Step 1: Personal Information */}
                     {currentStep === 1 && (
@@ -256,12 +256,12 @@ export default function VerifyPage() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">First Name</label>
-                                    <input type="text" value={formData.first_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, first_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm font-body font-light focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter first name" />
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">First Name</label>
+                                    <input type="text" value={formData.first_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, first_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter first name" />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">Last Name</label>
-                                    <input type="text" value={formData.last_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, last_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm font-body font-light focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter last name" />
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Last Name</label>
+                                    <input type="text" value={formData.last_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, last_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter last name" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Date of Birth</label>
@@ -276,39 +276,39 @@ export default function VerifyPage() {
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">Residential Address</label>
-                                    <input type="text" value={formData.address} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, address: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm font-body font-light focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Street name, building, unit number" />
+                                <div className="md:col-span-2 space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Residential Address</label>
+                                    <input type="text" value={formData.address} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, address: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Street name, building, unit number" />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">City</label>
-                                    <input type="text" value={formData.city} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, city: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm font-body font-light focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Enter city" />
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">City</label>
+                                    <input type="text" value={formData.city} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, city: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Enter city" />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">Phone Number</label>
-                                    <input type="tel" value={formData.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, phone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm font-body font-light focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="+60 12345678" />
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Phone Number</label>
+                                    <input type="tel" value={formData.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, phone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="+60 12345678" />
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">Tax Identification Number (TIN)</label>
-                                    <input type="text" value={formData.tax_id} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, tax_id: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm font-body font-light focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Optional for individual investors" />
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Tax Identification Number (TIN)</label>
+                                    <input type="text" value={formData.tax_id} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, tax_id: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Optional for individual investors" />
                                 </div>
                             </div>
 
-                            <label className="flex items-center gap-3 p-5 bg-white/[0.02] border border-white/5 rounded-xl cursor-pointer group hover:bg-white/[0.04] transition-all">
+                            <label className="flex items-center gap-3 p-5 bg-white/[0.02] border border-white/5 rounded-3xl cursor-pointer group hover:bg-white/[0.04] transition-all">
                                 <input type="checkbox" checked={formData.nationality_match} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, nationality_match: e.target.checked})} className="h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
-                                <span className="text-[11px] font-body font-light text-zinc-400 uppercase tracking-tight">My place of birth and nationality are the same as my country of residence.</span>
+                                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-tight">My place of birth and nationality are the same as my country of residence.</span>
                             </label>
 
                             <div className="flex gap-4 pt-4">
                                 <button 
                                     onClick={() => handleFinalSubmit('Draft')} 
-                                    className="flex-1 bg-white/5 border border-white/10 text-white font-heading font-light py-5 rounded-xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
+                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
                                 >
                                     Save & Close
                                 </button>
                                 <button 
                                     onClick={nextStep} 
-                                    className="flex-[2] bg-white/5 border border-white/10 text-white font-heading font-light py-5 rounded-xl hover:bg-gv-gold hover:text-black transition-all uppercase tracking-[0.2em] text-[11px] shadow-lg"
+                                    className="flex-[2] bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-gv-gold hover:text-black transition-all uppercase tracking-[0.2em] text-[11px] shadow-lg"
                                 >
                                     Next Step
                                 </button>
@@ -324,31 +324,31 @@ export default function VerifyPage() {
                                 <p className="text-xs text-zinc-500 font-medium">To provide a secure service, we need to understand your investment profile.</p>
                             </div>
 
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">Purpose of Account</label>
-                                    <select value={formData.account_purpose} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, account_purpose: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm font-body font-light focus:outline-none transition-all">
-                                        <option value="Investment" className="bg-[#1a1a1a]">Investment</option>
-                                        <option value="Hedging" className="bg-[#1a1a1a]">Hedging</option>
-                                        <option value="Speculation" className="bg-[#1a1a1a]">Speculation</option>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Purpose of Account</label>
+                                    <select value={formData.account_purpose} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, account_purpose: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                        <option value="Investment">Investment</option>
+                                        <option value="Hedging">Hedging</option>
+                                        <option value="Speculation">Speculation</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">Employment Status</label>
-                                    <select value={formData.employment_status} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, employment_status: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm font-body font-light focus:outline-none transition-all">
-                                        <option value="Full-time" className="bg-[#1a1a1a]">Full-time</option>
-                                        <option value="Part-time" className="bg-[#1a1a1a]">Part-time</option>
-                                        <option value="Freelancer" className="bg-[#1a1a1a]">Freelancer</option>
-                                        <option value="Business Owner" className="bg-[#1a1a1a]">Business Owner</option>
-                                        <option value="Retired" className="bg-[#1a1a1a]">Retired</option>
-                                        <option value="Unemployed" className="bg-[#1a1a1a]">Unemployed</option>
-                                        <option value="Student" className="bg-[#1a1a1a]">Student</option>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Employment Status</label>
+                                    <select value={formData.employment_status} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, employment_status: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                        <option value="Full-time">Full-time</option>
+                                        <option value="Part-time">Part-time</option>
+                                        <option value="Freelancer">Freelancer</option>
+                                        <option value="Business Owner">Business Owner</option>
+                                        <option value="Retired">Retired</option>
+                                        <option value="Unemployed">Unemployed</option>
+                                        <option value="Student">Student</option>
                                     </select>
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">Industry</label>
-                                    <select value={formData.industry} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, industry: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-sm font-body font-light focus:outline-none transition-all">
-                                        {industries.map((ind: string) => <option key={ind} value={ind} className="bg-[#1a1a1a]">{ind}</option>)}
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Industry</label>
+                                    <select value={formData.industry} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, industry: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                        {industries.map((ind: string) => <option key={ind} value={ind}>{ind}</option>)}
                                     </select>
                                 </div>
                             </div>
@@ -364,23 +364,23 @@ export default function VerifyPage() {
                                 </div>
                             </div>
 
-                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">Total Net Worth</label>
-                                    <select value={formData.total_wealth} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, total_wealth: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-body font-light transition-all">
-                                        {financialTiers.map((t: string) => <option key={t} value={t} className="bg-[#1a1a1a]">{t}</option>)}
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Total Net Worth</label>
+                                    <select value={formData.total_wealth} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, total_wealth: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                        {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">Annual Net Income</label>
-                                    <select value={formData.annual_income} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, annual_income: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-body font-light transition-all">
-                                        {financialTiers.map((t: string) => <option key={t} value={t} className="bg-[#1a1a1a]">{t}</option>)}
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Annual Net Income</label>
+                                    <select value={formData.annual_income} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, annual_income: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                        {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-heading font-light uppercase tracking-widest text-zinc-500 px-1">Expected Yearly Deposit</label>
-                                    <select value={formData.yearly_deposit} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, yearly_deposit: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-body font-light transition-all">
-                                        {financialTiers.map((t: string) => <option key={t} value={t} className="bg-[#1a1a1a]">{t}</option>)}
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Expected Yearly Deposit</label>
+                                    <select value={formData.yearly_deposit} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, yearly_deposit: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                        {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                             </div>

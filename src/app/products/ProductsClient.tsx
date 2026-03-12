@@ -168,7 +168,7 @@ export default function ProductsClient() {
         <div className="min-h-screen bg-[var(--bg-primary)] text-white selection:bg-gv-gold selection:text-black flex flex-col font-body">
             {/* --- NAVIGATION --- */}
             <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[var(--bg-primary)]/80 backdrop-blur-md">
-                <div className="main-container flex items-center justify-between py-4 md:h-20">
+                <div className="container flex items-center justify-between py-4 md:h-20">
                     <div className="flex items-center">
                         <Link href={`/?lang=${lang}`} className="flex items-center shrink-0">
                             <img src="/logo.png" alt="GV Capital Trust Logo" className="h-[34px] sm:max-h-[48px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]" />
@@ -221,7 +221,7 @@ export default function ProductsClient() {
             </nav>
 
             {/* 鈹€鈹€鈹€ HERO 鈹€鈹€鈹€ */}
-            <main className="main-container relative flex-1 pt-32 pb-20 px-6 w-full">
+            <main className="container relative flex-1 pt-32 pb-20 px-6 w-full">
                 {/* Decorative glow */}
                 <div className="absolute top-40 left-1/2 -z-10 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-gv-gold/5 blur-[140px]"></div>
 
@@ -267,7 +267,7 @@ export default function ProductsClient() {
                 </div>
 
                 {/* 鈹€鈹€鈹€ TIER CARDS 鈹€鈹€鈹€ */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8 main-container">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8 container">
                     {TIERS.map((tier, index) => {
                         const isActive = activeTierId === tier.id;
 

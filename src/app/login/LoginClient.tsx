@@ -109,7 +109,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] text-white flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black font-body">
+        <div className="min-h-screen bg-[#121212] text-white flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
             <title>{`Login | GV Capital Trust`}</title>
 
             <div className="absolute top-8 right-8">
@@ -127,36 +127,36 @@ export default function LoginPage() {
                         <img
                             src="/logo.png"
                             alt="GV Capital Trust Logo"
-                            className="h-[80px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
+                            className="h-[100px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
                         />
                     </Link>
-                    <h1 className="text-4xl font-heading font-light uppercase tracking-tighter mb-2">{t.title}</h1>
-                    <p className="text-zinc-500 font-body font-light">{t.subtitle}</p>
+                    <h1 className="text-4xl font-black uppercase tracking-tighter mb-2">{t.title}</h1>
+                    <p className="text-zinc-500 font-medium">{t.subtitle}</p>
                 </div>
 
                 {errorMsg && <div className="w-full bg-red-500/20 border border-red-500/50 p-4 rounded-xl text-red-500 text-sm mb-6">{errorMsg}</div>}
 
                 <form onSubmit={handleLogin} className="w-full space-y-6">
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-heading font-light uppercase tracking-widest px-1">{t.emailLabel}</label>
+                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.emailLabel}</label>
                         <input
                             type="email"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-[var(--bg-card)] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-gv-gold/50 transition-all font-body font-light"
+                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_email}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-heading font-light uppercase tracking-widest px-1">{t.passwordLabel}</label>
+                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.passwordLabel}</label>
                         <input
                             type="password"
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-[var(--bg-card)] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 focus:ring-gv-gold/50 transition-all font-body font-light"
+                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_pass}
                         />
                     </div>
@@ -164,15 +164,15 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-gv-gold text-black font-heading font-light text-lg py-5 rounded-xl hover:bg-gv-gold/90 transition-all shadow-xl uppercase tracking-widest flex items-center justify-center gap-3"
+                        className="w-full bg-gv-gold text-black font-black text-lg py-5 rounded-2xl hover:bg-gv-gold/90 transition-all shadow-[0_10px_30px_rgba(212,175,55,0.2)] uppercase tracking-widest flex items-center justify-center gap-3"
                     >
                         {isLoading ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
                     </button>
                 </form>
 
-                <p className="text-center mt-8 text-zinc-500 text-sm font-body font-light">
+                <p className="text-center mt-8 text-zinc-500 text-sm font-medium">
                     {t.footer}
-                    <Link href={`/register?lang=${lang}`} className="text-gv-gold hover:underline font-heading font-light ml-2">
+                    <Link href={`/register?lang=${lang}`} className="text-gv-gold hover:underline font-bold ml-1">
                         {t.link}
                     </Link>
                 </p>
