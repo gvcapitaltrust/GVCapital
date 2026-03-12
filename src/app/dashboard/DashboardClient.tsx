@@ -551,7 +551,7 @@ export default function DashboardClient() {
     // Instead, we will conditionally render the content inside the main area.
 
     return (
-        <div className="min-h-screen bg-[#121212] text-white flex font-sans overflow-x-hidden">
+        <div className="min-h-screen bg-[#121212] text-white flex font-sans overflow-hidden">
             <title>{`Dashboard | GV Capital Trust`}</title>
 
             <aside className="w-64 border-r border-white/10 p-6 flex flex-col justify-between hidden md:flex bg-[#0a0a0a]">
@@ -582,13 +582,6 @@ export default function DashboardClient() {
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             Security
                         </button>
-                        <Link
-                            href={`/products?lang=${lang}`}
-                            className="w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all text-zinc-500 hover:text-white"
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                            Explore Tiers
-                        </Link>
                     </nav>
                 </div>
                 <div className="space-y-4">
@@ -612,7 +605,7 @@ export default function DashboardClient() {
 
             <main className="flex-1 overflow-y-auto bg-[#121212] relative flex flex-col">
                 <CurrencyExchangeTicker />
-                <div className="max-w-7xl mx-auto w-full space-y-8 md:space-y-12 flex-1 pb-20 p-4 sm:p-6 md:p-8 lg:p-12">
+                <div className="max-w-7xl mx-auto w-full space-y-12 flex-1 pb-20 p-8 md:p-12">
                     <header className="flex justify-between items-center">
                         <div>
                             <p className="text-zinc-500 text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
@@ -696,53 +689,44 @@ export default function DashboardClient() {
                                 )
                             ) : (
                                 <>
-                            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-                                <div className="bg-[#1a1a1a] border border-white/5 p-6 md:p-10 rounded-2xl md:rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
+                                    <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalAssets}</p>
                                     <div className="flex flex-col gap-2">
-                                        <h2 className="text-2xl md:text-4xl font-black tracking-tighter">
+                                        <h2 className="text-4xl font-black tracking-tighter">
                                             {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
                                         </h2>
                                         {!isCheckingAuth && user?.kyc_completed && (
-                                            <p className="text-xs font-bold text-zinc-400">
+                                            <p className="text-sm font-bold text-zinc-400">
                                                 (${(Number(user?.total_assets || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                                             </p>
                                         )}
                                     </div>
                                 </div>
-                                <div className="bg-[#1a1a1a] border border-white/5 p-6 md:p-10 rounded-2xl md:rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{lang === "en" ? "Locked Capital" : "锁定本金"}</p>
+                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
+                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalEquity}</p>
                                     <div className="flex flex-col gap-2">
-                                        <h2 className="text-2xl md:text-4xl font-black tracking-tighter text-gv-gold">
+                                        <h2 className="text-4xl font-black tracking-tighter text-gv-gold">
                                             {isCheckingAuth ? "..." : `RM ${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                         </h2>
                                         {!isCheckingAuth && (
-                                            <p className="text-xs font-bold text-zinc-400">
+                                            <p className="text-sm font-bold text-zinc-400">
                                                 (${(Number(user?.balance || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                                             </p>
                                         )}
                                     </div>
                                 </div>
-                                <div className="bg-[#1a1a1a] border border-white/5 p-6 md:p-10 rounded-2xl md:rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{lang === "en" ? "Available Dividends" : "可用股息"}</p>
+                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
+                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.totalProfit}</p>
                                     <div className="flex flex-col gap-2">
-                                        <h2 className="text-2xl md:text-4xl font-black tracking-tighter text-emerald-500">
+                                        <h2 className="text-4xl font-black tracking-tighter text-emerald-500">
                                             {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                         </h2>
                                         {!isCheckingAuth && (
-                                            <p className="text-xs font-bold text-zinc-400">
+                                            <p className="text-sm font-bold text-zinc-400">
                                                 (${(Number(user?.profit || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                                             </p>
                                         )}
-                                    </div>
-                                </div>
-                                <div className="bg-[#1a1a1a] border border-white/5 p-6 md:p-10 rounded-2xl md:rounded-[40px] shadow-xl">
-                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{lang === "en" ? "Referred Count" : "推荐人数"}</p>
-                                    <div className="flex flex-col gap-2">
-                                        <h2 className="text-2xl md:text-4xl font-black tracking-tighter text-white">
-                                            {isCheckingAuth ? "..." : referredCount}
-                                        </h2>
-                                        <p className="text-xs font-bold text-zinc-400 uppercase tracking-tighter">{lang === "en" ? "Active Referrals" : "活跃推荐"}</p>
                                     </div>
                                 </div>
                             </section>

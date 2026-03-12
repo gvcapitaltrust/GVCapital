@@ -66,7 +66,7 @@ export default function HomeClient() {
         <div className="min-h-screen bg-[#121212] text-white selection:bg-gv-gold selection:text-black flex flex-col">
             {/* Navigation */}
             <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#121212]/80 backdrop-blur-md">
-                <div className="container flex items-center justify-between py-4">
+                <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
                     <div className="flex items-center gap-2">
                         <Link href={`/?lang=${lang}`} className="flex items-center">
                             <img
@@ -141,7 +141,7 @@ export default function HomeClient() {
                 </div>
 
                 {/* Feature Grid placeholder */}
-                <div className="mt-32 grid grid-cols-1 gap-8 sm:grid-cols-3 container">
+                <div className="mt-32 grid grid-cols-1 gap-8 sm:grid-cols-3 max-w-6xl w-full">
                     {[1, 2, 3].map((i) => (
                         <div key={i} className="group rounded-2xl border border-white/5 bg-white/5 p-8 transition-all hover:border-gv-gold/30 hover:bg-white/10">
                             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gv-gold/20 text-gv-gold">
