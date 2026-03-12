@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -147,9 +147,9 @@ export default function ApprovalsClient() {
 
     return (
         <div className="min-h-screen bg-[#0F0F0F] text-zinc-300 font-sans p-8">
-            <header className="max-w-7xl mx-auto mb-12 flex justify-between items-end">
+            <header className="main-container mb-12 flex justify-between items-end">
                 <div>
-                    <Link href="/admin" className="text-zinc-600 hover:text-white transition-colors text-xs font-black uppercase tracking-widest mb-4 inline-block">鈫?Back to Master Control</Link>
+                    <Link href="/admin" className="text-zinc-600 hover:text-white transition-colors text-xs font-black uppercase tracking-widest mb-4 inline-block">← Back to Master Control</Link>
                     <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Approval Center</h1>
                     <p className="text-gv-gold text-xs font-black tracking-widest uppercase mt-2">Manage pending deposits & dividend payouts</p>
                 </div>
@@ -166,7 +166,7 @@ export default function ApprovalsClient() {
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto">
+            <main className="main-container">
                 <div className="bg-[#121212] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
                     <div className="p-8 border-b border-white/10 flex items-center justify-between">
                         <h2 className="text-xl font-black text-white uppercase tracking-tight">Pending Deposit Review</h2>

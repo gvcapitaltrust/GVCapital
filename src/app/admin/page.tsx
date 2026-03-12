@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -664,7 +664,7 @@ export default function AdminPortal() {
                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
 
-                    <div className="max-w-7xl mx-auto space-y-12 pb-20">
+                    <div className="main-container space-y-12 pb-20">
                         {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div className="bg-[#0F0F0F] border border-white/5 p-6 rounded-lg hover:border-gv-gold/20 transition-all duration-300">

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -509,12 +509,11 @@ export default function DashboardClient() {
                     city: profileForm.city,
                 })
                 .eq("id", user.id);
-
             if (error) throw error;
             setIsEditingProfile(false);
             // Update local user state
             setUser((prev: any) => ({ ...prev, ...profileForm, fullName: profileForm.full_name }));
-            alert(lang === "en" ? "Profile updated successfully." : "涓汉璧勬枡宸叉垚鍔熸洿鏂般€?);
+            alert(lang === "en" ? "Profile updated successfully." : "个人资料已成功更新。");
         } catch (err: any) {
             alert(err.message);
         } finally {
@@ -609,11 +608,12 @@ export default function DashboardClient() {
         doc.text("GV Capital Trust is a registered investment platform. All financial activities are subject to terms and conditions.", 105, finalY + 5, { align: "center" });
 
         doc.save(`GV_Statement_${user?.id?.substring(0, 8)}_${monthName}.pdf`);
+        alert(lang === "en" ? "Statement has been downloaded." : "账单已下载。");
     };
 
     const handleKycSubmit = async () => {
         if (!idPhoto || !signature || !occupation || !bankName || !accountNumber) {
-            alert(lang === "en" ? "Please complete all required fields and upload your ID." : "璇峰～鍐欐墍鏈夊繀濉瓧娈靛苟涓婁紶鎮ㄧ殑璇佷欢鐓х墖銆?);
+            alert(lang === "en" ? "Please complete all required fields and upload your ID." : "请填写所有必填字段并上传您的证件照片。");
             return;
         }
 
@@ -675,7 +675,7 @@ export default function DashboardClient() {
             deposit: "Deposit",
             withdraw: "Withdraw",
             history: "Transaction History",
-            unverifiedBanner: "鈿狅笍 Account Unverified. Access to Deposits, Withdrawals, and Trading is restricted.",
+            unverifiedBanner: "⚠️ Account Unverified. Access to Deposits, Withdrawals, and Trading is restricted.",
             verifyNow: "Verify Now",
             securityPin: "Withdrawal Security PIN",
             enterPin: "Enter your 6-digit withdrawal PIN to authorize this request.",
@@ -703,42 +703,42 @@ export default function DashboardClient() {
             pendingVerification: "Account Pending Verification. Please contact your Agent or Admin to activate your account.",
         },
         zh: {
-            welcome: "娆㈣繋鍥炴潵锛?,
-            nav: "鎺у埗鍙?,
-            logout: "閫€鍑虹櫥褰?,
-            totalAssets: "鎬昏祫浜?,
-            activeInvestment: "娲昏穬鎶曡祫",
-            totalProfit: "鎬绘敹鐩?,
-            totalEquity: "鎬绘潈鐩?,
-            deposit: "鍏ラ噾",
-            withdraw: "鎻愭",
-            history: "浜ゆ槗鍘嗗彶",
-            unverifiedBanner: "鈿狅笍 璐︽埛鏈牳瀹炪€傚瓨娆俱€佸彇娆惧拰浜ゆ槗鍔熻兘鍙楅檺銆?,
-            verifyNow: "绔嬪嵆鏍稿疄",
-            securityPin: "鍙栨瀹夊叏瀵嗙爜",
-            enterPin: "璇疯緭鍏ユ偍鐨?6 浣嶅彇娆惧瘑鐮佷互鎺堟潈姝ょ敵璇枫€?,
-            confirmWithdraw: "鎺堟潈鎻愭",
-            successTitle: "鎻愪氦鎴愬姛",
-            successDesc: "鎴戜滑鐨勫洟闃熷皢鍦?24 灏忔椂鍐呭鏍告偍鐨勭敵璇枫€?,
-            whatsapp: "閫氳繃 WhatsApp 鑱旂郴鏀寔",
-            expectedMonthly: "棰勮鏈堝害鑲℃伅",
-            projectedYearly: "棰勮骞村害鍒╂鼎",
-            latestDeposit: "鏈€鏂板瓨娆剧姸鎬?,
-            dividendTrends: "6 涓湀鑲℃伅瓒嬪娍",
-            downloadStatement: "涓嬭浇鏈堝害璐﹀崟",
-            referTitle: "鎺ㄨ崘鏈嬪弸",
-            referSubtitle: "閭€璇蜂粬浜哄姞鍏?GV 璧勬湰锛屽叡鍚屽彂灞曠ぞ鍖恒€?,
-            copyCode: "澶嶅埗鎺ㄨ崘鐮?,
-            copied: "宸插鍒?",
-            shareWA: "鍦?WhatsApp 涓婂垎浜?,
-            totalReferred: "宸叉垚鍔熸帹鑽愪汉鏁?,
-            securityTitle: "瀹夊叏璁剧疆",
-            securitySubtitle: "鏇存柊鎮ㄧ殑璐︽埛瀵嗙爜浠ョ‘淇濇偍鐨勮祫閲戝緱鍒颁繚鎶ゃ€?,
-            currentPass: "褰撳墠瀵嗙爜",
-            newPass: "鏂板瘑鐮?,
-            confirmPass: "纭鏂板瘑鐮?,
-            updateBtn: "鏇存柊瀵嗙爜",
-            pendingVerification: "璐︽埛寰呭鏍搞€傝鑱旂郴鎮ㄧ殑浠ｇ悊鎴栫鐞嗗憳浠ユ縺娲绘偍鐨勮处鎴枫€?,
+            welcome: "欢迎回来，",
+            nav: "控制中心",
+            logout: "退出登录",
+            totalAssets: "总资产",
+            activeInvestment: "活跃投资",
+            totalProfit: "总收益",
+            totalEquity: "总权益",
+            deposit: "充值",
+            withdraw: "提现",
+            history: "交易历史",
+            unverifiedBanner: "⚠️ 账户未核实。存款、取款和交易功能受限。",
+            verifyNow: "立即核实",
+            securityPin: "取款安全密码",
+            enterPin: "请输入您的 6 位取款密码以授权此申请。",
+            confirmWithdraw: "授权提款",
+            successTitle: "提交成功",
+            successDesc: "我们的团队将在 24 小时内审核您的申请。",
+            whatsapp: "通过 WhatsApp 联系支持",
+            expectedMonthly: "预计月度股息",
+            projectedYearly: "预计年度利润",
+            latestDeposit: "最新存款状态",
+            dividendTrends: "6 个月股息趋势",
+            downloadStatement: "下载月度账单",
+            referTitle: "推荐朋友",
+            referSubtitle: "邀请他人加入 GV 资本，共同发展社区。",
+            copyCode: "复制推荐码",
+            copied: "已复制！",
+            shareWA: "在 WhatsApp 上分享",
+            totalReferred: "总推荐人数",
+            securityTitle: "安全设置",
+            securitySubtitle: "更新您的账户密码以确保您的资金得到保护。",
+            currentPass: "当前密码",
+            newPass: "新密码",
+            confirmPass: "确认新密码",
+            updateBtn: "更新密码",
+            pendingVerification: "账户待审核。请联系您的代理或管理员以激活您的账户。",
         },
     };
 
@@ -816,8 +816,8 @@ export default function DashboardClient() {
                         <div className="text-xs text-white font-mono">Verified: {String(user?.is_verified)}</div>
                     </div>
 
-                    <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="w-full rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/5 transition-all duration-300 duration-300 text-zinc-400">
-                        {lang === "en" ? "鍒囨崲鑷?绠€浣撲腑鏂? : "Switch to English"}
+                    <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="w-full rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/5 transition-all duration-300 text-zinc-400">
+                        {lang === "en" ? "切换至简体中文" : "Switch to English"}
                     </button>
                     <button onClick={handleLogout} className="w-full text-zinc-500 hover:text-red-400 transition-colors text-sm font-medium flex items-center gap-3 px-4 py-2">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
@@ -832,7 +832,7 @@ export default function DashboardClient() {
                     <header className="flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="flex flex-col items-center md:items-start w-full md:w-auto">
                             <div className="md:hidden mb-6">
-                                <img src="/logo.png" alt="GV Capital" className="h-8 md:h-12 w-auto object-contain mix-blend-screen" />
+                                <img src="/logo.png" alt="GV Capital" className="max-h-[48px] w-auto object-contain mix-blend-screen" />
                             </div>
                             <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">{t.nav}</p>
                             <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left tracking-[-0.02em]">
@@ -1231,7 +1231,7 @@ export default function DashboardClient() {
                                                 type="password"
                                                 required
                                                 className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all duration-300"
-                                                placeholder="鈥⑩€⑩€⑩€⑩€⑩€⑩€⑩€?
+                                                placeholder="••••••••"
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -1241,7 +1241,7 @@ export default function DashboardClient() {
                                                 type="password"
                                                 required
                                                 className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all duration-300"
-                                                placeholder="鈥⑩€⑩€⑩€⑩€⑩€⑩€⑩€?
+                                                placeholder="••••••••"
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -1251,7 +1251,7 @@ export default function DashboardClient() {
                                                 type="password"
                                                 required
                                                 className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all duration-300"
-                                                placeholder="鈥⑩€⑩€⑩€⑩€⑩€⑩€⑩€?
+                                                placeholder="••••••••"
                                             />
                                         </div>
                                         <button
@@ -1274,7 +1274,7 @@ export default function DashboardClient() {
                                         <div>
                                             <h2 className="text-3xl font-black uppercase tracking-tighter mb-2 text-white">Profile Management</h2>
                                             <p className="text-zinc-500 font-medium">
-                                                {lang === "en" ? "View and update your personal information." : "鏌ョ湅骞舵洿鏂版偍鐨勪釜浜轰俊鎭€?}
+                                                {lang === "en" ? "View and update your personal information." : "查看并更新您的个人信息。"}
                                             </p>
                                         </div>
                                         {user?.is_verified && (
@@ -1345,7 +1345,7 @@ export default function DashboardClient() {
                                         </div>
                                     </div>
 
-                                    {/* Bank Details 鈥?Read-Only when KYC verified */}
+                                    {/* Bank Details - Read-Only when KYC verified */}
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-3">
                                             <h3 className="text-xl font-black uppercase tracking-tighter text-white">Bank Details</h3>
@@ -1361,7 +1361,7 @@ export default function DashboardClient() {
                                                 <p className="text-[10px] font-bold text-amber-500/70 uppercase tracking-widest">
                                                     {lang === "en"
                                                         ? "Bank details are locked after KYC verification for security. Contact support to update."
-                                                        : "閾惰璇︽儏鍦↘YC楠岃瘉鍚庡凡閿佸畾浠ョ‘淇濆畨鍏ㄣ€傚闇€鏇存柊锛岃鑱旂郴瀹㈡湇銆?}
+                                                        : "银行详情在 KYC 验证后已锁定以确保安全。如需更新，请联系客服。"}
                                                 </p>
                                             </div>
                                         )}
@@ -1503,7 +1503,7 @@ export default function DashboardClient() {
                             <p className="text-zinc-500 font-medium text-sm px-4">
                                 {lang === "en"
                                     ? `A 6-digit verification code has been sent to your registered email (${user?.email}).`
-                                    : `6浣嶉獙璇佺爜宸插彂閫佽嚦鎮ㄧ殑娉ㄥ唽閭 (${user?.email})銆俙}
+                                    : `6位验证码已发送至您的注册邮箱 (${user?.email})。`}
                             </p>
                         </div>
                         <div className="space-y-4">
@@ -1602,13 +1602,7 @@ export default function DashboardClient() {
                     </div>
                 </div>
             )}
-            {/* Global style tag for date pickers avoiding messy classes */}
-            <style jsx>{`
-                .inverted-scheme-date-picker::-webkit-calendar-picker-indicator {
-                    filter: invert(1);
-                    cursor: pointer;
-                }
-            `}</style>
+
         </div>
     );
 }

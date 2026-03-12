@@ -224,7 +224,7 @@ export default function VerifyPage() {
             <div className="w-full max-w-3xl px-6 py-12 space-y-12">
                 <header className="flex flex-col items-center text-center space-y-6">
                     <Link href={`/dashboard?lang=${lang}`}>
-                        <img src="/logo.png" className="h-[40px] md:h-[60px] w-auto mix-blend-screen brightness-110" />
+                        <img src="/logo.png" className="max-h-[48px] w-auto mix-blend-screen brightness-110" />
                     </Link>
                     <div className="space-y-2">
                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Identity Verification</h1>

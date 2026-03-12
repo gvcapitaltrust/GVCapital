@@ -31,37 +31,35 @@ export default function GlobalFooter() {
     return (
         <footer className="w-full border-t border-white/5 bg-[#0F0F0F] py-20 px-6 mt-auto">
             <div className="main-container">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16 items-start">
-                    {/* Left Column: Logo and Disclaimer */}
-                    <div className="lg:col-span-4 space-y-6 flex flex-col items-center md:items-start text-center md:text-left">
-                        <div className="flex items-center gap-3 opacity-40 grayscale hover:opacity-100 hover:grayscale-0 transition-all">
+                <div className="flex flex-col md:flex-row justify-between items-start gap-16 mb-16">
+                    {/* Left Column: Logo only as requested */}
+                    <div className="flex-shrink-0">
+                        <div className="flex items-center gap-4 opacity-40 grayscale hover:opacity-100 hover:grayscale-0 transition-all">
                             <img
                                 src="/logo.png"
                                 alt="GV Capital Trust Logo"
-                                className="h-10 w-auto object-contain mix-blend-screen"
+                                className="max-h-[48px] w-auto object-contain mix-blend-screen"
                             />
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-black tracking-[0.3em] text-white">GV CAPITAL</span>
-                                <span className="text-[7px] font-bold tracking-[0.4em] text-gv-gold/60">TRUST MONACO</span>
+                                <span className="text-[12px] font-black tracking-[0.3em] text-white">GV CAPITAL</span>
+                                <span className="text-[8px] font-bold tracking-[0.4em] text-gv-gold/60">TRUST MONACO</span>
                             </div>
                         </div>
-                        <p className="text-[9px] text-zinc-600 max-w-xs leading-relaxed font-bold uppercase tracking-widest">
-                            {t.disclaimer}
-                        </p>
                     </div>
 
-                    {/* Middle Column: Spacer for large screens */}
-                    <div className="hidden lg:block lg:col-span-2"></div>
-
-                    {/* Right Column: Links and Location */}
-                    <div className="lg:col-span-6 flex flex-col items-center md:items-end gap-10">
-                        <div className="flex flex-wrap justify-center md:justify-end gap-8 text-[12px] font-bold uppercase tracking-[0.1em] text-zinc-500">
+                    {/* Right Column: Links and Disclaimer grouped to maintain 60px logic but keeping mandatory info */}
+                    <div className="flex flex-col items-center md:items-end gap-10 flex-1 min-w-[300px]" style={{ marginLeft: '60px' }}>
+                        <div className="flex flex-wrap justify-center md:justify-end gap-10 text-[12px] font-bold uppercase tracking-[0.1em] text-zinc-500">
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.privacy}</Link>
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.terms}</Link>
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.risk}</Link>
                         </div>
 
                         <div className="flex flex-col items-center md:items-end gap-6 w-full">
+                            <p className="text-[10px] text-zinc-600 max-w-xl text-center md:text-right leading-relaxed font-bold uppercase tracking-widest">
+                                {t.disclaimer}
+                            </p>
+                            
                             <div className="flex items-center gap-3 text-zinc-500 bg-white/5 px-6 py-3 rounded-lg border border-white/5 transition-all duration-300">
                                 <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

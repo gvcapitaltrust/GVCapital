@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -117,16 +117,16 @@ export default function DepositClient() {
             estimatedCredit: "Estimated Credit",
         },
         zh: {
-            title: "璧勯噾鍏呭€?,
-            subtitle: "鍏呭€兼偍鐨?GV 璧勬湰鎶曡祫璐︽埛",
-            amount: "閲戦 (RM)",
-            receipt: "涓婁紶閾惰鏀舵嵁 (鍥剧墖/PDF)",
-            button: "纭瀛樻",
-            back: "杩斿洖鎺у埗鍙?,
-            note: "鎮ㄧ殑瀛樻姝ｅ湪鐢?GV 璧勬湰绠＄悊鍛樺洟闃熼獙璇併€?杩欓€氬父闇€瑕?1-2 灏忔椂銆?,
-            successTitle: "瀛樻宸叉彁浜?,
-            successDesc: "姝ｅ湪涓烘偍璺宠浆鍒版帶鍒跺彴...",
-            estimatedCredit: "棰勮淇＄敤棰濆害",
+            title: "资金充值",
+            subtitle: "充值您的 GV 资本投资账户",
+            amount: "金额 (RM)",
+            receipt: "上传银行收据 (图片/PDF)",
+            button: "确认存款",
+            back: "返回控制台",
+            note: "您的存款正在由 GV 资本管理团队验证。这通常需要 1-2 小时。",
+            successTitle: "存款已提交",
+            successDesc: "正在为您跳转到控制台...",
+            estimatedCredit: "预计信用额度",
         }
     };
 
@@ -139,9 +139,9 @@ export default function DepositClient() {
     return (
         <div className="min-h-screen bg-[#0F0F0F] text-white flex flex-col selection:bg-gv-gold selection:text-black">
             <header className="border-b border-white/10 bg-[#0F0F0F]/80 backdrop-blur-md sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+                <div className="main-container px-6 py-4 flex justify-between items-center h-20">
                     <Link href={`/dashboard?lang=${lang}`} className="flex items-center gap-2">
-                        <img src="/logo.png" alt="GV Capital" className="h-10 md:h-12 w-auto object-contain mix-blend-screen" />
+                        <img src="/logo.png" alt="GV Capital" className="max-h-[48px] w-auto object-contain mix-blend-screen" />
                     </Link>
                     <Link href={`/dashboard?lang=${lang}`} className="text-zinc-500 hover:text-white transition-colors text-sm font-black uppercase tracking-widest flex items-center gap-2">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M15 19l-7-7 7-7" /></svg>

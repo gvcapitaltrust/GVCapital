@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
@@ -151,53 +151,50 @@ export default function ProductsClient() {
             cta: "Get Started",
         },
         zh: {
-            nav: { services: "鏈嶅姟", about: "鍏充簬鎴戜滑", contact: "鑱旂郴鎴戜滑", login: "瀹㈡埛鐧诲綍" },
-            hero: "鎶曡祫鏂规",
-            heroSub: "閫夋嫨绗﹀悎鎮ㄧ洰鏍囩殑绛夌骇銆傚湪涓嬫柟杈撳叆閲戦浠ユ煡鐪嬮璁℃湀鍥炴姤銆?,
-            inputLabel: "杈撳叆鎶曡祫閲戦 (USD)",
-            inputPlaceholder: "渚嬪 3500",
-            estLabel: "棰勮姣忔湀鍒嗙孩",
-            perMonth: "/ 鏈?,
-            range: "鑼冨洿",
-            features: "鍖呭惈鍐呭",
-            cta: "绔嬪嵆寮€濮?,
+            nav: { services: "服务", about: "关于我们", contact: "联系我们", login: "客户登录" },
+            hero: "投资方案",
+            heroSub: "选择符合您目标的等级。在下方输入金额以查看预计月回报。",
+            inputLabel: "输入投资金额 (USD)",
+            inputPlaceholder: "例如 3500",
+            estLabel: "预计每月分红",
+            perMonth: "/ 月",
+            range: "范围",
+            features: "包含内容",
+            cta: "立即开始",
         }
     }[lang];
 
     return (
         <div className="min-h-screen bg-[#0F0F0F] text-white selection:bg-gv-gold selection:text-black flex flex-col">
-            {/* 鈹€鈹€鈹€ NAVIGATION 鈹€鈹€鈹€ */}
+            {/* --- NAVIGATION --- */}
             <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0F0F0F]/80 backdrop-blur-md">
-                <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4 md:h-20">
+                <div className="main-container flex items-center justify-between py-4 md:h-20">
                     <div className="flex items-center">
                         <Link href={`/?lang=${lang}`} className="flex items-center shrink-0">
-                            <img src="/logo.png" alt="GV Capital Trust Logo" className="max-h-[40px] md:max-h-[50px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]" />
+                            <img src="/logo.png" alt="GV Capital Trust Logo" className="max-h-[48px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]" />
                         </Link>
                     </div>
 
-                    <div className="hidden md:flex flex-1 justify-center items-center gap-10 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
-                        <Link href={`/products?lang=${lang}`} className="text-gv-gold transition-colors">{t.nav.services}</Link>
-                        <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
-                        <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
-                    </div>
+                    <div className="flex items-center gap-12">
+                        {/* Desktop Navigation Grouped with Buttons for "Perfect Horizontal Line" */}
+                        <div className="hidden md:flex items-center gap-10 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                            <Link href={`/products?lang=${lang}`} className="text-gv-gold transition-colors">{t.nav.services}</Link>
+                            <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
+                            <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
+                        </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="hidden md:flex items-center gap-4">
-                            <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="hidden lg:block rounded-lg border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all duration-300 duration-300 text-zinc-500">
-                                {lang === "en" ? "涓枃" : "EN"}
+                        <div className="hidden md:flex items-center gap-6">
+                            <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="hidden lg:block rounded-lg border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all duration-300 text-zinc-500">
+                                {lang === "en" ? "中文" : "EN"}
                             </button>
-                            <Link href={`/login?lang=${lang}`} className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest text-black shadow-lg hover:-translate-y-1 transition-all duration-300 duration-300 active:scale-95">
+                            <Link href={`/login?lang=${lang}`} className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-lg text-[11px] font-black uppercase tracking-widest text-black shadow-lg hover:-translate-y-1 transition-all duration-300 active:scale-95 whitespace-nowrap">
                                 {t.nav.login}
                             </Link>
                         </div>
 
                         <button className="md:hidden p-2 text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                {isMenuOpen ? (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                ) : (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                                )}
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMenuOpen ? "M6 18L18 6" : "M4 6h16M4 12h16M4 18h16"} />
                             </svg>
                         </button>
                     </div>
@@ -212,7 +209,7 @@ export default function ProductsClient() {
                             <div className="h-px bg-white/5 w-full my-2"></div>
                             <div className="flex flex-col gap-4">
                                 <button onClick={() => { setLang(lang === "en" ? "zh" : "en"); setIsMenuOpen(false); }} className="w-full text-left py-2 hover:text-gv-gold transition-colors">
-                                    {lang === "en" ? "鍒囨崲鑷充腑鏂? : "SWITCH TO ENGLISH"}
+                                    {lang === "en" ? "切换至简体中文" : "SWITCH TO ENGLISH"}
                                 </button>
                                 <Link href={`/login?lang=${lang}`} onClick={() => setIsMenuOpen(false)} className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-lg text-center text-[10px] font-black uppercase tracking-widest text-black shadow-lg hover:shadow-gv-gold/20 transition-all duration-300 duration-300">
                                     {t.nav.login}
@@ -224,7 +221,7 @@ export default function ProductsClient() {
             </nav>
 
             {/* 鈹€鈹€鈹€ HERO 鈹€鈹€鈹€ */}
-            <main className="relative flex-1 pt-32 pb-20 px-6 max-w-[1440px] mx-auto w-full">
+            <main className="main-container relative flex-1 pt-32 pb-20 px-6 w-full">
                 {/* Decorative glow */}
                 <div className="absolute top-40 left-1/2 -z-10 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-gv-gold/5 blur-[140px]"></div>
 
@@ -258,19 +255,19 @@ export default function ProductsClient() {
                             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-2">{t.estLabel}</p>
                             <div className="inline-flex items-baseline gap-2 bg-white/5 border border-gv-gold/20 rounded-lg px-8 py-4">
                                 <span className="text-3xl font-black text-gv-gold">{formatCurrency(estimate.low)}</span>
-                                <span className="text-zinc-500 text-sm font-bold">鈥?/span>
+                                <span className="text-zinc-500 text-sm font-bold">-</span>
                                 <span className="text-3xl font-black text-gv-gold">{formatCurrency(estimate.high)}</span>
                                 <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest ml-1">{t.perMonth}</span>
                             </div>
                             <p className="mt-3 text-zinc-600 text-xs font-bold uppercase tracking-widest">
-                                {estimate.tier.name} Tier &middot; {estimate.tier.dividendMin}% 鈥?{estimate.tier.dividendMax}% {t.range}
+                                {estimate.tier.name} Tier &middot; {estimate.tier.dividendMin}% - {estimate.tier.dividendMax}% {t.range}
                             </p>
                         </div>
                     )}
                 </div>
 
                 {/* 鈹€鈹€鈹€ TIER CARDS 鈹€鈹€鈹€ */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8 main-container">
                     {TIERS.map((tier, index) => {
                         const isActive = activeTierId === tier.id;
 
@@ -318,7 +315,7 @@ export default function ProductsClient() {
                                             isActive ? "text-white" : "text-zinc-300"
                                         }`}>
                                             {formatCurrency(tier.minUSD)}
-                                            <span className="text-zinc-600 mx-2 text-lg">鈥?/span>
+                                            <span className="text-zinc-600 mx-2 text-lg">-</span>
                                             {formatCurrency(tier.maxUSD)}
                                         </p>
                                         <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mt-1">Investment Range</p>
@@ -334,7 +331,7 @@ export default function ProductsClient() {
                                         <p className={`text-2xl font-black transition-colors duration-500 ${
                                             isActive ? "text-gv-gold" : "text-zinc-400"
                                         }`}>
-                                            {tier.dividendMin}% 鈥?{tier.dividendMax}%
+                                            {tier.dividendMin}% - {tier.dividendMax}%
                                         </p>
 
                                         {/* Show live calculation when active */}
@@ -342,7 +339,7 @@ export default function ProductsClient() {
                                             <div className="mt-3 pt-3 border-t border-gv-gold/10 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                                 <p className="text-[10px] font-black uppercase tracking-widest text-gv-gold/60 mb-1">Your Estimate</p>
                                                 <p className="text-lg font-black text-gv-gold">
-                                                    {formatCurrency((amount * tier.dividendMin) / 100)} 鈥?{formatCurrency((amount * tier.dividendMax) / 100)}
+                                                    {formatCurrency((amount * tier.dividendMin) / 100)} - {formatCurrency((amount * tier.dividendMax) / 100)}
                                                     <span className="text-xs text-gv-gold/50 ml-1">/mo</span>
                                                 </p>
                                             </div>
@@ -385,7 +382,7 @@ export default function ProductsClient() {
                 <p className="text-center text-[9px] text-zinc-700 font-bold uppercase tracking-widest mt-16 max-w-2xl mx-auto leading-relaxed">
                     {lang === "en"
                         ? "Dividend estimates are projections based on historical performance and are not guaranteed. Past performance does not guarantee future results. Investing involves risk."
-                        : "鍒嗙孩浼扮畻鍩轰簬鍘嗗彶琛ㄧ幇鐨勯娴嬶紝涓嶄綔浠讳綍淇濊瘉銆傝繃寰€琛ㄧ幇涓嶄唬琛ㄦ湭鏉ュ洖鎶ャ€傛姇璧勬秹鍙婇闄┿€?}
+                        : "分红估算基于历史表现的预测，不作任何保证。过往表现不代表未来回报。投资涉及风险。"}
                 </p>
             </main>
 

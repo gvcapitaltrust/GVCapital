@@ -128,7 +128,7 @@ export default function LoginPage() {
                         <img
                             src="/logo.png"
                             alt="GV Capital Trust Logo"
-                            className="h-[60px] md:h-[120px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_20px_rgba(212,175,55,0.4)]"
+                            className="max-h-[48px] md:max-h-[60px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_20px_rgba(212,175,55,0.4)]"
                         />
                     </Link>
                     <h1 className="text-4xl font-black uppercase tracking-tighter mb-2 text-white">{t.title}</h1>

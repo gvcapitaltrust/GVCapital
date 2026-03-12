@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -47,17 +47,17 @@ export default function HomeClient() {
         },
         zh: {
             nav: {
-                services: "鏈嶅姟",
-                about: "鍏充簬鎴戜滑",
-                contact: "鑱旂郴鎴戜滑",
-                login: "瀹㈡埛鐧诲綍",
+                services: "服务",
+                about: "关于我们",
+                contact: "联系我们",
+                login: "客户登录",
             },
             hero: {
-                title: "GV 璧勬湰淇℃墭",
-                slogan: "淇′换 路 璇氫俊 路 鑷敱",
-                description: "鎮ㄥ湪璐㈠瘜绠＄悊鍜岃储鍔¤嚜鐢辨柟闈㈢殑鍚堜綔浼欎即銆傛垜浠嚧鍔涗簬浠ヨ瘹淇″拰鍗撹秺鎻愪緵瀹氬埗鐨勪俊鎵樻湇鍔°€?,
+                title: "GV 资本信托",
+                slogan: "信任 · 诚信 · 自由",
+                description: "您在财富管理和财务自由方面的合作伙伴。我们致力于以诚信和卓越提供定制的信托服务。",
             },
-            cta: "绔嬪嵆寮€濮?,
+            cta: "立即开始",
         },
     };
 
@@ -73,30 +73,30 @@ export default function HomeClient() {
                             <img
                                 src="/logo.png"
                                 alt="GV Capital Trust Logo"
-                                className="h-8 md:h-12 w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                                className="max-h-[48px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]"
                             />
                         </Link>
                     </div>
 
-                    {/* Desktop Navigation */}
-                    <div className="hidden md:flex flex-1 justify-center items-center gap-10 text-[12px] font-bold uppercase tracking-[0.1em] text-zinc-500">
-                        <Link href={`/products?lang=${lang}`} className="hover:text-gv-gold transition-colors">{t.nav.services}</Link>
-                        <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
-                        <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
-                    </div>
+                    <div className="flex items-center gap-12">
+                        {/* Desktop Navigation Grouped for "Perfect Horizontal Line" */}
+                        <div className="hidden md:flex items-center gap-10 text-[12px] font-bold uppercase tracking-[0.1em] text-zinc-500">
+                            <Link href={`/products?lang=${lang}`} className="hover:text-gv-gold transition-colors">{t.nav.services}</Link>
+                            <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
+                            <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
+                        </div>
 
-                    <div className="flex items-center gap-4">
                         <div className="hidden md:flex items-center gap-6">
                             <button
                                 onClick={() => setLang(lang === "en" ? "zh" : "en")}
-                                className="hidden lg:block rounded-lg border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all duration-300 duration-300 text-zinc-500"
+                                className="hidden lg:block rounded-lg border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all duration-300 text-zinc-500"
                             >
-                                {lang === "en" ? "涓枃" : "EN"}
+                                {lang === "en" ? "中文" : "EN"}
                             </button>
 
                             <Link
                                 href={`/login?lang=${lang}`}
-                                className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-lg text-[12px] font-bold uppercase tracking-[0.1em] text-black shadow-lg hover:-translate-y-1 transition-all duration-300 duration-300 active:scale-95 whitespace-nowrap"
+                                className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-lg text-[12px] font-bold uppercase tracking-[0.1em] text-black shadow-lg hover:-translate-y-1 transition-all duration-300 active:scale-95 whitespace-nowrap"
                             >
                                 {t.nav.login}
                             </Link>
@@ -108,11 +108,7 @@ export default function HomeClient() {
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                {isMenuOpen ? (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                ) : (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                                )}
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMenuOpen ? "M6 18L18 6" : "M4 6h16M4 12h16M4 18h16"} />
                             </svg>
                         </button>
                     </div>
