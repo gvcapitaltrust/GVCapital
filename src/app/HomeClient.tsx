@@ -10,6 +10,7 @@ export default function HomeClient() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [lang, setLang] = useState<"en" | "zh">("en");
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
         const l = searchParams?.get("lang");
@@ -66,39 +67,86 @@ export default function HomeClient() {
         <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-gv-gold selection:text-black flex flex-col">
             {/* Navigation */}
             <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-md">
-                <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 h-20 md:h-24">
-                    <div className="flex-1 flex justify-start">
+                <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 h-20">
+                    <div className="flex items-center">
                         <Link href={`/?lang=${lang}`} className="flex items-center shrink-0">
                             <img
                                 src="/logo.png"
                                 alt="GV Capital Trust Logo"
-                                className="h-[50px] md:h-[60px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(238,206,128,0.3)]"
+                                className="max-h-[50px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(238,206,128,0.3)]"
                             />
                         </Link>
                     </div>
 
-                    <div className="hidden md:flex flex-[2] justify-center items-center gap-8 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
-                        <Link href="#" className="hover:text-gv-gold transition-colors whitespace-nowrap">{t.nav.services}</Link>
-                        <Link href="#" className="hover:text-gv-gold transition-colors whitespace-nowrap">{t.nav.about}</Link>
-                        <Link href="#" className="hover:text-gv-gold transition-colors whitespace-nowrap">{t.nav.contact}</Link>
+                    {/* Desktop Navigation */}
+                    <div className="hidden md:flex flex-1 justify-center items-center gap-10 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+                        <Link href={`/products?lang=${lang}`} className="hover:text-gv-gold transition-colors">{t.nav.services}</Link>
+                        <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
+                        <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
                     </div>
 
-                    <div className="flex-1 flex justify-end items-center gap-4">
-                        <button
-                            onClick={() => setLang(lang === "en" ? "zh" : "en")}
-                            className="hidden lg:block rounded-full border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-zinc-500 whitespace-nowrap"
-                        >
-                            {lang === "en" ? "中文" : "EN"}
-                        </button>
+                    <div className="flex items-center gap-4">
+                        <div className="hidden md:flex items-center gap-4">
+                            <button
+                                onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                                className="hidden lg:block rounded-full border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-zinc-500"
+                            >
+                                {lang === "en" ? "中文" : "EN"}
+                            </button>
 
-                        <Link
-                            href={`/login?lang=${lang}`}
-                            className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest text-black shadow-lg hover:-translate-y-1 transition-all active:scale-95 whitespace-nowrap"
+                            <Link
+                                href={`/login?lang=${lang}`}
+                                className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest text-black shadow-lg hover:-translate-y-1 transition-all active:scale-95"
+                            >
+                                {t.nav.login}
+                            </Link>
+                        </div>
+
+                        {/* Mobile Menu Button */}
+                        <button 
+                            className="md:hidden p-2 text-white"
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
                         >
-                            {t.nav.login}
-                        </Link>
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {isMenuOpen ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                ) : (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                                )}
+                            </svg>
+                        </button>
                     </div>
                 </div>
+
+                {/* Mobile Navigation Drawer */}
+                {isMenuOpen && (
+                    <div className="md:hidden absolute top-20 left-0 w-full bg-[#0a0a0a] border-b border-white/5 animate-in slide-in-from-top duration-300">
+                        <div className="flex flex-col p-6 gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+                            <Link href={`/products?lang=${lang}`} onClick={() => setIsMenuOpen(false)} className="hover:text-gv-gold transition-colors">{t.nav.services}</Link>
+                            <Link href="#" onClick={() => setIsMenuOpen(false)} className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
+                            <Link href="#" onClick={() => setIsMenuOpen(false)} className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
+                            <div className="h-px bg-white/5 w-full my-2"></div>
+                            <div className="flex flex-col gap-4">
+                                <button
+                                    onClick={() => {
+                                        setLang(lang === "en" ? "zh" : "en");
+                                        setIsMenuOpen(false);
+                                    }}
+                                    className="w-full text-left py-2 hover:text-gv-gold transition-colors"
+                                >
+                                    {lang === "en" ? "切换至中文" : "SWITCH TO ENGLISH"}
+                                </button>
+                                <Link
+                                    href={`/login?lang=${lang}`}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-full text-center text-[10px] font-black uppercase tracking-widest text-black shadow-lg"
+                                >
+                                    {t.nav.login}
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </nav>
 
             {/* Hero Section */}

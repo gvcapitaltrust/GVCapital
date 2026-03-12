@@ -571,7 +571,7 @@ export default function DashboardClient() {
             `}>
                 <div className="space-y-12">
                     <div className="flex items-center gap-2">
-                        <img src="/logo.png" alt="GV Capital" className="h-[60px] w-auto object-contain mix-blend-screen" />
+                        <img src="/logo.png" alt="GV Capital" className="h-[50px] w-auto object-contain mix-blend-screen" />
                     </div>
 
                     <nav className="space-y-2">
@@ -623,7 +623,7 @@ export default function DashboardClient() {
                     <header className="flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="flex flex-col items-center md:items-start w-full md:w-auto">
                             <div className="md:hidden mb-6">
-                                <img src="/logo.png" alt="GV Capital" className="h-16 w-auto object-contain mix-blend-screen" />
+                                <img src="/logo.png" alt="GV Capital" className="h-[50px] w-auto object-contain mix-blend-screen" />
                             </div>
                             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em] mb-2">{t.nav}</p>
                             <h1 className="text-3xl md:text-5xl font-black text-center md:text-left">

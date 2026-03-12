@@ -37,7 +37,7 @@ export default function GlobalFooter() {
                             <img
                                 src="/logo.png"
                                 alt="GV Capital Trust Logo"
-                                className="h-[45px] w-auto object-contain mix-blend-screen"
+                                className="max-h-[45px] w-auto object-contain mix-blend-screen"
                             />
                             <div className="flex flex-col">
                                 <span className="text-xs font-black tracking-[0.3em] text-white">GV CAPITAL</span>
@@ -55,7 +55,7 @@ export default function GlobalFooter() {
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.terms}</Link>
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.risk}</Link>
                         </div>
-                        
+
                         <div className="flex flex-col items-center lg:items-end gap-6 w-full">
                             <div className="flex items-center gap-3 text-zinc-500 bg-white/5 px-6 py-3 rounded-full border border-white/5">
                                 <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -64,7 +64,7 @@ export default function GlobalFooter() {
                                 </svg>
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t.location}</span>
                             </div>
-                            
+
                             <p className="text-[9px] text-zinc-700 max-w-sm text-center lg:text-right leading-loose font-bold uppercase tracking-[0.2em] pt-6 border-t border-white/5">
                                 {lang === "en"
                                     ? "Personal Data Protection Act 2010 (PDPA) Compliance: By using this site, you consent to the collection and processing of your personal data for investment management purposes."
