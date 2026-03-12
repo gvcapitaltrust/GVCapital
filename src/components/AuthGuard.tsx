@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -26,7 +26,7 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
 
     if (!isClient || loading) {
         return (
-            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+            <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
                 <div className="h-12 w-12 border-4 border-gv-gold border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
@@ -39,7 +39,7 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
 
     if (requireAdmin && !isMasterAdmin && role.toLowerCase() !== "admin") {
         return (
-            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 bg-[radial-gradient(circle_at_center,_#1a1a1a_0%,_#0a0a0a_100%)]">
+            <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center p-6 bg-[radial-gradient(circle_at_center,_#1a1a1a_0%,_#0a0a0a_100%)]">
                 <div className="max-w-md w-full text-center space-y-8 animate-in zoom-in duration-500">
                     <div className="relative inline-block">
                         <div className="absolute inset-0 bg-red-500/20 blur-3xl rounded-full"></div>
@@ -58,7 +58,7 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
                     </div>
                     <button
                         onClick={() => router.push("/")}
-                        className="bg-zinc-800 text-white font-bold px-10 py-4 rounded-2xl hover:bg-zinc-700 transition-all active:scale-95 border border-white/5"
+                        className="bg-zinc-800 text-white font-bold px-10 py-4 rounded-lg hover:bg-zinc-700 transition-all duration-300 active:scale-95 border border-white/5"
                     >
                         Return to Home
                     </button>

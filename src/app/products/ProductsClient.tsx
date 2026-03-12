@@ -1,13 +1,13 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import GlobalFooter from "@/components/GlobalFooter";
 
-/* ──────────────────────────────────────────────
+/* 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
    Tier definitions
-   ────────────────────────────────────────────── */
+   鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
 interface Tier {
     id: string;
     name: string;
@@ -88,9 +88,9 @@ const TIERS: Tier[] = [
     },
 ];
 
-/* ──────────────────────────────────────────────
+/* 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
    Helpers
-   ────────────────────────────────────────────── */
+   鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
 function getTierForAmount(amount: number): string | null {
     if (amount <= 0) return null;
     for (const tier of TIERS) {
@@ -103,9 +103,9 @@ function formatCurrency(value: number): string {
     return value.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 });
 }
 
-/* ──────────────────────────────────────────────
+/* 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
    Component
-   ────────────────────────────────────────────── */
+   鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
 export default function ProductsClient() {
     const searchParams = useSearchParams();
     const [lang, setLang] = useState<"en" | "zh">("en");
@@ -151,27 +151,27 @@ export default function ProductsClient() {
             cta: "Get Started",
         },
         zh: {
-            nav: { services: "服务", about: "关于我们", contact: "联系我们", login: "客户登录" },
-            hero: "投资方案",
-            heroSub: "选择符合您目标的等级。在下方输入金额以查看预计月回报。",
-            inputLabel: "输入投资金额 (USD)",
-            inputPlaceholder: "例如 3500",
-            estLabel: "预计每月分红",
-            perMonth: "/ 月",
-            range: "范围",
-            features: "包含内容",
-            cta: "立即开始",
+            nav: { services: "鏈嶅姟", about: "鍏充簬鎴戜滑", contact: "鑱旂郴鎴戜滑", login: "瀹㈡埛鐧诲綍" },
+            hero: "鎶曡祫鏂规",
+            heroSub: "閫夋嫨绗﹀悎鎮ㄧ洰鏍囩殑绛夌骇銆傚湪涓嬫柟杈撳叆閲戦浠ユ煡鐪嬮璁℃湀鍥炴姤銆?,
+            inputLabel: "杈撳叆鎶曡祫閲戦 (USD)",
+            inputPlaceholder: "渚嬪 3500",
+            estLabel: "棰勮姣忔湀鍒嗙孩",
+            perMonth: "/ 鏈?,
+            range: "鑼冨洿",
+            features: "鍖呭惈鍐呭",
+            cta: "绔嬪嵆寮€濮?,
         }
     }[lang];
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-gv-gold selection:text-black flex flex-col">
-            {/* ─── NAVIGATION ─── */}
-            <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-md">
+        <div className="min-h-screen bg-[#0F0F0F] text-white selection:bg-gv-gold selection:text-black flex flex-col">
+            {/* 鈹€鈹€鈹€ NAVIGATION 鈹€鈹€鈹€ */}
+            <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0F0F0F]/80 backdrop-blur-md">
                 <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4 md:h-20">
                     <div className="flex items-center">
                         <Link href={`/?lang=${lang}`} className="flex items-center shrink-0">
-                            <img src="/logo.png" alt="GV Capital Trust Logo" className="max-h-[40px] md:max-h-[50px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(238,206,128,0.3)]" />
+                            <img src="/logo.png" alt="GV Capital Trust Logo" className="max-h-[40px] md:max-h-[50px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]" />
                         </Link>
                     </div>
 
@@ -183,10 +183,10 @@ export default function ProductsClient() {
 
                     <div className="flex items-center gap-4">
                         <div className="hidden md:flex items-center gap-4">
-                            <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="hidden lg:block rounded-full border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-zinc-500">
-                                {lang === "en" ? "中文" : "EN"}
+                            <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="hidden lg:block rounded-lg border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all duration-300 duration-300 text-zinc-500">
+                                {lang === "en" ? "涓枃" : "EN"}
                             </button>
-                            <Link href={`/login?lang=${lang}`} className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest text-black shadow-lg hover:-translate-y-1 transition-all active:scale-95">
+                            <Link href={`/login?lang=${lang}`} className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest text-black shadow-lg hover:-translate-y-1 transition-all duration-300 duration-300 active:scale-95">
                                 {t.nav.login}
                             </Link>
                         </div>
@@ -204,7 +204,7 @@ export default function ProductsClient() {
                 </div>
 
                 {isMenuOpen && (
-                    <div className="md:hidden absolute top-full left-0 w-full bg-[#0a0a0a] border-b border-white/5 animate-in slide-in-from-top duration-300 shadow-2xl">
+                    <div className="md:hidden absolute top-full left-0 w-full bg-[#0F0F0F] border-b border-white/5 animate-in slide-in-from-top duration-300 shadow-2xl">
                         <div className="flex flex-col p-6 gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
                             <Link href={`/products?lang=${lang}`} onClick={() => setIsMenuOpen(false)} className="text-gv-gold transition-colors">{t.nav.services}</Link>
                             <Link href="#" onClick={() => setIsMenuOpen(false)} className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
@@ -212,9 +212,9 @@ export default function ProductsClient() {
                             <div className="h-px bg-white/5 w-full my-2"></div>
                             <div className="flex flex-col gap-4">
                                 <button onClick={() => { setLang(lang === "en" ? "zh" : "en"); setIsMenuOpen(false); }} className="w-full text-left py-2 hover:text-gv-gold transition-colors">
-                                    {lang === "en" ? "切换至中文" : "SWITCH TO ENGLISH"}
+                                    {lang === "en" ? "鍒囨崲鑷充腑鏂? : "SWITCH TO ENGLISH"}
                                 </button>
-                                <Link href={`/login?lang=${lang}`} onClick={() => setIsMenuOpen(false)} className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-full text-center text-[10px] font-black uppercase tracking-widest text-black shadow-lg">
+                                <Link href={`/login?lang=${lang}`} onClick={() => setIsMenuOpen(false)} className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-lg text-center text-[10px] font-black uppercase tracking-widest text-black shadow-lg hover:shadow-gv-gold/20 transition-all duration-300 duration-300">
                                     {t.nav.login}
                                 </Link>
                             </div>
@@ -223,7 +223,7 @@ export default function ProductsClient() {
                 )}
             </nav>
 
-            {/* ─── HERO ─── */}
+            {/* 鈹€鈹€鈹€ HERO 鈹€鈹€鈹€ */}
             <main className="relative flex-1 pt-32 pb-20 px-6 max-w-[1440px] mx-auto w-full">
                 {/* Decorative glow */}
                 <div className="absolute top-40 left-1/2 -z-10 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-gv-gold/5 blur-[140px]"></div>
@@ -234,7 +234,7 @@ export default function ProductsClient() {
                     <p className="mx-auto max-w-2xl text-zinc-400 text-lg leading-relaxed">{t.heroSub}</p>
                 </div>
 
-                {/* ─── CALCULATOR INPUT ─── */}
+                {/* 鈹€鈹€鈹€ CALCULATOR INPUT 鈹€鈹€鈹€ */}
                 <div className="max-w-xl mx-auto mb-20 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
                     <label className="block text-center text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-4">
                         {t.inputLabel}
@@ -248,7 +248,7 @@ export default function ProductsClient() {
                             value={rawInput}
                             onChange={e => setRawInput(e.target.value)}
                             placeholder={t.inputPlaceholder}
-                            className="w-full bg-white/[0.03] border-2 border-white/10 rounded-2xl pl-14 pr-6 py-6 text-3xl font-black text-white text-center focus:outline-none focus:border-gv-gold/50 focus:shadow-[0_0_40px_rgba(212,175,55,0.15)] transition-all placeholder:text-zinc-700 placeholder:text-xl"
+                            className="w-full bg-white/[0.03] border-2 border-white/10 rounded-lg pl-14 pr-6 py-6 text-3xl font-black text-white text-center focus:outline-none focus:border-gv-gold/50 focus:shadow-[0_0_40px_rgba(212,175,55,0.15)] transition-all duration-300 placeholder:text-zinc-700 placeholder:text-xl"
                         />
                     </div>
 
@@ -256,20 +256,20 @@ export default function ProductsClient() {
                     {estimate && (
                         <div className="mt-6 text-center animate-in fade-in zoom-in-95 duration-500">
                             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-2">{t.estLabel}</p>
-                            <div className="inline-flex items-baseline gap-2 bg-white/5 border border-gv-gold/20 rounded-2xl px-8 py-4">
+                            <div className="inline-flex items-baseline gap-2 bg-white/5 border border-gv-gold/20 rounded-lg px-8 py-4">
                                 <span className="text-3xl font-black text-gv-gold">{formatCurrency(estimate.low)}</span>
-                                <span className="text-zinc-500 text-sm font-bold">—</span>
+                                <span className="text-zinc-500 text-sm font-bold">鈥?/span>
                                 <span className="text-3xl font-black text-gv-gold">{formatCurrency(estimate.high)}</span>
                                 <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest ml-1">{t.perMonth}</span>
                             </div>
                             <p className="mt-3 text-zinc-600 text-xs font-bold uppercase tracking-widest">
-                                {estimate.tier.name} Tier &middot; {estimate.tier.dividendMin}% — {estimate.tier.dividendMax}% {t.range}
+                                {estimate.tier.name} Tier &middot; {estimate.tier.dividendMin}% 鈥?{estimate.tier.dividendMax}% {t.range}
                             </p>
                         </div>
                     )}
                 </div>
 
-                {/* ─── TIER CARDS ─── */}
+                {/* 鈹€鈹€鈹€ TIER CARDS 鈹€鈹€鈹€ */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
                     {TIERS.map((tier, index) => {
                         const isActive = activeTierId === tier.id;
@@ -277,17 +277,17 @@ export default function ProductsClient() {
                         return (
                             <div
                                 key={tier.id}
-                                className="relative rounded-3xl p-[1px] transition-all duration-700 ease-out"
+                                className="relative rounded-lg p-[1px] transition-all duration-300 duration-700 ease-out"
                                 style={{
                                     background: isActive
-                                        ? "linear-gradient(135deg, #EECE80, #B8860B, #EECE80)"
+                                        ? "linear-gradient(135deg, #D4AF37, #B8860B, #D4AF37)"
                                         : "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
                                     animationDelay: `${index * 100}ms`,
                                 }}
                             >
                                 {/* Glow effect behind card */}
                                 <div
-                                    className="absolute inset-0 rounded-3xl transition-all duration-700 ease-out -z-10"
+                                    className="absolute inset-0 rounded-lg transition-all duration-300 duration-700 ease-out -z-10"
                                     style={{
                                         boxShadow: isActive
                                             ? `0 0 60px ${tier.glowColor}, 0 0 120px ${tier.glowColor}`
@@ -296,14 +296,14 @@ export default function ProductsClient() {
                                 ></div>
 
                                 <div
-                                    className={`relative h-full rounded-3xl p-8 lg:p-10 transition-all duration-500 ${
+                                    className={`relative h-full rounded-lg p-8 lg:p-10 transition-all duration-300 duration-500 ${
                                         isActive
-                                            ? "bg-[#111111]"
-                                            : "bg-[#0d0d0d] hover:bg-[#111111]"
+                                            ? "bg-[#141414]"
+                                            : "bg-[#0b0b0b] hover:bg-[#141414]"
                                     }`}
                                 >
                                     {/* Tier badge */}
-                                    <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6 transition-all duration-500 ${
+                                    <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6 transition-all duration-300 duration-500 ${
                                         isActive
                                             ? "bg-gv-gold/20 text-gv-gold"
                                             : "bg-white/5 text-zinc-500"
@@ -318,14 +318,14 @@ export default function ProductsClient() {
                                             isActive ? "text-white" : "text-zinc-300"
                                         }`}>
                                             {formatCurrency(tier.minUSD)}
-                                            <span className="text-zinc-600 mx-2 text-lg">—</span>
+                                            <span className="text-zinc-600 mx-2 text-lg">鈥?/span>
                                             {formatCurrency(tier.maxUSD)}
                                         </p>
                                         <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mt-1">Investment Range</p>
                                     </div>
 
                                     {/* Dividend rate */}
-                                    <div className={`rounded-2xl p-5 mb-8 transition-all duration-500 ${
+                                    <div className={`rounded-lg p-5 mb-8 transition-all duration-300 duration-500 ${
                                         isActive
                                             ? "bg-gv-gold/10 border border-gv-gold/20"
                                             : "bg-white/[0.02] border border-white/5"
@@ -334,7 +334,7 @@ export default function ProductsClient() {
                                         <p className={`text-2xl font-black transition-colors duration-500 ${
                                             isActive ? "text-gv-gold" : "text-zinc-400"
                                         }`}>
-                                            {tier.dividendMin}% — {tier.dividendMax}%
+                                            {tier.dividendMin}% 鈥?{tier.dividendMax}%
                                         </p>
 
                                         {/* Show live calculation when active */}
@@ -342,7 +342,7 @@ export default function ProductsClient() {
                                             <div className="mt-3 pt-3 border-t border-gv-gold/10 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                                 <p className="text-[10px] font-black uppercase tracking-widest text-gv-gold/60 mb-1">Your Estimate</p>
                                                 <p className="text-lg font-black text-gv-gold">
-                                                    {formatCurrency((amount * tier.dividendMin) / 100)} — {formatCurrency((amount * tier.dividendMax) / 100)}
+                                                    {formatCurrency((amount * tier.dividendMin) / 100)} 鈥?{formatCurrency((amount * tier.dividendMax) / 100)}
                                                     <span className="text-xs text-gv-gold/50 ml-1">/mo</span>
                                                 </p>
                                             </div>
@@ -367,7 +367,7 @@ export default function ProductsClient() {
                                     {/* CTA */}
                                     <Link
                                         href={`/register?lang=${lang}`}
-                                        className={`block w-full text-center py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${
+                                        className={`block w-full text-center py-4 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 duration-300 ${
                                             isActive
                                                 ? "bg-gv-gold-gradient metallic-shine text-black shadow-lg hover:-translate-y-1"
                                                 : "border border-white/10 text-zinc-500 hover:border-gv-gold/30 hover:text-gv-gold"
@@ -385,7 +385,7 @@ export default function ProductsClient() {
                 <p className="text-center text-[9px] text-zinc-700 font-bold uppercase tracking-widest mt-16 max-w-2xl mx-auto leading-relaxed">
                     {lang === "en"
                         ? "Dividend estimates are projections based on historical performance and are not guaranteed. Past performance does not guarantee future results. Investing involves risk."
-                        : "分红估算基于历史表现的预测，不作任何保证。过往表现不代表未来回报。投资涉及风险。"}
+                        : "鍒嗙孩浼扮畻鍩轰簬鍘嗗彶琛ㄧ幇鐨勯娴嬶紝涓嶄綔浠讳綍淇濊瘉銆傝繃寰€琛ㄧ幇涓嶄唬琛ㄦ湭鏉ュ洖鎶ャ€傛姇璧勬秹鍙婇闄┿€?}
                 </p>
             </main>
 

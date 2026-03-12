@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -617,7 +617,7 @@ export default function AdminPortal() {
 
     return (
         <AuthGuard requireAdmin={true}>
-            <div className="flex h-screen bg-[#0a0a0a] text-white font-sans overflow-hidden relative">
+            <div className="flex h-screen bg-[#0F0F0F] text-white font-sans overflow-hidden relative">
                 <title>{`Admin Portal | GV Capital Trust`}</title>
 
                 {/* Mobile Menu Overlay */}
@@ -630,7 +630,7 @@ export default function AdminPortal() {
 
                 {/* Sidebar */}
                 <aside className={`
-                    fixed md:relative z-[101] h-full w-72 border-r border-white/5 bg-[#0a0a0a] flex flex-col transition-transform duration-300
+                    fixed md:relative z-[101] h-full w-72 border-r border-white/5 bg-[#0F0F0F] flex flex-col transition-transform duration-300
                     ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
                 `}>
                     <div className="p-8 border-b border-white/10 flex items-center gap-4">
@@ -645,21 +645,21 @@ export default function AdminPortal() {
                             <button
                                 key={tab}
                                 onClick={() => { setActiveTab(tab); setIsMobileMenuOpen(false); }}
-                                className={`w-full flex items-center gap-3 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? "bg-gv-gold text-black" : "text-zinc-500 hover:text-white"}`}
+                                className={`w-full flex items-center gap-3 px-6 py-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeTab === tab ? "bg-gv-gold text-black" : "text-zinc-500 hover:text-white"}`}
                             >
                                 {tab}
                             </button>
                         ))}
                     </div>
                     <div className="p-8 border-t border-white/5">
-                        <button onClick={() => { supabase.auth.signOut(); router.push("/login"); }} className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-xl text-xs font-black uppercase hover:text-red-500 transition-all">Logout</button>
+                        <button onClick={() => { supabase.auth.signOut(); router.push("/login"); }} className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-lg text-xs font-black uppercase hover:text-red-500 transition-all duration-300">Logout</button>
                     </div>
                 </aside>
 
                 <main className="flex-1 p-4 md:p-8 overflow-x-hidden overflow-y-auto relative">
                     <button 
                         onClick={() => setIsMobileMenuOpen(true)}
-                        className="md:hidden mb-6 h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10"
+                        className="md:hidden mb-6 h-12 w-12 rounded-lg bg-white/5 flex items-center justify-center border border-white/10"
                     >
                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
@@ -667,7 +667,7 @@ export default function AdminPortal() {
                     <div className="max-w-7xl mx-auto space-y-12 pb-20">
                         {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
+                            <div className="bg-[#0F0F0F] border border-white/5 p-6 rounded-lg hover:border-gv-gold/20 transition-all duration-300">
                                 {(() => {
                                     const totalRm = users.reduce((acc, u) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
                                     const rate = parseFloat(currentForexRate) || 4.0;
@@ -680,15 +680,15 @@ export default function AdminPortal() {
                                     );
                                 })()}
                             </div>
-                            <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
+                            <div className="bg-[#0F0F0F] border border-white/5 p-6 rounded-lg">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC Pending</p>
                                 <h2 className="text-2xl font-black text-gv-gold">{kycQueue.length}</h2>
                             </div>
-                            <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
+                            <div className="bg-[#0F0F0F] border border-white/5 p-6 rounded-lg">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Pending Deposit Approval</p>
                                 <h2 className="text-2xl font-black text-emerald-500">{deposits.filter((d: any) => d.status === 'pending' || d.status === 'Pending').length}</h2>
                             </div>
-                            <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
+                            <div className="bg-[#0F0F0F] border border-white/5 p-6 rounded-lg">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Clients</p>
                                 <h2 className="text-2xl font-black text-white">{users.length}</h2>
                             </div>
@@ -700,7 +700,7 @@ export default function AdminPortal() {
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
+                                    className={`px-8 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${activeTab === tab ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
                                 >
                                     {tab === "kyc" ? `KYC Queue (${kycQueue.length})` : tab}
                                 </button>
@@ -708,7 +708,7 @@ export default function AdminPortal() {
                         </div>
 
                         {/* Content Area */}
-                        <div className="bg-[#121212] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
+                        <div className="bg-[#0F0F0F] border border-white/5 rounded-lg overflow-hidden shadow-2xl">
                             {activeTab === "kyc" && (
                                 <table className="w-full text-left">
                                     <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
@@ -777,8 +777,8 @@ export default function AdminPortal() {
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
-                                                    <button onClick={() => handleRejectWithdrawal(w)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">Reject</button>
-                                                    <button onClick={() => handleApproveWithdrawal(w)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Approve Withdrawal</button>
+                                                    <button onClick={() => handleRejectWithdrawal(w)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-lg text-[10px] font-black uppercase transition-all duration-300 hidden md:block">Reject</button>
+                                                    <button onClick={() => handleApproveWithdrawal(w)} className="bg-emerald-500 text-black px-6 py-2 rounded-lg text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all duration-300">Approve Withdrawal</button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -806,13 +806,13 @@ export default function AdminPortal() {
                                                 placeholder="Search Agent Username..."
                                                 value={searchQuery}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-gv-gold transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-xs focus:outline-none focus:border-gv-gold transition-all duration-300"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                        <div className="lg:col-span-2 overflow-x-auto border border-white/5 rounded-3xl">
+                                        <div className="lg:col-span-2 overflow-x-auto border border-white/5 rounded-lg">
                                             <table className="w-full text-left min-w-[600px]">
                                                 <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                     <tr>
@@ -834,9 +834,9 @@ export default function AdminPortal() {
                                                                 <td className="px-6 py-5">
                                                                     <div className="flex items-center gap-2">
                                                                         <span className="font-mono text-zinc-500 text-xs">#{(index + 1).toString().padStart(2, '0')}</span>
-                                                                        {index === 0 && <span className="text-lg">馃</span>}
-                                                                        {index === 1 && <span className="text-lg">馃</span>}
-                                                                        {index === 2 && <span className="text-lg">馃</span>}
+                                                                        {index === 0 && <span className="text-lg">棣冾殞</span>}
+                                                                        {index === 1 && <span className="text-lg">棣冾殟</span>}
+                                                                        {index === 2 && <span className="text-lg">棣冾殠</span>}
                                                                     </div>
                                                                 </td>
                                                                 <td className="px-6 py-5">
@@ -861,7 +861,7 @@ export default function AdminPortal() {
                                             </table>
                                         </div>
 
-                                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 h-fit min-h-[400px]">
+                                        <div className="bg-white/[0.02] border border-white/5 rounded-lg p-6 h-fit min-h-[400px]">
                                             {selectedAgent ? (
                                                 <div className="space-y-6 animate-in fade-in duration-300">
                                                     <div>
@@ -872,7 +872,7 @@ export default function AdminPortal() {
                                                         <h5 className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Referred Clients ({agentReferrals.length})</h5>
                                                         <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                                             {agentReferrals.map((ref: any, i: number) => (
-                                                                <div key={i} className="bg-white/5 border border-white/5 p-4 rounded-xl flex items-center justify-between group">
+                                                                <div key={i} className="bg-white/5 border border-white/5 p-4 rounded-lg flex items-center justify-between group">
                                                                     <div>
                                                                         <div className="text-xs font-black text-white">{ref.full_name || ref.username}</div>
                                                                         <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">@{ref.username}</div>
@@ -893,7 +893,7 @@ export default function AdminPortal() {
                                                 </div>
                                             ) : (
                                                 <div className="h-full flex flex-col items-center justify-center text-center p-10">
-                                                    <div className="text-4xl mb-4 opacity-20">馃搳</div>
+                                                    <div className="text-4xl mb-4 opacity-20">棣冩惓</div>
                                                     <div className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Select an agent to view drill-down performance</div>
                                                 </div>
                                             )}
@@ -906,7 +906,7 @@ export default function AdminPortal() {
                                 adminProfile?.role !== 'admin' && adminProfile?.email !== 'thenja96@gmail.com' ? (
                                     <div className="min-h-[400px] flex items-center justify-center text-center p-12">
                                         <div className="space-y-4">
-                                            <div className="text-4xl">馃攼</div>
+                                            <div className="text-4xl">棣冩敿</div>
                                             <h3 className="text-xl font-bold text-white uppercase tracking-tighter">Access Restricted</h3>
                                             <p className="text-zinc-500 text-sm max-w-xs">You do not have the necessary permissions to access global pricing controls.</p>
                                         </div>
@@ -927,14 +927,14 @@ export default function AdminPortal() {
                                                     step="0.001"
                                                     value={newForexRate}
                                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewForexRate(e.target.value)}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all text-white"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all duration-300 text-white"
                                                     placeholder="4.000"
                                                 />
                                             </div>
                                             <button
                                                 onClick={handleUpdateForexRate}
                                                 disabled={isUpdatingRate}
-                                                className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl uppercase tracking-widest shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/20 transition-all active:scale-95 disabled:opacity-50"
+                                                className="w-full bg-gv-gold text-black font-black py-5 rounded-lg uppercase tracking-widest shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/20 transition-all duration-300 active:scale-95 disabled:opacity-50"
                                             >
                                                 {isUpdatingRate ? "Propagating Rate..." : "Update Global Rate"}
                                             </button>
@@ -946,7 +946,7 @@ export default function AdminPortal() {
                                             <h3 className="text-xl font-black uppercase tracking-tighter text-white">Rate Audit History</h3>
                                             <div className="h-[1px] flex-1 bg-white/5 mx-8"></div>
                                         </div>
-                                        <div className="overflow-hidden border border-white/5 rounded-3xl">
+                                        <div className="overflow-hidden border border-white/5 rounded-lg">
                                             <table className="w-full text-left">
                                                 <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                     <tr>
@@ -1000,7 +1000,7 @@ export default function AdminPortal() {
                                                     placeholder="Search Email..."
                                                     value={userSearchQuery}
                                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserSearchQuery(e.target.value)}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all text-white"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all duration-300 text-white"
                                                 />
                                                 <svg className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                                             </div>
@@ -1008,7 +1008,7 @@ export default function AdminPortal() {
                                             <select 
                                                 value={userStatusFilter}
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setUserStatusFilter(e.target.value)}
-                                                className="bg-[#121212] border border-white/10 rounded-xl px-6 py-2.5 text-xs font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 cursor-pointer transition-all"
+                                                className="bg-[#0F0F0F] border border-white/10 rounded-lg px-6 py-2.5 text-xs font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 cursor-pointer transition-all duration-300"
                                             >
                                                 <option value="All">All Users</option>
                                                 <option value="Verified">Fully Verified</option>
@@ -1017,7 +1017,7 @@ export default function AdminPortal() {
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="overflow-x-auto border border-white/5 rounded-3xl">
+                                    <div className="overflow-x-auto border border-white/5 rounded-lg">
                                         <table className="w-full text-left min-w-[800px]">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
@@ -1087,13 +1087,13 @@ export default function AdminPortal() {
                                                             <div className="flex gap-2">
                                                                 <button
                                                                     onClick={() => handleVerifyUser(u.id)}
-                                                                    className="bg-emerald-500 text-black px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all whitespace-nowrap"
+                                                                    className="bg-emerald-500 text-black px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all duration-300 whitespace-nowrap"
                                                                 >
                                                                     Manual Verify
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleRejectUser(u.id)}
-                                                                    className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-red-500/20 hover:scale-105 transition-all whitespace-nowrap"
+                                                                    className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-red-500/20 hover:scale-105 transition-all duration-300 whitespace-nowrap"
                                                                 >
                                                                     Reject
                                                                 </button>
@@ -1133,7 +1133,7 @@ export default function AdminPortal() {
                             )}
 
                              {activeTab === "deposits" && (
-                                <div className="overflow-x-auto border border-white/5 rounded-3xl">
+                                <div className="overflow-x-auto border border-white/5 rounded-lg">
                                     <table className="w-full text-left min-w-[900px]">
                                     <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                         <tr>
@@ -1184,8 +1184,8 @@ export default function AdminPortal() {
                                                 <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
                                                     {d.status === 'Pending' && (
                                                         <>
-                                                            <button onClick={() => handleRejectDeposit(d)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">Reject</button>
-                                                            <button onClick={() => handleApproveDeposit(d)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Verify & Credit</button>
+                                                            <button onClick={() => handleRejectDeposit(d)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-lg text-[10px] font-black uppercase transition-all duration-300 hidden md:block">Reject</button>
+                                                            <button onClick={() => handleApproveDeposit(d)} className="bg-emerald-500 text-black px-6 py-2 rounded-lg text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all duration-300">Verify & Credit</button>
                                                         </>
                                                     )}
                                                 </td>
@@ -1221,7 +1221,7 @@ export default function AdminPortal() {
                                                     placeholder="Search Email or Admin..."
                                                     value={auditSearchQuery}
                                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAuditSearchQuery(e.target.value)}
-                                                    className="bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all w-full md:w-64"
+                                                    className="bg-white/5 border border-white/10 rounded-lg px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all duration-300 w-full md:w-64"
                                                 />
                                                 <svg className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                                             </div>
@@ -1230,7 +1230,7 @@ export default function AdminPortal() {
                                             <select 
                                                 value={auditStatusFilter}
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setAuditStatusFilter(e.target.value)}
-                                                className="bg-[#121212] border border-white/10 rounded-xl px-6 py-2.5 text-xs font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 cursor-pointer transition-all"
+                                                className="bg-[#0F0F0F] border border-white/10 rounded-lg px-6 py-2.5 text-xs font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 cursor-pointer transition-all duration-300"
                                             >
                                                 <option value="All">All Actions</option>
                                                 <option value="Verified">Verified Only</option>
@@ -1243,7 +1243,7 @@ export default function AdminPortal() {
                                         </div>
                                     </div>
 
-                                    <div className="overflow-x-auto border border-white/5 rounded-3xl">
+                                    <div className="overflow-x-auto border border-white/5 rounded-lg">
                                         <table className="w-full text-left min-w-[800px]">
 
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
@@ -1317,8 +1317,8 @@ export default function AdminPortal() {
                                                     name="currentPassword"
                                                     type="password"
                                                     required
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
-                                                    placeholder="••••••••"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all duration-300"
+                                                    placeholder="鈥⑩€⑩€⑩€⑩€⑩€⑩€⑩€?
                                                 />
                                             </div>
                                             <div className="space-y-2">
@@ -1327,8 +1327,8 @@ export default function AdminPortal() {
                                                     name="newPassword"
                                                     type="password"
                                                     required
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
-                                                    placeholder="••••••••"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all duration-300"
+                                                    placeholder="鈥⑩€⑩€⑩€⑩€⑩€⑩€⑩€?
                                                 />
                                             </div>
                                             <div className="space-y-2">
@@ -1337,14 +1337,14 @@ export default function AdminPortal() {
                                                     name="confirmPassword"
                                                     type="password"
                                                     required
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
-                                                    placeholder="••••••••"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all duration-300"
+                                                    placeholder="鈥⑩€⑩€⑩€⑩€⑩€⑩€⑩€?
                                                 />
                                             </div>
                                             <button
                                                 type="submit"
                                                 disabled={isUpdatingRate}
-                                                className="w-full bg-gv-gold text-black font-black py-6 rounded-2xl uppercase tracking-widest shadow-xl hover:shadow-gv-gold/20 hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-4 mt-10"
+                                                className="w-full bg-gv-gold text-black font-black py-6 rounded-lg uppercase tracking-widest shadow-xl hover:shadow-gv-gold/20 hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center gap-4 mt-10"
                                             >
                                                 {isUpdatingRate ? "Updating..." : "Update Password"}
                                             </button>
@@ -1357,7 +1357,7 @@ export default function AdminPortal() {
                 </main>
 
                 {toast.visible && (
-                    <div className="fixed bottom-8 right-8 bg-emerald-500 text-white px-8 py-4 rounded-2xl shadow-2xl z-[100] animate-in slide-in-from-bottom-10 duration-500 font-bold border border-white/20 flex items-center gap-3">
+                    <div className="fixed bottom-8 right-8 bg-emerald-500 text-white px-8 py-4 rounded-lg shadow-2xl z-[100] animate-in slide-in-from-bottom-10 duration-500 font-bold border border-white/20 flex items-center gap-3">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                         {toast.message}
                     </div>
@@ -1373,7 +1373,7 @@ export default function AdminPortal() {
                         ></div>
                         
                         {/* Drawer */}
-                        <div className="fixed inset-y-0 right-0 z-[600] w-full max-w-md bg-[#121212] border-l border-white/10 shadow-2xl p-8 overflow-y-auto animate-in slide-in-from-right duration-300">
+                        <div className="fixed inset-y-0 right-0 z-[600] w-full max-w-md bg-[#0F0F0F] border-l border-white/10 shadow-2xl p-8 overflow-y-auto animate-in slide-in-from-right duration-300">
                             <button 
                                 onClick={() => setIsDetailModalOpen(false)}
                                 className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors"
@@ -1389,7 +1389,7 @@ export default function AdminPortal() {
                                         Account Created: {selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString() : 'N/A'}
                                     </p>
                                     <div className="mt-6 space-y-4">
-                                        <div className="bg-gv-gold/10 border border-gv-gold/30 p-4 rounded-2xl flex items-center justify-between shadow-[0_0_15px_rgba(238,206,128,0.1)]">
+                                        <div className="bg-gv-gold/10 border border-gv-gold/30 p-4 rounded-lg flex items-center justify-between shadow-[0_0_15px_rgba(238,206,128,0.1)]">
                                             <div className="flex items-center gap-3">
                                                 <div className="h-8 w-8 rounded-full bg-gv-gold text-black flex items-center justify-center">
                                                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -1401,7 +1401,7 @@ export default function AdminPortal() {
                                                 <div className="text-[10px] font-bold text-zinc-500">(${( (Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)) / 4).toFixed(2)} USD)</div>
                                             </div>
                                         </div>
-                                        <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between">
+                                        <div className="bg-white/5 border border-white/10 p-4 rounded-lg flex items-center justify-between">
                                             <div className="flex items-center gap-3">
                                                 <div className="h-8 w-8 rounded-full bg-white/10 text-zinc-400 flex items-center justify-center">
                                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
@@ -1419,11 +1419,11 @@ export default function AdminPortal() {
                                 <section className="space-y-4">
                                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold">Current Status</h3>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-white/5 border border-white/10 p-5 rounded-xl">
+                                        <div className="bg-white/5 border border-white/10 p-5 rounded-lg">
                                             <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC Step</p>
                                             <p className="text-2xl font-black text-white">{selectedUser.kyc_step || 0} / 3</p>
                                         </div>
-                                        <div className="bg-white/5 border border-white/10 p-5 rounded-xl">
+                                        <div className="bg-white/5 border border-white/10 p-5 rounded-lg">
                                             <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Verification</p>
                                             <p className={`text-sm font-black uppercase mt-2 ${selectedUser.is_verified ? "text-emerald-500" : "text-amber-500"}`}>
                                                 {selectedUser.is_verified ? "Verified" : "Unverified"}
@@ -1436,12 +1436,12 @@ export default function AdminPortal() {
                                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold">Compliance Documents</h3>
                                     <div className="space-y-3">
                                         {isLoadingDocs ? (
-                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-zinc-500 animate-pulse">
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-lg text-center text-[10px] font-black uppercase tracking-widest text-zinc-500 animate-pulse">
                                                 Loading documents...
                                             </div>
                                         ) : userKycDocs.length > 0 ? (
                                             userKycDocs.map((doc, idx) => (
-                                                <div key={idx} className="flex flex-col gap-3 p-4 bg-white/5 border border-white/10 rounded-xl hover:border-gv-gold/30 transition-all group">
+                                                <div key={idx} className="flex flex-col gap-3 p-4 bg-white/5 border border-white/10 rounded-lg hover:border-gv-gold/30 transition-all duration-300 group">
                                                     <div className="flex items-center justify-between">
                                                         <div className="flex items-center gap-3 overflow-hidden">
                                                             <svg className="h-5 w-5 text-zinc-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
@@ -1451,7 +1451,7 @@ export default function AdminPortal() {
                                                             href={doc.url} 
                                                             target="_blank" 
                                                             rel="noopener noreferrer" 
-                                                            className="text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-white/10 hover:bg-gv-gold hover:text-black hover:shadow-[0_0_15px_rgba(238,206,128,0.3)] text-white rounded-lg transition-all flex-shrink-0"
+                                                            className="text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-white/10 hover:bg-gv-gold hover:text-black hover:shadow-[0_0_15px_rgba(238,206,128,0.3)] text-white rounded-lg transition-all duration-300 flex-shrink-0"
                                                         >
                                                             Open Full
                                                         </a>
@@ -1466,7 +1466,7 @@ export default function AdminPortal() {
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-zinc-600">No documents uploaded yet.</div>
+                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-lg text-center text-[10px] font-black uppercase tracking-widest text-zinc-600">No documents uploaded yet.</div>
                                         )}
                                     </div>
                                 </section>
@@ -1474,13 +1474,13 @@ export default function AdminPortal() {
                                 <div className="pt-8 border-t border-white/10 space-y-4">
                                     <button 
                                         onClick={() => { handleVerifyUser(selectedUser.id); setIsDetailModalOpen(false); }}
-                                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-black py-4 rounded-xl text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
+                                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-black py-4 rounded-lg text-xs uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-lg shadow-emerald-500/20"
                                     >
                                         Verify User
                                     </button>
                                     <button 
                                         onClick={() => { setRejectReasonText(""); setIsRejectModalOpen(true); }}
-                                        className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 font-black py-4 rounded-xl text-xs uppercase tracking-widest transition-all active:scale-95"
+                                        className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 font-black py-4 rounded-lg text-xs uppercase tracking-widest transition-all duration-300 active:scale-95"
                                     >
                                         Reject / Reset KYC
                                     </button>
@@ -1496,11 +1496,11 @@ export default function AdminPortal() {
                         <div className="relative max-w-6xl w-full h-full flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
                             <button 
                                 onClick={() => setViewingDoc(null)}
-                                className="absolute -top-12 right-0 text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2 hover:text-gv-gold transition-all"
+                                className="absolute -top-12 right-0 text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2 hover:text-gv-gold transition-all duration-300"
                             >
                                 Close Viewer <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
-                            <div className="w-full h-full flex items-center justify-center bg-white/5 rounded-[40px] overflow-hidden border border-white/10">
+                            <div className="w-full h-full flex items-center justify-center bg-white/5 rounded-lg overflow-hidden border border-white/10">
                                 <img 
                                     src={viewingDoc} 
                                     className="w-full h-full object-contain"
@@ -1514,7 +1514,7 @@ export default function AdminPortal() {
                 {/* Deposit Receipt Drawer / Modal */}
                 {isDepositDrawerOpen && selectedDepositTx && (
                     <div className="fixed inset-0 z-[750] bg-black/80 backdrop-blur-md flex justify-end animate-in fade-in duration-300">
-                        <div className="w-full max-w-xl bg-[#121212] border-l border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.8)] h-full overflow-y-auto animate-in slide-in-from-right-full duration-500 flex flex-col">
+                        <div className="w-full max-w-xl bg-[#0F0F0F] border-l border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.8)] h-full overflow-y-auto animate-in slide-in-from-right-full duration-500 flex flex-col">
                             <div className="p-8 border-b border-white/10 shrink-0 flex items-center justify-between bg-black/40 sticky top-0 z-10 backdrop-blur-xl">
                                 <div>
                                     <h2 className="text-xl font-black text-white uppercase tracking-tighter">Deposit Review</h2>
@@ -1522,7 +1522,7 @@ export default function AdminPortal() {
                                 </div>
                                 <button 
                                     onClick={() => setIsDepositDrawerOpen(false)}
-                                    className="h-10 w-10 bg-white/5 hover:bg-white/10 hover:text-white text-zinc-500 rounded-full flex items-center justify-center transition-all"
+                                    className="h-10 w-10 bg-white/5 hover:bg-white/10 hover:text-white text-zinc-500 rounded-full flex items-center justify-center transition-all duration-300"
                                 >
                                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                                 </button>
@@ -1531,23 +1531,23 @@ export default function AdminPortal() {
                             <div className="p-8 flex-1 flex flex-col">
                                 <div className="space-y-8 flex-1 flex flex-col">
                                     {/* Image Viewer */}
-                                    <div className="relative group w-full bg-[#0a0a0a] border border-white/10 rounded-3xl flex-1 min-h-[400px] overflow-hidden flex items-center justify-center p-2 shadow-inner">
+                                    <div className="relative group w-full bg-[#0F0F0F] border border-white/10 rounded-lg flex-1 min-h-[400px] overflow-hidden flex items-center justify-center p-2 shadow-inner">
                                         {depositReceiptUrl ? (
                                             <>
                                                 {selectedDepositTx.receipt_url && selectedDepositTx.receipt_url.toLowerCase().endsWith('.pdf') ? (
-                                                    <iframe src={depositReceiptUrl} className="w-full h-full rounded-2xl bg-white"/>
+                                                    <iframe src={depositReceiptUrl} className="w-full h-full rounded-lg bg-white"/>
                                                 ) : (
                                                     <img 
                                                         src={depositReceiptUrl} 
                                                         alt="Deposit Receipt" 
-                                                        className="w-full h-full object-contain rounded-2xl group-hover:scale-[1.02] transition-transform duration-700"
+                                                        className="w-full h-full object-contain rounded-lg group-hover:scale-[1.02] transition-transform duration-700"
                                                     />
                                                 )}
                                                 <a 
                                                     href={depositReceiptUrl}
                                                     download={`Receipt_${selectedDepositTx.ref_id}`}
                                                     target="_blank" 
-                                                    className="absolute bottom-6 right-6 bg-black/80 hover:bg-gv-gold hover:text-black hover:shadow-[0_0_20px_rgba(238,206,128,0.4)] backdrop-blur-lg border border-white/10 p-4 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all hidden md:flex"
+                                                    className="absolute bottom-6 right-6 bg-black/80 hover:bg-gv-gold hover:text-black hover:shadow-[0_0_20px_rgba(238,206,128,0.4)] backdrop-blur-lg border border-white/10 p-4 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:flex"
                                                     title="Download Original"
                                                 >
                                                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
@@ -1562,7 +1562,7 @@ export default function AdminPortal() {
                                     </div>
 
                                     {/* Transaction Quick Details */}
-                                    <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 flex flex-col items-center justify-center shrink-0">
+                                    <div className="bg-white/[0.02] border border-white/5 rounded-lg p-6 flex flex-col items-center justify-center shrink-0">
                                         <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] mb-3">Request Amount</div>
                                         <h3 className="text-5xl font-black text-emerald-400 tracking-tighter drop-shadow-[0_0_15px_rgba(52,211,153,0.3)]">
                                             RM {Number(selectedDepositTx.amount || 0).toFixed(2)}
@@ -1585,13 +1585,13 @@ export default function AdminPortal() {
                                 <div className="flex gap-4">
                                     <button 
                                         onClick={() => handleRejectDeposit(selectedDepositTx)}
-                                        className="w-1/3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 px-6 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all text-center hover:shadow-[0_0_20px_rgba(239,68,68,0.2)] active:scale-95"
+                                        className="w-1/3 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 px-6 py-5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 text-center hover:shadow-[0_0_20px_rgba(239,68,68,0.2)] active:scale-95"
                                     >
                                         Reject
                                     </button>
                                     <button 
                                         onClick={() => handleApproveDeposit(selectedDepositTx)}
-                                        className="w-2/3 bg-emerald-500 hover:bg-emerald-600 text-black px-6 py-5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all text-center shadow-[0_0_20px_rgba(52,211,153,0.3)] active:scale-95 flex items-center justify-center gap-3"
+                                        className="w-2/3 bg-emerald-500 hover:bg-emerald-600 text-black px-6 py-5 rounded-lg text-xs font-black uppercase tracking-widest transition-all duration-300 text-center shadow-[0_0_20px_rgba(52,211,153,0.3)] active:scale-95 flex items-center justify-center gap-3"
                                     >
                                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                         Approve & Credit
@@ -1605,7 +1605,7 @@ export default function AdminPortal() {
                 {/* Reject Confirmation Modal */}
                 {isRejectModalOpen && selectedUser && (
                     <div className="fixed inset-0 z-[800] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={() => setIsRejectModalOpen(false)}>
-                        <div className="bg-[#121212] border border-white/10 shadow-2xl rounded-3xl p-8 max-w-md w-full animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
+                        <div className="bg-[#0F0F0F] border border-white/10 shadow-2xl rounded-lg p-8 max-w-md w-full animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
                             <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-2">Reject KYC Submission</h2>
                             <p className="text-zinc-400 text-sm mb-6">Please provide a reason for rejecting <span className="text-white font-bold">{selectedUser.email}</span>'s KYC application.</p>
                             
@@ -1617,13 +1617,13 @@ export default function AdminPortal() {
                                         onChange={(e) => setRejectReasonText(e.target.value)}
                                         placeholder="e.g., ID document is blurred, or details do not match..."
                                         rows={4}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500/50 transition-all resize-none"
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500/50 transition-all duration-300 resize-none"
                                     />
                                 </div>
                                 <div className="flex gap-4 pt-4">
                                     <button 
                                         onClick={() => setIsRejectModalOpen(false)}
-                                        className="flex-1 bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all"
+                                        className="flex-1 bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-lg font-black uppercase tracking-widest text-[10px] transition-all duration-300"
                                     >
                                         Cancel
                                     </button>
@@ -1637,7 +1637,7 @@ export default function AdminPortal() {
                                             setIsRejectModalOpen(false);
                                             setIsDetailModalOpen(false);
                                         }}
-                                        className="flex-1 bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-red-500/20 active:scale-95 transition-all"
+                                        className="flex-1 bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-black uppercase tracking-widest text-[10px] shadow-lg shadow-red-500/20 active:scale-95 transition-all duration-300"
                                     >
                                         Confirm Rejection
                                     </button>

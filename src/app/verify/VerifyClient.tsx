@@ -218,7 +218,7 @@ export default function VerifyPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0d0d0d] text-zinc-300 flex flex-col items-center selection:bg-gv-gold selection:text-black">
+        <div className="min-h-screen bg-[#0F0F0F] text-zinc-300 flex flex-col items-center selection:bg-gv-gold selection:text-black">
             <title>{`KYC Verification | GV Capital Trust`}</title>
 
             <div className="w-full max-w-3xl px-6 py-12 space-y-12">
@@ -235,7 +235,7 @@ export default function VerifyPage() {
                     <div className="flex items-center gap-4 pt-4 w-full justify-center">
                         {[1, 2, 3].map((s: number) => (
                             <div key={s} className="flex items-center gap-2">
-                                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black transition-all ${currentStep >= s ? 'bg-gv-gold text-black shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'bg-white/5 text-zinc-600 border border-white/10'}`}>
+                                <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-black transition-all duration-300 ${currentStep >= s ? 'bg-gv-gold text-black shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'bg-white/5 text-zinc-600 border border-white/10'}`}>
                                     {s}
                                 </div>
                                 {s < 3 && <div className={`h-[1px] w-8 md:w-16 ${currentStep > s ? 'bg-gv-gold' : 'bg-white/10'}`} />}
@@ -257,19 +257,19 @@ export default function VerifyPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">First Name</label>
-                                    <input type="text" value={formData.first_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, first_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter first name" />
+                                    <input type="text" value={formData.first_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, first_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all duration-300" placeholder="Enter first name" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Last Name</label>
-                                    <input type="text" value={formData.last_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, last_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter last name" />
+                                    <input type="text" value={formData.last_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, last_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all duration-300" placeholder="Enter last name" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Date of Birth</label>
-                                    <input type="date" value={formData.dob} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, dob: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all [color-scheme:dark]" />
+                                    <input type="date" value={formData.dob} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, dob: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all duration-300 [color-scheme:dark]" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Gender</label>
-                                    <select value={formData.gender} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, gender: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all">
+                                    <select value={formData.gender} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, gender: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all duration-300">
                                         <option value="">Select Gender</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
@@ -278,23 +278,23 @@ export default function VerifyPage() {
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Residential Address</label>
-                                    <input type="text" value={formData.address} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, address: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Street name, building, unit number" />
+                                    <input type="text" value={formData.address} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, address: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all duration-300" placeholder="Street name, building, unit number" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">City</label>
-                                    <input type="text" value={formData.city} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, city: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Enter city" />
+                                    <input type="text" value={formData.city} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, city: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all duration-300" placeholder="Enter city" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Phone Number</label>
-                                    <input type="tel" value={formData.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, phone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="+60 12345678" />
+                                    <input type="tel" value={formData.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, phone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all duration-300" placeholder="+60 12345678" />
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Tax Identification Number (TIN)</label>
-                                    <input type="text" value={formData.tax_id} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, tax_id: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Optional for individual investors" />
+                                    <input type="text" value={formData.tax_id} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, tax_id: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all duration-300" placeholder="Optional for individual investors" />
                                 </div>
                             </div>
 
-                            <label className="flex items-center gap-3 p-5 bg-white/[0.02] border border-white/5 rounded-3xl cursor-pointer group hover:bg-white/[0.04] transition-all">
+                            <label className="flex items-center gap-3 p-5 bg-white/[0.02] border border-white/5 rounded-3xl cursor-pointer group hover:bg-white/[0.04] transition-all duration-300">
                                 <input type="checkbox" checked={formData.nationality_match} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, nationality_match: e.target.checked})} className="h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                 <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-tight">My place of birth and nationality are the same as my country of residence.</span>
                             </label>
@@ -302,13 +302,13 @@ export default function VerifyPage() {
                             <div className="flex gap-4 pt-4">
                                 <button 
                                     onClick={() => handleFinalSubmit('Draft')} 
-                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
+                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-lg hover:bg-white/10 transition-all duration-300 uppercase tracking-widest text-[11px]"
                                 >
                                     Save & Close
                                 </button>
                                 <button 
                                     onClick={nextStep} 
-                                    className="flex-[2] bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-gv-gold hover:text-black transition-all uppercase tracking-[0.2em] text-[11px] shadow-lg"
+                                    className="flex-[2] bg-white/5 border border-white/10 text-white font-black py-5 rounded-lg hover:bg-gv-gold hover:text-black transition-all duration-300 uppercase tracking-[0.2em] text-[11px] shadow-lg"
                                 >
                                     Next Step
                                 </button>
@@ -327,7 +327,7 @@ export default function VerifyPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Purpose of Account</label>
-                                    <select value={formData.account_purpose} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, account_purpose: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                    <select value={formData.account_purpose} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, account_purpose: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-3.5 text-sm font-bold focus:outline-none transition-all duration-300">
                                         <option value="Investment">Investment</option>
                                         <option value="Hedging">Hedging</option>
                                         <option value="Speculation">Speculation</option>
@@ -335,7 +335,7 @@ export default function VerifyPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Employment Status</label>
-                                    <select value={formData.employment_status} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, employment_status: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                    <select value={formData.employment_status} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, employment_status: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-3.5 text-sm font-bold focus:outline-none transition-all duration-300">
                                         <option value="Full-time">Full-time</option>
                                         <option value="Part-time">Part-time</option>
                                         <option value="Freelancer">Freelancer</option>
@@ -347,7 +347,7 @@ export default function VerifyPage() {
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Industry</label>
-                                    <select value={formData.industry} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, industry: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
+                                    <select value={formData.industry} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, industry: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-5 py-3.5 text-sm font-bold focus:outline-none transition-all duration-300">
                                         {industries.map((ind: string) => <option key={ind} value={ind}>{ind}</option>)}
                                     </select>
                                 </div>
@@ -357,7 +357,7 @@ export default function VerifyPage() {
                                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Primary Source of Wealth (Select all that apply)</label>
                                 <div className="flex flex-wrap gap-2">
                                     {wealthSources.map(source => (
-                                        <button key={source} onClick={() => toggleWealthSource(source)} className={`px-5 py-2.5 rounded-xl text-[10px] font-black transition-all ${formData.source_of_wealth.includes(source) ? 'bg-gv-gold text-black' : 'bg-white/5 text-zinc-500 border border-white/10'}`}>
+                                        <button key={source} onClick={() => toggleWealthSource(source)} className={`px-5 py-2.5 rounded-lg text-[10px] font-black transition-all duration-300 ${formData.source_of_wealth.includes(source) ? 'bg-gv-gold text-black' : 'bg-white/5 text-zinc-500 border border-white/10'}`}>
                                             {source}
                                         </button>
                                     ))}
@@ -367,40 +367,40 @@ export default function VerifyPage() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Total Net Worth</label>
-                                    <select value={formData.total_wealth} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, total_wealth: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                    <select value={formData.total_wealth} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, total_wealth: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-[11px] font-black transition-all duration-300">
                                         {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Annual Net Income</label>
-                                    <select value={formData.annual_income} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, annual_income: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                    <select value={formData.annual_income} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, annual_income: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-[11px] font-black transition-all duration-300">
                                         {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Expected Yearly Deposit</label>
-                                    <select value={formData.yearly_deposit} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, yearly_deposit: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
+                                    <select value={formData.yearly_deposit} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, yearly_deposit: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-[11px] font-black transition-all duration-300">
                                         {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
                                     </select>
                                 </div>
                             </div>
 
                             <div className="space-y-4 pt-4">
-                                <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
+                                <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all duration-300">
                                     <input type="checkbox" checked={formData.accuracy_confirmed} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, accuracy_confirmed: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-white uppercase tracking-tighter">Information Accuracy</p>
                                         <p className="text-[9px] text-zinc-500 font-bold leading-normal">I hereby confirm that all the information provided above is true and correct.</p>
                                     </div>
                                 </label>
-                                <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
+                                <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all duration-300">
                                     <input type="checkbox" checked={formData.risk_acknowledged} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, risk_acknowledged: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-white uppercase tracking-tighter">Risk Acknowledgement</p>
                                         <p className="text-[9px] text-zinc-500 font-bold leading-normal">I understand and acknowledge the risks associated with high-yield investments.</p>
                                     </div>
                                 </label>
-                                <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
+                                <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all duration-300">
                                     <input type="checkbox" checked={formData.is_not_pep} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, is_not_pep: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-white uppercase tracking-tighter">PEP Declaration</p>
@@ -410,14 +410,14 @@ export default function VerifyPage() {
                             </div>
 
                             <div className="flex gap-4 pt-4">
-                                <button onClick={prevStep} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]">Back</button>
+                                <button onClick={prevStep} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-lg hover:bg-white/10 transition-all duration-300 uppercase tracking-widest text-[11px]">Back</button>
                                 <button 
                                     onClick={() => handleFinalSubmit('Draft')} 
-                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
+                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-lg hover:bg-white/10 transition-all duration-300 uppercase tracking-widest text-[11px]"
                                 >
                                     Save & Close
                                 </button>
-                                <button onClick={nextStep} className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-2xl transition-all uppercase tracking-widest text-[11px] shadow-lg shadow-gv-gold/20">Next Step</button>
+                                <button onClick={nextStep} className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-lg transition-all duration-300 duration-300 uppercase tracking-widest text-[11px] shadow-lg shadow-gv-gold/20">Next Step</button>
                             </div>
                         </div>
                     )}
@@ -451,7 +451,7 @@ export default function VerifyPage() {
                                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 inline-block">Select Document Type</label>
                                 <div className="flex flex-wrap justify-center gap-3">
                                     {["ID Card", "Driver's License", "Passport", "Military ID", "Residence Permit"].map((type: string) => (
-                                        <button key={type} onClick={() => setFormData({...formData, id_type: type})} className={`px-6 py-3 rounded-2xl text-[10px] font-black tracking-widest border transition-all ${formData.id_type === type ? 'bg-gv-gold border-gv-gold text-black' : 'bg-[#1a1a1a] border-white/10 text-zinc-500 hover:border-white/20'}`}>
+                                        <button key={type} onClick={() => setFormData({...formData, id_type: type})} className={`px-6 py-3 rounded-lg text-[10px] font-black tracking-widest border transition-all duration-300 ${formData.id_type === type ? 'bg-gv-gold border-gv-gold text-black' : 'bg-[#1a1a1a] border-white/10 text-zinc-500 hover:border-white/20'}`}>
                                             {type}
                                         </button>
                                     ))}
@@ -461,10 +461,10 @@ export default function VerifyPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Front of Document</label>
-                                    <div className="relative group border-2 border-white/5 border-dashed rounded-[32px] overflow-hidden bg-white/[0.02] aspect-[3/2] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all border-dashed-2">
+                                    <div className="relative group border-2 border-white/5 border-dashed rounded-[32px] overflow-hidden bg-white/[0.02] aspect-[3/2] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all duration-300 border-dashed-2">
                                         {idFront ? (
                                             <div className="absolute inset-0 p-4">
-                                                <img src={URL.createObjectURL(idFront)} className="w-full h-full object-cover rounded-2xl opacity-50" />
+                                                <img src={URL.createObjectURL(idFront)} className="w-full h-full object-cover rounded-lg opacity-50" />
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center space-y-2">
                                                     <svg className="h-10 w-10 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
                                                     <span className="text-[9px] font-black uppercase text-white tracking-widest">{idFront.name}</span>
@@ -472,7 +472,7 @@ export default function VerifyPage() {
                                             </div>
                                         ) : (
                                             <div className="flex flex-col items-center space-y-4">
-                                                <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-gv-gold group-hover:text-black transition-all">
+                                                <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-gv-gold group-hover:text-black transition-all duration-300">
                                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /></svg>
                                                 </div>
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Upload IC / Image</span>
@@ -483,10 +483,10 @@ export default function VerifyPage() {
                                 </div>
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Back of Document</label>
-                                    <div className="relative group border-2 border-white/5 border-dashed rounded-[32px] overflow-hidden bg-white/[0.02] aspect-[3/2] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all border-dashed-2">
+                                    <div className="relative group border-2 border-white/5 border-dashed rounded-[32px] overflow-hidden bg-white/[0.02] aspect-[3/2] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all duration-300 border-dashed-2">
                                         {idBack ? (
                                             <div className="absolute inset-0 p-4">
-                                                <img src={URL.createObjectURL(idBack)} className="w-full h-full object-cover rounded-2xl opacity-50" />
+                                                <img src={URL.createObjectURL(idBack)} className="w-full h-full object-cover rounded-lg opacity-50" />
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center space-y-2">
                                                     <svg className="h-10 w-10 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
                                                     <span className="text-[9px] font-black uppercase text-white tracking-widest">{idBack.name}</span>
@@ -494,7 +494,7 @@ export default function VerifyPage() {
                                             </div>
                                         ) : (
                                             <div className="flex flex-col items-center space-y-4">
-                                                <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-gv-gold group-hover:text-black transition-all">
+                                                <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-gv-gold group-hover:text-black transition-all duration-300">
                                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /></svg>
                                                 </div>
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Upload IC / Image</span>
@@ -506,15 +506,15 @@ export default function VerifyPage() {
                             </div>
 
                             <div className="flex flex-col md:flex-row gap-4 pt-10">
-                                <button onClick={prevStep} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]">Back</button>
+                                <button onClick={prevStep} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-lg hover:bg-white/10 transition-all duration-300 uppercase tracking-widest text-[11px]">Back</button>
                                 <button 
                                     onClick={() => handleFinalSubmit('Draft')} 
                                     disabled={isLoading}
-                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
+                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-lg hover:bg-white/10 transition-all duration-300 uppercase tracking-widest text-[11px]"
                                 >
                                     {isLoading ? <div className="h-4 w-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div> : 'Save & Close'}
                                 </button>
-                                <button onClick={() => handleFinalSubmit('Pending')} disabled={isLoading} className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-2xl transition-all uppercase tracking-[0.2em] text-[11px] shadow-[0_20px_40px_rgba(212,175,55,0.2)] flex items-center justify-center gap-3">
+                                <button onClick={() => handleFinalSubmit('Pending')} disabled={isLoading} className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-lg transition-all duration-300 duration-300 uppercase tracking-[0.2em] text-[11px] shadow-[0_20px_40px_rgba(212,175,55,0.2)] flex items-center justify-center gap-3">
                                     {isLoading ? <div className="h-4 w-4 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : 'Submit Document'}
                                 </button>
                             </div>

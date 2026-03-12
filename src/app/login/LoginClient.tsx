@@ -109,13 +109,13 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
+        <div className="min-h-screen bg-[#0F0F0F] text-white flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
             <title>{`Login | GV Capital Trust`}</title>
 
             <div className="absolute top-8 right-8">
                 <button
                     onClick={() => setLang(lang === "en" ? "zh" : "en")}
-                    className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold hover:bg-white/10 transition-all uppercase tracking-widest text-white/50"
+                    className="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold hover:bg-white/10 transition-all duration-300 uppercase tracking-widest text-white/50"
                 >
                     {lang === "en" ? "简体中文" : "English"}
                 </button>
@@ -128,7 +128,7 @@ export default function LoginPage() {
                         <img
                             src="/logo.png"
                             alt="GV Capital Trust Logo"
-                            className="h-[60px] md:h-[120px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_20px_rgba(238,206,128,0.4)]"
+                            className="h-[60px] md:h-[120px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_20px_rgba(212,175,55,0.4)]"
                         />
                     </Link>
                     <h1 className="text-4xl font-black uppercase tracking-tighter mb-2 text-white">{t.title}</h1>
@@ -145,7 +145,7 @@ export default function LoginPage() {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:ring-1 focus:ring-gv-gold/50 transition-all font-medium"
+                                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 text-white focus:outline-none focus:ring-1 focus:ring-gv-gold/50 transition-all duration-300 font-medium"
                                     placeholder={t.placeholder_email}
                                 />
                             </div>
@@ -157,7 +157,7 @@ export default function LoginPage() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:ring-1 focus:ring-gv-gold/50 transition-all font-medium"
+                                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 text-white focus:outline-none focus:ring-1 focus:ring-gv-gold/50 transition-all duration-300 font-medium"
                                     placeholder={t.placeholder_pass}
                                 />
                             </div>
@@ -165,7 +165,7 @@ export default function LoginPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-gv-gold-gradient metallic-shine text-black font-black text-lg py-5 rounded-2xl hover:brightness-110 transition-all shadow-[0_10px_30px_rgba(238,206,128,0.2)] uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95"
+                                className="w-full bg-gv-gold-gradient metallic-shine text-black font-black text-lg py-5 rounded-lg hover:brightness-110 transition-all duration-300 shadow-[0_10px_30px_rgba(212,175,55,0.2)] uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95"
                             >
                                 {isLoading ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
                             </button>

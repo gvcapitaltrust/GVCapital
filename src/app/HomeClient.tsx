@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -47,56 +47,56 @@ export default function HomeClient() {
         },
         zh: {
             nav: {
-                services: "服务",
-                about: "关于我们",
-                contact: "联系我们",
-                login: "客户登录",
+                services: "鏈嶅姟",
+                about: "鍏充簬鎴戜滑",
+                contact: "鑱旂郴鎴戜滑",
+                login: "瀹㈡埛鐧诲綍",
             },
             hero: {
-                title: "GV 资本信托",
-                slogan: "信任 · 诚信 · 自由",
-                description: "您在财富管理和财务自由方面的合作伙伴。我们致力于以诚信和卓越提供定制的信托服务。",
+                title: "GV 璧勬湰淇℃墭",
+                slogan: "淇′换 路 璇氫俊 路 鑷敱",
+                description: "鎮ㄥ湪璐㈠瘜绠＄悊鍜岃储鍔¤嚜鐢辨柟闈㈢殑鍚堜綔浼欎即銆傛垜浠嚧鍔涗簬浠ヨ瘹淇″拰鍗撹秺鎻愪緵瀹氬埗鐨勪俊鎵樻湇鍔°€?,
             },
-            cta: "立即开始",
+            cta: "绔嬪嵆寮€濮?,
         },
     };
 
     const t = content[lang];
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-gv-gold selection:text-black flex flex-col">
+        <div className="min-h-screen bg-[#0F0F0F] text-white selection:bg-gv-gold selection:text-black flex flex-col">
             {/* Navigation */}
-            <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-md">
-                <div className="flex items-center justify-between px-6 py-4 md:h-20">
+            <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0F0F0F]/80 backdrop-blur-md">
+                <div className="main-container flex items-center justify-between py-4 md:h-20">
                     <div className="flex items-center">
                         <Link href={`/?lang=${lang}`} className="flex items-center shrink-0">
                             <img
                                 src="/logo.png"
                                 alt="GV Capital Trust Logo"
-                                className="max-h-[40px] md:max-h-[50px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(238,206,128,0.3)]"
+                                className="h-8 md:h-12 w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]"
                             />
                         </Link>
                     </div>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex flex-1 justify-center items-center gap-10 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+                    <div className="hidden md:flex flex-1 justify-center items-center gap-10 text-[12px] font-bold uppercase tracking-[0.1em] text-zinc-500">
                         <Link href={`/products?lang=${lang}`} className="hover:text-gv-gold transition-colors">{t.nav.services}</Link>
                         <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
                         <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="hidden md:flex items-center gap-4">
+                        <div className="hidden md:flex items-center gap-6">
                             <button
                                 onClick={() => setLang(lang === "en" ? "zh" : "en")}
-                                className="hidden lg:block rounded-full border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-zinc-500"
+                                className="hidden lg:block rounded-lg border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all duration-300 duration-300 text-zinc-500"
                             >
-                                {lang === "en" ? "中文" : "EN"}
+                                {lang === "en" ? "涓枃" : "EN"}
                             </button>
 
                             <Link
                                 href={`/login?lang=${lang}`}
-                                className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest text-black shadow-lg hover:-translate-y-1 transition-all active:scale-95"
+                                className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-lg text-[12px] font-bold uppercase tracking-[0.1em] text-black shadow-lg hover:-translate-y-1 transition-all duration-300 duration-300 active:scale-95 whitespace-nowrap"
                             >
                                 {t.nav.login}
                             </Link>
@@ -120,7 +120,7 @@ export default function HomeClient() {
 
                 {/* Mobile Navigation Drawer */}
                 {isMenuOpen && (
-                    <div className="md:hidden absolute top-full left-0 w-full bg-[#0a0a0a] border-b border-white/5 animate-in slide-in-from-top duration-300 shadow-2xl">
+                    <div className="md:hidden absolute top-full left-0 w-full bg-[#0F0F0F] border-b border-white/5 animate-in slide-in-from-top duration-300 shadow-2xl">
                         <div className="flex flex-col p-6 gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
                             <Link href={`/products?lang=${lang}`} onClick={() => setIsMenuOpen(false)} className="hover:text-gv-gold transition-colors">{t.nav.services}</Link>
                             <Link href="#" onClick={() => setIsMenuOpen(false)} className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
@@ -134,12 +134,12 @@ export default function HomeClient() {
                                     }}
                                     className="w-full text-left py-2 hover:text-gv-gold transition-colors"
                                 >
-                                    {lang === "en" ? "切换至中文" : "SWITCH TO ENGLISH"}
+                                    {lang === "en" ? "鍒囨崲鑷充腑鏂? : "SWITCH TO ENGLISH"}
                                 </button>
                                 <Link
                                     href={`/login?lang=${lang}`}
                                     onClick={() => setIsMenuOpen(false)}
-                                    className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-full text-center text-[10px] font-black uppercase tracking-widest text-black shadow-lg"
+                                    className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-lg text-center text-[10px] font-black uppercase tracking-widest text-black shadow-lg hover:shadow-gv-gold/20 transition-all duration-300 duration-300"
                                 >
                                     {t.nav.login}
                                 </Link>
@@ -150,15 +150,15 @@ export default function HomeClient() {
             </nav>
 
             {/* Hero Section */}
-            <main className="relative flex flex-col items-center justify-center pt-32 pb-20 px-6 text-center flex-1 w-full">
+            <main className="main-container relative flex flex-col items-center justify-center pt-[150px] md:pt-[200px] pb-20 text-center flex-1">
                 {/* Decorative background element */}
-                <div className="absolute top-1/2 left-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gv-gold/10 blur-[120px]"></div>
+                <div className="absolute top-1/2 left-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-gv-gold/10 blur-[120px]"></div>
 
                 <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                    <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.3em] text-gv-gold">
+                    <h2 className="mb-4 text-[12px] font-bold uppercase tracking-[0.1em] text-gv-gold">
                         {t.hero.slogan}
                     </h2>
-                    <h1 className="mb-8 text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl">
+                    <h1 className="mb-8 text-5xl font-bold tracking-[-0.02em] sm:text-7xl lg:text-8xl">
                         <span className="block text-white">{t.hero.title}</span>
                     </h1>
                     <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-zinc-400 sm:text-xl">
@@ -168,7 +168,7 @@ export default function HomeClient() {
                     <div className="flex flex-col gap-6 sm:flex-row sm:justify-center">
                         <Link
                             href={`/register?lang=${lang}`}
-                            className="bg-gv-gold-gradient metallic-shine inline-flex items-center justify-center rounded-full px-12 py-5 text-sm font-black uppercase tracking-[0.2em] text-black shadow-2xl hover:-translate-y-1 transition-all group"
+                            className="bg-gv-gold-gradient metallic-shine inline-flex items-center justify-center rounded-lg px-12 py-5 text-[14px] font-bold uppercase tracking-[0.1em] text-black shadow-2xl hover:-translate-y-1 transition-all duration-300 duration-300 group"
                         >
                             <span className="relative">{t.cta}</span>
                             <svg
@@ -180,24 +180,24 @@ export default function HomeClient() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </Link>
-                        <button className="rounded-full border border-white/10 px-12 py-5 text-sm font-black uppercase tracking-[0.2em] text-white hover:bg-white/5 transition-all">
+                        <button className="rounded-lg border border-white/10 px-12 py-5 text-sm font-black uppercase tracking-[0.2em] text-white hover:bg-white/5 transition-all duration-300 duration-300">
                             {t.nav.about}
                         </button>
                     </div>
                 </div>
 
                 {/* Feature Grid placeholder */}
-                <div className="mt-32 grid grid-cols-1 gap-8 sm:grid-cols-3 max-w-6xl w-full">
+                <div className="mt-32 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="group rounded-2xl border border-white/5 bg-white/5 p-8 transition-all hover:border-gv-gold/30 hover:bg-white/10">
-                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gv-gold/20 text-gv-gold">
-                                <div className="h-6 w-6 border-2 border-gv-gold rounded-full"></div>
+                        <div key={i} className="group rounded-lg border border-white/5 bg-white/5 p-8 transition-all duration-300 hover:border-gv-gold/30 hover:bg-white/10">
+                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gv-gold/20 text-gv-gold">
+                                <div className="h-6 w-6 border-2 border-gv-gold rounded-lg"></div>
                             </div>
-                            <h3 className="mb-2 text-xl font-bold">{lang === "en" ? `Premium Service ${i}` : `卓越服务 ${i}`}</h3>
+                            <h3 className="mb-2 text-xl font-bold">{lang === "en" ? `Premium Service ${i}` : `鍗撹秺鏈嶅姟 ${i}`}</h3>
                             <p className="text-zinc-400 text-sm leading-relaxed">
                                 {lang === "en"
                                     ? "Global asset allocation and wealth protection strategies tailored to your specific financial goals."
-                                    : "针对您的特定财务目标量身定制的全球资产配置和财富保护策略。"}
+                                    : "閽堝鎮ㄧ殑鐗瑰畾璐㈠姟鐩爣閲忚韩瀹氬埗鐨勫叏鐞冭祫浜ч厤缃拰璐㈠瘜淇濇姢绛栫暐銆?}
                             </p>
                         </div>
                     ))}

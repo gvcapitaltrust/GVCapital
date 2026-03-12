@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
+  --background: #0F0F0F;
   --foreground: #ededed;
   --color-gv-gold: #D4AF37;
 }
@@ -10,12 +10,12 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-gv-gold: var(--color-gv-gold);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-montserrat);
 }
 
 :root {
-  --background: #0a0a0a;
+  --background: #0F0F0F;
   --foreground: #ededed;
 }
 
@@ -30,8 +30,28 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
   overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.nav-link, button, .cta-button, input, select, textarea {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+button, .cta-button {
+  border-radius: 8px !important;
 }
 
 img {
@@ -55,7 +75,7 @@ img {
   }
 
   .bg-gv-gold-gradient {
-    background: linear-gradient(135deg, #EECE80 0%, #B8860B 50%, #EECE80 100%);
+    background: linear-gradient(135deg, #D4AF37 0%, #B8860B 50%, #D4AF37 100%);
     background-size: 200% auto;
     transition: 0.5s;
     border: none;

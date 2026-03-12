@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState, ChangeEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -514,7 +514,7 @@ export default function DashboardClient() {
             setIsEditingProfile(false);
             // Update local user state
             setUser((prev: any) => ({ ...prev, ...profileForm, fullName: profileForm.full_name }));
-            alert(lang === "en" ? "Profile updated successfully." : "个人资料已成功更新。");
+            alert(lang === "en" ? "Profile updated successfully." : "涓汉璧勬枡宸叉垚鍔熸洿鏂般€?);
         } catch (err: any) {
             alert(err.message);
         } finally {
@@ -613,7 +613,7 @@ export default function DashboardClient() {
 
     const handleKycSubmit = async () => {
         if (!idPhoto || !signature || !occupation || !bankName || !accountNumber) {
-            alert(lang === "en" ? "Please complete all required fields and upload your ID." : "请填写所有必填字段并上传您的证件照片。");
+            alert(lang === "en" ? "Please complete all required fields and upload your ID." : "璇峰～鍐欐墍鏈夊繀濉瓧娈靛苟涓婁紶鎮ㄧ殑璇佷欢鐓х墖銆?);
             return;
         }
 
@@ -675,7 +675,7 @@ export default function DashboardClient() {
             deposit: "Deposit",
             withdraw: "Withdraw",
             history: "Transaction History",
-            unverifiedBanner: "⚠️ Account Unverified. Access to Deposits, Withdrawals, and Trading is restricted.",
+            unverifiedBanner: "鈿狅笍 Account Unverified. Access to Deposits, Withdrawals, and Trading is restricted.",
             verifyNow: "Verify Now",
             securityPin: "Withdrawal Security PIN",
             enterPin: "Enter your 6-digit withdrawal PIN to authorize this request.",
@@ -703,42 +703,42 @@ export default function DashboardClient() {
             pendingVerification: "Account Pending Verification. Please contact your Agent or Admin to activate your account.",
         },
         zh: {
-            welcome: "欢迎回来，",
-            nav: "控制台",
-            logout: "退出登录",
-            totalAssets: "总资产",
-            activeInvestment: "活跃投资",
-            totalProfit: "总收益",
-            totalEquity: "总权益",
-            deposit: "入金",
-            withdraw: "提款",
-            history: "交易历史",
-            unverifiedBanner: "⚠️ 账户未核实。存款、取款和交易功能受限。",
-            verifyNow: "立即核实",
-            securityPin: "取款安全密码",
-            enterPin: "请输入您的 6 位取款密码以授权此申请。",
-            confirmWithdraw: "授权提款",
-            successTitle: "提交成功",
-            successDesc: "我们的团队将在 24 小时内审核您的申请。",
-            whatsapp: "通过 WhatsApp 联系支持",
-            expectedMonthly: "预计月度股息",
-            projectedYearly: "预计年度利润",
-            latestDeposit: "最新存款状态",
-            dividendTrends: "6 个月股息趋势",
-            downloadStatement: "下载月度账单",
-            referTitle: "推荐朋友",
-            referSubtitle: "邀请他人加入 GV 资本，共同发展社区。",
-            copyCode: "复制推荐码",
-            copied: "已复制!",
-            shareWA: "在 WhatsApp 上分享",
-            totalReferred: "已成功推荐人数",
-            securityTitle: "安全设置",
-            securitySubtitle: "更新您的账户密码以确保您的资金得到保护。",
-            currentPass: "当前密码",
-            newPass: "新密码",
-            confirmPass: "确认新密码",
-            updateBtn: "更新密码",
-            pendingVerification: "账户待审核。请联系您的代理或管理员以激活您的账户。",
+            welcome: "娆㈣繋鍥炴潵锛?,
+            nav: "鎺у埗鍙?,
+            logout: "閫€鍑虹櫥褰?,
+            totalAssets: "鎬昏祫浜?,
+            activeInvestment: "娲昏穬鎶曡祫",
+            totalProfit: "鎬绘敹鐩?,
+            totalEquity: "鎬绘潈鐩?,
+            deposit: "鍏ラ噾",
+            withdraw: "鎻愭",
+            history: "浜ゆ槗鍘嗗彶",
+            unverifiedBanner: "鈿狅笍 璐︽埛鏈牳瀹炪€傚瓨娆俱€佸彇娆惧拰浜ゆ槗鍔熻兘鍙楅檺銆?,
+            verifyNow: "绔嬪嵆鏍稿疄",
+            securityPin: "鍙栨瀹夊叏瀵嗙爜",
+            enterPin: "璇疯緭鍏ユ偍鐨?6 浣嶅彇娆惧瘑鐮佷互鎺堟潈姝ょ敵璇枫€?,
+            confirmWithdraw: "鎺堟潈鎻愭",
+            successTitle: "鎻愪氦鎴愬姛",
+            successDesc: "鎴戜滑鐨勫洟闃熷皢鍦?24 灏忔椂鍐呭鏍告偍鐨勭敵璇枫€?,
+            whatsapp: "閫氳繃 WhatsApp 鑱旂郴鏀寔",
+            expectedMonthly: "棰勮鏈堝害鑲℃伅",
+            projectedYearly: "棰勮骞村害鍒╂鼎",
+            latestDeposit: "鏈€鏂板瓨娆剧姸鎬?,
+            dividendTrends: "6 涓湀鑲℃伅瓒嬪娍",
+            downloadStatement: "涓嬭浇鏈堝害璐﹀崟",
+            referTitle: "鎺ㄨ崘鏈嬪弸",
+            referSubtitle: "閭€璇蜂粬浜哄姞鍏?GV 璧勬湰锛屽叡鍚屽彂灞曠ぞ鍖恒€?,
+            copyCode: "澶嶅埗鎺ㄨ崘鐮?,
+            copied: "宸插鍒?",
+            shareWA: "鍦?WhatsApp 涓婂垎浜?,
+            totalReferred: "宸叉垚鍔熸帹鑽愪汉鏁?,
+            securityTitle: "瀹夊叏璁剧疆",
+            securitySubtitle: "鏇存柊鎮ㄧ殑璐︽埛瀵嗙爜浠ョ‘淇濇偍鐨勮祫閲戝緱鍒颁繚鎶ゃ€?,
+            currentPass: "褰撳墠瀵嗙爜",
+            newPass: "鏂板瘑鐮?,
+            confirmPass: "纭鏂板瘑鐮?,
+            updateBtn: "鏇存柊瀵嗙爜",
+            pendingVerification: "璐︽埛寰呭鏍搞€傝鑱旂郴鎮ㄧ殑浠ｇ悊鎴栫鐞嗗憳浠ユ縺娲绘偍鐨勮处鎴枫€?,
         },
     };
 
@@ -755,7 +755,7 @@ export default function DashboardClient() {
     // Instead, we will conditionally render the content inside the main area.
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white flex font-sans overflow-hidden relative">
+        <div className="min-h-screen bg-[#0F0F0F] text-white flex font-sans overflow-hidden relative">
             <title>{`Dashboard | GV Capital Trust`}</title>
 
             {/* Mobile Menu Overlay */}
@@ -768,39 +768,39 @@ export default function DashboardClient() {
 
             <aside className={`
                 fixed md:relative z-[101] h-full w-64 border-r border-white/10 p-6 flex flex-col justify-between 
-                bg-[#0a0a0a] transition-transform duration-300 md:translate-x-0
+                bg-[#0F0F0F] transition-transform duration-300 md:translate-x-0
                 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
             `}>
                 <div className="space-y-12">
                     <div className="flex items-center gap-2">
-                        <img src="/logo.png" alt="GV Capital" className="h-[50px] w-auto object-contain mix-blend-screen" />
+                        <img src="/logo.png" alt="GV Capital" className="h-10 md:h-12 w-auto object-contain mix-blend-screen" />
                     </div>
 
                     <nav className="space-y-2">
                         <button
                             onClick={() => setActiveTab("overview")}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "overview" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-lg text-[12px] font-bold uppercase tracking-[0.1em] transition-all duration-300 duration-300 ${activeTab === "overview" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                             {t.nav}
                         </button>
                         <button
                             onClick={() => setActiveTab("statements")}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "statements" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-lg text-[12px] font-bold uppercase tracking-[0.1em] transition-all duration-300 duration-300 ${activeTab === "statements" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                             Statements
                         </button>
                         <button
                             onClick={() => setActiveTab("security")}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "security" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-lg text-[12px] font-bold uppercase tracking-[0.1em] transition-all duration-300 duration-300 ${activeTab === "security" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             Security
                         </button>
                         <button
                             onClick={() => setActiveTab("profile")}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "profile" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-lg text-[12px] font-bold uppercase tracking-[0.1em] transition-all duration-300 duration-300 ${activeTab === "profile" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                             Profile
@@ -809,15 +809,15 @@ export default function DashboardClient() {
                 </div>
                 <div className="space-y-4">
                     {/* DEBUG MODE INFO */}
-                    <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-left space-y-1">
+                    <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-lg text-left space-y-1">
                         <div className="text-[9px] font-black uppercase text-red-500 tracking-widest">Debug Mode</div>
                         <div className="text-[10px] text-white/50 font-mono truncate">{user?.email}</div>
                         <div className="text-xs text-white font-mono">Role: {user?.role || 'null'}</div>
                         <div className="text-xs text-white font-mono">Verified: {String(user?.is_verified)}</div>
                     </div>
 
-                    <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/5 transition-all text-zinc-400">
-                        {lang === "en" ? "切换至 简体中文" : "Switch to English"}
+                    <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="w-full rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/5 transition-all duration-300 duration-300 text-zinc-400">
+                        {lang === "en" ? "鍒囨崲鑷?绠€浣撲腑鏂? : "Switch to English"}
                     </button>
                     <button onClick={handleLogout} className="w-full text-zinc-500 hover:text-red-400 transition-colors text-sm font-medium flex items-center gap-3 px-4 py-2">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
@@ -826,28 +826,28 @@ export default function DashboardClient() {
                 </div>
             </aside>
 
-            <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#0a0a0a] relative flex flex-col">
+            <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#0F0F0F] relative flex flex-col">
                 <CurrencyExchangeTicker />
-                <div className="max-w-[1440px] mx-auto w-full space-y-12 flex-1 pb-20 p-4 md:p-12">
+                <div className="main-container space-y-12 flex-1 pb-20 p-4 md:p-12">
                     <header className="flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="flex flex-col items-center md:items-start w-full md:w-auto">
                             <div className="md:hidden mb-6">
-                                <img src="/logo.png" alt="GV Capital" className="h-[40px] md:h-[50px] w-auto object-contain mix-blend-screen" />
+                                <img src="/logo.png" alt="GV Capital" className="h-8 md:h-12 w-auto object-contain mix-blend-screen" />
                             </div>
-                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em] mb-2">{t.nav}</p>
-                            <h1 className="text-3xl md:text-5xl font-black text-center md:text-left">
-                                {t.welcome}<span className="text-gv-gold tracking-tighter drop-shadow-[0_0_15px_rgba(238,206,128,0.3)]">{user?.fullName || "Member"}</span>
+                            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">{t.nav}</p>
+                            <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left tracking-[-0.02em]">
+                                {t.welcome}<span className="text-gv-gold tracking-tighter drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]">{user?.fullName || "Member"}</span>
                             </h1>
                         </div>
-                        <div className="flex items-center gap-4 md:gap-6 bg-white/5 p-2 rounded-2xl border border-white/10 glass-card">
+                        <div className="flex items-center gap-4 md:gap-6 bg-white/5 p-2 rounded-lg border border-white/10 glass-card">
                             <button 
                                 onClick={() => setIsMobileMenuOpen(true)}
-                                className="md:hidden h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10"
+                                className="md:hidden h-12 w-12 rounded-lg bg-white/5 flex items-center justify-center border border-white/10"
                             >
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                             </button>
                             {user && <NotificationBell userId={user.id} />}
-                            <div className="h-14 w-14 rounded-2xl bg-gv-gold-gradient metallic-shine flex items-center justify-center font-black text-black text-xl border border-gv-gold/30 shadow-lg capitalize">
+                            <div className="h-14 w-14 rounded-lg bg-gv-gold-gradient metallic-shine flex items-center justify-center font-black text-black text-xl border border-gv-gold/30 shadow-lg capitalize">
                                 {user?.fullName?.[0] || user?.email?.[0] || "U"}
                             </div>
                         </div>
@@ -857,7 +857,7 @@ export default function DashboardClient() {
                         <>
                             {(!user?.is_verified && user?.email !== "thenja96@gmail.com") ? (
                                 (user?.kyc_status === 'Pending' || user?.kyc_status === 'pending') ? (
-                                    <div className="bg-amber-400 p-12 rounded-[40px] text-center space-y-8 py-24 animate-in fade-in zoom-in-95 duration-700 max-w-3xl mx-auto shadow-[0_30px_60px_rgba(0,0,0,0.5)] border border-amber-500/20">
+                                    <div className="bg-amber-400 p-12 rounded-lg text-center space-y-8 py-24 animate-in fade-in zoom-in-95 duration-700 max-w-3xl mx-auto shadow-[0_30px_60px_rgba(0,0,0,0.5)] border border-amber-500/20">
                                         <div className="h-28 w-28 bg-amber-950/20 rounded-full flex items-center justify-center mx-auto border-4 border-amber-950/10">
                                             <svg className="h-16 w-16 text-amber-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -871,7 +871,7 @@ export default function DashboardClient() {
                                         </div>
                                     </div>
                                 ) : (user?.kyc_status === 'Rejected' || user?.kyc_status === 'rejected') && !isReuploading ? (
-                                    <div className="bg-red-500 p-12 rounded-[40px] text-center space-y-8 py-24 animate-in fade-in zoom-in-95 duration-700 max-w-3xl mx-auto shadow-[0_30px_60px_rgba(239,68,68,0.3)] border border-red-600/20">
+                                    <div className="bg-red-500 p-12 rounded-lg text-center space-y-8 py-24 animate-in fade-in zoom-in-95 duration-700 max-w-3xl mx-auto shadow-[0_30px_60px_rgba(239,68,68,0.3)] border border-red-600/20">
                                         <div className="h-28 w-28 bg-white/20 rounded-full flex items-center justify-center mx-auto border-4 border-white/10">
                                             <svg className="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -879,10 +879,10 @@ export default function DashboardClient() {
                                         </div>
                                         <div className="space-y-6 text-white">
                                             <h2 className="text-4xl font-black uppercase tracking-tighter">Verification Unsuccessful</h2>
-                                            <div className="bg-white/10 p-6 rounded-3xl border border-white/20 max-w-2xl mx-auto">
+                                            <div className="bg-white/10 p-6 rounded-lg border border-white/20 max-w-2xl mx-auto">
                                                 <p className="text-white font-bold text-xl leading-relaxed">
                                                     Our team was unable to verify your documents for the following reason:<br/>
-                                                    <span className="text-black bg-white/90 px-3 py-1 mt-3 inline-block rounded-xl font-black uppercase tracking-tight">
+                                                    <span className="text-black bg-white/90 px-3 py-1 mt-3 inline-block rounded-lg font-black uppercase tracking-tight">
                                                         {user?.rejection_reason || "Invalid Document Clarity / Mismatch Information"}
                                                     </span>
                                                 </p>
@@ -890,14 +890,14 @@ export default function DashboardClient() {
                                             <p className="text-white/80 font-medium">Please re-upload a clear copy of your ID to proceed.</p>
                                             <button 
                                                 onClick={() => router.push(`/verify?lang=${lang}`)}
-                                                className="bg-white text-red-600 font-black px-10 py-5 rounded-2xl uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all"
+                                                className="bg-white text-red-600 font-black px-10 py-5 rounded-lg uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all duration-300"
                                             >
                                                 Re-upload Documents
                                             </button>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="bg-[#1a1a1a] p-12 rounded-[40px] border border-white/5 shadow-xl space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700 text-center py-20">
+                                    <div className="bg-[#1a1a1a] p-12 rounded-lg border border-white/5 shadow-xl space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700 text-center py-20">
                                         <div className="h-24 w-24 bg-gv-gold/10 rounded-full flex items-center justify-center mx-auto text-gv-gold shadow-[0_0_50px_rgba(212,175,55,0.1)]">
                                             <svg className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                                         </div>
@@ -913,7 +913,7 @@ export default function DashboardClient() {
                                         </div>
                                         <Link 
                                             href={`/verify?lang=${lang}`}
-                                            className="inline-block bg-gv-gold text-black font-black text-xl px-12 py-5 rounded-[28px] hover:bg-gv-gold/90 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)] uppercase tracking-widest"
+                                            className="inline-block bg-gv-gold text-black font-black text-xl px-12 py-5 rounded-[28px] hover:bg-gv-gold/90 transition-all duration-300 shadow-[0_20px_40px_rgba(212,175,55,0.2)] uppercase tracking-widest"
                                         >
                                             {user?.kyc_status === 'Draft' || (user?.kyc_step && user.kyc_step > 1) ? "Resume Verification" : "Start Verification"}
                                         </Link>
@@ -924,11 +924,11 @@ export default function DashboardClient() {
                                     {/* Dual Wallet Cards */}
                                     <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         {/* Locked Capital Wallet */}
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl relative overflow-hidden group hover:border-amber-500/20 transition-all">
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-lg shadow-xl relative overflow-hidden group hover:border-amber-500/20 transition-all duration-300">
                                             <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
                                             <div className="relative z-10">
                                                 <div className="flex items-center gap-3 mb-6">
-                                                    <div className="h-10 w-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                                                    <div className="h-10 w-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
                                                         <svg className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                                     </div>
                                                     <div>
@@ -946,7 +946,7 @@ export default function DashboardClient() {
                                                 )}
                                                 {/* Lock Countdown */}
                                                 {earliestUnlock && lockCountdown && lockCountdown !== "Unlocked" && (
-                                                    <div className="mt-6 flex items-center gap-3 bg-amber-500/5 border border-amber-500/10 rounded-2xl px-5 py-4">
+                                                    <div className="mt-6 flex items-center gap-3 bg-amber-500/5 border border-amber-500/10 rounded-lg px-5 py-4">
                                                         <svg className="h-4 w-4 text-amber-500 shrink-0 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                         <div>
                                                             <p className="text-[9px] font-black text-amber-500/70 uppercase tracking-widest">Next Unlock In</p>
@@ -955,7 +955,7 @@ export default function DashboardClient() {
                                                     </div>
                                                 )}
                                                 {lockCountdown === "Unlocked" && (
-                                                    <div className="mt-6 flex items-center gap-3 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl px-5 py-4">
+                                                    <div className="mt-6 flex items-center gap-3 bg-emerald-500/5 border border-emerald-500/10 rounded-lg px-5 py-4">
                                                         <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                         <p className="text-sm font-black text-emerald-400 uppercase tracking-widest">Capital Unlocked</p>
                                                     </div>
@@ -964,11 +964,11 @@ export default function DashboardClient() {
                                         </div>
 
                                         {/* Available Dividends Wallet */}
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl relative overflow-hidden group hover:border-emerald-500/20 transition-all">
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-lg shadow-xl relative overflow-hidden group hover:border-emerald-500/20 transition-all duration-300">
                                             <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
                                             <div className="relative z-10">
                                                 <div className="flex items-center gap-3 mb-6">
-                                                    <div className="h-10 w-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                                    <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                                                         <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                     </div>
                                                     <div>
@@ -993,9 +993,9 @@ export default function DashboardClient() {
                                     </section>
 
                                     {/* Total Assets Summary */}
-                                    <section className="bg-[#111] border border-white/5 p-8 rounded-[32px] flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                    <section className="bg-[#111] border border-white/5 p-8 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-6">
                                         <div className="flex items-center gap-4">
-                                            <div className="h-12 w-12 rounded-2xl bg-gv-gold/10 border border-gv-gold/20 flex items-center justify-center">
+                                            <div className="h-12 w-12 rounded-lg bg-gv-gold/10 border border-gv-gold/20 flex items-center justify-center">
                                                 <svg className="h-6 w-6 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
                                             </div>
                                             <div>
@@ -1013,15 +1013,15 @@ export default function DashboardClient() {
                                     </section>
 
                             <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
-                                    <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
+                                <div className="bg-[#111] border border-white/5 p-10 rounded-lg relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all duration-300">
                                         <svg className="h-20 w-20 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                     </div>
                                     <h3 className="text-3xl font-black text-white">RM {(user?.total_assets * monthlyRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
                                     <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Based on {(monthlyRate * 100).toFixed(0)}% Monthly Return</p>
                                 </div>
-                                <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
-                                    <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
+                                <div className="bg-[#111] border border-white/5 p-10 rounded-lg relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all duration-300">
                                         <svg className="h-20 w-20 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                     </div>
                                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
@@ -1031,13 +1031,13 @@ export default function DashboardClient() {
                             </section>
 
                             <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                <div className="lg:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8">
+                                <div className="lg:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-lg space-y-8">
                                     <h3 className="text-xl font-black uppercase tracking-tighter">{t.dividendTrends}</h3>
                                     <div className="h-64 flex items-end justify-between gap-4 px-4">
                                         {dividendHistory.length > 0 ? dividendHistory.map((div: any, i: number) => (
                                             <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
                                                 <div
-                                                    className="w-full bg-gv-gold-gradient metallic-shine rounded-t-xl transition-all duration-500 group-hover:brightness-110"
+                                                    className="w-full bg-gv-gold-gradient metallic-shine rounded-t-xl transition-all duration-300 duration-500 group-hover:brightness-110"
                                                     style={{ height: `${Math.max(10, (div.amount / (Math.max(...dividendHistory.map((d: any) => d.amount)) || 1)) * 100)}%` }}
                                                 ></div>
                                                 <span className="text-[8px] font-black text-zinc-600 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
@@ -1047,7 +1047,7 @@ export default function DashboardClient() {
                                         )}
                                     </div>
                                 </div>
-                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] flex flex-col justify-center items-center text-center space-y-6">
+                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-lg flex flex-col justify-center items-center text-center space-y-6">
                                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{t.latestDeposit}</p>
                                     {transactions.find((t: any) => t.type === 'Deposit') ? (
                                         <>
@@ -1068,7 +1068,7 @@ export default function DashboardClient() {
                             <section className="flex flex-col sm:flex-row gap-6">
                                 <Link
                                     href={`/deposit?lang=${lang}`}
-                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gv-gold text-black hover:bg-gv-gold/90 hover:-translate-y-1 shadow-[0_15px_30px_rgba(212,175,55,0.2)]" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
+                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all duration-300 flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gv-gold text-black hover:bg-gv-gold/90 hover:-translate-y-1 shadow-[0_15px_30px_rgba(212,175,55,0.2)]" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
                                     onClick={(e) => handleProtectedAction(e, () => router.push(`/deposit?lang=${lang}`))}
                                 >
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4v16m8-8H4" /></svg>
@@ -1076,21 +1076,21 @@ export default function DashboardClient() {
                                 </Link>
                                 <button
                                     onClick={(e) => handleProtectedAction(e, () => setIsWithdrawModalOpen(true))}
-                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gv-gold-gradient metallic-shine text-black shadow-lg hover:-translate-y-1" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
+                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all duration-300 flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gv-gold-gradient metallic-shine text-black shadow-lg hover:-translate-y-1" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
                                 >
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                                     {t.withdraw}
                                 </button>
                             </section>
 
-                            <section className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
+                            <section className="bg-[#1a1a1a] border border-white/5 p-10 rounded-lg relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-96 h-96 bg-gv-gold/5 blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
                                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-10">
                                     <div className="space-y-4 max-w-lg">
                                         <h3 className="text-2xl font-black uppercase tracking-tighter">{t.referTitle}</h3>
                                         <p className="text-zinc-500 font-medium leading-relaxed">{t.referSubtitle}</p>
                                         <div className="flex items-center gap-4 mt-8">
-                                            <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl">
+                                            <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-lg">
                                                 <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-1">Your Code</p>
                                                 <p className="text-xl font-black text-gv-gold tracking-widest">{user?.id}</p>
                                             </div>
@@ -1099,14 +1099,14 @@ export default function DashboardClient() {
                                                     navigator.clipboard.writeText(user?.id);
                                                     alert(t.copied);
                                                 }}
-                                                className="h-full px-6 py-4 bg-gv-gold text-black font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-gv-gold/90 transition-all shadow-lg"
+                                                className="h-full px-6 py-4 bg-gv-gold text-black font-black text-xs uppercase tracking-widest rounded-lg hover:bg-gv-gold/90 transition-all duration-300 shadow-lg"
                                             >
                                                 {t.copyCode}
                                             </button>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-center gap-6 text-center md:text-right md:items-end">
-                                        <div className="bg-[#222] border border-white/10 p-6 rounded-[32px] w-full md:w-auto">
+                                        <div className="bg-[#222] border border-white/10 p-6 rounded-lg w-full md:w-auto">
                                             <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-1">{t.totalReferred}</p>
                                             <h4 className="text-4xl font-black text-white">{referredCount}</h4>
                                         </div>
@@ -1115,7 +1115,7 @@ export default function DashboardClient() {
                                                 const url = typeof window !== 'undefined' ? `${window.location.origin}/register?ref=${user?.id}` : `https://gvcapital.com/register?ref=${user?.id}`;
                                                 window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t.referSubtitle + " " + url)}`);
                                             }}
-                                            className="flex items-center gap-3 bg-[#25D366] text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl"
+                                            className="flex items-center gap-3 bg-[#25D366] text-white px-8 py-4 rounded-lg font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all duration-300 shadow-xl"
                                         >
                                             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.41 0 .01 5.403.01 12.039c0 2.121.554 4.191 1.607 6.039L0 24l6.135-1.61a11.748 11.748 0 005.911 1.586h.005c6.637 0 12.04-5.403 12.04-12.039a11.82 11.82 0 00-3.417-8.416" /></svg>
                                             {t.shareWA}
@@ -1129,13 +1129,13 @@ export default function DashboardClient() {
                                     <h3 className="text-2xl font-black uppercase tracking-tighter">{t.history}</h3>
                                     <button
                                         onClick={() => generateStatement()}
-                                        className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black text-xs py-3 px-6 rounded-xl uppercase tracking-widest transition-all flex items-center gap-2 w-full sm:w-auto justify-center"
+                                        className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black text-xs py-3 px-6 rounded-lg uppercase tracking-widest transition-all duration-300 flex items-center gap-2 w-full sm:w-auto justify-center"
                                     >
                                         <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
                                         {t.downloadStatement}
                                     </button>
                                 </div>
-                                <div className="border border-white/10 rounded-[30px] md:rounded-[40px] overflow-hidden bg-[#1a1a1a]/30 glass-card metallic-shine shadow-2xl">
+                                <div className="border border-white/10 rounded-[30px] md:rounded-lg overflow-hidden bg-[#1a1a1a]/30 glass-card metallic-shine shadow-2xl">
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-left min-w-[600px] md:min-w-0">
                                         <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
@@ -1153,7 +1153,7 @@ export default function DashboardClient() {
                                                             <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-8 py-6 text-right"><span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' : tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>{tx.status}</span></td>
+                                                    <td className="px-8 py-6 text-right"><span className={`px-4 py-2 rounded-lg text-[9px] uppercase font-black tracking-widest ${tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' : tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>{tx.status}</span></td>
                                                 </tr>
                                             ))}
                                             {transactions.length === 0 && (
@@ -1170,8 +1170,8 @@ export default function DashboardClient() {
                 </>
             ) : activeTab === "statements" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl overflow-hidden relative group">
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
+                            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-lg shadow-2xl overflow-hidden relative group">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-300 duration-1000"></div>
                                 <div className="relative z-10 max-w-2xl">
                                     <h2 className="text-3xl font-black uppercase tracking-tighter mb-4 text-white">Statement Center</h2>
                                     <p className="text-zinc-500 font-medium mb-12">Select your desired period to generate and download a professional investment statement.</p>
@@ -1182,7 +1182,7 @@ export default function DashboardClient() {
                                             <select
                                                 value={selectedMonth}
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedMonth(parseInt(e.target.value))}
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all duration-300 appearance-none cursor-pointer"
                                             >
                                                 {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((m, i) => (
                                                     <option key={i} value={i} className="bg-[#1a1a1a] text-white">{m}</option>
@@ -1194,7 +1194,7 @@ export default function DashboardClient() {
                                             <select
                                                 value={selectedYear}
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedYear(parseInt(e.target.value))}
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all duration-300 appearance-none cursor-pointer"
                                             >
                                                 {[2024, 2025, 2026].map(y => (
                                                     <option key={y} value={y} className="bg-[#1a1a1a] text-white">{y}</option>
@@ -1205,7 +1205,7 @@ export default function DashboardClient() {
 
                                     <button
                                         onClick={() => generateStatement()}
-                                        className="bg-gv-gold text-black font-black py-6 px-12 rounded-2xl uppercase tracking-widest shadow-xl hover:shadow-gv-gold/20 hover:-translate-y-1 transition-all active:scale-95 flex items-center gap-4"
+                                        className="bg-gv-gold text-black font-black py-6 px-12 rounded-lg uppercase tracking-widest shadow-xl hover:shadow-gv-gold/20 hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center gap-4"
                                     >
                                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
                                         Generate & Download PDF
@@ -1215,8 +1215,8 @@ export default function DashboardClient() {
                         </section>
                     ) : activeTab === "security" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
+                            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-lg shadow-2xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-300 duration-1000"></div>
                                 <div className="relative z-10 max-w-xl text-center mx-auto space-y-10">
                                     <div>
                                         <h2 className="text-3xl font-black uppercase tracking-tighter mb-2 text-white">{t.securityTitle}</h2>
@@ -1230,8 +1230,8 @@ export default function DashboardClient() {
                                                 name="currentPassword"
                                                 type="password"
                                                 required
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
-                                                placeholder="••••••••"
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all duration-300"
+                                                placeholder="鈥⑩€⑩€⑩€⑩€⑩€⑩€⑩€?
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -1240,8 +1240,8 @@ export default function DashboardClient() {
                                                 name="newPassword"
                                                 type="password"
                                                 required
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
-                                                placeholder="••••••••"
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all duration-300"
+                                                placeholder="鈥⑩€⑩€⑩€⑩€⑩€⑩€⑩€?
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -1250,14 +1250,14 @@ export default function DashboardClient() {
                                                 name="confirmPassword"
                                                 type="password"
                                                 required
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
-                                                placeholder="••••••••"
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all duration-300"
+                                                placeholder="鈥⑩€⑩€⑩€⑩€⑩€⑩€⑩€?
                                             />
                                         </div>
                                         <button
                                             type="submit"
                                             disabled={isSubmitting}
-                                            className="w-full bg-gv-gold text-black font-black py-6 rounded-2xl uppercase tracking-widest shadow-xl hover:shadow-gv-gold/20 hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-4 mt-10"
+                                            className="w-full bg-gv-gold text-black font-black py-6 rounded-lg uppercase tracking-widest shadow-xl hover:shadow-gv-gold/20 hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center gap-4 mt-10"
                                         >
                                             {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.updateBtn}
                                         </button>
@@ -1267,14 +1267,14 @@ export default function DashboardClient() {
                         </section>
                     ) : activeTab === "profile" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
+                            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-lg shadow-2xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-300 duration-1000"></div>
                                 <div className="relative z-10 max-w-2xl mx-auto space-y-10">
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <h2 className="text-3xl font-black uppercase tracking-tighter mb-2 text-white">Profile Management</h2>
                                             <p className="text-zinc-500 font-medium">
-                                                {lang === "en" ? "View and update your personal information." : "查看并更新您的个人信息。"}
+                                                {lang === "en" ? "View and update your personal information." : "鏌ョ湅骞舵洿鏂版偍鐨勪釜浜轰俊鎭€?}
                                             </p>
                                         </div>
                                         {user?.is_verified && (
@@ -1295,7 +1295,7 @@ export default function DashboardClient() {
                                                     value={profileForm.full_name}
                                                     onChange={(e) => setProfileForm({...profileForm, full_name: e.target.value})}
                                                     disabled={!isEditingProfile}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                                 />
                                             </div>
                                             <div className="space-y-2">
@@ -1304,7 +1304,7 @@ export default function DashboardClient() {
                                                     type="email"
                                                     value={user?.email || ""}
                                                     disabled
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold opacity-50 cursor-not-allowed"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-lg font-bold opacity-50 cursor-not-allowed"
                                                 />
                                             </div>
                                         </div>
@@ -1316,7 +1316,7 @@ export default function DashboardClient() {
                                                     value={profileForm.phone}
                                                     onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
                                                     disabled={!isEditingProfile}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                                     placeholder="+60 12345678"
                                                 />
                                             </div>
@@ -1327,7 +1327,7 @@ export default function DashboardClient() {
                                                     value={profileForm.city}
                                                     onChange={(e) => setProfileForm({...profileForm, city: e.target.value})}
                                                     disabled={!isEditingProfile}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                                     placeholder="Kuala Lumpur"
                                                 />
                                             </div>
@@ -1339,13 +1339,13 @@ export default function DashboardClient() {
                                                 value={profileForm.address}
                                                 onChange={(e) => setProfileForm({...profileForm, address: e.target.value})}
                                                 disabled={!isEditingProfile}
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                                 placeholder="Street address"
                                             />
                                         </div>
                                     </div>
 
-                                    {/* Bank Details — Read-Only when KYC verified */}
+                                    {/* Bank Details 鈥?Read-Only when KYC verified */}
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-3">
                                             <h3 className="text-xl font-black uppercase tracking-tighter text-white">Bank Details</h3>
@@ -1357,11 +1357,11 @@ export default function DashboardClient() {
                                             )}
                                         </div>
                                         {user?.is_verified && (
-                                            <div className="bg-amber-500/5 border border-amber-500/10 rounded-2xl px-5 py-3">
+                                            <div className="bg-amber-500/5 border border-amber-500/10 rounded-lg px-5 py-3">
                                                 <p className="text-[10px] font-bold text-amber-500/70 uppercase tracking-widest">
                                                     {lang === "en"
                                                         ? "Bank details are locked after KYC verification for security. Contact support to update."
-                                                        : "银行详情在KYC验证后已锁定以确保安全。如需更新，请联系客服。"}
+                                                        : "閾惰璇︽儏鍦↘YC楠岃瘉鍚庡凡閿佸畾浠ョ‘淇濆畨鍏ㄣ€傚闇€鏇存柊锛岃鑱旂郴瀹㈡湇銆?}
                                                 </p>
                                             </div>
                                         )}
@@ -1372,7 +1372,7 @@ export default function DashboardClient() {
                                                     type="text"
                                                     value={user?.bank_name || ""}
                                                     disabled
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold opacity-50 cursor-not-allowed"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-lg font-bold opacity-50 cursor-not-allowed"
                                                     placeholder="Not set"
                                                 />
                                             </div>
@@ -1382,7 +1382,7 @@ export default function DashboardClient() {
                                                     type="text"
                                                     value={user?.account_number ? `****${user.account_number.slice(-4)}` : ""}
                                                     disabled
-                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold opacity-50 cursor-not-allowed font-mono tracking-widest"
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-lg font-bold opacity-50 cursor-not-allowed font-mono tracking-widest"
                                                     placeholder="Not set"
                                                 />
                                             </div>
@@ -1403,14 +1403,14 @@ export default function DashboardClient() {
                                                             city: user?.city || "",
                                                         });
                                                     }}
-                                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl uppercase tracking-widest text-xs hover:bg-white/10 transition-all"
+                                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-lg uppercase tracking-widest text-xs hover:bg-white/10 transition-all duration-300"
                                                 >
                                                     Cancel
                                                 </button>
                                                 <button
                                                     onClick={handleProfileSave}
                                                     disabled={profileSaving}
-                                                    className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-2xl uppercase tracking-widest text-xs shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-3"
+                                                    className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-lg uppercase tracking-widest text-xs shadow-lg hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3"
                                                 >
                                                     {profileSaving ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : "Save Changes"}
                                                 </button>
@@ -1418,7 +1418,7 @@ export default function DashboardClient() {
                                         ) : (
                                             <button
                                                 onClick={() => setIsEditingProfile(true)}
-                                                className="w-full bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl uppercase tracking-widest text-xs hover:bg-gv-gold hover:text-black transition-all flex items-center justify-center gap-3"
+                                                className="w-full bg-white/5 border border-white/10 text-white font-black py-5 rounded-lg uppercase tracking-widest text-xs hover:bg-gv-gold hover:text-black transition-all duration-300 flex items-center justify-center gap-3"
                                             >
                                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                                 Edit Profile
@@ -1436,7 +1436,7 @@ export default function DashboardClient() {
             {/* Deposit Modal */}
             {isDepositModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[30px] md:rounded-[40px] p-6 md:p-10 max-w-lg w-full space-y-6 md:space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300 overflow-y-auto max-h-[90vh]">
+                    <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[30px] md:rounded-lg p-6 md:p-10 max-w-lg w-full space-y-6 md:space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300 overflow-y-auto max-h-[90vh]">
                         <div className="flex justify-between items-center">
                             <h2 className="text-3xl font-black text-gv-gold tracking-tighter uppercase">Deposit</h2>
                             <button onClick={() => setIsDepositModalOpen(false)} className="text-zinc-600 hover:text-white transition-colors">
@@ -1446,21 +1446,21 @@ export default function DashboardClient() {
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Amount (MYR)</label>
-                                <input type="number" value={depositAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                                <input type="number" value={depositAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all duration-300" placeholder="0.00" />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Transfer Date</label>
-                                <input type="date" value={depositDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-black focus:outline-none focus:border-gv-gold transition-all text-white inverted-scheme-date-picker" />
+                                <input type="date" value={depositDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-xl font-black focus:outline-none focus:border-gv-gold transition-all duration-300 text-white inverted-scheme-date-picker" />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Bank Receipt (Image/PDF)</label>
-                                <div className="border border-white/10 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-colors cursor-pointer relative group">
+                                <div className="border border-white/10 border-dashed rounded-lg p-8 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-colors cursor-pointer relative group">
                                     <svg className="h-10 w-10 text-zinc-600 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                     <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{depositReceipt ? (depositReceipt as File).name : "Select Document"}</span>
                                     <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositReceipt(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,.pdf" />
                                 </div>
                             </div>
-                            <button onClick={handleDepositSubmit} disabled={isSubmitting || !depositAmount || !depositReceipt} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:-translate-y-1">
+                            <button onClick={handleDepositSubmit} disabled={isSubmitting || !depositAmount || !depositReceipt} className="w-full bg-gv-gold text-black font-black py-5 rounded-lg flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all duration-300 hover:-translate-y-1">
                                 {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : "Confirm Deposit"}
                             </button>
                         </div>
@@ -1471,7 +1471,7 @@ export default function DashboardClient() {
             {/* Withdraw Modal */}
             {isWithdrawModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#1a1a1a] border border-white/10 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                    <div className="bg-[#1a1a1a] border border-white/10 rounded-lg p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                         <div className="flex justify-between items-center">
                             <h2 className="text-3xl font-black text-white tracking-tighter uppercase">Withdrawal</h2>
                             <button onClick={() => setIsWithdrawModalOpen(false)} className="text-zinc-600 hover:text-white transition-colors">
@@ -1481,9 +1481,9 @@ export default function DashboardClient() {
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Amount (MYR)</label>
-                                <input type="number" value={withdrawAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                                <input type="number" value={withdrawAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all duration-300" placeholder="0.00" />
                             </div>
-                             <button onClick={() => handleWithdrawInitiate()} disabled={!withdrawAmount} className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50">
+                             <button onClick={() => handleWithdrawInitiate()} disabled={!withdrawAmount} className="w-full bg-white text-black font-black py-5 rounded-lg flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50">
                                 Request Withdrawal
                             </button>
                         </div>
@@ -1494,7 +1494,7 @@ export default function DashboardClient() {
             {/* OTP Verification Modal */}
             {isOtpModalOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl">
-                    <div className="bg-[#111] border border-gv-gold/50 rounded-[40px] p-12 max-w-md w-full text-center space-y-10 shadow-[0_0_100px_rgba(212,175,55,0.15)] animate-in fade-in zoom-in-90 duration-300">
+                    <div className="bg-[#111] border border-gv-gold/50 rounded-lg p-12 max-w-md w-full text-center space-y-10 shadow-[0_0_100px_rgba(212,175,55,0.15)] animate-in fade-in zoom-in-90 duration-300">
                         <div className="h-20 w-20 bg-gv-gold/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-gv-gold/20">
                             <svg className="h-10 w-10 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                         </div>
@@ -1503,7 +1503,7 @@ export default function DashboardClient() {
                             <p className="text-zinc-500 font-medium text-sm px-4">
                                 {lang === "en"
                                     ? `A 6-digit verification code has been sent to your registered email (${user?.email}).`
-                                    : `6位验证码已发送至您的注册邮箱 (${user?.email})。`}
+                                    : `6浣嶉獙璇佺爜宸插彂閫佽嚦鎮ㄧ殑娉ㄥ唽閭 (${user?.email})銆俙}
                             </p>
                         </div>
                         <div className="space-y-4">
@@ -1513,7 +1513,7 @@ export default function DashboardClient() {
                                 maxLength={6}
                                 value={otpCode}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[1em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold"
+                                className="w-full bg-white/5 border border-white/10 rounded-lg p-6 text-4xl font-black text-center tracking-[1em] focus:outline-none focus:border-gv-gold transition-all duration-300 text-gv-gold"
                                 placeholder="000000"
                                 autoFocus
                             />
@@ -1525,7 +1525,7 @@ export default function DashboardClient() {
                             <button
                                 onClick={handleOtpWithdraw}
                                 disabled={isSubmitting || otpCode.length !== 6}
-                                className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 hover:-translate-y-1 transition-all"
+                                className="w-full bg-gv-gold text-black font-black py-5 rounded-lg flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 hover:-translate-y-1 transition-all duration-300"
                             >
                                 {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : "Verify & Withdraw"}
                             </button>
@@ -1580,7 +1580,7 @@ export default function DashboardClient() {
             )}
             {/* Action Toast */}
             {actionToast && (
-                <div className="fixed bottom-6 right-6 z-[600] bg-[#1a1a1a] border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 max-w-sm shadow-gv-gold/10">
+                <div className="fixed bottom-6 right-6 z-[600] bg-[#1a1a1a] border border-gv-gold/30 rounded-lg p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 max-w-sm shadow-gv-gold/10">
                     <div className="flex flex-col gap-5">
                         <div className="flex items-start justify-between gap-4">
                             <p className="text-white font-black text-sm uppercase tracking-widest leading-relaxed">{actionToast.message}</p>
@@ -1594,7 +1594,7 @@ export default function DashboardClient() {
                                     setActionToast(null);
                                     router.push(actionToast.actionUrl as string);
                                 }}
-                                className="w-full bg-gv-gold text-black font-black py-3 px-6 rounded-xl uppercase tracking-widest text-xs hover:bg-gv-gold/90 transition-all shadow-lg active:scale-95"
+                                className="w-full bg-gv-gold text-black font-black py-3 px-6 rounded-lg uppercase tracking-widest text-xs hover:bg-gv-gold/90 transition-all duration-300 shadow-lg active:scale-95"
                             >
                                 {actionToast.actionText}
                             </button>
