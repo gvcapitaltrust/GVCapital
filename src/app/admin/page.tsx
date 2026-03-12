@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
+import { useSettings } from "@/providers/SettingsProvider";
 
 export default function AdminPortal() {
     const router = useRouter();
@@ -54,8 +55,7 @@ export default function AdminPortal() {
         setTimeout(() => setToast({ message: "", visible: false }), 5000);
     };
 
-    // Forex Control State
-    const [currentForexRate, setCurrentForexRate] = useState<string>("4.0");
+    const { forexRate } = useSettings();
     const [newForexRate, setNewForexRate] = useState<string>("");
     const [forexHistory, setForexHistory] = useState<any[]>([]);
     const [isUpdatingRate, setIsUpdatingRate] = useState(false);
@@ -96,9 +96,9 @@ export default function AdminPortal() {
         setMounted(true);
         fetchData();
         checkMaintenance();
-        fetchForexData();
         fetchSalesData();
         fetchAdminProfile();
+        fetchForexHistory();
 
         // Real-time listener for ALL transactions (New Deposits, etc.)
         const channel = supabase
@@ -112,8 +112,8 @@ export default function AdminPortal() {
                 fetchData();
             })
             .on('postgres_changes', { event: '*', schema: 'public', table: 'platform_settings' }, () => {
-                console.log("[REALTIME] Forex change detected. Refreshing...");
-                fetchForexData();
+                console.log("[REALTIME] Forex change detected. Refreshing history...");
+                fetchForexHistory();
             })
             .subscribe();
 
@@ -240,23 +240,7 @@ export default function AdminPortal() {
         if (logs) setVerificationLogs(logs);
     };
 
-    const fetchForexData = async () => {
-        const { data: currentRateData, error } = await supabase
-            .from('platform_settings')
-            .select('value')
-            .eq('key', 'usd_to_myr_rate')
-            .single();
-
-        if (!currentRateData || error) {
-            console.error("Forex fetch error, using fallback 4.0:", error);
-            setCurrentForexRate("4.0");
-            setNewForexRate("4.0");
-            return;
-        }
-
-        const rateStr = parseFloat(currentRateData.value).toString() || "1.0";
-        setCurrentForexRate(rateStr);
-        setNewForexRate(rateStr);
+    const fetchForexHistory = async () => {
         const { data: historyData } = await supabase
             .from('forex_history')
             .select('*')
@@ -355,7 +339,7 @@ export default function AdminPortal() {
             const { error: historyError } = await supabase
                 .from('forex_history')
                 .insert([{
-                    old_rate: parseFloat(currentForexRate),
+                    old_rate: forexRate,
                     new_rate: parseFloat(newForexRate),
                     changed_by: user?.id || null // MUST use ID for UUID fields
                 }]);
@@ -366,7 +350,7 @@ export default function AdminPortal() {
             }
 
             alert("Forex rate updated successfully.");
-            fetchForexData();
+            fetchForexHistory();
         } catch (err: any) {
             if (err.code === '42501' || err.status === 403) {
                 showToast("You do not have permission to change system settings.");
@@ -537,7 +521,7 @@ export default function AdminPortal() {
 
     const handleApproveDeposit = async (tx: any) => {
         const displayRm = Number(tx.amount || 0).toFixed(2);
-        const creditUsd = (Number(tx.amount || 0) / (parseFloat(currentForexRate) || 4.0)).toFixed(2);
+        const creditUsd = (Number(tx.amount || 0) / forexRate).toFixed(2);
         if (!confirm(`Confirming deposit of RM ${displayRm} (Credit: $${creditUsd} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             // Use RPC for atomic update of transaction and profile balance
@@ -560,7 +544,7 @@ export default function AdminPortal() {
 
     const handleRejectDeposit = async (tx: any) => {
         const amountRm = Number(tx.amount || 0);
-        const amountUsd = amountRm / (parseFloat(currentForexRate) || 4.0);
+        const amountUsd = amountRm / forexRate;
         if (!confirm(`Reject deposit: Client sent RM ${amountRm.toFixed(2)}. This will void the $${amountUsd.toFixed(2)} USD credit for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             const { error: txError } = await supabase.from('transactions').update({ status: 'Rejected' }).eq('id', tx.id);
@@ -575,7 +559,7 @@ export default function AdminPortal() {
 
     const handleApproveWithdrawal = async (tx: any) => {
         const amountRm = Math.abs(Number(tx.amount || 0));
-        const amountUsd = amountRm / (parseFloat(currentForexRate) || 4.0);
+        const amountUsd = amountRm / forexRate;
         if (!confirm(`Approve withdrawal of RM ${amountRm.toFixed(2)} ($${amountUsd.toFixed(2)} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             // DATABASE TRIGGER HANDLES BALANCE UPDATES
@@ -596,7 +580,7 @@ export default function AdminPortal() {
 
     const handleRejectWithdrawal = async (tx: any) => {
         const amountRm = Math.abs(Number(tx.amount || 0));
-        const amountUsd = amountRm / (parseFloat(currentForexRate) || 4.0);
+        const amountUsd = amountRm / forexRate;
         if (!confirm(`Reject withdrawal: Client requested RM ${amountRm.toFixed(2)} ($${amountUsd.toFixed(2)} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             const { error: txError } = await supabase.from('transactions').update({ status: 'Rejected' }).eq('id', tx.id);
@@ -647,13 +631,12 @@ export default function AdminPortal() {
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
                                 {(() => {
-                                    const totalRm = users.reduce((acc: number, u: Profile) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
-                                    const rate = parseFloat(currentForexRate) || 4.0;
+                                    const totalUsd = users.reduce((acc: number, u: Profile) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
                                     return (
                                         <>
                                             <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
-                                            <h2 className="text-2xl font-black text-white">RM {totalRm.toFixed(2)}</h2>
-                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">(${(totalRm / rate).toFixed(2)} USD)</p>
+                                            <h2 className="text-2xl font-black text-white">RM {(totalUsd * forexRate).toFixed(2)}</h2>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">(${(totalUsd).toFixed(2)} USD)</p>
                                         </>
                                     );
                                 })()}
@@ -751,7 +734,7 @@ export default function AdminPortal() {
                                                 <td className="px-8 py-6 text-red-400">
                                                     <div className="flex flex-col">
                                                         <span>RM {Math.abs(Number(w.amount || 0)).toFixed(2)}</span>
-                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(w.amount || 0)) / (parseFloat(currentForexRate) || 4.0)).toFixed(2)})</span>
+                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(w.amount || 0)) / forexRate).toFixed(2)})</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
@@ -896,7 +879,7 @@ export default function AdminPortal() {
                                         <div className="space-y-4">
                                             <div className="space-y-1">
                                                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Current Platform Rate</label>
-                                                <div className="text-4xl font-black text-gv-gold tracking-tighter">1 USD = RM {parseFloat(currentForexRate).toFixed(3)}</div>
+                                                <div className="text-4xl font-black text-gv-gold tracking-tighter">1 USD = RM {forexRate.toFixed(4)}</div>
                                             </div>
                                             <div className="space-y-1">
                                                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">New Target Rate (MYR)</label>
