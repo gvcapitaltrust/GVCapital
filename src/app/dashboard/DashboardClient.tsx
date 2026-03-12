@@ -10,6 +10,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import CurrencyExchangeTicker from "@/components/CurrencyExchangeTicker";
 import { useAuth } from "@/providers/AuthProvider";
+import { useSettings } from "@/providers/SettingsProvider";
 import ProductSelection from "@/components/ProductSelection";
 import ComparisonTable from "@/components/ComparisonTable";
 import { TIERS, getTierByAmount, formatUSD } from "@/lib/tierUtils";
@@ -21,8 +22,7 @@ export default function DashboardClient() {
     const [lang, setLang] = useState<"en" | "zh">("en");
     const [user, setUser] = useState<any>(null);
     const [transactions, setTransactions] = useState<any[]>([]);
-    const [monthlyRate, setMonthlyRate] = useState(0.08); // 8% Default
-    const [yearlyRate, setYearlyRate] = useState(0.96); // 96% Default
+    const { forexRate, monthlyRate, yearlyRate } = useSettings();
     const [dividendHistory, setDividendHistory] = useState<any[]>([]);
     const [activeTab, setActiveTab] = useState<"overview" | "products" | "statements" | "security">("overview");
     const [isComparisonOpen, setIsComparisonOpen] = useState(false);
@@ -30,7 +30,6 @@ export default function DashboardClient() {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [referredCount, setReferredCount] = useState(0);
-    const [forexRate, setForexRate] = useState(1.0); // Safe fallback as requested
 
     // UI States
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -79,11 +78,7 @@ export default function DashboardClient() {
             console.log("FETCHING DASHBOARD DATA for:", authUser.email);
             
             try {
-                // 1. Fetch Forex Rate first for global calculations
-                const { data: psRate, error: psError } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
-                const currentRate = (!psRate || psError) ? 4.0 : parseFloat(psRate.value) || 4.0;
-                setForexRate(currentRate);
-                console.log('Effective Forex Rate (Loaded or Fallback):', currentRate);
+                console.log('Effective Forex Rate (Global):', forexRate);
 
                 // 2. Fetch Profile
                 const { data: profile } = await supabase
@@ -104,7 +99,7 @@ export default function DashboardClient() {
                     }
 
                     const totalAssetsCalc = Number(profile.balance || 0) + Number(profile.profit || 0);
-                    console.log('Balance:', profile.balance, 'Profit:', profile.profit, 'Total Assets Calc:', totalAssetsCalc, 'Rate:', currentRate);
+                    console.log('Balance:', profile.balance, 'Profit:', profile.profit, 'Total Assets Calc:', totalAssetsCalc, 'Rate:', forexRate);
                     setUser({
                         ...authUser,
                         ...profile,
@@ -127,13 +122,6 @@ export default function DashboardClient() {
                 if (txs) {
                     setTransactions(txs);
                     setDividendHistory(txs.filter((t: any) => t.type === 'Dividend' || t.type === 'bonus').slice(0, 6).reverse());
-                }
-
-                // 4. Fetch Rates & Referrals
-                const { data: rates } = await supabase.from('settings').select('*').in('key', ['monthly_return_rate', 'yearly_return_rate']);
-                if (rates) {
-                    setMonthlyRate(parseFloat(rates.find((r: any) => r.key === 'monthly_return_rate')?.value || "0.08"));
-                    setYearlyRate(parseFloat(rates.find((r: any) => r.key === 'yearly_return_rate')?.value || "0.96"));
                 }
 
                 const { count } = await supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('referred_by', authUser.id);

@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
@@ -7,11 +5,12 @@ import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
 import { updateGlobalForexRate } from "@/app/actions/forex";
 import Link from "next/link";
+import { useSettings } from "@/providers/SettingsProvider";
 
 export default function ForexControlPanel() {
     const router = useRouter();
+    const { forexRate: globalForexRate } = useSettings();
     const [mounted, setMounted] = useState(false);
-    const [currentRate, setCurrentRate] = useState<string>("4.0");
     const [newRate, setNewRate] = useState<string>("");
     const [history, setHistory] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -20,10 +19,9 @@ export default function ForexControlPanel() {
     useEffect(() => {
         setMounted(true);
         fetchData();
-        // Setup realtime subscription for data updates
+        // Setup realtime subscription for audit history data updates
         const channel = supabase
-            .channel('forex_updates')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'platform_settings' }, () => fetchData())
+            .channel('forex_history_updates')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'forex_history' }, () => fetchData())
             .subscribe();
 
@@ -33,18 +31,6 @@ export default function ForexControlPanel() {
     }, []);
 
     const fetchData = async () => {
-        // Fetch Current Rate
-        const { data: currentData } = await supabase
-            .from('platform_settings')
-            .select('value')
-            .eq('key', 'usd_to_myr_rate')
-            .single();
-
-        if (currentData) {
-            setCurrentRate(currentData.value);
-            if (!newRate) setNewRate(currentData.value);
-        }
-
         // Fetch Audit History
         const { data: historyData } = await supabase
             .from('forex_history')
@@ -130,7 +116,7 @@ export default function ForexControlPanel() {
                                         1 USD <span className="text-gv-gold">=</span>
                                     </h2>
                                     <h2 className="text-6xl font-black text-gv-gold tracking-tighter tabular-nums drop-shadow-[0_0_20px_rgba(212,175,55,0.3)]">
-                                        RM {parseFloat(currentRate).toFixed(3)}
+                                        RM {globalForexRate.toFixed(3)}
                                     </h2>
                                 </div>
                                 <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Syncing with all terminal units...</p>

@@ -1,36 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { useSettings } from "@/providers/SettingsProvider";
 
 export default function CurrencyExchangeTicker() {
-    const [rate, setRate] = useState<number | null>(null);
-
-    useEffect(() => {
-        const fetchRate = async () => {
-            try {
-                const { data, error } = await supabase
-                    .from('platform_settings')
-                    .select('value')
-                    .eq('key', 'usd_to_myr_rate')
-                    .single();
-
-                if (!data || error) {
-                    console.warn("Using fallback rate 1.0 due to fetch failure.");
-                    setRate(1.0);
-                    return;
-                }
-
-                const parsedRate = parseFloat(data.value) || 1.0;
-                setRate(parsedRate);
-            } catch (err) {
-                console.error("Error fetching rate:", err);
-                setRate(1.0);
-            }
-        };
-
-        fetchRate();
-    }, []);
+    const { forexRate: rate } = useSettings();
 
     if (rate === null) return null;
 

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useSettings } from "@/providers/SettingsProvider";
 
 export default function ApprovalsClient() {
     const router = useRouter();
@@ -11,17 +12,7 @@ export default function ApprovalsClient() {
     const [isLoading, setIsLoading] = useState(true);
     const [distributing, setDistributing] = useState(false);
     const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
-    const [forexRate, setForexRate] = useState<number>(4.0);
-
-    const fetchRate = async () => {
-        const { data } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
-        if (data) setForexRate(parseFloat(data.value));
-        else setForexRate(4.0);
-    };
-
-    useEffect(() => {
-        fetchRate();
-    }, []);
+    const { forexRate } = useSettings();
 
     useEffect(() => {
         fetchPending();
@@ -31,10 +22,6 @@ export default function ApprovalsClient() {
             .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
                 console.log("[REALTIME] Change in approvals detected...");
                 fetchPending();
-            })
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'platform_settings' }, () => {
-                console.log("[REALTIME] Forex change detected. Refreshing...");
-                fetchRate();
             })
             .subscribe();
 
@@ -66,7 +53,7 @@ export default function ApprovalsClient() {
 
     const handleApprove = async (tx: any) => {
         const displayRm = Number(tx.amount || 0).toFixed(2);
-        const creditUsd = (Number(tx.amount || 0) / 4).toFixed(2);
+        const creditUsd = (Number(tx.amount || 0) / forexRate).toFixed(2);
         if (!confirm(`Confirming deposit of RM ${displayRm} (Credit: $${creditUsd} USD) for ${tx.profiles.full_name}?`)) return;
 
         try {

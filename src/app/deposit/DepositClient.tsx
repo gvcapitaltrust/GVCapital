@@ -5,10 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
+import { useSettings } from "@/providers/SettingsProvider";
 
 export default function DepositClient() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { forexRate } = useSettings();
     const [lang, setLang] = useState<"en" | "zh">("en");
     const [user, setUser] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +21,6 @@ export default function DepositClient() {
     // Form States
     const [amount, setAmount] = useState("");
     const [receipt, setReceipt] = useState<File | null>(null);
-    const [rate, setRate] = useState<number>(4.0); // Fallback rate
 
     useEffect(() => {
         const l = searchParams?.get("lang") || "en";
@@ -33,21 +34,7 @@ export default function DepositClient() {
             }
             setUser(session.user);
         };
-        const fetchRate = async () => {
-            const { data, error } = await supabase
-                .from('platform_settings')
-                .select('value')
-                .eq('key', 'usd_to_myr_rate')
-                .single();
-            if (data && !error) {
-                setRate(parseFloat(data.value));
-            } else {
-                setRate(4.0);
-            }
-        };
-
         checkAuth();
-        fetchRate();
     }, [searchParams, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -175,7 +162,7 @@ export default function DepositClient() {
                                     <div className="mt-3 flex items-center gap-2 px-1 animate-in fade-in slide-in-from-left-2 duration-300">
                                         <div className="h-2 w-2 rounded-full bg-gv-gold animate-pulse"></div>
                                         <p className="text-gv-gold font-black text-sm uppercase tracking-tighter">
-                                            {t.estimatedCredit}: ≈ ${(parseFloat(amount) / rate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                                            {t.estimatedCredit}: ≈ ${(parseFloat(amount) / forexRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                                         </p>
                                     </div>
                                 )}
