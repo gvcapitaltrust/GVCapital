@@ -63,48 +63,46 @@ export default function HomeClient() {
     const t = content[lang];
 
     return (
-        <div className="min-h-screen bg-[#121212] text-white selection:bg-gv-gold selection:text-black flex flex-col">
+        <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-gv-gold selection:text-black flex flex-col">
             {/* Navigation */}
-            <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#121212]/80 backdrop-blur-md">
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-                    <div className="flex items-center gap-2">
-                        <Link href={`/?lang=${lang}`} className="flex items-center">
+            <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-md">
+                <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 h-20 md:h-24">
+                    <div className="flex-1 flex justify-start">
+                        <Link href={`/?lang=${lang}`} className="flex items-center shrink-0">
                             <img
                                 src="/logo.png"
                                 alt="GV Capital Trust Logo"
-                                className="h-[40px] sm:h-[60px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_6px_rgba(212,175,55,0.4)]"
+                                className="h-[50px] md:h-[60px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(238,206,128,0.3)]"
                             />
                         </Link>
                     </div>
 
-                    <div className="flex items-center gap-8">
-                        <div className="hidden items-center gap-6 text-sm font-medium text-zinc-400 md:flex">
-                            <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.services}</Link>
-                            <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>
-                            <Link href="#" className="hover:text-gv-gold transition-colors">{t.nav.contact}</Link>
-                        </div>
+                    <div className="hidden md:flex flex-[2] justify-center items-center gap-8 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+                        <Link href="#" className="hover:text-gv-gold transition-colors whitespace-nowrap">{t.nav.services}</Link>
+                        <Link href="#" className="hover:text-gv-gold transition-colors whitespace-nowrap">{t.nav.about}</Link>
+                        <Link href="#" className="hover:text-gv-gold transition-colors whitespace-nowrap">{t.nav.contact}</Link>
+                    </div>
 
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => setLang(lang === "en" ? "zh" : "en")}
-                                className="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold hover:bg-white/10 transition-all"
-                            >
-                                {lang === "en" ? "简体中文" : "English"}
-                            </button>
+                    <div className="flex-1 flex justify-end items-center gap-4">
+                        <button
+                            onClick={() => setLang(lang === "en" ? "zh" : "en")}
+                            className="hidden lg:block rounded-full border border-white/20 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-zinc-500 whitespace-nowrap"
+                        >
+                            {lang === "en" ? "中文" : "EN"}
+                        </button>
 
-                            <Link
-                                href={`/login?lang=${lang}`}
-                                className="rounded-full bg-gv-gold px-5 py-2 text-sm font-bold text-black hover:bg-gv-gold/90 transition-all active:scale-95"
-                            >
-                                {t.nav.login}
-                            </Link>
-                        </div>
+                        <Link
+                            href={`/login?lang=${lang}`}
+                            className="bg-gv-gold-gradient metallic-shine px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest text-black shadow-lg hover:-translate-y-1 transition-all active:scale-95 whitespace-nowrap"
+                        >
+                            {t.nav.login}
+                        </Link>
                     </div>
                 </div>
             </nav>
 
             {/* Hero Section */}
-            <main className="relative flex flex-col items-center justify-center pt-32 pb-20 px-6 text-center flex-1">
+            <main className="relative flex flex-col items-center justify-center pt-32 pb-20 px-6 text-center flex-1 max-w-[1440px] mx-auto w-full">
                 {/* Decorative background element */}
                 <div className="absolute top-1/2 left-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gv-gold/10 blur-[120px]"></div>
 
@@ -119,22 +117,22 @@ export default function HomeClient() {
                         {t.hero.description}
                     </p>
 
-                    <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
+                    <div className="flex flex-col gap-6 sm:flex-row sm:justify-center">
                         <Link
                             href={`/register?lang=${lang}`}
-                            className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gv-gold px-10 py-4 text-lg font-bold text-black transition-all hover:pr-12"
+                            className="bg-gv-gold-gradient metallic-shine inline-flex items-center justify-center rounded-full px-12 py-5 text-sm font-black uppercase tracking-[0.2em] text-black shadow-2xl hover:-translate-y-1 transition-all group"
                         >
                             <span className="relative">{t.cta}</span>
                             <svg
-                                className="absolute right-4 h-5 w-5 -translate-x-4 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                                className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
                             >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </Link>
-                        <button className="rounded-full border border-white/20 px-10 py-4 text-lg font-bold text-white hover:bg-white/5 transition-all">
+                        <button className="rounded-full border border-white/10 px-12 py-5 text-sm font-black uppercase tracking-[0.2em] text-white hover:bg-white/5 transition-all">
                             {t.nav.about}
                         </button>
                     </div>

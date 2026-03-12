@@ -553,7 +553,7 @@ export default function DashboardClient() {
     // Instead, we will conditionally render the content inside the main area.
 
     return (
-        <div className="min-h-screen bg-[#121212] text-white flex font-sans overflow-hidden relative">
+        <div className="min-h-screen bg-[#0a0a0a] text-white flex font-sans overflow-hidden relative">
             <title>{`Dashboard | GV Capital Trust`}</title>
 
             {/* Mobile Menu Overlay */}
@@ -617,17 +617,20 @@ export default function DashboardClient() {
                 </div>
             </aside>
 
-            <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#121212] relative flex flex-col">
+            <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#0a0a0a] relative flex flex-col">
                 <CurrencyExchangeTicker />
-                <div className="max-w-7xl mx-auto w-full space-y-12 flex-1 pb-20 p-4 md:p-12">
-                    <header className="flex justify-between items-center">
-                        <div>
-                            <p className="text-zinc-500 text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
-                            <h1 className="text-4xl font-black">
-                                {t.welcome}<span className="text-gv-gold tracking-tighter">{user?.fullName || "Member"}</span>
+                <div className="max-w-[1440px] mx-auto w-full space-y-12 flex-1 pb-20 p-4 md:p-12">
+                    <header className="flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div className="flex flex-col items-center md:items-start w-full md:w-auto">
+                            <div className="md:hidden mb-6">
+                                <img src="/logo.png" alt="GV Capital" className="h-16 w-auto object-contain mix-blend-screen" />
+                            </div>
+                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em] mb-2">{t.nav}</p>
+                            <h1 className="text-3xl md:text-5xl font-black text-center md:text-left">
+                                {t.welcome}<span className="text-gv-gold tracking-tighter drop-shadow-[0_0_15px_rgba(238,206,128,0.3)]">{user?.fullName || "Member"}</span>
                             </h1>
                         </div>
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-4 md:gap-6 bg-white/5 p-2 rounded-2xl border border-white/10 glass-card">
                             <button 
                                 onClick={() => setIsMobileMenuOpen(true)}
                                 className="md:hidden h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10"
@@ -635,7 +638,7 @@ export default function DashboardClient() {
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                             </button>
                             {user && <NotificationBell userId={user.id} />}
-                            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-xl border border-gv-gold/30 shadow-lg capitalize">
+                            <div className="h-14 w-14 rounded-2xl bg-gv-gold-gradient metallic-shine flex items-center justify-center font-black text-black text-xl border border-gv-gold/30 shadow-lg capitalize">
                                 {user?.fullName?.[0] || user?.email?.[0] || "U"}
                             </div>
                         </div>
@@ -776,7 +779,7 @@ export default function DashboardClient() {
                                         {dividendHistory.length > 0 ? dividendHistory.map((div: any, i: number) => (
                                             <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
                                                 <div
-                                                    className="w-full bg-gv-gold rounded-t-xl transition-all duration-500 group-hover:brightness-125"
+                                                    className="w-full bg-gv-gold-gradient metallic-shine rounded-t-xl transition-all duration-500 group-hover:brightness-110"
                                                     style={{ height: `${Math.max(10, (div.amount / (Math.max(...dividendHistory.map((d: any) => d.amount)) || 1)) * 100)}%` }}
                                                 ></div>
                                                 <span className="text-[8px] font-black text-zinc-600 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
@@ -815,7 +818,7 @@ export default function DashboardClient() {
                                 </Link>
                                 <button
                                     onClick={(e) => handleProtectedAction(e, () => setIsWithdrawModalOpen(true))}
-                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-[#222] text-white hover:bg-[#333] hover:-translate-y-1 border border-white/10" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
+                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gv-gold-gradient metallic-shine text-black shadow-lg hover:-translate-y-1" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
                                 >
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                                     {t.withdraw}
@@ -874,7 +877,7 @@ export default function DashboardClient() {
                                         {t.downloadStatement}
                                     </button>
                                 </div>
-                                <div className="border border-white/10 rounded-[30px] md:rounded-[40px] overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
+                                <div className="border border-white/10 rounded-[30px] md:rounded-[40px] overflow-hidden bg-[#1a1a1a]/30 glass-card metallic-shine shadow-2xl">
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-left min-w-[600px] md:min-w-0">
                                         <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">

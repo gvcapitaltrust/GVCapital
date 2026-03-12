@@ -29,41 +29,48 @@ export default function GlobalFooter() {
     const t = content[lang];
 
     return (
-        <footer className="w-full border-t border-white/5 bg-[#0a0a0a]/50 backdrop-blur-sm py-12 px-6 mt-auto">
+        <footer className="w-full border-t border-white/5 bg-[#070707] py-20 px-6 mt-auto">
             <div className="mx-auto max-w-7xl">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-8">
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2 grayscale opacity-50">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 mb-16">
+                    <div className="lg:col-span-5 space-y-8 flex flex-col items-center lg:items-start text-center lg:text-left">
+                        <div className="flex items-center gap-3 opacity-30 grayscale hover:opacity-100 hover:grayscale-0 transition-all">
                             <img
                                 src="/logo.png"
                                 alt="GV Capital Trust Logo"
-                                className="h-[24px] w-auto object-contain mix-blend-screen"
+                                className="h-[45px] w-auto object-contain mix-blend-screen"
                             />
-                            <span className="text-sm font-bold tracking-tighter text-white/50">GV CAPITAL TRUST</span>
+                            <div className="flex flex-col">
+                                <span className="text-xs font-black tracking-[0.3em] text-white">GV CAPITAL</span>
+                                <span className="text-[8px] font-bold tracking-[0.4em] text-gv-gold/60">TRUST MONACO</span>
+                            </div>
                         </div>
-                        <p className="text-[10px] text-zinc-500 max-w-md leading-relaxed font-medium uppercase tracking-wider">
+                        <p className="text-[10px] text-zinc-600 max-w-sm leading-relaxed font-bold uppercase tracking-widest">
                             {t.disclaimer}
                         </p>
                     </div>
 
-                    <div className="flex flex-col items-start md:items-end gap-4">
-                        <div className="flex flex-wrap gap-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                    <div className="lg:col-span-7 flex flex-col items-center lg:items-end justify-between gap-10">
+                        <div className="flex flex-wrap justify-center lg:justify-end gap-10 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.privacy}</Link>
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.terms}</Link>
                             <Link href="#" className="hover:text-gv-gold transition-colors">{t.risk}</Link>
                         </div>
-                        <div className="flex items-center gap-2 text-zinc-600">
-                            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t.location}</span>
+                        
+                        <div className="flex flex-col items-center lg:items-end gap-6 w-full">
+                            <div className="flex items-center gap-3 text-zinc-500 bg-white/5 px-6 py-3 rounded-full border border-white/5">
+                                <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t.location}</span>
+                            </div>
+                            
+                            <p className="text-[9px] text-zinc-700 max-w-sm text-center lg:text-right leading-loose font-bold uppercase tracking-[0.2em] pt-6 border-t border-white/5">
+                                {lang === "en"
+                                    ? "Personal Data Protection Act 2010 (PDPA) Compliance: By using this site, you consent to the collection and processing of your personal data for investment management purposes."
+                                    : "2010 年个人数据保护法 (PDPA) 合规性：使用本网站即表示您同意为投资管理之目的收集和处理您的个人数据。"}
+                            </p>
                         </div>
-                        <p className="text-[8px] text-zinc-700 max-w-xs text-left md:text-right leading-tight font-bold uppercase tracking-widest mt-2 border-t border-white/5 pt-4">
-                            {lang === "en"
-                                ? "Personal Data Protection Act 2010 (PDPA) Compliance: By using this site, you consent to the collection and processing of your personal data."
-                                : "2010 年个人数据保护法 (PDPA) 合规性：使用本网站即表示您同意收集和处理您的个人数据。"}
-                        </p>
                     </div>
                 </div>
 

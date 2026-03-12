@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #121212;
+  --background: #0a0a0a;
   --foreground: #ededed;
   --color-gv-gold: #D4AF37;
 }
@@ -15,8 +15,12 @@
 }
 
 :root {
-  --background: #121212;
+  --background: #0a0a0a;
   --foreground: #ededed;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -30,6 +34,64 @@ img {
   max-width: 100%;
   height: auto;
 }
+
+.container-fluid {
+    width: 100%;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .bg-gv-gold-gradient {
+    background: linear-gradient(135deg, #EECE80 0%, #B8860B 50%, #EECE80 100%);
+    background-size: 200% auto;
+    transition: 0.5s;
+    border: none;
+  }
+
+  .bg-gv-gold-gradient:hover {
+    background-position: right center;
+  }
+
+  .glass-card {
+    background: rgba(18, 18, 18, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  .metallic-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metallic-shine::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.05) 40%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.05) 60%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(45deg);
+    pointer-events: none;
+    transition: 0.8s;
+    opacity: 0;
+  }
+
+  .metallic-shine:hover::after {
+    opacity: 1;
+    transform: rotate(45deg) translate(20%, 20%);
+  }
 
 .dashboard-container {
   width: 100%;

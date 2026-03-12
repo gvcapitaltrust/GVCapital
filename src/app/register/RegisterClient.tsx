@@ -270,7 +270,7 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#121212] flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
+        <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
             <title>{`Register | GV Capital Trust`}</title>
 
             <div className="absolute top-8 right-8">
@@ -392,7 +392,7 @@ export default function RegisterPage() {
                     <button
                         type="submit"
                         disabled={isLoading || !isAgreed || !isReferralValid || isValidatingReferral || !isUsernameValid || isValidatingUsername || !ownUsername}
-                        className="w-full bg-gv-gold text-black font-black text-lg py-5 rounded-2xl hover:bg-gv-gold/90 transition-all shadow-[0_10px_30px_rgba(212,175,55,0.2)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest flex items-center justify-center gap-2"
+                        className="w-full bg-gv-gold-gradient metallic-shine text-black font-black text-lg py-5 rounded-2xl hover:brightness-110 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest flex items-center justify-center gap-2"
                     >
                         {isLoading || isValidatingReferral || isValidatingUsername ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
                     </button>
