@@ -454,13 +454,16 @@ export default function DashboardClient() {
 
     const content = {
         en: {
-            welcome: "Welcome back, ",
+            welcome: "Welcome, ",
             nav: "Dashboard",
             logout: "Log Out",
-            totalAssets: "Total Assets",
+            totalAssets: "Total Wallet Amount",
             activeInvestment: "Active Investment",
-            totalProfit: "Total Profit",
-            totalEquity: "Total Equity",
+            totalProfit: "Total Dividend",
+            totalEquity: "Total Investment",
+            dividendNote: "(Withdrawable)",
+            investmentNote: "(6 month lock period)",
+            currentPackage: "Current Package",
             deposit: "Deposit",
             withdraw: "Withdraw",
             history: "Transaction History",
@@ -507,13 +510,16 @@ export default function DashboardClient() {
             pendingVerification: "Account Pending Verification. Please contact your Agent or Admin to activate your account.",
         },
         zh: {
-            welcome: "欢迎回来，",
+            welcome: "欢迎, ",
             nav: "控制台",
             logout: "退出登录",
-            totalAssets: "总资产",
+            totalAssets: "钱包总额",
             activeInvestment: "活跃投资",
-            totalProfit: "总收益",
-            totalEquity: "总权益",
+            totalProfit: "总股息",
+            totalEquity: "总投资",
+            dividendNote: "(可提取)",
+            investmentNote: "(6个月锁定期)",
+            currentPackage: "当前配套",
             deposit: "入金",
             withdraw: "提款",
             history: "交易历史",
@@ -811,44 +817,74 @@ export default function DashboardClient() {
                                 )
                             ) : (
                                 <>
-                                    <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                            <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalAssets}</p>
+                                    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {/* Total Wallet Amount */}
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
+                                            <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors">{t.totalAssets}</p>
                                             <div className="flex flex-col gap-2">
-                                                <h2 className="text-4xl font-black tracking-tighter">
+                                                <h2 className="text-3xl font-black tracking-tighter">
                                                     {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${(Number(user?.total_assets || 0) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
                                                 </h2>
                                                 {!isCheckingAuth && user?.kyc_completed && (
-                                                    <p className="text-sm font-bold text-zinc-400">
+                                                    <p className="text-[10px] font-bold text-zinc-500">
                                                         (${(Number(user?.total_assets || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
                                                     </p>
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                            <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalEquity}</p>
+
+                                        {/* Total Investment */}
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest group-hover:text-zinc-400 transition-colors">{t.totalEquity}</p>
+                                                <span className="text-[8px] font-black text-gv-gold border border-gv-gold/20 px-2 py-0.5 rounded-full uppercase">{t.investmentNote}</span>
+                                            </div>
                                             <div className="flex flex-col gap-2">
-                                                <h2 className="text-4xl font-black tracking-tighter text-gv-gold">
+                                                <h2 className="text-3xl font-black tracking-tighter text-gv-gold">
                                                     {isCheckingAuth ? "..." : `RM ${(Number(user?.balance || 0) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                 </h2>
                                                 {!isCheckingAuth && (
-                                                    <p className="text-sm font-bold text-zinc-400">
+                                                    <p className="text-[10px] font-bold text-zinc-500">
                                                         (${(Number(user?.balance || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
                                                     </p>
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
-                                            <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.totalProfit}</p>
+
+                                        {/* Total Dividend */}
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest group-hover:text-zinc-400 transition-colors">{t.totalProfit}</p>
+                                                <span className="text-[8px] font-black text-emerald-500 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase">{t.dividendNote}</span>
+                                            </div>
                                             <div className="flex flex-col gap-2">
-                                                <h2 className="text-4xl font-black tracking-tighter text-emerald-500">
+                                                <h2 className="text-3xl font-black tracking-tighter text-emerald-500">
                                                     {isCheckingAuth ? "..." : `RM ${(Number(user?.profit || 0) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                 </h2>
                                                 {!isCheckingAuth && (
-                                                    <p className="text-sm font-bold text-zinc-400">
+                                                    <p className="text-[10px] font-bold text-zinc-500">
                                                         (${(Number(user?.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
                                                     </p>
                                                 )}
+                                            </div>
+                                        </div>
+
+                                        {/* Current Package */}
+                                        <div className="bg-gv-gold/5 border border-gv-gold/10 p-8 rounded-[40px] shadow-xl relative overflow-hidden group">
+                                            <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
+                                            <div className="flex flex-col gap-1">
+                                                <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
+                                                    {getTierByAmount(Number(user?.balance || 0)).name}
+                                                </h2>
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <div className="h-2 w-2 rounded-full bg-gv-gold animate-pulse"></div>
+                                                    <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">Active Status</span>
+                                                </div>
+                                            </div>
+                                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                                                <svg className="h-12 w-12 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                                                    <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-2.06 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946 2.06 3.42 3.42 0 012.219 4.438 3.42 3.42 0 00-2.06 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 002.06 1.946 3.42 3.42 0 01-2.219 4.438 3.42 3.42 0 00-1.946-2.06 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946 2.06 3.42 3.42 0 01-2.219-4.438 3.42 3.42 0 002.06-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00-2.06-1.946 3.42 3.42 0 012.219-4.438z" />
+                                                </svg>
                                             </div>
                                         </div>
                                     </section>
@@ -859,16 +895,36 @@ export default function DashboardClient() {
                                                 <svg className="h-20 w-20 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                             </div>
                                             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
-                                            <h3 className="text-3xl font-black text-white">RM {(user?.total_assets * monthlyRate * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
-                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Based on {(monthlyRate * 100).toFixed(0)}% Monthly Return</p>
+                                            {(() => {
+                                                const currentTier = getTierByAmount(Number(user?.balance || 0));
+                                                const monthlyMin = Number(user?.balance || 0) * currentTier.minDividend * forexRate;
+                                                const monthlyMax = Number(user?.balance || 0) * currentTier.maxDividend * forexRate;
+                                                return (
+                                                    <h3 className="text-3xl font-black text-white">
+                                                        RM {monthlyMin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} - {monthlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                    </h3>
+                                                );
+                                            })()}
+                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">
+                                                Based on {getTierByAmount(Number(user?.balance || 0)).minDividend * 100}-{getTierByAmount(Number(user?.balance || 0)).maxDividend * 100}% {getTierByAmount(Number(user?.balance || 0)).name} Returns
+                                            </p>
                                         </div>
                                         <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
                                             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
                                                 <svg className="h-20 w-20 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                             </div>
                                             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
-                                            <h3 className="text-3xl font-black text-emerald-500">RM {(user?.total_assets * yearlyRate * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
-                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Yearly Forecast ({(yearlyRate * 100).toFixed(0)}% ROI)</p>
+                                            {(() => {
+                                                const currentTier = getTierByAmount(Number(user?.balance || 0));
+                                                const yearlyMin = Number(user?.balance || 0) * currentTier.minDividend * 12 * forexRate;
+                                                const yearlyMax = Number(user?.balance || 0) * currentTier.maxDividend * 12 * forexRate;
+                                                return (
+                                                    <h3 className="text-3xl font-black text-emerald-500">
+                                                        RM {yearlyMin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} - {yearlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                    </h3>
+                                                );
+                                            })()}
+                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Yearly Forecast (Based on {getTierByAmount(Number(user?.balance || 0)).name})</p>
                                         </div>
                                     </section>
 
