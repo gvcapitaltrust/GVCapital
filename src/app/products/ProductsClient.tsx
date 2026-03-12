@@ -168,10 +168,10 @@ export default function ProductsClient() {
         <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-gv-gold selection:text-black flex flex-col">
             {/* ─── NAVIGATION ─── */}
             <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-md">
-                <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 h-20">
+                <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4 md:h-20">
                     <div className="flex items-center">
                         <Link href={`/?lang=${lang}`} className="flex items-center shrink-0">
-                            <img src="/logo.png" alt="GV Capital Trust Logo" className="max-h-[50px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(238,206,128,0.3)]" />
+                            <img src="/logo.png" alt="GV Capital Trust Logo" className="max-h-[40px] md:max-h-[50px] w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(238,206,128,0.3)]" />
                         </Link>
                     </div>
 
@@ -204,7 +204,7 @@ export default function ProductsClient() {
                 </div>
 
                 {isMenuOpen && (
-                    <div className="md:hidden absolute top-20 left-0 w-full bg-[#0a0a0a] border-b border-white/5 animate-in slide-in-from-top duration-300">
+                    <div className="md:hidden absolute top-full left-0 w-full bg-[#0a0a0a] border-b border-white/5 animate-in slide-in-from-top duration-300 shadow-2xl">
                         <div className="flex flex-col p-6 gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
                             <Link href={`/products?lang=${lang}`} onClick={() => setIsMenuOpen(false)} className="text-gv-gold transition-colors">{t.nav.services}</Link>
                             <Link href="#" onClick={() => setIsMenuOpen(false)} className="hover:text-gv-gold transition-colors">{t.nav.about}</Link>

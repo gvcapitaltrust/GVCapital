@@ -288,7 +288,7 @@ export default function RegisterPage() {
                         <img
                             src="/logo.png"
                             alt="GV Capital Trust Logo"
-                            className="h-[80px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
+                            className="h-[50px] md:h-[80px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
                         />
                     </Link>
                     <h1 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">{t.title}</h1>

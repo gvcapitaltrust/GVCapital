@@ -21,7 +21,7 @@ export default function DashboardClient() {
     const [monthlyRate, setMonthlyRate] = useState(0.08); // 8% Default
     const [yearlyRate, setYearlyRate] = useState(0.96); // 96% Default
     const [dividendHistory, setDividendHistory] = useState<any[]>([]);
-    const [activeTab, setActiveTab] = useState<"overview" | "statements" | "security">("overview");
+    const [activeTab, setActiveTab] = useState<"overview" | "statements" | "security" | "profile">("overview");
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -34,6 +34,7 @@ export default function DashboardClient() {
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
     const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
     const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+    const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [successRefId, setSuccessRefId] = useState("");
@@ -45,6 +46,19 @@ export default function DashboardClient() {
     const [depositReceipt, setDepositReceipt] = useState<File | null>(null);
     const [withdrawAmount, setWithdrawAmount] = useState("");
     const [withdrawPIN, setWithdrawPIN] = useState("");
+    const [otpCode, setOtpCode] = useState("");
+    const [otpSending, setOtpSending] = useState(false);
+    const [otpSent, setOtpSent] = useState(false);
+    const [otpError, setOtpError] = useState("");
+
+    // Profile Edit States
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [profileForm, setProfileForm] = useState({ full_name: "", phone: "", address: "", city: "" });
+    const [profileSaving, setProfileSaving] = useState(false);
+
+    // Lock Countdown
+    const [lockCountdown, setLockCountdown] = useState("");
+    const [earliestUnlock, setEarliestUnlock] = useState<Date | null>(null);
 
     // KYC Form States
     const [idPhoto, setIdPhoto] = useState<File | null>(null);
@@ -124,6 +138,34 @@ export default function DashboardClient() {
                 if (txs) {
                     setTransactions(txs);
                     setDividendHistory(txs.filter((t: any) => t.type === 'Dividend' || t.type === 'bonus').slice(0, 6).reverse());
+
+                    // Calculate 6-month lock from approved deposits
+                    const approvedDeposits = txs.filter((t: any) => t.type === 'Deposit' && t.status === 'Approved');
+                    if (approvedDeposits.length > 0) {
+                        const lockDates = approvedDeposits.map((d: any) => {
+                            const depositDate = new Date(d.created_at || d.date);
+                            const lockEnd = new Date(depositDate);
+                            lockEnd.setMonth(lockEnd.getMonth() + 6);
+                            return lockEnd;
+                        });
+                        // Find the earliest lock that hasn't expired yet
+                        const now = new Date();
+                        const futureLocks = lockDates.filter((d: Date) => d > now);
+                        if (futureLocks.length > 0) {
+                            const earliest = futureLocks.reduce((a: Date, b: Date) => a < b ? a : b);
+                            setEarliestUnlock(earliest);
+                        }
+                    }
+                }
+
+                // Pre-fill profile form
+                if (profile) {
+                    setProfileForm({
+                        full_name: profile.full_name || authUser.user_metadata?.full_name || "",
+                        phone: profile.phone || "",
+                        address: profile.address || "",
+                        city: profile.city || "",
+                    });
                 }
 
                 // 4. Fetch Rates & Referrals
@@ -246,7 +288,8 @@ export default function DashboardClient() {
 
     const handleWithdrawInitiate = () => {
         if (!withdrawAmount) return;
-        setIsPinModalOpen(true);
+        // Send OTP for email verification
+        handleSendOtp();
     };
 
     const handleWithdrawConfirm = async () => {
@@ -318,6 +361,165 @@ export default function DashboardClient() {
     const handleLogout = async () => {
         await supabase.auth.signOut();
         router.push(`/?lang=${lang}`);
+    };
+
+    // Countdown timer for locked capital
+    useEffect(() => {
+        if (!earliestUnlock) return;
+        const timer = setInterval(() => {
+            const now = new Date();
+            const diff = earliestUnlock.getTime() - now.getTime();
+            if (diff <= 0) {
+                setLockCountdown("Unlocked");
+                setEarliestUnlock(null);
+                clearInterval(timer);
+                return;
+            }
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            setLockCountdown(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [earliestUnlock]);
+
+    // OTP Handlers
+    const handleSendOtp = async () => {
+        if (!user) return;
+        setOtpSending(true);
+        setOtpError("");
+        try {
+            const res = await fetch("/api/send-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    userId: user.id, 
+                    email: user.email,
+                    amount: withdrawAmount 
+                }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setOtpSent(true);
+                setIsOtpModalOpen(true);
+                // In dev mode, auto-fill OTP for testing
+                if (data._dev_otp) {
+                    setOtpCode(data._dev_otp);
+                }
+            } else {
+                setOtpError(data.error || "Failed to send OTP");
+            }
+        } catch (err: any) {
+            setOtpError(err.message);
+        } finally {
+            setOtpSending(false);
+        }
+    };
+
+    const verifyOTP = async (code: string) => {
+        if (!user) return false;
+        
+        const { data: otpRecord, error: otpErr } = await supabase
+            .from("otp_codes")
+            .select("*")
+            .eq("user_id", user.id)
+            .eq("code", code)
+            .gte("expires_at", new Date().toISOString())
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .single();
+
+        if (otpErr || !otpRecord) {
+            return false;
+        }
+
+        // Delete the OTP code after verification as requested
+        await supabase.from("otp_codes").delete().eq("id", otpRecord.id);
+        return true;
+    };
+
+    const handleOtpWithdraw = async () => {
+        if (otpCode.length !== 6) {
+            setOtpError("Please enter the 6-digit OTP code.");
+            return;
+        }
+        setIsSubmitting(true);
+        setOtpError("");
+
+        try {
+            const isValid = await verifyOTP(otpCode);
+
+            if (!isValid) {
+                setOtpError("Invalid or expired OTP. Please request a new one.");
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Create the withdrawal transaction
+            const refId = `TXN-${Math.floor(1000 + Math.random() * 9000)}`;
+            const { error } = await supabase
+                .from("transactions")
+                .insert([{
+                    user_id: user.id,
+                    type: "Withdrawal",
+                    amount: parseFloat(withdrawAmount),
+                    status: "Pending",
+                    ref_id: refId,
+                }]);
+
+            if (error) throw error;
+
+            // Clean up
+            setIsOtpModalOpen(false);
+            setIsWithdrawModalOpen(false);
+            setWithdrawAmount("");
+            setOtpCode("");
+            setOtpSent(false);
+            setSuccessRefId(refId);
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 3000);
+
+            // Refetch transactions
+            let refetchQuery = supabase.from("transactions").select("*");
+            if (user?.email !== "thenja96@gmail.com") {
+                refetchQuery = refetchQuery.eq("user_id", user.id);
+            }
+            const { data: txs } = await refetchQuery.order("created_at", { ascending: false });
+            if (txs) setTransactions(txs);
+
+        } catch (err: any) {
+            setOtpError(err.message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // Profile Save Handler
+    const handleProfileSave = async () => {
+        if (!user) return;
+        setProfileSaving(true);
+        try {
+            const { error } = await supabase
+                .from("profiles")
+                .update({
+                    full_name: profileForm.full_name,
+                    phone: profileForm.phone,
+                    address: profileForm.address,
+                    city: profileForm.city,
+                })
+                .eq("id", user.id);
+
+            if (error) throw error;
+            setIsEditingProfile(false);
+            // Update local user state
+            setUser((prev: any) => ({ ...prev, ...profileForm, fullName: profileForm.full_name }));
+            alert(lang === "en" ? "Profile updated successfully." : "个人资料已成功更新。");
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setProfileSaving(false);
+        }
     };
 
     const generateStatement = (m?: number, y?: number) => {
@@ -596,6 +798,13 @@ export default function DashboardClient() {
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             Security
                         </button>
+                        <button
+                            onClick={() => setActiveTab("profile")}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "profile" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                        >
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                            Profile
+                        </button>
                     </nav>
                 </div>
                 <div className="space-y-4">
@@ -623,7 +832,7 @@ export default function DashboardClient() {
                     <header className="flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="flex flex-col items-center md:items-start w-full md:w-auto">
                             <div className="md:hidden mb-6">
-                                <img src="/logo.png" alt="GV Capital" className="h-[50px] w-auto object-contain mix-blend-screen" />
+                                <img src="/logo.png" alt="GV Capital" className="h-[40px] md:h-[50px] w-auto object-contain mix-blend-screen" />
                             </div>
                             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em] mb-2">{t.nav}</p>
                             <h1 className="text-3xl md:text-5xl font-black text-center md:text-left">
@@ -712,47 +921,96 @@ export default function DashboardClient() {
                                 )
                             ) : (
                                 <>
-                                    <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalAssets}</p>
-                                    <div className="flex flex-col gap-2">
-                                        <h2 className="text-4xl font-black tracking-tighter">
-                                            {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
-                                        </h2>
+                                    {/* Dual Wallet Cards */}
+                                    <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        {/* Locked Capital Wallet */}
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl relative overflow-hidden group hover:border-amber-500/20 transition-all">
+                                            <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                                            <div className="relative z-10">
+                                                <div className="flex items-center gap-3 mb-6">
+                                                    <div className="h-10 w-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                                                        <svg className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">Locked Capital</p>
+                                                        <p className="text-[8px] text-zinc-700 font-bold uppercase tracking-widest">6-Month Lock Period</p>
+                                                    </div>
+                                                </div>
+                                                <h2 className="text-4xl font-black tracking-tighter text-white mb-2">
+                                                    {isCheckingAuth ? "..." : `RM ${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                </h2>
+                                                {!isCheckingAuth && (
+                                                    <p className="text-sm font-bold text-zinc-500">
+                                                        (${(Number(user?.balance || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                                    </p>
+                                                )}
+                                                {/* Lock Countdown */}
+                                                {earliestUnlock && lockCountdown && lockCountdown !== "Unlocked" && (
+                                                    <div className="mt-6 flex items-center gap-3 bg-amber-500/5 border border-amber-500/10 rounded-2xl px-5 py-4">
+                                                        <svg className="h-4 w-4 text-amber-500 shrink-0 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                        <div>
+                                                            <p className="text-[9px] font-black text-amber-500/70 uppercase tracking-widest">Next Unlock In</p>
+                                                            <p className="text-sm font-black text-amber-400 tracking-wider font-mono">{lockCountdown}</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {lockCountdown === "Unlocked" && (
+                                                    <div className="mt-6 flex items-center gap-3 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl px-5 py-4">
+                                                        <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                        <p className="text-sm font-black text-emerald-400 uppercase tracking-widest">Capital Unlocked</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Available Dividends Wallet */}
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl relative overflow-hidden group hover:border-emerald-500/20 transition-all">
+                                            <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+                                            <div className="relative z-10">
+                                                <div className="flex items-center gap-3 mb-6">
+                                                    <div className="h-10 w-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                                        <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">Available Dividends</p>
+                                                        <p className="text-[8px] text-zinc-700 font-bold uppercase tracking-widest">Withdrawable Balance</p>
+                                                    </div>
+                                                </div>
+                                                <h2 className="text-4xl font-black tracking-tighter text-emerald-500 mb-2">
+                                                    {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                </h2>
+                                                {!isCheckingAuth && (
+                                                    <p className="text-sm font-bold text-zinc-500">
+                                                        (${(Number(user?.profit || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                                    </p>
+                                                )}
+                                                <div className="mt-6 flex items-center gap-2 text-[9px] font-black text-emerald-500/50 uppercase tracking-widest">
+                                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M5 13l4 4L19 7" /></svg>
+                                                    Available for withdrawal
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    {/* Total Assets Summary */}
+                                    <section className="bg-[#111] border border-white/5 p-8 rounded-[32px] flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-12 w-12 rounded-2xl bg-gv-gold/10 border border-gv-gold/20 flex items-center justify-center">
+                                                <svg className="h-6 w-6 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                                            </div>
+                                            <div>
+                                                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest">{t.totalAssets}</p>
+                                                <h3 className="text-2xl font-black text-gv-gold tracking-tighter">
+                                                    {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
+                                                </h3>
+                                            </div>
+                                        </div>
                                         {!isCheckingAuth && user?.kyc_completed && (
-                                            <p className="text-sm font-bold text-zinc-400">
+                                            <p className="text-sm font-bold text-zinc-500">
                                                 (${(Number(user?.total_assets || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                                             </p>
                                         )}
-                                    </div>
-                                </div>
-                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalEquity}</p>
-                                    <div className="flex flex-col gap-2">
-                                        <h2 className="text-4xl font-black tracking-tighter text-gv-gold">
-                                            {isCheckingAuth ? "..." : `RM ${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                                        </h2>
-                                        {!isCheckingAuth && (
-                                            <p className="text-sm font-bold text-zinc-400">
-                                                (${(Number(user?.balance || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
-                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.totalProfit}</p>
-                                    <div className="flex flex-col gap-2">
-                                        <h2 className="text-4xl font-black tracking-tighter text-emerald-500">
-                                            {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                                        </h2>
-                                        {!isCheckingAuth && (
-                                            <p className="text-sm font-bold text-zinc-400">
-                                                (${(Number(user?.profit || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            </section>
+                                    </section>
 
                             <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
@@ -955,7 +1213,7 @@ export default function DashboardClient() {
                                 </div>
                             </div>
                         </section>
-                    ) : (
+                    ) : activeTab === "security" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
                             <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
@@ -1007,7 +1265,170 @@ export default function DashboardClient() {
                                 </div>
                             </div>
                         </section>
-                    )}
+                    ) : activeTab === "profile" ? (
+                        <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
+                                <div className="relative z-10 max-w-2xl mx-auto space-y-10">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h2 className="text-3xl font-black uppercase tracking-tighter mb-2 text-white">Profile Management</h2>
+                                            <p className="text-zinc-500 font-medium">
+                                                {lang === "en" ? "View and update your personal information." : "查看并更新您的个人信息。"}
+                                            </p>
+                                        </div>
+                                        {user?.is_verified && (
+                                            <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-full">
+                                                <svg className="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Verified</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Editable Fields */}
+                                    <div className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Full Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={profileForm.full_name}
+                                                    onChange={(e) => setProfileForm({...profileForm, full_name: e.target.value})}
+                                                    disabled={!isEditingProfile}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Email</label>
+                                                <input
+                                                    type="email"
+                                                    value={user?.email || ""}
+                                                    disabled
+                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold opacity-50 cursor-not-allowed"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Phone Number</label>
+                                                <input
+                                                    type="tel"
+                                                    value={profileForm.phone}
+                                                    onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
+                                                    disabled={!isEditingProfile}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    placeholder="+60 12345678"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">City</label>
+                                                <input
+                                                    type="text"
+                                                    value={profileForm.city}
+                                                    onChange={(e) => setProfileForm({...profileForm, city: e.target.value})}
+                                                    disabled={!isEditingProfile}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    placeholder="Kuala Lumpur"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Address</label>
+                                            <input
+                                                type="text"
+                                                value={profileForm.address}
+                                                onChange={(e) => setProfileForm({...profileForm, address: e.target.value})}
+                                                disabled={!isEditingProfile}
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold focus:outline-none focus:border-gv-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                placeholder="Street address"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Bank Details — Read-Only when KYC verified */}
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-3">
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">Bank Details</h3>
+                                            {user?.is_verified && (
+                                                <span className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full text-[9px] font-black text-amber-500 uppercase tracking-widest">
+                                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                                    Read-Only
+                                                </span>
+                                            )}
+                                        </div>
+                                        {user?.is_verified && (
+                                            <div className="bg-amber-500/5 border border-amber-500/10 rounded-2xl px-5 py-3">
+                                                <p className="text-[10px] font-bold text-amber-500/70 uppercase tracking-widest">
+                                                    {lang === "en"
+                                                        ? "Bank details are locked after KYC verification for security. Contact support to update."
+                                                        : "银行详情在KYC验证后已锁定以确保安全。如需更新，请联系客服。"}
+                                                </p>
+                                            </div>
+                                        )}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Bank Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={user?.bank_name || ""}
+                                                    disabled
+                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold opacity-50 cursor-not-allowed"
+                                                    placeholder="Not set"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Account Number</label>
+                                                <input
+                                                    type="text"
+                                                    value={user?.account_number ? `****${user.account_number.slice(-4)}` : ""}
+                                                    disabled
+                                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-bold opacity-50 cursor-not-allowed font-mono tracking-widest"
+                                                    placeholder="Not set"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex gap-4 pt-6">
+                                        {isEditingProfile ? (
+                                            <>
+                                                <button
+                                                    onClick={() => {
+                                                        setIsEditingProfile(false);
+                                                        setProfileForm({
+                                                            full_name: user?.fullName || user?.full_name || "",
+                                                            phone: user?.phone || "",
+                                                            address: user?.address || "",
+                                                            city: user?.city || "",
+                                                        });
+                                                    }}
+                                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl uppercase tracking-widest text-xs hover:bg-white/10 transition-all"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={handleProfileSave}
+                                                    disabled={profileSaving}
+                                                    className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-2xl uppercase tracking-widest text-xs shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-3"
+                                                >
+                                                    {profileSaving ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : "Save Changes"}
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <button
+                                                onClick={() => setIsEditingProfile(true)}
+                                                className="w-full bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl uppercase tracking-widest text-xs hover:bg-gv-gold hover:text-black transition-all flex items-center justify-center gap-3"
+                                            >
+                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                                Edit Profile
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    ) : null}
                 </div>
                 <GlobalFooter />
             </main>
@@ -1070,34 +1491,69 @@ export default function DashboardClient() {
                 </div>
             )}
 
-            {/* PIN Modal */}
-            {isPinModalOpen && (
+            {/* OTP Verification Modal */}
+            {isOtpModalOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl">
                     <div className="bg-[#111] border border-gv-gold/50 rounded-[40px] p-12 max-w-md w-full text-center space-y-10 shadow-[0_0_100px_rgba(212,175,55,0.15)] animate-in fade-in zoom-in-90 duration-300">
                         <div className="h-20 w-20 bg-gv-gold/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-gv-gold/20">
-                            <svg className="h-10 w-10 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            <svg className="h-10 w-10 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                         </div>
                         <div>
-                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">{t.securityPin}</h3>
-                            <p className="text-zinc-500 font-medium text-sm px-4">{t.enterPin}</p>
-                        </div>
-                        <div className="flex justify-center gap-3">
-                            <input
-                                type="password"
-                                maxLength={6}
-                                value={withdrawPIN}
-                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[1em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold"
-                                autoFocus
-                            />
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">Email Verification</h3>
+                            <p className="text-zinc-500 font-medium text-sm px-4">
+                                {lang === "en"
+                                    ? `A 6-digit verification code has been sent to your registered email (${user?.email}).`
+                                    : `6位验证码已发送至您的注册邮箱 (${user?.email})。`}
+                            </p>
                         </div>
                         <div className="space-y-4">
-                            <button onClick={handleWithdrawConfirm} disabled={isSubmitting || withdrawPIN.length !== 6} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50">
-                                {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.confirmWithdraw}
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                maxLength={6}
+                                value={otpCode}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[1em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold"
+                                placeholder="000000"
+                                autoFocus
+                            />
+                            {otpError && (
+                                <p className="text-red-500 text-xs font-bold uppercase tracking-widest">{otpError}</p>
+                            )}
+                        </div>
+                        <div className="space-y-4">
+                            <button
+                                onClick={handleOtpWithdraw}
+                                disabled={isSubmitting || otpCode.length !== 6}
+                                className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 hover:-translate-y-1 transition-all"
+                            >
+                                {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : "Verify & Withdraw"}
                             </button>
-                            <button onClick={() => setIsPinModalOpen(false)} className="text-zinc-600 font-bold hover:text-white transition-colors uppercase tracking-widest text-xs">
-                                Cancel Transaction
-                            </button>
+                            <div className="flex items-center justify-center gap-4">
+                                <button
+                                    onClick={() => {
+                                        setOtpCode("");
+                                        setOtpError("");
+                                        handleSendOtp();
+                                    }}
+                                    disabled={otpSending}
+                                    className="text-gv-gold font-bold hover:text-white transition-colors uppercase tracking-widest text-[10px]"
+                                >
+                                    {otpSending ? "Sending..." : "Resend Code"}
+                                </button>
+                                <span className="text-zinc-700">|</span>
+                                <button
+                                    onClick={() => {
+                                        setIsOtpModalOpen(false);
+                                        setOtpCode("");
+                                        setOtpError("");
+                                        setOtpSent(false);
+                                    }}
+                                    className="text-zinc-600 font-bold hover:text-white transition-colors uppercase tracking-widest text-[10px]"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
