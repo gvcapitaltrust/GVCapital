@@ -35,7 +35,7 @@ export async function POST(request: Request) {
                 .eq('key', 'usd_to_myr_rate')
                 .single();
 
-            const rate = parseFloat(forexData?.value || '4.752');
+            const rate = parseFloat(forexData?.value || '4.0');
 
             // 2. Calculate amount_usd
             const amount_usd = amount_myr / rate;

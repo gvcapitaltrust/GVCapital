@@ -13,12 +13,13 @@ export default function ApprovalsClient() {
     const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
     const [forexRate, setForexRate] = useState<number>(4.0);
 
+    const fetchRate = async () => {
+        const { data } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
+        if (data) setForexRate(parseFloat(data.value));
+        else setForexRate(4.0);
+    };
+
     useEffect(() => {
-        const fetchRate = async () => {
-            const { data } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
-            if (data) setForexRate(parseFloat(data.value));
-            else setForexRate(4.0);
-        };
         fetchRate();
     }, []);
 
@@ -30,6 +31,10 @@ export default function ApprovalsClient() {
             .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
                 console.log("[REALTIME] Change in approvals detected...");
                 fetchPending();
+            })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'platform_settings' }, () => {
+                console.log("[REALTIME] Forex change detected. Refreshing...");
+                fetchRate();
             })
             .subscribe();
 
@@ -61,7 +66,7 @@ export default function ApprovalsClient() {
 
     const handleApprove = async (tx: any) => {
         const displayRm = Number(tx.amount || 0).toFixed(2);
-        const creditUsd = (Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2);
+        const creditUsd = (Number(tx.amount || 0) / 4).toFixed(2);
         if (!confirm(`Confirming deposit of RM ${displayRm} (Credit: $${creditUsd} USD) for ${tx.profiles.full_name}?`)) return;
 
         try {
@@ -193,7 +198,7 @@ export default function ApprovalsClient() {
                                          </td>
                                           <td className="px-8 py-6 font-bold text-emerald-400">
                                                RM {Number(tx.amount || 0).toFixed(2)}
-                                               <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
+                                               <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(tx.amount || 0) / 4).toFixed(2)})</span>
                                           </td>
                                          <td className="px-8 py-6">
                                              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${

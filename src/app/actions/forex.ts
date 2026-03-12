@@ -23,25 +23,25 @@ export async function updateGlobalForexRate(newRate: number) {
         }
 
         // Get Old Rate: Fetches the current usd_to_myr_rate from the 
-        // platform_settings table (where id = 'current_rates').
+        // platform_settings table (where key = 'usd_to_myr_rate').
         const { data: currentSettings, error: fetchError } = await supabase
             .from('platform_settings')
             .select('value')
-            .eq('id', 'current_rates')
+            .eq('key', 'usd_to_myr_rate')
             .single();
 
         // Handle fallback rate if current_rates doesn't exist yet
-        const oldRateValue = currentSettings?.value ? parseFloat(currentSettings.value) : 4.752;
+        const oldRateValue = currentSettings?.value ? parseFloat(currentSettings.value) : 4.0;
 
         // Update Rate: Performs an upsert on platform_settings with the new rate 
         // and the current user's ID in the updated_by column.
         const { error: updateError } = await supabase
             .from('platform_settings')
             .upsert({
-                id: 'current_rates',
+                key: 'usd_to_myr_rate',
                 value: String(newRate),
                 updated_by: user.id
-            }, { onConflict: 'id' });
+            }, { onConflict: 'key' });
 
         if (updateError) {
             console.error("Supabase Upsert Error:", updateError);

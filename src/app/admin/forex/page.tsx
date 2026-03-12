@@ -11,7 +11,7 @@ import Link from "next/link";
 export default function ForexControlPanel() {
     const router = useRouter();
     const [mounted, setMounted] = useState(false);
-    const [currentRate, setCurrentRate] = useState<string>("4.752");
+    const [currentRate, setCurrentRate] = useState<string>("4.0");
     const [newRate, setNewRate] = useState<string>("");
     const [history, setHistory] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +37,7 @@ export default function ForexControlPanel() {
         const { data: currentData } = await supabase
             .from('platform_settings')
             .select('value')
-            .eq('id', 'current_rates')
+            .eq('key', 'usd_to_myr_rate')
             .single();
 
         if (currentData) {
@@ -150,7 +150,7 @@ export default function ForexControlPanel() {
                                                 value={newRate}
                                                 onChange={(e) => setNewRate(e.target.value)}
                                                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all text-white placeholder-zinc-700"
-                                                placeholder="4.7520"
+                                                placeholder="4.000"
                                             />
                                         </div>
                                     </div>
