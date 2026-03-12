@@ -24,7 +24,7 @@ export default function DashboardClient() {
     const [transactions, setTransactions] = useState<any[]>([]);
     const { forexRate, monthlyRate, yearlyRate } = useSettings();
     const [dividendHistory, setDividendHistory] = useState<any[]>([]);
-    const [activeTab, setActiveTab] = useState<"overview" | "products" | "statements" | "security">("overview");
+    const [activeTab, setActiveTab] = useState<"overview" | "products" | "statements" | "profile" | "security">("overview");
     const [isComparisonOpen, setIsComparisonOpen] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -489,6 +489,21 @@ export default function DashboardClient() {
             newPass: "New Password",
             confirmPass: "Confirm New Password",
             updateBtn: "Update Password",
+            profile: "Profile",
+            personalInfo: "Personal Information",
+            compliance: "Compliance & Industry",
+            bankDetails: "Bank Information",
+            fullName: "Full Name",
+            username: "Username",
+            email: "Email Address",
+            phone: "Phone Number",
+            country: "Country",
+            occupation: "Occupation",
+            industry: "Industry",
+            wealthSource: "Source of Wealth",
+            riskProfile: "Risk Profile",
+            bankName: "Bank Name",
+            accNumber: "Account Number",
             pendingVerification: "Account Pending Verification. Please contact your Agent or Admin to activate your account.",
         },
         zh: {
@@ -527,6 +542,21 @@ export default function DashboardClient() {
             newPass: "新密码",
             confirmPass: "确认新密码",
             updateBtn: "更新密码",
+            profile: "个人资料",
+            personalInfo: "个人信息",
+            compliance: "合规与行业",
+            bankDetails: "银行资料",
+            fullName: "全名",
+            username: "用户名",
+            email: "电子邮件",
+            phone: "电话号码",
+            country: "国家",
+            occupation: "职业",
+            industry: "行业",
+            wealthSource: "财富来源",
+            riskProfile: "风险评估",
+            bankName: "银行名称",
+            accNumber: "银行账号",
             pendingVerification: "账户待审核。请联系您的代理或管理员以激活您的账户。",
         },
     };
@@ -576,11 +606,18 @@ export default function DashboardClient() {
                             Statements
                         </button>
                         <button
+                            onClick={() => setActiveTab("profile")}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "profile" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                        >
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                            {t.profile}
+                        </button>
+                        <button
                             onClick={() => setActiveTab("security")}
                             className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "security" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            Security
+                            {t.securityTitle}
                         </button>
                     </nav>
                 </div>
@@ -649,11 +686,18 @@ export default function DashboardClient() {
                             Statements
                         </button>
                         <button
+                            onClick={() => { setActiveTab("profile"); setIsSidebarOpen(false); }}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "profile" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                        >
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                            {t.profile}
+                        </button>
+                        <button
                             onClick={() => { setActiveTab("security"); setIsSidebarOpen(false); }}
                             className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "security" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            Security
+                            {t.securityTitle}
                         </button>
                     </nav>
                 </div>
@@ -1012,6 +1056,95 @@ export default function DashboardClient() {
                                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
                                         Generate & Download PDF
                                     </button>
+                                </div>
+                            </div>
+                        </section>
+                    ) : activeTab === "profile" ? (
+                        <section className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Personal Information */}
+                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-2xl space-y-8 relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
+                                    <div className="relative z-10">
+                                        <h3 className="text-xl font-black uppercase tracking-tighter text-gv-gold mb-8 flex items-center gap-3">
+                                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                            {t.personalInfo}
+                                        </h3>
+                                        <div className="grid gap-6">
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.fullName}</p>
+                                                <p className="text-lg font-bold text-white tracking-tight">{user?.fullName || "-"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.username}</p>
+                                                <p className="text-lg font-bold text-white tracking-tight">@{user?.username || "-"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.email}</p>
+                                                <p className="text-lg font-bold text-white tracking-tight">{user?.email || "-"}</p>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-6">
+                                                <div className="space-y-1">
+                                                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.phone}</p>
+                                                    <p className="text-lg font-bold text-white tracking-tight">{user?.phone || "-"}</p>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.country}</p>
+                                                    <p className="text-lg font-bold text-white tracking-tight">{user?.country || "-"}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Compliance & Industry */}
+                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-2xl space-y-8 relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
+                                    <div className="relative z-10">
+                                        <h3 className="text-xl font-black uppercase tracking-tighter text-gv-gold mb-8 flex items-center gap-3">
+                                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                            {t.compliance}
+                                        </h3>
+                                        <div className="grid gap-6">
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.occupation}</p>
+                                                <p className="text-lg font-bold text-white tracking-tight">{user?.occupation || "-"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.industry}</p>
+                                                <p className="text-lg font-bold text-white tracking-tight">{user?.industry || "-"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.wealthSource}</p>
+                                                <p className="text-lg font-bold text-white tracking-tight">{user?.source_of_wealth || "-"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.riskProfile}</p>
+                                                <p className="text-lg font-bold text-emerald-400 tracking-tight">{user?.risk_profile || "-"}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bank Details */}
+                            <div className="bg-gv-gold/5 border border-gv-gold/10 p-10 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
+                                <div className="relative z-10">
+                                    <h3 className="text-xl font-black uppercase tracking-tighter text-gv-gold mb-8 flex items-center gap-3">
+                                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 00-3 3z" /></svg>
+                                        {t.bankDetails}
+                                    </h3>
+                                    <div className="flex flex-col md:flex-row gap-12">
+                                        <div className="space-y-1 flex-1">
+                                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.bankName}</p>
+                                            <p className="text-2xl font-black text-white tracking-widest uppercase">{user?.bank_name || "-"}</p>
+                                        </div>
+                                        <div className="space-y-1 flex-1">
+                                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.accNumber}</p>
+                                            <p className="text-2xl font-black text-white tracking-[0.2em] font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </section>
