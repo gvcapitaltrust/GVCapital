@@ -972,6 +972,8 @@ export default function DashboardClient() {
                                     </table>
                                 </div>
                             </section>
+                                </>
+                            )}
                         </>
                     ) : activeTab === "products" ? (
                         <ProductSelection
