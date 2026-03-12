@@ -58,10 +58,11 @@ export default function ApprovalsClient() {
 
         try {
             // Use RPC for atomic update of transaction and profile balance
+            const creditUsd = Number(tx.amount || 0) / forexRate;
             const { error: rpcError } = await supabase.rpc('approve_deposit', {
                 p_tx_id: tx.id,
                 p_user_id: tx.user_id,
-                p_amount: Number(tx.amount)
+                p_amount: creditUsd
             });
 
             if (rpcError) throw rpcError;
@@ -185,7 +186,7 @@ export default function ApprovalsClient() {
                                          </td>
                                           <td className="px-8 py-6 font-bold text-emerald-400">
                                                RM {Number(tx.amount || 0).toFixed(2)}
-                                               <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(tx.amount || 0) / 4).toFixed(2)})</span>
+                                               <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(tx.amount || 0) / forexRate).toFixed(2)})</span>
                                           </td>
                                          <td className="px-8 py-6">
                                              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${

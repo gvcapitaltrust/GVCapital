@@ -228,9 +228,9 @@ export default function AdminPortal() {
         if (txError) console.error('Supabase TX Error:', txError);
         
         if (txList) {
-            // REMOVED STATUS FILTER: Show ALL deposits and withdrawals
-            setDeposits(txList.filter((t: any) => t.type === 'Deposit'));
-            setWithdrawals(txList.filter((t: any) => t.type === 'Withdrawal'));
+            // Case-insensitive filtering for robustness
+            setDeposits(txList.filter((t: any) => t.type?.toLowerCase() === 'deposit'));
+            setWithdrawals(txList.filter((t: any) => t.type?.toLowerCase() === 'withdrawal'));
         }
 
         const { data: logs } = await supabase
@@ -648,7 +648,7 @@ export default function AdminPortal() {
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Pending Deposit Approval</p>
-                                <h2 className="text-2xl font-black text-emerald-500">{deposits.filter((d: any) => d.status === 'pending' || d.status === 'Pending').length}</h2>
+                                <h2 className="text-2xl font-black text-emerald-500">{deposits.filter((d: any) => d.status?.toLowerCase() === 'pending').length}</h2>
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Clients</p>
@@ -813,7 +813,7 @@ export default function AdminPortal() {
                                                                 <td className="px-6 py-5 font-black text-emerald-400">
                                                                     <div className="flex flex-col">
                                                                         <span>RM {Number(agent.total_referred_capital || 0).toFixed(2)}</span>
-                                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(agent.total_referred_capital || 0) / 4).toFixed(2)})</span>
+                                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(agent.total_referred_capital || 0) / forexRate).toFixed(2)})</span>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -845,9 +845,9 @@ export default function AdminPortal() {
                                                                         <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">@{ref.username}</div>
                                                                     </div>
                                                                     <div className="text-right">
-                                                                        <div className="flex flex-col items-end">
+                                                                        <div className="flex flex-col">
                                                                             <span className="text-xs font-black text-emerald-400">RM {Number(ref.balance || 0).toFixed(2)}</span>
-                                                                            <span className="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(ref.balance || 0) / 4).toFixed(2)})</span>
+                                                                            <span className="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(ref.balance || 0) / forexRate).toFixed(2)})</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>

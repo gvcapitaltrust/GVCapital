@@ -55,7 +55,7 @@ export async function POST(request: Request) {
             const { error: updateError } = await supabase
                 .from('profiles')
                 .update({
-                    balance: updatedBalanceMYR,
+                    balance: updatedBalanceUSD,
                     balance_usd: updatedBalanceUSD
                 })
                 .eq('id', userId);

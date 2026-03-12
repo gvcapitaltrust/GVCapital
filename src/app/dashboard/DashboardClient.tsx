@@ -121,7 +121,10 @@ export default function DashboardClient() {
                 const { data: txs } = await txQuery.order('created_at', { ascending: false });
                 if (txs) {
                     setTransactions(txs);
-                    setDividendHistory(txs.filter((t: any) => t.type === 'Dividend' || t.type === 'bonus').slice(0, 6).reverse());
+                    setDividendHistory(txs.filter((t: any) => 
+                        t.type?.toLowerCase() === 'dividend' || 
+                        t.type?.toLowerCase() === 'bonus'
+                    ).slice(0, 6).reverse());
                 }
 
                 const { count } = await supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('referred_by', authUser.id);
