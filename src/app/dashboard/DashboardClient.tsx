@@ -10,6 +10,9 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import CurrencyExchangeTicker from "@/components/CurrencyExchangeTicker";
 import { useAuth } from "@/providers/AuthProvider";
+import ProductSelection from "@/components/ProductSelection";
+import ComparisonTable from "@/components/ComparisonTable";
+import { TIERS, getTierByAmount, formatUSD } from "@/lib/tierUtils";
 
 export default function DashboardClient() {
     const { user: authUser, role: authRole, isVerified: authVerified, refresh: refreshAuth } = useAuth();
@@ -21,7 +24,8 @@ export default function DashboardClient() {
     const [monthlyRate, setMonthlyRate] = useState(0.08); // 8% Default
     const [yearlyRate, setYearlyRate] = useState(0.96); // 96% Default
     const [dividendHistory, setDividendHistory] = useState<any[]>([]);
-    const [activeTab, setActiveTab] = useState<"overview" | "statements" | "security">("overview");
+    const [activeTab, setActiveTab] = useState<"overview" | "products" | "statements" | "security">("overview");
+    const [isComparisonOpen, setIsComparisonOpen] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -570,6 +574,13 @@ export default function DashboardClient() {
                             {t.nav}
                         </button>
                         <button
+                            onClick={() => setActiveTab("products")}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "products" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                        >
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                            Products
+                        </button>
+                        <button
                             onClick={() => setActiveTab("statements")}
                             className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "statements" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
@@ -634,6 +645,13 @@ export default function DashboardClient() {
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                             {t.nav}
+                        </button>
+                        <button
+                            onClick={() => { setActiveTab("products"); setIsSidebarOpen(false); }}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "products" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                        >
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                            Products
                         </button>
                         <button
                             onClick={() => { setActiveTab("statements"); setIsSidebarOpen(false); }}
@@ -762,99 +780,100 @@ export default function DashboardClient() {
                             ) : (
                                 <>
                                     <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalAssets}</p>
-                                    <div className="flex flex-col gap-2">
-                                        <h2 className="text-4xl font-black tracking-tighter">
-                                            {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
-                                        </h2>
-                                        {!isCheckingAuth && user?.kyc_completed && (
-                                            <p className="text-sm font-bold text-zinc-400">
-                                                (${(Number(user?.total_assets || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalEquity}</p>
-                                    <div className="flex flex-col gap-2">
-                                        <h2 className="text-4xl font-black tracking-tighter text-gv-gold">
-                                            {isCheckingAuth ? "..." : `RM ${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                                        </h2>
-                                        {!isCheckingAuth && (
-                                            <p className="text-sm font-bold text-zinc-400">
-                                                (${(Number(user?.balance || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
-                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.totalProfit}</p>
-                                    <div className="flex flex-col gap-2">
-                                        <h2 className="text-4xl font-black tracking-tighter text-emerald-500">
-                                            {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                                        </h2>
-                                        {!isCheckingAuth && (
-                                            <p className="text-sm font-bold text-zinc-400">
-                                                (${(Number(user?.profit || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            </section>
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
+                                            <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalAssets}</p>
+                                            <div className="flex flex-col gap-2">
+                                                <h2 className="text-4xl font-black tracking-tighter">
+                                                    {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
+                                                </h2>
+                                                {!isCheckingAuth && user?.kyc_completed && (
+                                                    <p className="text-sm font-bold text-zinc-400">
+                                                        (${(Number(user?.total_assets || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
+                                            <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors uppercase">{t.totalEquity}</p>
+                                            <div className="flex flex-col gap-2">
+                                                <h2 className="text-4xl font-black tracking-tighter text-gv-gold">
+                                                    {isCheckingAuth ? "..." : `RM ${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                </h2>
+                                                {!isCheckingAuth && (
+                                                    <p className="text-sm font-bold text-zinc-400">
+                                                        (${(Number(user?.balance || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl">
+                                            <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.totalProfit}</p>
+                                            <div className="flex flex-col gap-2">
+                                                <h2 className="text-4xl font-black tracking-tighter text-emerald-500">
+                                                    {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                </h2>
+                                                {!isCheckingAuth && (
+                                                    <p className="text-sm font-bold text-zinc-400">
+                                                        (${(Number(user?.profit || 0) / (forexRate || 4.0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </section>
 
-                            <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
-                                    <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
-                                        <svg className="h-20 w-20 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    </div>
-                                    <h3 className="text-3xl font-black text-white">RM {(user?.total_assets * monthlyRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
-                                    <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Based on {(monthlyRate * 100).toFixed(0)}% Monthly Return</p>
-                                </div>
-                                <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
-                                    <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
-                                        <svg className="h-20 w-20 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                                    </div>
-                                    <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
-                                    <h3 className="text-3xl font-black text-emerald-500">RM {(user?.total_assets * yearlyRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
-                                    <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Yearly Forecast ({(yearlyRate * 100).toFixed(0)}% ROI)</p>
-                                </div>
-                            </section>
+                                    <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
+                                            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
+                                                <svg className="h-20 w-20 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            </div>
+                                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
+                                            <h3 className="text-3xl font-black text-white">RM {(user?.total_assets * monthlyRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
+                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Based on {(monthlyRate * 100).toFixed(0)}% Monthly Return</p>
+                                        </div>
+                                        <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
+                                            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
+                                                <svg className="h-20 w-20 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                            </div>
+                                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
+                                            <h3 className="text-3xl font-black text-emerald-500">RM {(user?.total_assets * yearlyRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
+                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Yearly Forecast ({(yearlyRate * 100).toFixed(0)}% ROI)</p>
+                                        </div>
+                                    </section>
 
-                            <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                <div className="lg:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8">
-                                    <h3 className="text-xl font-black uppercase tracking-tighter">{t.dividendTrends}</h3>
-                                    <div className="h-64 flex items-end justify-between gap-4 px-4">
-                                        {dividendHistory.length > 0 ? dividendHistory.map((div: any, i: number) => (
-                                            <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
-                                                <div
-                                                    className="w-full bg-gv-gold rounded-t-xl transition-all duration-500 group-hover:brightness-125"
-                                                    style={{ height: `${Math.max(10, (div.amount / (Math.max(...dividendHistory.map((d: any) => d.amount)) || 1)) * 100)}%` }}
-                                                ></div>
-                                                <span className="text-[8px] font-black text-zinc-600 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
+                                    <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                        <div className="lg:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8">
+                                            <h3 className="text-xl font-black uppercase tracking-tighter">{t.dividendTrends}</h3>
+                                            <div className="h-64 flex items-end justify-between gap-4 px-4">
+                                                {dividendHistory.length > 0 ? dividendHistory.map((div: any, i: number) => (
+                                                    <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
+                                                        <div
+                                                            className="w-full bg-gv-gold rounded-t-xl transition-all duration-500 group-hover:brightness-125"
+                                                            style={{ height: `${Math.max(10, (div.amount / (Math.max(...dividendHistory.map((d: any) => d.amount)) || 1)) * 100)}%` }}
+                                                        ></div>
+                                                        <span className="text-[8px] font-black text-zinc-600 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
+                                                    </div>
+                                                )) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-zinc-700 font-black uppercase tracking-widest text-xs">No Dividend Data Yet</div>
+                                                )}
                                             </div>
-                                        )) : (
-                                            <div className="w-full h-full flex items-center justify-center text-zinc-700 font-black uppercase tracking-widest text-xs">No Dividend Data Yet</div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] flex flex-col justify-center items-center text-center space-y-6">
-                                    <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{t.latestDeposit}</p>
-                                    {transactions.find((t: any) => t.type === 'Deposit') ? (
-                                        <>
-                                            <div className={`h-24 w-24 rounded-full flex items-center justify-center border-2 ${transactions.find(t => t.type === 'Deposit').status === 'Approved' ? 'border-emerald-500/20 text-emerald-500' : transactions.find(t => t.type === 'Deposit').status === 'Rejected' ? 'border-red-500/20 text-red-500' : 'border-amber-500/20 text-amber-500'}`}>
-                                                <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                            </div>
-                                            <div>
-                                                <h4 className={`text-2xl font-black uppercase tracking-tighter ${transactions.find((t: any) => t.type === 'Deposit').status === 'Approved' ? 'text-emerald-500' : transactions.find((t: any) => t.type === 'Deposit').status === 'Rejected' ? 'text-red-500' : 'text-amber-500'}`}>{transactions.find((t: any) => t.type === 'Deposit').status}</h4>
-                                                <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1">{formatCurrency(transactions.find((t: any) => t.type === 'Deposit').amount)} Ref: {transactions.find((t: any) => t.type === 'Deposit').ref_id}</p>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <p className="text-zinc-700 font-black uppercase tracking-widest text-xs">No Deposits Found</p>
-                                    )}
-                                </div>
-                            </section>
+                                        </div>
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] flex flex-col justify-center items-center text-center space-y-6">
+                                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{t.latestDeposit}</p>
+                                            {transactions.find((t: any) => t.type === 'Deposit') ? (
+                                                <>
+                                                    <div className={`h-24 w-24 rounded-full flex items-center justify-center border-2 ${transactions.find((t: any) => t.type === 'Deposit').status === 'Approved' ? 'border-emerald-500/20 text-emerald-500' : transactions.find((t: any) => t.type === 'Deposit').status === 'Rejected' ? 'border-red-500/20 text-red-500' : 'border-amber-500/20 text-amber-500'}`}>
+                                                        <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                    </div>
+                                                    <div>
+                                                        <h4 className={`text-2xl font-black uppercase tracking-tighter ${transactions.find((t: any) => t.type === 'Deposit').status === 'Approved' ? 'text-emerald-500' : transactions.find((t: any) => t.type === 'Deposit').status === 'Rejected' ? 'text-red-500' : 'text-amber-500'}`}>{transactions.find((t: any) => t.type === 'Deposit').status}</h4>
+                                                        <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1">{formatCurrency(transactions.find((t: any) => t.type === 'Deposit').amount)} Ref: {transactions.find((t: any) => t.type === 'Deposit').ref_id}</p>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <p className="text-zinc-700 font-black uppercase tracking-widest text-xs">No Deposits Found</p>
+                                            )}
+                                        </div>
+                                    </section>
 
                             <section className="flex flex-col sm:flex-row gap-6">
                                 <Link
@@ -954,9 +973,13 @@ export default function DashboardClient() {
                                 </div>
                             </section>
                         </>
-                    )}
-                </>
-            ) : activeTab === "statements" ? (
+                    ) : activeTab === "products" ? (
+                        <ProductSelection
+                            currentInvestment={Number(user?.balance || 0) / (forexRate || 4.0)}
+                            lang={lang}
+                            onOpenComparison={() => setIsComparisonOpen(true)}
+                        />
+                    ) : activeTab === "statements" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
                             <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl overflow-hidden relative group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
@@ -1147,6 +1170,10 @@ export default function DashboardClient() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {isComparisonOpen && (
+                <ComparisonTable lang={lang} onClose={() => setIsComparisonOpen(false)} />
             )}
 
             {/* Success Overlays */}
