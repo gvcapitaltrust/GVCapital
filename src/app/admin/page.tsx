@@ -525,10 +525,11 @@ export default function AdminPortal() {
         if (!confirm(`Confirming deposit of RM ${displayRm} (Credit: $${creditUsd} USD) for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
             // Use RPC for atomic update of transaction and profile balance
+            const creditUsd = Number(tx.amount) / forexRate;
             const { error: rpcError } = await supabase.rpc('approve_deposit', {
                 p_tx_id: tx.id,
                 p_user_id: tx.user_id,
-                p_amount: Number(tx.amount)
+                p_amount: creditUsd
             });
             
             if (rpcError) throw rpcError;
