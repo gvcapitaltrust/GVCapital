@@ -1,48 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  /* Background colors */
+  /* Design variables from GV Capital Trust */
   --bg-primary: #0a0a0a;
-  --bg-secondary: #111111;
-
-  /* Brand colors */
   --gold: #c9a84c;
-  --gold-light: #e0c872;
+  --text-primary: #f0ece4;
 
-  /* Legacy Fallbacks */
+  /* Theme mappings */
   --background: var(--bg-primary);
-  --foreground: #ededed;
+  --foreground: var(--text-primary);
 }
 
 @theme {
-  --color-bg-primary: var(--bg-primary);
-  --color-bg-secondary: var(--bg-secondary);
   --color-gold: var(--gold);
-  --color-gold-light: var(--gold-light);
-  --font-heading: var(--font-heading);
-  --font-body: var(--font-body);
+  --color-bg-primary: var(--bg-primary);
+  --color-text-primary: var(--text-primary);
+
+  /* Font mappings */
+  --font-heading: var(--font-heading), 'Cormorant Garamond', serif;
+  --font-body: var(--font-body), 'Outfit', sans-serif;
 }
 
 body {
-  background: var(--bg-primary);
-  color: var(--foreground);
-  font-family: var(--font-body), sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-heading), serif;
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
   font-weight: 600;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
+}
+
+/* Core utilities */
+.text-gold {
+  color: var(--gold);
+}
+
+.bg-gold {
+  background-color: var(--gold);
+}
+
+.border-gold {
+  border-color: var(--gold);
 }
