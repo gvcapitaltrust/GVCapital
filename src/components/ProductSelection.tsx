@@ -31,16 +31,24 @@ export default function ProductSelection({
       subtitle: "Select an amount to see your tier and estimated returns",
       sliderLabel: "Investment Amount (USD)",
       monthlyReturn: "Estimated Monthly Return",
-      compare: "Compare Packages",
+      compare: "Compare Tiers",
       cta: "Proceed to Deposit",
+      currentTier: "Current Tier",
+      potentialUpgrade: "Potential Upgrade",
+      increaseBy: "Increase by",
+      toReach: "to reach"
     },
     zh: {
       title: "选择您的投资计划",
       subtitle: "选择金额以查看您的等级和预计回报",
       sliderLabel: "投资金额 (USD)",
       monthlyReturn: "预计每月回报",
-      compare: "比较套餐",
+      compare: "比较等级",
       cta: "前往入金",
+      currentTier: "当前等级",
+      potentialUpgrade: "潜在升级",
+      increaseBy: "增加",
+      toReach: "即可达到"
     }
   }[lang];
 
@@ -115,20 +123,20 @@ export default function ProductSelection({
           </div>
 
           <div className="flex items-center">
-            <div className="bg-gv-gold/10 border border-gv-gold/20 p-6 rounded-[2rem] space-y-4 w-full">
+            <div className="bg-gv-gold/10 border border-gv-gold/20 p-6 rounded-[2rem] space-y-4 w-full flex flex-col items-center text-center">
               <div className="flex items-center gap-4 text-gv-gold">
                 <Wallet className="h-5 w-5" />
                 <span className="text-xs font-black uppercase tracking-widest">Investment Summary</span>
               </div>
               <div className="space-y-1">
                 <p className="text-zinc-400 text-xs font-medium">Your current tier is based on your total balance.</p>
-                <p className="text-white text-sm font-bold">Current Tier: <span className="text-gv-gold font-black uppercase">{qualifiedTier.name}</span></p>
+                <p className="text-white text-sm font-bold">{t.currentTier}: <span className="text-gv-gold font-black uppercase text-center">{qualifiedTier.name.replace(/ package/gi, '')}</span></p>
               </div>
               {amount > currentInvestment && (
-                <div className="pt-2 border-t border-gv-gold/10">
-                  <p className="text-[10px] text-gv-gold/60 font-black uppercase">Potential Upgrade</p>
+                <div className="pt-2 border-t border-gv-gold/10 w-full">
+                  <p className="text-[10px] text-gv-gold/60 font-black uppercase">{t.potentialUpgrade}</p>
                   <p className="text-white text-sm font-bold italic">
-                    Increase by {formatUSD(amount - currentInvestment)} (≈ RM {((amount - currentInvestment) * forexRate).toLocaleString()}) to reach {activeTier.name}
+                    {t.increaseBy} {formatUSD(amount - currentInvestment)} (≈ RM {((amount - currentInvestment) * forexRate).toLocaleString()}) {t.toReach} {activeTier.name.replace(/ package/gi, '')}
                   </p>
                 </div>
               )}

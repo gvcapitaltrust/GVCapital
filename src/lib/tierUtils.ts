@@ -12,7 +12,7 @@ export interface Tier {
 export const TIERS: Tier[] = [
   {
     id: "basic",
-    name: "Basic Package",
+    name: "Basic",
     minAmount: 1,
     maxAmount: 999,
     minDividend: 0.01,
@@ -22,7 +22,7 @@ export const TIERS: Tier[] = [
   },
   {
     id: "silver",
-    name: "Silver Package",
+    name: "Silver",
     minAmount: 1000,
     maxAmount: 2999,
     minDividend: 0.03,
@@ -32,7 +32,7 @@ export const TIERS: Tier[] = [
   },
   {
     id: "gold",
-    name: "Gold Package",
+    name: "Gold",
     minAmount: 3000,
     maxAmount: 4999,
     minDividend: 0.05,
@@ -42,7 +42,7 @@ export const TIERS: Tier[] = [
   },
   {
     id: "platinum",
-    name: "Platinum Package",
+    name: "Platinum",
     minAmount: 5000,
     maxAmount: 10000,
     minDividend: 0.08,

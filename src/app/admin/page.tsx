@@ -51,6 +51,7 @@ export default function AdminPortal() {
     }
 
     const [activeTab, setActiveTab] = useState("deposits");
+    const [lang, setLang] = useState<"en" | "zh">("en");
     const [mounted, setMounted] = useState(false);
     const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [adminProfile, setAdminProfile] = useState<Profile | null>(null);
@@ -109,6 +110,213 @@ export default function AdminPortal() {
         remarks: ""
     });
     const [kycFilter, setKycFilter] = useState<string>("Pending"); // New KYC filter
+
+    const content = {
+        en: {
+            adminPortal: "Admin Portal",
+            tabs: {
+                kyc: "KYC",
+                deposits: "Deposits",
+                withdrawals: "Withdrawals",
+                users: "Users",
+                sales: "Sales",
+                settings: "Settings",
+                audit: "Audit Logs"
+            },
+            status: {
+                status: "Status",
+                all: "All",
+                pending: "Pending",
+                approved: "Approved",
+                rejected: "Rejected",
+                verified: "Verified",
+                unverified: "Unverified",
+                active: "Active",
+                inactive: "Inactive",
+                suspended: "Suspended"
+            },
+            table: {
+                user: "User",
+                amount: "Amount",
+                date: "Date",
+                actions: "Actions",
+                status: "Status",
+                refId: "Ref ID",
+                email: "Email",
+                totalAssets: "Total Assets",
+                totalProfit: "Total Profit",
+                tier: "Tier",
+                fullName: "Full Name",
+                username: "Username",
+                balance: "Balance",
+                profit: "Profit"
+            },
+            kyc: {
+                queue: "Verification Queue",
+                viewDocs: "View Docs",
+                approve: "Approve",
+                reject: "Reject",
+                noDocs: "No verification requests at the moment.",
+                viewingDocs: "Viewing Documents"
+            },
+            users: {
+                userDirectory: "User Directory",
+                activeInvestors: "Active Investors",
+                searchNameEmail: "Search Name or Email...",
+                adjust: "Adjust",
+                details: "Details",
+                manage: "Manage",
+                noUsersFound: "No users found",
+                internalRemark: "Internal Remark",
+                investmentPortfolio: "Investment Portfolio",
+                portfolioNote: "Allocation of user's fund",
+                platformName: "Platform Name",
+                accountId: "Account ID",
+                password: "Password",
+                financialAdjustments: "Financial Adjustments",
+                increase: "Increase",
+                decrease: "Decrease",
+                dividend: "Dividend",
+                wallet: "Wallet",
+                reason: "Reason",
+                updateBtn: "Update",
+                changeTier: "Change Tier",
+                currentTier: "Current Tier",
+                totalInvestment: "Total Investment",
+                dividendEarned: "Dividend Earned"
+            },
+            settings: {
+                platformSettings: "Platform Settings",
+                forexRate: "Global Forex Rate",
+                maintenance: "Maintenance Mode",
+                history: "Rate History",
+                updateRate: "Update Rate",
+                on: "ON",
+                off: "OFF"
+            },
+            sales: {
+                performance: "Sales Performance",
+                leaderboard: "Global Agent Leaderboard",
+                searchAgent: "Search Agent Username...",
+                detailProfile: "Agent Detail Profile",
+                referredClients: "Referred Clients",
+                noReferrals: "No referrals found",
+                selectAgent: "Select an agent to view drill-down performance"
+            },
+            audit: {
+                title: "System Audit Log",
+                subtitle: "Tracking Administrative Actions",
+                dateTime: "Date/Time",
+                admin: "Admin",
+                targetUser: "Target User",
+                action: "Action",
+                reason: "Reason"
+            }
+        },
+        zh: {
+            adminPortal: "管理后台",
+            tabs: {
+                kyc: "KYC",
+                deposits: "入金管理",
+                withdrawals: "提款管理",
+                users: "用户列表",
+                sales: "销售数据",
+                settings: "系统设置",
+                audit: "审计日志"
+            },
+            status: {
+                status: "状态",
+                all: "全部",
+                pending: "待处理",
+                approved: "已批准",
+                rejected: "已拒绝",
+                verified: "已核实",
+                unverified: "未核实",
+                active: "活跃",
+                inactive: "离线",
+                suspended: "已停用"
+            },
+            table: {
+                user: "用户",
+                amount: "金额",
+                date: "日期",
+                actions: "操作",
+                status: "状态",
+                refId: "参考ID",
+                email: "邮箱",
+                totalAssets: "总资产",
+                totalProfit: "总利润",
+                tier: "等级",
+                fullName: "全名",
+                username: "用户名",
+                balance: "余额",
+                profit: "利润"
+            },
+            kyc: {
+                queue: "审核队列",
+                viewDocs: "查看文档",
+                approve: "通过",
+                reject: "拒绝",
+                noDocs: "目前没有待核实的请求。",
+                viewingDocs: "正在查看文档"
+            },
+            users: {
+                userDirectory: "用户目录",
+                activeInvestors: "活跃投资者",
+                searchNameEmail: "搜索姓名或邮箱...",
+                adjust: "调整",
+                details: "详情",
+                manage: "管理",
+                noUsersFound: "未发现用户",
+                internalRemark: "内部备注",
+                investmentPortfolio: "投资组合",
+                portfolioNote: "用户资金分配",
+                platformName: "平台名称",
+                accountId: "账号 ID",
+                password: "密码",
+                financialAdjustments: "财务调账",
+                increase: "增加",
+                decrease: "减少",
+                dividend: "分红",
+                wallet: "钱包",
+                reason: "理由",
+                updateBtn: "更新",
+                changeTier: "变更等级",
+                currentTier: "当前等级",
+                totalInvestment: "总投资",
+                dividendEarned: "已赚红利"
+            },
+            settings: {
+                platformSettings: "平台设置",
+                forexRate: "全局汇率",
+                maintenance: "维护模式",
+                history: "汇率历史",
+                updateRate: "更新汇率",
+                on: "开启",
+                off: "关闭"
+            },
+            sales: {
+                performance: "销售业绩",
+                leaderboard: "全球代理排行榜",
+                searchAgent: "搜索代理用户名...",
+                detailProfile: "代理详细资料",
+                referredClients: "推荐客户",
+                noReferrals: "未发现推荐",
+                selectAgent: "选择代理以查看详细业绩"
+            },
+            audit: {
+                title: "系统审计日志",
+                subtitle: "追踪管理操作",
+                dateTime: "日期/时间",
+                admin: "管理员",
+                targetUser: "目标用户",
+                action: "操作",
+                reason: "原因"
+            }
+        }
+    };
+
+    const t = content[lang];
 
     const hasFetchedRef = React.useRef(false);
 
@@ -713,13 +921,13 @@ export default function AdminPortal() {
     return (
         <AuthGuard requireAdmin={true}>
             <div className="min-h-screen bg-[#0a0a0a] text-zinc-300 font-sans flex flex-col selection:bg-gv-gold selection:text-black">
-                <title>{`Admin Portal | GV Capital Trust`}</title>
+                <title>{`${t.adminPortal} | GV Capital Trust`}</title>
 
                 <header className="border-b border-white/10 bg-[#121212] px-8 py-4 flex items-center justify-between sticky top-0 z-50">
                     <div className="flex items-center gap-4">
                         <img src="/logo.png" className="h-[40px] w-auto mix-blend-screen" />
                         <div>
-                            <h1 className="text-xl font-bold text-white uppercase tracking-tighter">Master Control</h1>
+                            <h1 className="text-xl font-bold text-white uppercase tracking-tighter">{t.adminPortal}</h1>
                             <div className="flex items-center gap-2">
                                 <p className="text-[10px] text-gv-gold font-black tracking-widest uppercase">Admin System Core</p>
                                 <span className="text-[8px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded border border-red-500/20 font-mono">DEBUG: {adminProfile?.role || 'Bypassed'} | {adminProfile?.email}</span>
@@ -727,13 +935,29 @@ export default function AdminPortal() {
                         </div>
                     </div>
                     <div className="flex items-center gap-8">
+                        {/* Language Switcher */}
+                        <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
+                            <button
+                                onClick={() => setLang("en")}
+                                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${lang === "en" ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
+                            >
+                                EN
+                            </button>
+                            <button
+                                onClick={() => setLang("zh")}
+                                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${lang === "zh" ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
+                            >
+                                中
+                            </button>
+                        </div>
+
                         <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Maintenance</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.settings.maintenance}</span>
                             <button onClick={toggleMaintenance} className={`h-6 w-12 rounded-full relative transition-all ${maintenanceMode ? "bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]" : "bg-white/10"}`}>
                                 <div className={`h-4 w-4 bg-white rounded-full absolute top-1 transition-all ${maintenanceMode ? "right-1" : "left-1"}`}></div>
                             </button>
                         </div>
-                        <button onClick={() => { supabase.auth.signOut(); router.push("/login"); }} className="bg-white/5 border border-white/10 px-6 py-2 rounded-xl text-xs font-black uppercase hover:text-red-500 transition-all">Logout</button>
+                        <button onClick={() => { supabase.auth.signOut(); router.push("/login"); }} className="bg-white/5 border border-white/10 px-6 py-2 rounded-xl text-xs font-black uppercase hover:text-red-500 transition-all font-black">Logout</button>
                     </div>
                 </header>
 
@@ -746,7 +970,7 @@ export default function AdminPortal() {
                                     const totalAssetsRm = users.reduce((acc: number, u: Profile) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
                                     return (
                                         <>
-                                            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
+                                            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">{t.table.totalAssets}</p>
                                             <h2 className="text-2xl font-black text-white">RM {totalAssetsRm.toFixed(2)}</h2>
                                             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">(${(totalAssetsRm / forexRate).toFixed(2)} USD)</p>
                                         </>
@@ -754,34 +978,46 @@ export default function AdminPortal() {
                                 })()}
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
-                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC Pending</p>
+                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC {t.status.pending}</p>
                                 <h2 className="text-2xl font-black text-gv-gold">{users.filter(u => u.kyc_status === 'Pending').length}</h2>
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
-                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Pending Deposit</p>
+                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">{t.status.pending} {t.tabs.deposits}</p>
                                 <h2 className="text-2xl font-black text-emerald-500">{deposits.filter((d: any) => d.status?.toLowerCase() === 'pending').length}</h2>
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
-                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Pending Withdrawal</p>
+                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">{t.status.pending} {t.tabs.withdrawals}</p>
                                 <h2 className="text-2xl font-black text-red-500">{withdrawals.filter((w: any) => w.status?.toLowerCase() === 'pending').length}</h2>
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
-                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Clients</p>
+                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total {t.tabs.users}</p>
                                 <h2 className="text-2xl font-black text-white">{users.length}</h2>
                             </div>
                         </div>
 
                         {/* Tabs Navigation */}
                         <div className="flex gap-4 border-b border-white/10 pb-4 overflow-x-auto">
-                            {["deposits", "kyc", "withdrawals", "users", "sales", "forex", "audit", "security"].map(tab => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveTab(tab)}
-                                    className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
-                                >
-                                    {tab === "kyc" ? `KYC Queue (${kycQueue.length})` : tab}
-                                </button>
-                            ))}
+                            {["deposits", "kyc", "withdrawals", "users", "sales", "forex", "audit", "security"].map(tab => {
+                                let label = tab;
+                                if (tab === "deposits") label = t.tabs.deposits;
+                                if (tab === "kyc") label = t.tabs.kyc;
+                                if (tab === "withdrawals") label = t.tabs.withdrawals;
+                                if (tab === "users") label = t.tabs.users;
+                                if (tab === "sales") label = t.tabs.sales;
+                                if (tab === "audit") label = t.tabs.audit;
+                                if (tab === "forex") label = t.settings.forexRate;
+                                if (tab === "security") label = "Admin Account";
+                                
+                                return (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setActiveTab(tab)}
+                                        className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === tab ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
+                                    >
+                                        {label}
+                                    </button>
+                                );
+                            })}
                         </div>
 
                         {/* Content Area */}
@@ -790,8 +1026,8 @@ export default function AdminPortal() {
                                 <div className="animate-in fade-in duration-500">
                                     <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                         <div>
-                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">KYC Verification Queue</h3>
-                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Identify & Verify Clients</p>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">{t.kyc.queue}</h3>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Verify Client Identity</p>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-4">
                                             <select 
@@ -799,16 +1035,16 @@ export default function AdminPortal() {
                                                 onChange={(e) => setKycFilter(e.target.value)}
                                                 className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 transition-all"
                                             >
-                                                <option value="All">All Status</option>
-                                                <option value="Pending">Pending</option>
-                                                <option value="Verified">Verified</option>
-                                                <option value="Rejected">Rejected</option>
+                                                <option value="All">{t.status.all} {t.status.status}</option>
+                                                <option value="Pending">{t.status.pending}</option>
+                                                <option value="Verified">{t.status.verified}</option>
+                                                <option value="Rejected">{t.status.rejected}</option>
                                                 <option value="Draft">Draft</option>
                                             </select>
                                             <div className="relative group w-full md:w-64">
                                                 <input 
                                                     type="text"
-                                                    placeholder="Search Name or Email..."
+                                                    placeholder={t.users.searchNameEmail}
                                                     value={kycSearchQuery}
                                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setKycSearchQuery(e.target.value)}
                                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all text-white"
@@ -821,11 +1057,11 @@ export default function AdminPortal() {
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
-                                                    <th className="px-8 py-6">Client</th>
-                                                    <th className="px-8 py-6">Submission Date</th>
+                                                    <th className="px-8 py-6">{t.table.user}</th>
+                                                    <th className="px-8 py-6">{t.table.date}</th>
                                                     <th className="px-8 py-6">Country</th>
-                                                    <th className="px-8 py-6 text-center">Status</th>
-                                                    <th className="px-8 py-6 text-right">Actions</th>
+                                                    <th className="px-8 py-6 text-center">{t.table.status}</th>
+                                                    <th className="px-8 py-6 text-right">{t.table.actions}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
@@ -889,14 +1125,14 @@ export default function AdminPortal() {
                                 <div className="animate-in fade-in duration-500">
                                     <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                         <div>
-                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">Withdrawal Requests</h3>
-                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Manage Payouts</p>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">{t.tabs.withdrawals}</h3>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{t.status.all} {t.tabs.withdrawals}</p>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-4">
                                             <div className="relative group w-full md:w-64">
                                                 <input 
                                                     type="text"
-                                                    placeholder="Search Name or Email..."
+                                                    placeholder={t.users.searchNameEmail}
                                                     value={withdrawalSearchQuery}
                                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawalSearchQuery(e.target.value)}
                                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all text-white"
@@ -908,17 +1144,17 @@ export default function AdminPortal() {
                                                 onChange={(e) => setWithdrawalStatusFilter(e.target.value)}
                                                 className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 transition-all cursor-pointer"
                                             >
-                                                <option value="All">All Status</option>
-                                                <option value="Pending">Pending</option>
-                                                <option value="Approved">Approved</option>
-                                                <option value="Rejected">Rejected</option>
+                                                <option value="All">{t.status.all} {t.status.status}</option>
+                                                <option value="Pending">{t.status.pending}</option>
+                                                <option value="Approved">{t.status.approved}</option>
+                                                <option value="Rejected">{t.status.rejected}</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div className="overflow-hidden border border-white/5 mx-8 mb-8 rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                                <tr><th className="px-8 py-6">Client</th><th className="px-8 py-6">Bank Details</th><th className="px-8 py-6">Ref ID</th><th className="px-8 py-6">Amount (RM)</th><th className="px-8 py-6 text-right">Action</th></tr>
+                                                <tr><th className="px-8 py-6">{t.table.user}</th><th className="px-8 py-6">Bank Details</th><th className="px-8 py-6">{t.table.refId}</th><th className="px-8 py-6">{t.table.amount} (RM)</th><th className="px-8 py-6 text-right">{t.table.actions}</th></tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
                                                 {withdrawals.filter((w: any) => {
@@ -948,13 +1184,13 @@ export default function AdminPortal() {
                                                         <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
                                                             {w.status === 'Pending' && (
                                                                 <>
-                                                                    <button onClick={() => handleRejectWithdrawal(w)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">Reject</button>
-                                                                    <button onClick={() => handleApproveWithdrawal(w)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Approve Withdrawal</button>
+                                                                    <button onClick={() => handleRejectWithdrawal(w)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">{t.kyc.reject}</button>
+                                                                    <button onClick={() => handleApproveWithdrawal(w)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">{t.kyc.approve} Withdrawal</button>
                                                                 </>
                                                             )}
                                                             {w.status !== 'Pending' && (
                                                                 <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${w.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
-                                                                    {w.status}
+                                                                    {w.status === 'Approved' ? t.status.approved : w.status === 'Rejected' ? t.status.rejected : w.status}
                                                                 </span>
                                                             )}
                                                         </td>
@@ -981,13 +1217,13 @@ export default function AdminPortal() {
                                 <div className="p-8 space-y-8">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                                         <div>
-                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">Sales Performance</h3>
-                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Global Agent Leaderboard</p>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">{t.sales.performance}</h3>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{t.sales.leaderboard}</p>
                                         </div>
                                         <div className="relative w-full md:w-72">
                                             <input
                                                 type="text"
-                                                placeholder="Search Agent Username..."
+                                                placeholder={t.sales.searchAgent}
                                                 value={searchQuery}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-gv-gold transition-all"
@@ -1001,7 +1237,7 @@ export default function AdminPortal() {
                                                 <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                     <tr>
                                                         <th className="px-6 py-4">Rank</th>
-                                                        <th className="px-6 py-4">Agent</th>
+                                                        <th className="px-6 py-4">{t.table.user}</th>
                                                         <th className="px-6 py-4">Total Ref</th>
                                                         <th className="px-6 py-4">Total Capital</th>
                                                     </tr>
@@ -1049,11 +1285,11 @@ export default function AdminPortal() {
                                             {selectedAgent ? (
                                                 <div className="space-y-6 animate-in fade-in duration-300">
                                                     <div>
-                                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold mb-1">Agent Detail Profile</h4>
+                                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold mb-1">{t.sales.detailProfile}</h4>
                                                         <div className="text-2xl font-black text-white uppercase tracking-tighter">{selectedAgent}</div>
                                                     </div>
                                                     <div className="space-y-4">
-                                                        <h5 className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Referred Clients ({agentReferrals.length})</h5>
+                                                        <h5 className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.sales.referredClients} ({agentReferrals.length})</h5>
                                                         <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                                             {agentReferrals.map((ref: any, i: number) => (
                                                                 <div key={i} className="bg-white/5 border border-white/5 p-4 rounded-xl flex items-center justify-between group">
@@ -1070,7 +1306,7 @@ export default function AdminPortal() {
                                                                 </div>
                                                             ))}
                                                             {agentReferrals.length === 0 && (
-                                                                <div className="text-center py-10 text-zinc-600 text-[10px] font-black uppercase">No referrals found</div>
+                                                                <div className="text-center py-10 text-zinc-600 text-[10px] font-black uppercase">{t.sales.noReferrals}</div>
                                                             )}
                                                         </div>
                                                     </div>
@@ -1173,15 +1409,15 @@ export default function AdminPortal() {
                                 <div className="p-8 space-y-6 animate-in fade-in duration-500">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                                         <div>
-                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">Client Directory</h3>
-                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Global User Management</p>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">{t.users.userDirectory}</h3>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{t.users.activeInvestors}</p>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-4">
                                             {/* Search Bar */}
                                             <div className="relative group w-full md:w-64">
                                                 <input 
                                                     type="text"
-                                                    placeholder="Search Name or Email..."
+                                                    placeholder={t.users.searchNameEmail}
                                                     value={userSearchQuery}
                                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserSearchQuery(e.target.value)}
                                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all text-white"
@@ -1194,10 +1430,9 @@ export default function AdminPortal() {
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setUserStatusFilter(e.target.value)}
                                                 className="bg-[#121212] border border-white/10 rounded-xl px-6 py-2.5 text-xs font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 cursor-pointer transition-all"
                                             >
-                                                <option value="All">All Users</option>
-                                                <option value="Verified">Fully Verified</option>
-                                                <option value="KYC Pending">KYC Pending</option>
-                                                <option value="Unverified">Unverified</option>
+                                                <option value="All">{t.status.all} {t.tabs.users}</option>
+                                                <option value="Verified">{t.status.verified}</option>
+                                                <option value="Unverified">{t.status.unverified}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -1205,14 +1440,12 @@ export default function AdminPortal() {
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
-                                                    <th className="px-8 py-6">Client</th>
-                                                    <th className="px-8 py-6">Total Balance (RM/USD)</th>
-                                                    <th className="px-8 py-6">Profit Earned</th>
-                                                    <th className="px-8 py-6">Total Assets</th>
-                                                    <th className="px-8 py-6 text-center">Tier</th>
-                                                    <th className="px-8 py-6 text-center">KYC</th>
-                                                    <th className="px-8 py-6 text-center">Status</th>
-                                                    <th className="px-8 py-6 text-right">Action</th>
+                                                    <th className="px-8 py-6">{t.table.user}</th>
+                                                    <th className="px-8 py-6">{t.users.totalInvestment || "Total Investment"}</th>
+                                                    <th className="px-8 py-6">{t.users.dividendEarned || "Dividend Earned"}</th>
+                                                    <th className="px-8 py-6 text-center">{t.table.tier}</th>
+                                                    <th className="px-8 py-6 text-center">{t.table.status}</th>
+                                                    <th className="px-8 py-6 text-right">{t.table.actions}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
@@ -1222,10 +1455,8 @@ export default function AdminPortal() {
                                                     let matchesFilter = true;
                                                     if (userStatusFilter === "Verified") {
                                                         matchesFilter = u.is_verified === true;
-                                                    } else if (userStatusFilter === "KYC Pending") {
-                                                        matchesFilter = !u.is_verified && u.kyc_step === 3;
                                                     } else if (userStatusFilter === "Unverified") {
-                                                        matchesFilter = !u.is_verified && (u.kyc_step || 0) < 3;
+                                                        matchesFilter = u.is_verified === false;
                                                     }
                                                     return matchesSearch && matchesFilter;
                                                 }).map((u: any, i: number) => (
@@ -1247,12 +1478,6 @@ export default function AdminPortal() {
                                                             </div>
                                                         </td>
                                                         <td className="px-8 py-6 text-gv-gold font-mono text-xs">RM {Number(u.profit || 0).toFixed(2)}</td>
-                                                        <td className="px-8 py-6 text-white font-black">
-                                                            <div className="flex flex-col">
-                                                                <span>RM {(Number(u.balance || 0) + Number(u.profit || 0)).toFixed(2)}</span>
-                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${( (Number(u.balance || 0) + Number(u.profit || 0)) / forexRate).toFixed(2)} USD)</span>
-                                                            </div>
-                                                        </td>
                                                         <td className="px-8 py-6 text-center">
                                                             <div className="flex flex-col items-center gap-1">
                                                                 <TierMedal tierId={u.selected_tier || "Basic"} size="sm" />
@@ -1261,19 +1486,14 @@ export default function AdminPortal() {
                                                                 </span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-8 py-6">
-                                                            <div className="flex justify-center">
-                                                                <span className={`px-3 py-1 rounded-full text-[9px] uppercase font-black text-center ${u.kyc_status === 'Verified' ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-500"}`}>{u.kyc_status || 'Pending'}</span>
-                                                            </div>
-                                                        </td>
                                                         <td className="px-8 py-6 text-center">
                                                             {u.is_verified ? (
-                                                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Verified</span>
+                                                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{t.status.verified}</span>
                                                             ) : (
-                                                                <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Pending</span>
+                                                                <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{t.status.pending}</span>
                                                             )}
                                                         </td>
-                                                        <td className="px-8 py-6 text-right" onClick={(e: React.MouseEvent<HTMLTableCellElement>) => {
+                                                        <td className="px-8 py-6 text-right space-x-4" onClick={(e: React.MouseEvent<HTMLTableCellElement>) => {
                                                             e.stopPropagation();
                                                             setSelectedUser(u);
                                                             setPortfolioData({
@@ -1285,9 +1505,14 @@ export default function AdminPortal() {
                                                             setIsDetailModalOpen(true);
                                                         }}>
                                                             <button 
-                                                                className="text-gv-gold text-[10px] font-black uppercase tracking-widest hover:underline"
+                                                                className="bg-gv-gold/10 text-gv-gold text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl hover:bg-gv-gold hover:text-black transition-all"
                                                             >
-                                                                Details
+                                                                {t.users.adjust}
+                                                            </button>
+                                                            <button 
+                                                                className="text-white text-[10px] font-black uppercase tracking-widest hover:underline"
+                                                            >
+                                                                {t.users.details}
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -1317,8 +1542,8 @@ export default function AdminPortal() {
                                 <div className="animate-in fade-in duration-500">
                                     <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                         <div>
-                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">Deposit Management</h3>
-                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Review & Approve Funds</p>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">{t.tabs.deposits}</h3>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{t.status.all} {t.tabs.deposits}</p>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-4">
                                             <div className="relative group w-full md:w-64">
@@ -1336,10 +1561,10 @@ export default function AdminPortal() {
                                                 onChange={(e) => setDepositStatusFilter(e.target.value)}
                                                 className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 transition-all cursor-pointer"
                                             >
-                                                <option value="All">All Status</option>
-                                                <option value="Pending">Pending</option>
-                                                <option value="Approved">Approved</option>
-                                                <option value="Rejected">Rejected</option>
+                                                <option value="All">{t.status.all} {t.status.status}</option>
+                                                <option value="Pending">{t.status.pending}</option>
+                                                <option value="Approved">{t.status.approved}</option>
+                                                <option value="Rejected">{t.status.rejected}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -1347,12 +1572,12 @@ export default function AdminPortal() {
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
-                                                    <th className="px-8 py-6">Client</th>
-                                                    <th className="px-8 py-6">Ref ID</th>
-                                                    <th className="px-8 py-6">Amount (RM)</th>
-                                                    <th className="px-8 py-6">Status</th>
-                                                    <th className="px-8 py-6">Date</th>
-                                                    <th className="px-8 py-6 text-right">Action</th>
+                                                    <th className="px-8 py-6">{t.table.user}</th>
+                                                    <th className="px-8 py-6">{t.table.refId}</th>
+                                                    <th className="px-8 py-6">{t.table.amount} (RM)</th>
+                                                    <th className="px-8 py-6">{t.table.status}</th>
+                                                    <th className="px-8 py-6">{t.table.date}</th>
+                                                    <th className="px-8 py-6 text-right">{t.table.actions}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
@@ -1418,7 +1643,7 @@ export default function AdminPortal() {
                                 <div className="p-8 animate-in fade-in duration-500">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                                         <div>
-                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">System Audit Log</h3>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">{t.tabs.audit}</h3>
                                             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Tracking Administrative Actions</p>
                                         </div>
                                         
@@ -1427,7 +1652,7 @@ export default function AdminPortal() {
                                             <div className="relative group">
                                                 <input 
                                                     type="text"
-                                                    placeholder="Search Email or Admin..."
+                                                    placeholder={t.users.searchNameEmail}
                                                     value={auditSearchQuery}
                                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAuditSearchQuery(e.target.value)}
                                                     className="bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all w-full md:w-64"
@@ -1456,11 +1681,11 @@ export default function AdminPortal() {
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
-                                                    <th className="px-8 py-4">Date/Time</th>
-                                                    <th className="px-8 py-4">Admin</th>
-                                                    <th className="px-8 py-4">Target User</th>
-                                                    <th className="px-8 py-4">Action</th>
-                                                    <th className="px-8 py-4">Reason</th>
+                                                    <th className="px-8 py-4">{t.audit.dateTime}</th>
+                                                    <th className="px-8 py-4">{t.audit.admin}</th>
+                                                    <th className="px-8 py-4">{t.audit.targetUser}</th>
+                                                    <th className="px-8 py-4">{t.audit.action}</th>
+                                                    <th className="px-8 py-4">{t.audit.reason}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
@@ -1603,7 +1828,7 @@ export default function AdminPortal() {
                             
                             <div className="mt-8 space-y-10">
                                 <header className="space-y-2">
-                                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter">{selectedUser.full_name || "User Details"}</h2>
+                                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter">{selectedUser.full_name || t.users.details}</h2>
                                     <p className="text-zinc-400 text-sm font-medium">{selectedUser.email}</p>
                                     <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest pt-2">
                                         Account Created: {selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString() : 'N/A'}
@@ -1616,20 +1841,52 @@ export default function AdminPortal() {
                                         </div>
                                         <div className="bg-white/5 border border-white/10 p-5 rounded-2xl flex items-center justify-between">
                                             <div>
-                                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Current Tier</p>
-                                                <p className="text-xl font-black text-gv-gold uppercase tracking-tighter">{selectedUser.selected_tier || "Basic"}</p>
-                                                <p className="text-[10px] font-bold text-zinc-500">Status: {selectedUser.is_verified ? "Verified" : "Unverified"}</p>
+                                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">{t.users.currentTier || "Current Tier"}</p>
+                                                <p className="text-xl font-black text-gv-gold uppercase tracking-tighter">{(selectedUser.selected_tier || "Basic").replace(/ package/gi, '')}</p>
+                                                <p className="text-[10px] font-bold text-zinc-500">{t.table.status}: {selectedUser.is_verified ? t.status.verified : t.status.unverified}</p>
                                             </div>
                                             <TierMedal tierId={selectedUser.selected_tier || "Basic"} size="md" className="shrink-0" />
                                         </div>
                                     </div>
                                 </header>
 
+                                {/* Conditional KYC Actions (Only visible in KYC tab) */}
+                                {activeTab === "kyc" && (
+                                    <section className="space-y-4 pt-6 border-t border-white/10">
+                                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold">Verification Controls</h3>
+                                        <div className="flex gap-4">
+                                            {selectedUser.kyc_status !== 'Verified' ? (
+                                                <>
+                                                    <button 
+                                                        onClick={() => handleVerifyUser(selectedUser.id)}
+                                                        className="flex-1 bg-emerald-500 text-black py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20"
+                                                    >
+                                                        Approve KYC
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleRejectUser(selectedUser.id)}
+                                                        className="flex-1 bg-red-500 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-500/20"
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <button 
+                                                    onClick={() => handleResetKyc(selectedUser.id, "Admin decided to reset KYC status.")}
+                                                    className="flex-1 bg-white/5 text-zinc-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/10"
+                                                >
+                                                    Reset to Pending
+                                                </button>
+                                            )}
+                                        </div>
+                                    </section>
+                                )}
+
                                 {/* Section: Financial Adjustments */}
                                 <section className="space-y-4 pt-6 border-t border-white/10">
                                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
                                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                        Wallet Adjustments
+                                        {t.users.financialAdjustments}
                                     </h3>
                                     <div className="bg-white/5 border border-white/10 p-6 rounded-[32px] space-y-4">
                                         <div className="flex gap-2">
@@ -1637,13 +1894,13 @@ export default function AdminPortal() {
                                                 onClick={() => setAdjustmentType("balance")}
                                                 className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${adjustmentType === "balance" ? "bg-gv-gold text-black" : "bg-white/5 text-zinc-500"}`}
                                             >
-                                                Balance
+                                                {t.table.balance}
                                             </button>
                                             <button 
                                                 onClick={() => setAdjustmentType("profit")}
                                                 className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${adjustmentType === "profit" ? "bg-gv-gold text-black" : "bg-white/5 text-zinc-500"}`}
                                             >
-                                                Profit
+                                                {t.table.profit}
                                             </button>
                                         </div>
                                         <div className="space-y-3">
@@ -1676,7 +1933,7 @@ export default function AdminPortal() {
                                 <section className="space-y-4 pt-6 border-t border-white/10">
                                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
                                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                                        Investment Portfolio
+                                        {t.users.investmentPortfolio}
                                     </h3>
                                     <div className="bg-white/5 border border-white/10 p-6 rounded-[32px] space-y-4">
                                         <div className="space-y-3">
@@ -1818,8 +2075,8 @@ export default function AdminPortal() {
                         <div className="w-full max-w-xl bg-[#121212] border-l border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.8)] h-full overflow-y-auto animate-in slide-in-from-right-full duration-500 flex flex-col">
                             <div className="p-8 border-b border-white/10 shrink-0 flex items-center justify-between bg-black/40 sticky top-0 z-10 backdrop-blur-xl">
                                 <div>
-                                    <h2 className="text-xl font-black text-white uppercase tracking-tighter">Deposit Review</h2>
-                                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Ref: {selectedDepositTx.ref_id}</p>
+                                    <h2 className="text-xl font-black text-white uppercase tracking-tighter">{t.tabs.deposits} Review</h2>
+                                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">{t.table.refId}: {selectedDepositTx.ref_id}</p>
                                 </div>
                                 <button 
                                     onClick={() => setIsDepositDrawerOpen(false)}

@@ -35,7 +35,7 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
       }`}
     >
       {isQualified && isActive && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gv-gold text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gv-gold text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg text-center">
           Current Tier
         </div>
       )}

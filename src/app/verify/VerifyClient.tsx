@@ -10,6 +10,124 @@ export default function VerifyPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [lang, setLang] = useState<"en" | "zh">("en");
+
+    const content = {
+        en: {
+            identityVerification: "Identity Verification",
+            investorPortal: "Investor Onboarding Portal",
+            saveClose: "Save & Close",
+            nextStep: "Next Step",
+            back: "Back",
+            submitDocument: "Submit Document",
+            verificationStarted: "Verification Started",
+            complianceReview: "Compliance review in progress.",
+            step1Title: "Personal Information",
+            step1Desc: "Please provide your details exactly as they appear on your legal ID.",
+            firstName: "First Name",
+            lastName: "Last Name",
+            dob: "Date of Birth",
+            gender: "Gender",
+            selectGender: "Select Gender",
+            male: "Male",
+            female: "Female",
+            other: "Other",
+            address: "Residential Address",
+            streetPlaceholder: "Street name, building, unit number",
+            city: "City",
+            cityPlaceholder: "Enter city",
+            phone: "Phone Number",
+            taxId: "Tax Identification Number (TIN)",
+            taxIdPlaceholder: "Optional for individual investors",
+            localityCheck: "My place of birth and nationality are the same as my country of residence.",
+            step2Title: "Profile Information",
+            step2Desc: "To provide a secure service, we need to understand your investment profile.",
+            purpose: "Purpose of Account",
+            employment: "Employment Status",
+            industry: "Industry",
+            wealthSource: "Primary Source of Wealth (Select all that apply)",
+            netWorth: "Total Net Worth",
+            netIncome: "Annual Net Income",
+            expectedDeposit: "Expected Yearly Deposit",
+            accuracyTitle: "Information Accuracy",
+            accuracyDesc: "I hereby confirm that all the information provided above is true and correct.",
+            riskTitle: "Risk Acknowledgement",
+            riskDesc: "I understand and acknowledge the risks associated with high-yield investments.",
+            pepTitle: "PEP Declaration",
+            pepDesc: "I confirm that I am not a Politically Exposed Person (PEP) or a close associate of one.",
+            step3Title: "Verify Your Identity",
+            step3Desc: "Finalize your profile by uploading a valid government ID.",
+            country: "Country",
+            docTypeTitle: "Select Document Type",
+            frontDoc: "Front of Document",
+            backDoc: "Back of Document",
+            uploadPrompt: "Upload IC / Image",
+            industries: ["Finance", "Tech", "Healthcare", "Manufacturing", "Education", "Real Estate", "Law", "Media", "Travel", "Energy", "Retail", "Other"],
+            wealthSources: ["Salary", "Business Profits", "Savings", "Inheritance", "Investments"],
+            purposes: ["Investment", "Hedging", "Speculation"],
+            employments: ["Full-time", "Part-time", "Freelancer", "Business Owner", "Retired", "Unemployed", "Student"],
+            docTypes: ["ID Card", "Driver's License", "Passport", "Military ID", "Residence Permit"],
+            footerNote: "By providing your identity document, you authorize GV Capital Trust to perform security and compliance screenings in accordance with global AML/KYC regulations."
+        },
+        zh: {
+            identityVerification: "身份验证",
+            investorPortal: "投资者入驻门户",
+            saveClose: "保存并关闭",
+            nextStep: "下一步",
+            back: "返回",
+            submitDocument: "提交文件",
+            verificationStarted: "验证已开始",
+            complianceReview: "合规审核正在进行中。",
+            step1Title: "个人信息",
+            step1Desc: "请提供与您的法定身份证件完全一致的详细信息。",
+            firstName: "名字",
+            lastName: "姓氏",
+            dob: "出生日期",
+            gender: "性别",
+            selectGender: "选择性别",
+            male: "男",
+            female: "女",
+            other: "其他",
+            address: "居住地址",
+            streetPlaceholder: "街道名称、建筑物、单位编号",
+            city: "城市",
+            cityPlaceholder: "输入城市",
+            phone: "电话号码",
+            taxId: "税务识别号 (TIN)",
+            taxIdPlaceholder: "个人投资者可选",
+            localityCheck: "我的出生地和国籍与我的居住国家相同。",
+            step2Title: "个人资料信息",
+            step2Desc: "为了提供安全的投资服务，我们需要了解您的投资概况。",
+            purpose: "账户用途",
+            employment: "就业状态",
+            industry: "行业",
+            wealthSource: "主要财富来源（选择所有适用项）",
+            netWorth: "总资产净值",
+            netIncome: "年净收入",
+            expectedDeposit: "预计年度存款",
+            accuracyTitle: "信息准确性",
+            accuracyDesc: "我特此确认以上提供的所有信息均真实准确。",
+            riskTitle: "风险确认",
+            riskDesc: "我了解并确认与高收益投资相关的风险。",
+            pepTitle: "PEP 声明",
+            pepDesc: "我确认我不是政治公众人物 (PEP) 或其亲密助手。",
+            step3Title: "验证您的身份",
+            step3Desc: "通过上传有效的政府身份证件来完成您的个人资料。",
+            country: "国家",
+            docTypeTitle: "选择证件类型",
+            frontDoc: "证件正面",
+            backDoc: "证件背面",
+            uploadPrompt: "上传身份证 / 图片",
+            industries: ["金融", "科技", "医疗保健", "制造", "教育", "房地产", "法律", "媒体", "旅游", "能源", "零售", "其他"],
+            wealthSources: ["薪资", "核心业务利润", "个人储蓄", "遗产", "投资收益"],
+            purposes: ["投资", "对冲", "投机"],
+            employments: ["全职", "兼职", "自由职业者", "企业主", "已退休", "失业", "学生"],
+            docTypes: ["身份证", "驾驶执照", "护照", "军工卡", "居留证"],
+            footerNote: "通过提供您的身份证件，您授权 GV 资本信托根据全球 AML/KYC 法规进行安全和合规筛选。"
+        }
+    };
+
+    const t = content[lang];
+
     interface User {
         id: string;
         email?: string;
@@ -204,8 +322,8 @@ export default function VerifyPage() {
     };
     const prevStep = () => setCurrentStep((prev: number) => Math.max(prev - 1, 1));
 
-    const industries = ["Finance", "Tech", "Healthcare", "Manufacturing", "Education", "Real Estate", "Law", "Media", "Travel", "Energy", "Retail", "Other"];
-    const wealthSources = ["Salary", "Business Profits", "Savings", "Inheritance", "Investments"];
+    const industries = t.industries;
+    const wealthSources = t.wealthSources;
     const financialTiers = ["<$10k", "$10k-$50k", "$50k-$100k", "$100k-$500k", "$500k+"];
 
     const toggleWealthSource = (source: string) => {
@@ -227,8 +345,8 @@ export default function VerifyPage() {
                         <img src="/logo.png" className="h-[60px] w-auto mix-blend-screen brightness-110" />
                     </Link>
                     <div className="space-y-2">
-                        <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Identity Verification</h1>
-                        <p className="text-[10px] text-gv-gold font-black tracking-[0.2em] uppercase">Investor Onboarding Portal</p>
+                        <h1 className="text-3xl font-black text-white uppercase tracking-tighter">{t.identityVerification}</h1>
+                        <p className="text-[10px] text-gv-gold font-black tracking-[0.2em] uppercase">{t.investorPortal}</p>
                     </div>
 
                     {/* Step Indicator */}
@@ -250,53 +368,53 @@ export default function VerifyPage() {
                     {currentStep === 1 && (
                         <div className="space-y-8 animate-in fade-in duration-300">
                             <div className="space-y-2">
-                                <h2 className="text-xl font-bold text-white tracking-tight">Personal Information</h2>
-                                <p className="text-xs text-zinc-500 font-medium">Please provide your details exactly as they appear on your legal ID.</p>
+                                <h2 className="text-xl font-bold text-white tracking-tight">{t.step1Title}</h2>
+                                <p className="text-xs text-zinc-500 font-medium">{t.step1Desc}</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">First Name</label>
-                                    <input type="text" value={formData.first_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, first_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter first name" />
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.firstName}</label>
+                                    <input type="text" value={formData.first_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, first_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder={t.firstName} />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Last Name</label>
-                                    <input type="text" value={formData.last_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, last_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter last name" />
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.lastName}</label>
+                                    <input type="text" value={formData.last_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, last_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder={t.lastName} />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Date of Birth</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.dob}</label>
                                     <input type="date" value={formData.dob} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, dob: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all [color-scheme:dark]" />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Gender</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.gender}</label>
                                     <select value={formData.gender} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, gender: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all">
-                                        <option value="">Select Gender</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                        <option value="Other">Other</option>
+                                        <option value="">{t.selectGender}</option>
+                                        <option value="Male">{t.male}</option>
+                                        <option value="Female">{t.female}</option>
+                                        <option value="Other">{t.other}</option>
                                     </select>
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Residential Address</label>
-                                    <input type="text" value={formData.address} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, address: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Street name, building, unit number" />
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.address}</label>
+                                    <input type="text" value={formData.address} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, address: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder={t.streetPlaceholder} />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">City</label>
-                                    <input type="text" value={formData.city} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, city: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Enter city" />
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.city}</label>
+                                    <input type="text" value={formData.city} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, city: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder={t.cityPlaceholder} />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Phone Number</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.phone}</label>
                                     <input type="tel" value={formData.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, phone: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="+60 12345678" />
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Tax Identification Number (TIN)</label>
-                                    <input type="text" value={formData.tax_id} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, tax_id: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder="Optional for individual investors" />
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.taxId}</label>
+                                    <input type="text" value={formData.tax_id} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, tax_id: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all" placeholder={t.taxIdPlaceholder} />
                                 </div>
                             </div>
 
                             <label className="flex items-center gap-3 p-5 bg-white/[0.02] border border-white/5 rounded-3xl cursor-pointer group hover:bg-white/[0.04] transition-all">
                                 <input type="checkbox" checked={formData.nationality_match} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, nationality_match: e.target.checked})} className="h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
-                                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-tight">My place of birth and nationality are the same as my country of residence.</span>
+                                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-tight">{t.localityCheck}</span>
                             </label>
 
                             <div className="flex gap-4 pt-4">
@@ -304,13 +422,13 @@ export default function VerifyPage() {
                                     onClick={() => handleFinalSubmit('Draft')} 
                                     className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
                                 >
-                                    Save & Close
+                                    {t.saveClose}
                                 </button>
                                 <button 
                                     onClick={nextStep} 
                                     className="flex-[2] bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-gv-gold hover:text-black transition-all uppercase tracking-[0.2em] text-[11px] shadow-lg"
                                 >
-                                    Next Step
+                                    {t.nextStep}
                                 </button>
                             </div>
                         </div>
@@ -320,44 +438,40 @@ export default function VerifyPage() {
                     {currentStep === 2 && (
                         <div className="space-y-8 animate-in fade-in duration-300">
                             <div className="space-y-2">
-                                <h2 className="text-xl font-bold text-white tracking-tight">Profile Information</h2>
-                                <p className="text-xs text-zinc-500 font-medium">To provide a secure service, we need to understand your investment profile.</p>
+                                <h2 className="text-xl font-bold text-white tracking-tight">{t.step2Title}</h2>
+                                <p className="text-xs text-zinc-500 font-medium">{t.step2Desc}</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Purpose of Account</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.purpose}</label>
                                     <select value={formData.account_purpose} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, account_purpose: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
-                                        <option value="Investment">Investment</option>
-                                        <option value="Hedging">Hedging</option>
-                                        <option value="Speculation">Speculation</option>
+                                        {t.purposes.map((p: string, i: number) => (
+                                            <option key={p} value={content.en.purposes[i]}>{p}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Employment Status</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.employment}</label>
                                     <select value={formData.employment_status} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, employment_status: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
-                                        <option value="Full-time">Full-time</option>
-                                        <option value="Part-time">Part-time</option>
-                                        <option value="Freelancer">Freelancer</option>
-                                        <option value="Business Owner">Business Owner</option>
-                                        <option value="Retired">Retired</option>
-                                        <option value="Unemployed">Unemployed</option>
-                                        <option value="Student">Student</option>
+                                        {t.employments.map((e_stat: string, i: number) => (
+                                            <option key={e_stat} value={content.en.employments[i]}>{e_stat}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Industry</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.industry}</label>
                                     <select value={formData.industry} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, industry: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none transition-all">
-                                        {industries.map((ind: string) => <option key={ind} value={ind}>{ind}</option>)}
+                                        {industries.map((ind: string, i: number) => <option key={ind} value={content.en.industries[i]}>{ind}</option>)}
                                     </select>
                                 </div>
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Primary Source of Wealth (Select all that apply)</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.wealthSource}</label>
                                 <div className="flex flex-wrap gap-2">
-                                    {wealthSources.map(source => (
-                                        <button key={source} onClick={() => toggleWealthSource(source)} className={`px-5 py-2.5 rounded-xl text-[10px] font-black transition-all ${formData.source_of_wealth.includes(source) ? 'bg-gv-gold text-black' : 'bg-white/5 text-zinc-500 border border-white/10'}`}>
+                                    {wealthSources.map((source, i) => (
+                                        <button key={source} onClick={() => toggleWealthSource(content.en.wealthSources[i])} className={`px-5 py-2.5 rounded-xl text-[10px] font-black transition-all ${formData.source_of_wealth.includes(content.en.wealthSources[i]) ? 'bg-gv-gold text-black' : 'bg-white/5 text-zinc-500 border border-white/10'}`}>
                                             {source}
                                         </button>
                                     ))}
@@ -366,21 +480,21 @@ export default function VerifyPage() {
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Total Net Worth</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.netWorth}</label>
                                     <select value={formData.total_wealth} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, total_wealth: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
-                                        {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
+                                        {financialTiers.map((tier: string) => <option key={tier} value={tier}>{tier}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Annual Net Income</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.netIncome}</label>
                                     <select value={formData.annual_income} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, annual_income: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
-                                        {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
+                                        {financialTiers.map((tier: string) => <option key={tier} value={tier}>{tier}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Expected Yearly Deposit</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.expectedDeposit}</label>
                                     <select value={formData.yearly_deposit} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, yearly_deposit: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-black transition-all">
-                                        {financialTiers.map((t: string) => <option key={t} value={t}>{t}</option>)}
+                                        {financialTiers.map((tier: string) => <option key={tier} value={tier}>{tier}</option>)}
                                     </select>
                                 </div>
                             </div>
@@ -389,35 +503,35 @@ export default function VerifyPage() {
                                 <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
                                     <input type="checkbox" checked={formData.accuracy_confirmed} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, accuracy_confirmed: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black text-white uppercase tracking-tighter">Information Accuracy</p>
-                                        <p className="text-[9px] text-zinc-500 font-bold leading-normal">I hereby confirm that all the information provided above is true and correct.</p>
+                                        <p className="text-[10px] font-black text-white uppercase tracking-tighter">{t.accuracyTitle}</p>
+                                        <p className="text-[9px] text-zinc-500 font-bold leading-normal">{t.accuracyDesc}</p>
                                     </div>
                                 </label>
                                 <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
                                     <input type="checkbox" checked={formData.risk_acknowledged} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, risk_acknowledged: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black text-white uppercase tracking-tighter">Risk Acknowledgement</p>
-                                        <p className="text-[9px] text-zinc-500 font-bold leading-normal">I understand and acknowledge the risks associated with high-yield investments.</p>
+                                        <p className="text-[10px] font-black text-white uppercase tracking-tighter">{t.riskTitle}</p>
+                                        <p className="text-[9px] text-zinc-500 font-bold leading-normal">{t.riskDesc}</p>
                                     </div>
                                 </label>
                                 <label className="flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
                                     <input type="checkbox" checked={formData.is_not_pep} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, is_not_pep: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black text-white uppercase tracking-tighter">PEP Declaration</p>
-                                        <p className="text-[9px] text-zinc-500 font-bold leading-normal">I confirm that I am not a Politically Exposed Person (PEP) or a close associate of one.</p>
+                                        <p className="text-[10px] font-black text-white uppercase tracking-tighter">{t.pepTitle}</p>
+                                        <p className="text-[9px] text-zinc-500 font-bold leading-normal">{t.pepDesc}</p>
                                     </div>
                                 </label>
                             </div>
 
                             <div className="flex gap-4 pt-4">
-                                <button onClick={prevStep} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]">Back</button>
+                                <button onClick={prevStep} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]">{t.back}</button>
                                 <button 
                                     onClick={() => handleFinalSubmit('Draft')} 
                                     className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
                                 >
-                                    Save & Close
+                                    {t.saveClose}
                                 </button>
-                                <button onClick={nextStep} className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-2xl transition-all uppercase tracking-widest text-[11px] shadow-lg shadow-gv-gold/20">Next Step</button>
+                                <button onClick={nextStep} className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-2xl transition-all uppercase tracking-widest text-[11px] shadow-lg shadow-gv-gold/20">{t.nextStep}</button>
                             </div>
                         </div>
                     )}
@@ -426,32 +540,32 @@ export default function VerifyPage() {
                     {currentStep === 3 && (
                         <div className="space-y-10 animate-in fade-in duration-300">
                             <div className="space-y-2">
-                                <h2 className="text-xl font-bold text-white tracking-tight">Verify Your Identity</h2>
-                                <p className="text-xs text-zinc-500 font-medium">Finalize your profile by uploading a valid government ID.</p>
+                                <h2 className="text-xl font-bold text-white tracking-tight">{t.step3Title}</h2>
+                                <p className="text-xs text-zinc-500 font-medium">{t.step3Desc}</p>
                             </div>
 
                             <div className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div>
-                                        <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Country</p>
+                                        <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">{t.country}</p>
                                         <p className="text-sm font-black text-white uppercase">{formData.country}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">First Name</p>
+                                        <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">{t.firstName}</p>
                                         <p className="text-sm font-black text-white uppercase">{formData.first_name || "N/A"}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Last Name</p>
+                                        <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">{t.lastName}</p>
                                         <p className="text-sm font-black text-white uppercase">{formData.last_name || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-4 text-center">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 inline-block">Select Document Type</label>
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 inline-block">{t.docTypeTitle}</label>
                                 <div className="flex flex-wrap justify-center gap-3">
-                                    {["ID Card", "Driver's License", "Passport", "Military ID", "Residence Permit"].map((type: string) => (
-                                        <button key={type} onClick={() => setFormData({...formData, id_type: type})} className={`px-6 py-3 rounded-2xl text-[10px] font-black tracking-widest border transition-all ${formData.id_type === type ? 'bg-gv-gold border-gv-gold text-black' : 'bg-[#1a1a1a] border-white/10 text-zinc-500 hover:border-white/20'}`}>
+                                    {t.docTypes.map((type: string, i: number) => (
+                                        <button key={type} onClick={() => setFormData({...formData, id_type: content.en.docTypes[i]})} className={`px-6 py-3 rounded-2xl text-[10px] font-black tracking-widest border transition-all ${formData.id_type === content.en.docTypes[i] ? 'bg-gv-gold border-gv-gold text-black' : 'bg-[#1a1a1a] border-white/10 text-zinc-500 hover:border-white/20'}`}>
                                             {type}
                                         </button>
                                     ))}
@@ -460,7 +574,7 @@ export default function VerifyPage() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-4">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Front of Document</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.frontDoc}</label>
                                     <div className="relative group border-2 border-white/5 border-dashed rounded-[32px] overflow-hidden bg-white/[0.02] aspect-[3/2] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all border-dashed-2">
                                         {idFront ? (
                                             <div className="absolute inset-0 p-4">
@@ -475,14 +589,14 @@ export default function VerifyPage() {
                                                 <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-gv-gold group-hover:text-black transition-all">
                                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /></svg>
                                                 </div>
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Upload IC / Image</span>
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">{t.uploadPrompt}</span>
                                             </div>
                                         )}
                                         <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdFront(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
                                     </div>
                                 </div>
                                 <div className="space-y-4">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">Back of Document</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.backDoc}</label>
                                     <div className="relative group border-2 border-white/5 border-dashed rounded-[32px] overflow-hidden bg-white/[0.02] aspect-[3/2] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all border-dashed-2">
                                         {idBack ? (
                                             <div className="absolute inset-0 p-4">
@@ -497,7 +611,7 @@ export default function VerifyPage() {
                                                 <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-gv-gold group-hover:text-black transition-all">
                                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /></svg>
                                                 </div>
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Upload IC / Image</span>
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">{t.uploadPrompt}</span>
                                             </div>
                                         )}
                                         <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdBack(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
@@ -506,16 +620,16 @@ export default function VerifyPage() {
                             </div>
 
                             <div className="flex flex-col md:flex-row gap-4 pt-10">
-                                <button onClick={prevStep} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]">Back</button>
+                                <button onClick={prevStep} className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]">{t.back}</button>
                                 <button 
                                     onClick={() => handleFinalSubmit('Draft')} 
                                     disabled={isLoading}
                                     className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
                                 >
-                                    {isLoading ? <div className="h-4 w-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div> : 'Save & Close'}
+                                    {isLoading ? <div className="h-4 w-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div> : t.saveClose}
                                 </button>
                                 <button onClick={() => handleFinalSubmit('Pending')} disabled={isLoading} className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-2xl transition-all uppercase tracking-[0.2em] text-[11px] shadow-[0_20px_40px_rgba(212,175,55,0.2)] flex items-center justify-center gap-3">
-                                    {isLoading ? <div className="h-4 w-4 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : 'Submit Document'}
+                                    {isLoading ? <div className="h-4 w-4 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.submitDocument}
                                 </button>
                             </div>
                         </div>
@@ -525,7 +639,7 @@ export default function VerifyPage() {
                 
                 <footer className="text-center space-y-6">
                     <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-[0.2em] max-w-xl mx-auto leading-loose">
-                        By providing your identity document, you authorize GV Capital Trust to perform security and compliance screenings in accordance with global AML/KYC regulations.
+                        {t.footerNote}
                     </p>
                 </footer>
             </div>
@@ -537,8 +651,8 @@ export default function VerifyPage() {
                     <div className="h-32 w-32 bg-gv-gold rounded-full flex items-center justify-center mb-10 shadow-[0_0_80px_rgba(212,175,55,0.3)] animate-bounce">
                         <svg className="h-16 w-16 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
                     </div>
-                    <h2 className="text-5xl font-black mb-4 uppercase tracking-tighter text-white">Verification Started</h2>
-                    <p className="text-gv-gold/60 text-lg max-w-md font-black uppercase tracking-widest">Compliance review in progress.</p>
+                    <h2 className="text-5xl font-black mb-4 uppercase tracking-tighter text-white">{t.verificationStarted}</h2>
+                    <p className="text-gv-gold/60 text-lg max-w-md font-black uppercase tracking-widest">{t.complianceReview}</p>
                 </div>
             )}
         </div>

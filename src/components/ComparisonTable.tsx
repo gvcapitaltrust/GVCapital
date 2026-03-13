@@ -20,16 +20,24 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
       accountManager: "Account Manager",
       insurance: "Insurance Coverage",
       fees: "Withdrawal Fees",
+      standard: "Standard",
+      reduced: "Reduced",
+      zero: "Zero",
+      footnote: "* All dividends are calculated monthly based on your average daily balance. Higher tiers enjoy lower withdrawal fees and priority liquidation."
     },
     zh: {
-      title: "比较套餐",
+      title: "比较计划",
       feature: "功能",
-      dividend: "每月分红",
-      range: "存款范围",
+      dividend: "每月利润",
+      range: "投资范围",
       priority: "优先支持",
       accountManager: "客户经理",
       insurance: "保险保障",
       fees: "提款费用",
+      standard: "标准",
+      reduced: "降低",
+      zero: "零",
+      footnote: "* 所有分红均根据您的每日平均余额按月计算。更高级别享受更低的提款费和优先清算权。"
     }
   }[lang];
 
@@ -99,10 +107,10 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
               </tr>
               <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
                 <td className="py-6 px-4 text-zinc-400">{t.fees}</td>
-                <td className="py-6 px-4 text-center text-white">Standard</td>
-                <td className="py-6 px-4 text-center text-white">Standard</td>
-                <td className="py-6 px-4 text-center text-white">Reduced</td>
-                <td className="py-6 px-4 text-center text-emerald-500 font-bold">Zero</td>
+                <td className="py-6 px-4 text-center text-white">{t.standard}</td>
+                <td className="py-6 px-4 text-center text-white">{t.standard}</td>
+                <td className="py-6 px-4 text-center text-white">{t.reduced}</td>
+                <td className="py-6 px-4 text-center text-emerald-500 font-bold">{t.zero}</td>
               </tr>
             </tbody>
           </table>
@@ -110,7 +118,7 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
 
         <div className="mt-10 p-6 bg-white/5 rounded-2xl border border-white/5">
           <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-widest text-center leading-relaxed">
-            * All dividends are calculated monthly based on your average daily balance. Higher tiers enjoy lower withdrawal fees and priority liquidation.
+            {t.footnote}
           </p>
         </div>
       </div>

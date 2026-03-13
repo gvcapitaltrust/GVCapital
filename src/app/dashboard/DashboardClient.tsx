@@ -467,16 +467,32 @@ export default function DashboardClient() {
         en: {
             welcome: "Welcome, ",
             nav: "Dashboard",
+            products: "Products",
+            statements: "Statements",
             logout: "Log Out",
-            totalAssets: "Total Wallet Amount",
+            totalAssets: "Total Wallet",
             activeInvestment: "Active Investment",
             totalProfit: "Total Dividend",
             totalEquity: "Total Investment",
             dividendNote: "(Withdrawable)",
             investmentNote: "(Secure Capital)",
-            currentPackage: "Current Package",
+            currentPackage: "Current Tier",
             deposit: "Deposit",
             withdraw: "Withdraw",
+            comparisonTable: {
+                title: "Compare Packages",
+                feature: "Feature",
+                dividend: "Monthly Dividend",
+                range: "Deposit Range",
+                priority: "Priority Support",
+                accountManager: "Account Manager",
+                insurance: "Insurance Coverage",
+                fees: "Withdrawal Fees",
+                standard: "Standard",
+                reduced: "Reduced",
+                zero: "Zero",
+                footnote: "* All dividends are calculated monthly based on your average daily balance. Higher tiers enjoy lower withdrawal fees and priority liquidation."
+            },
             history: "Transaction History",
             unverifiedBanner: "⚠️ Account Unverified. Access to Deposits, Withdrawals, and Trading is restricted.",
             verifyNow: "Verify Now",
@@ -519,20 +535,80 @@ export default function DashboardClient() {
             bankName: "Bank Name",
             accNumber: "Account Number",
             pendingVerification: "Account Pending Verification. Please contact your Agent or Admin to activate your account.",
+            verificationInProgress: "Account Verification in Progress",
+            verificationInProgressDesc: "Thank you for choosing GV Capital. Our Compliance Team is currently reviewing your documents. Manual verification typically takes 1 to 3 business days. Once approved, you will have full access to our investment and deposit features.",
+            verificationUnsuccessful: "Verification Unsuccessful",
+            verificationUnsuccessfulDesc: "Our team was unable to verify your documents for the following reason:",
+            rejectionReasonLabel: "Invalid Document Clarity / Mismatch Information",
+            reuploadPrompt: "Please re-upload a clear copy of your ID to proceed.",
+            reuploadBtn: "Re-upload Documents",
+            completeProfile: "Complete Your Profile",
+            completeProfileDesc: "Please complete our 3-step verification process to unlock investment features and secure your account.",
+            resumeVerification: "Resume Verification",
+            startVerification: "Start Verification",
+            activeStatus: "Active Status",
+            noDividendData: "No Dividend Data Yet",
+            noDepositsFound: "No Deposits Found",
+            statementCenter: "Statement Center",
+            statementCenterDesc: "Select your desired period to generate and download a professional investment statement.",
+            selectMonth: "Month",
+            selectYear: "Year",
+            generateDownload: "Generate & Download PDF",
+            months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            depositTitle: "Deposit",
+            withdrawTitle: "Withdrawal",
+            amountMYR: "Amount (MYR)",
+            transferDate: "Transfer Date",
+            bankReceipt: "Bank Receipt (Image/PDF)",
+            selectDocument: "Select Document",
+            confirmDeposit: "Confirm Deposit",
+            requestWithdraw: "Request Withdrawal",
+            cancelTx: "Cancel Transaction",
+            docSubmitted: "Documents Submitted",
+            docSubmittedDesc: "Our compliance team will review your account within 24 hours. Your portfolio will activate automatically upon approval.",
+            debugMode: "Debug Mode",
+            role: "Role",
+            verified: "Verified",
+            date: "Date",
+            refId: "Ref ID",
+            type: "Type",
+            amount: "Amount",
+            status: "Status",
+            noTxFound: "No transaction history found",
+            basedOn: "Based on",
+            returns: "returns",
+            yearlyForecast: "Yearly Forecast",
+            yourCode: "Your Code",
         },
         zh: {
             welcome: "欢迎, ",
             nav: "控制台",
+            products: "投资产品",
+            statements: "账单中心",
             logout: "退出登录",
-            totalAssets: "钱包总额",
+            totalAssets: "总钱包",
             activeInvestment: "活跃投资",
             totalProfit: "总股息",
-            totalEquity: "总投资",
+            totalEquity: "总投资值",
             dividendNote: "(可提取)",
             investmentNote: "(安全资本)",
-            currentPackage: "当前配套",
+            currentPackage: "当前等级",
             deposit: "入金",
             withdraw: "提款",
+            comparisonTable: {
+                title: "比较计划",
+                feature: "功能",
+                dividend: "每月利润",
+                range: "投资范围",
+                priority: "优先支持",
+                accountManager: "客户经理",
+                insurance: "保险保障",
+                fees: "提款费用",
+                standard: "标准",
+                reduced: "降低",
+                zero: "零",
+                footnote: "* 所有分红均根据您的每日平均余额按月计算。更高级别享受更低的提款费和优先清算权。"
+            },
             history: "交易历史",
             unverifiedBanner: "⚠️ 账户未核实。存款、取款和交易功能受限。",
             verifyNow: "立即核实",
@@ -575,6 +651,50 @@ export default function DashboardClient() {
             bankName: "银行名称",
             accNumber: "银行账号",
             pendingVerification: "账户待审核。请联系您的代理或管理员以激活您的账户。",
+            verificationInProgress: "账户核实中",
+            verificationInProgressDesc: "感谢您选择 GV 资本。我们的合规团队正在审核您的文件。人工核实通常需要 1 到 3 个工作日。一旦批准，您将可以完全访问我们的投资和存款功能。",
+            verificationUnsuccessful: "核实未成功",
+            verificationUnsuccessfulDesc: "我们的团队由于以下原因无法核实您的文件：",
+            rejectionReasonLabel: "文件不清晰 / 信息不匹配",
+            reuploadPrompt: "请重新上传一份清晰的证件副本以继续。",
+            reuploadBtn: "重新上传文件",
+            completeProfile: "完成您的资料",
+            completeProfileDesc: "请完成我们的 3 步核实流程，以解锁投资功能并保护您的账户。",
+            resumeVerification: "恢复待续核实",
+            startVerification: "开始核实",
+            activeStatus: "活跃状态",
+            noDividendData: "尚无股息数据",
+            noDepositsFound: "未发现存款",
+            statementCenter: "账单中心",
+            statementCenterDesc: "选择您想要的期限以生成并下载专业的投资账单。",
+            selectMonth: "月份",
+            selectYear: "年份",
+            generateDownload: "生成并下载 PDF",
+            months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            depositTitle: "入金",
+            withdrawTitle: "提款",
+            amountMYR: "金额 (马币)",
+            transferDate: "转账日期",
+            bankReceipt: "银行收据 (图像/PDF)",
+            selectDocument: "选择文件",
+            confirmDeposit: "确认入金",
+            requestWithdraw: "申请提款",
+            cancelTx: "取消交易",
+            docSubmitted: "文件已提交",
+            docSubmittedDesc: "我们的合规团队将在 24 小时内审核您的账户。批准后您的投资组合将自动激活。",
+            debugMode: "调试模式",
+            role: "角色",
+            verified: "已核实",
+            date: "日期",
+            refId: "参考 ID",
+            type: "类型",
+            amount: "金额",
+            status: "状态",
+            noTxFound: "未发现交易历史",
+            basedOn: "基于",
+            returns: "回报",
+            yearlyForecast: "年度预测",
+            yourCode: "您的代码",
         },
     };
 
@@ -613,14 +733,14 @@ export default function DashboardClient() {
                             className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "products" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                            Products
+                            {t.products}
                         </button>
                         <button
                             onClick={() => setActiveTab("statements")}
                             className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "statements" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                            Statements
+                            {t.statements}
                         </button>
                         <button
                             onClick={() => setActiveTab("profile")}
@@ -641,10 +761,10 @@ export default function DashboardClient() {
                 <div className="space-y-4">
                     {/* DEBUG MODE INFO */}
                     <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-left space-y-1">
-                        <div className="text-[9px] font-black uppercase text-red-500 tracking-widest">Debug Mode</div>
+                        <div className="text-[9px] font-black uppercase text-red-500 tracking-widest">{t.debugMode}</div>
                         <div className="text-[10px] text-white/50 font-mono truncate">{user?.email}</div>
-                        <div className="text-xs text-white font-mono">Role: {user?.role || 'null'}</div>
-                        <div className="text-xs text-white font-mono">Verified: {String(user?.is_verified)}</div>
+                        <div className="text-xs text-white font-mono">{t.role}: {user?.role || 'null'}</div>
+                        <div className="text-xs text-white font-mono">{t.verified}: {String(user?.is_verified)}</div>
                     </div>
 
                     <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/5 transition-all text-zinc-400">
@@ -693,14 +813,14 @@ export default function DashboardClient() {
                             className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "products" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                            Products
+                            {t.products}
                         </button>
                         <button
                             onClick={() => { setActiveTab("statements"); setIsSidebarOpen(false); }}
                             className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "statements" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                            Statements
+                            {t.statements}
                         </button>
                         <button
                             onClick={() => { setActiveTab("profile"); setIsSidebarOpen(false); }}
@@ -740,7 +860,7 @@ export default function DashboardClient() {
                         </button>
                         <img src="/logo.png" alt="GV" className="h-8 w-auto mix-blend-screen" />
                     </div>
-                    {user && <NotificationBell userId={user.id} />}
+                    {user && <NotificationBell userId={user.id} lang={lang} />}
                 </div>
 
                 <CurrencyExchangeTicker />
@@ -753,7 +873,7 @@ export default function DashboardClient() {
                             </h1>
                         </div>
                         <div className="flex items-center gap-6 hidden sm:flex">
-                            {user && <NotificationBell userId={user.id} />}
+                            {user && <NotificationBell userId={user.id} lang={lang} />}
                             <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-xl border border-gv-gold/30 shadow-lg capitalize">
                                 {user?.fullName?.[0] || user?.email?.[0] || "U"}
                             </div>
@@ -761,8 +881,7 @@ export default function DashboardClient() {
                     </header>
 
                     {activeTab === "overview" ? (
-                        <>
-                            {(!user?.is_verified && user?.email !== "thenja96@gmail.com") ? (
+                            (!user?.is_verified && user?.email !== "thenja96@gmail.com") ? (
                                 (user?.kyc_status === 'Pending' || user?.kyc_status === 'pending') ? (
                                     <div className="bg-amber-400 p-12 rounded-[40px] text-center space-y-8 py-24 animate-in fade-in zoom-in-95 duration-700 max-w-3xl mx-auto shadow-[0_30px_60px_rgba(0,0,0,0.5)] border border-amber-500/20">
                                         <div className="h-28 w-28 bg-amber-950/20 rounded-full flex items-center justify-center mx-auto border-4 border-amber-950/10">
@@ -771,9 +890,9 @@ export default function DashboardClient() {
                                             </svg>
                                         </div>
                                         <div className="space-y-6 text-amber-950">
-                                            <h2 className="text-4xl font-black uppercase tracking-tighter">Account Verification in Progress</h2>
+                                            <h2 className="text-4xl font-black uppercase tracking-tighter">{t.verificationInProgress}</h2>
                                             <p className="text-amber-900 font-bold text-xl leading-relaxed max-w-2xl mx-auto">
-                                                Thank you for choosing GV Capital. Our Compliance Team is currently reviewing your documents. Manual verification typically takes 1 to 3 business days. Once approved, you will have full access to our investment and deposit features.
+                                                {t.verificationInProgressDesc}
                                             </p>
                                         </div>
                                     </div>
@@ -785,21 +904,21 @@ export default function DashboardClient() {
                                             </svg>
                                         </div>
                                         <div className="space-y-6 text-white">
-                                            <h2 className="text-4xl font-black uppercase tracking-tighter">Verification Unsuccessful</h2>
+                                            <h2 className="text-4xl font-black uppercase tracking-tighter">{t.verificationUnsuccessful}</h2>
                                             <div className="bg-white/10 p-6 rounded-3xl border border-white/20 max-w-2xl mx-auto">
                                                 <p className="text-white font-bold text-xl leading-relaxed">
-                                                    Our team was unable to verify your documents for the following reason:<br/>
+                                                    {t.verificationUnsuccessfulDesc}<br/>
                                                     <span className="text-black bg-white/90 px-3 py-1 mt-3 inline-block rounded-xl font-black uppercase tracking-tight">
-                                                        {user?.rejection_reason || "Invalid Document Clarity / Mismatch Information"}
+                                                        {user?.rejection_reason || t.rejectionReasonLabel}
                                                     </span>
                                                 </p>
                                             </div>
-                                            <p className="text-white/80 font-medium">Please re-upload a clear copy of your ID to proceed.</p>
+                                            <p className="text-white/80 font-medium">{t.reuploadPrompt}</p>
                                             <button 
                                                 onClick={() => router.push(`/verify?lang=${lang}`)}
                                                 className="bg-white text-red-600 font-black px-10 py-5 rounded-2xl uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all"
                                             >
-                                                Re-upload Documents
+                                                {t.reuploadBtn}
                                             </button>
                                         </div>
                                     </div>
@@ -810,19 +929,17 @@ export default function DashboardClient() {
                                         </div>
                                         <div className="space-y-4">
                                             <h2 className="text-3xl font-black uppercase tracking-tighter">
-                                                {user?.kyc_status === 'Draft' ? "Verification in Progress" : "Complete Your Profile"}
+                                                {user?.kyc_status === 'Draft' ? t.verificationInProgress : t.completeProfile}
                                             </h2>
                                             <p className="text-zinc-500 font-medium leading-relaxed max-w-lg mx-auto">
-                                                {user?.kyc_status === 'Draft' 
-                                                    ? "You have a saved draft. Please complete our 3-step verification process to unlock all features." 
-                                                    : "Please complete our 3-step verification process to unlock investment features and secure your account."}
+                                                {t.completeProfileDesc}
                                             </p>
                                         </div>
                                         <Link 
                                             href={`/verify?lang=${lang}`}
                                             className="inline-block bg-gv-gold text-black font-black text-xl px-12 py-5 rounded-[28px] hover:bg-gv-gold/90 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)] uppercase tracking-widest"
                                         >
-                                            {user?.kyc_status === 'Draft' || (user?.kyc_step && user.kyc_step > 1) ? "Resume Verification" : "Start Verification"}
+                                            {user?.kyc_status === 'Draft' || (user?.kyc_step && user.kyc_step > 1) ? t.resumeVerification : t.startVerification}
                                         </Link>
                                     </div>
                                 )
@@ -894,10 +1011,10 @@ export default function DashboardClient() {
                                                     </h2>
                                                     <div className="flex items-center gap-2 mt-2">
                                                         <div className="h-2 w-2 rounded-full bg-gv-gold animate-pulse"></div>
-                                                        <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">Active Status</span>
+                                                        <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">{t.activeStatus}</span>
                                                     </div>
                                                 </div>
-                                                <TierMedal tierId={getTierByAmount(Number(user?.balance || 0) / forexRate).id} size="lg" className="shrink-0" />
+                                                <TierMedal tierId={getTierByAmount(Number(user?.balance || 0) / forexRate).id} size="md" className="shrink-0" />
                                             </div>
                                             <div className="absolute top-0 right-0 p-4 opacity-10">
                                                 <svg className="h-12 w-12 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
@@ -924,7 +1041,7 @@ export default function DashboardClient() {
                                                 );
                                             })()}
                                             <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">
-                                                Based on {getTierByAmount(Number(user?.balance || 0) / forexRate).minDividend * 100}-{getTierByAmount(Number(user?.balance || 0) / forexRate).maxDividend * 100}% {getTierByAmount(Number(user?.balance || 0) / forexRate).name} Returns
+                                                {t.basedOn} {getTierByAmount(Number(user?.balance || 0) / forexRate).minDividend * 100}-{getTierByAmount(Number(user?.balance || 0) / forexRate).maxDividend * 100}% {getTierByAmount(Number(user?.balance || 0) / forexRate).name} {t.returns}
                                             </p>
                                         </div>
                                         <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
@@ -942,7 +1059,7 @@ export default function DashboardClient() {
                                                     </h3>
                                                 );
                                             })()}
-                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Yearly Forecast (Based on {getTierByAmount(Number(user?.balance || 0) / forexRate).name})</p>
+                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">{t.yearlyForecast} ({t.basedOn} {getTierByAmount(Number(user?.balance || 0) / forexRate).name})</p>
                                         </div>
                                     </section>
 
@@ -959,7 +1076,7 @@ export default function DashboardClient() {
                                                         <span className="text-[8px] font-black text-zinc-600 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
                                                     </div>
                                                 )) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-zinc-700 font-black uppercase tracking-widest text-xs">No Dividend Data Yet</div>
+                                                    <div className="w-full h-full flex items-center justify-center text-zinc-700 font-black uppercase tracking-widest text-xs">{t.noDividendData}</div>
                                                 )}
                                             </div>
                                         </div>
@@ -976,7 +1093,7 @@ export default function DashboardClient() {
                                                     </div>
                                                 </>
                                             ) : (
-                                                <p className="text-zinc-700 font-black uppercase tracking-widest text-xs">No Deposits Found</p>
+                                                <p className="text-zinc-700 font-black uppercase tracking-widest text-xs">{t.noDepositsFound}</p>
                                             )}
                                         </div>
                                     </section>
@@ -1007,7 +1124,7 @@ export default function DashboardClient() {
                                         <p className="text-zinc-500 font-medium leading-relaxed">{t.referSubtitle}</p>
                                         <div className="flex items-center gap-4 mt-8">
                                             <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl">
-                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-1">Your Code</p>
+                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-1">{t.yourCode}</p>
                                                 <p className="text-xl font-black text-gv-gold tracking-widest">{user?.username}</p>
                                             </div>
                                             <button
@@ -1054,7 +1171,7 @@ export default function DashboardClient() {
                                 <div className="border border-white/10 rounded-[40px] overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
                                     <table className="w-full text-left">
                                         <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
-                                            <tr><th className="px-8 py-6">Date</th><th className="px-8 py-6">Ref ID</th><th className="px-8 py-6">Type</th><th className="px-8 py-6">Amount</th><th className="px-8 py-6 text-right">Status</th></tr>
+                                            <tr><th className="px-8 py-6">{t.date}</th><th className="px-8 py-6">{t.refId}</th><th className="px-8 py-6">{t.type}</th><th className="px-8 py-6">{t.amount}</th><th className="px-8 py-6 text-right">{t.status}</th></tr>
                                         </thead>
                                         <tbody className="divide-y divide-white/[0.03]">
                                             {transactions.map((tx: any, idx: number) => (
@@ -1072,15 +1189,14 @@ export default function DashboardClient() {
                                                 </tr>
                                             ))}
                                             {transactions.length === 0 && (
-                                                <tr><td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No transaction history found</td></tr>
+                                                <tr><td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
                                             )}
                                         </tbody>
                                     </table>
                                 </div>
                             </section>
-                                </>
-                            )}
                         </>
+                        )
                     ) : activeTab === "products" ? (
                         <ProductSelection
                             currentInvestment={Number(user?.balance || 0) / (forexRate || 4.0)}
@@ -1093,24 +1209,24 @@ export default function DashboardClient() {
                             <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl overflow-hidden relative group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                 <div className="relative z-10 max-w-2xl">
-                                    <h2 className="text-3xl font-black uppercase tracking-tighter mb-4 text-white">Statement Center</h2>
-                                    <p className="text-zinc-500 font-medium mb-12">Select your desired period to generate and download a professional investment statement.</p>
+                                    <h2 className="text-3xl font-black uppercase tracking-tighter mb-4 text-white">{t.statementCenter}</h2>
+                                    <p className="text-zinc-500 font-medium mb-12">{t.statementCenterDesc}</p>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12">
                                         <div className="space-y-4">
-                                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Month</label>
+                                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.selectMonth}</label>
                                             <select
                                                 value={selectedMonth}
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedMonth(parseInt(e.target.value))}
                                                 className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
                                             >
-                                                {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((m, i) => (
+                                                {t.months.map((m: string, i: number) => (
                                                     <option key={i} value={i} className="bg-[#1a1a1a] text-white">{m}</option>
                                                 ))}
                                             </select>
                                         </div>
                                         <div className="space-y-4">
-                                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Year</label>
+                                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.selectYear}</label>
                                             <select
                                                 value={selectedYear}
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedYear(parseInt(e.target.value))}
@@ -1128,7 +1244,7 @@ export default function DashboardClient() {
                                         className="bg-gv-gold text-black font-black py-6 px-12 rounded-2xl uppercase tracking-widest shadow-xl hover:shadow-gv-gold/20 hover:-translate-y-1 transition-all active:scale-95 flex items-center gap-4"
                                     >
                                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
-                                        Generate & Download PDF
+                                        {t.generateDownload}
                                     </button>
                                 </div>
                             </div>
@@ -1284,30 +1400,30 @@ export default function DashboardClient() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
                     <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                         <div className="flex justify-between items-center">
-                            <h2 className="text-3xl font-black text-gv-gold tracking-tighter uppercase">Deposit</h2>
+                            <h2 className="text-3xl font-black text-gv-gold tracking-tighter uppercase">{t.depositTitle}</h2>
                             <button onClick={() => setIsDepositModalOpen(false)} className="text-zinc-600 hover:text-white transition-colors">
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Amount (MYR)</label>
+                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
                                 <input type="number" value={depositAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Transfer Date</label>
+                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.transferDate}</label>
                                 <input type="date" value={depositDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-black focus:outline-none focus:border-gv-gold transition-all text-white inverted-scheme-date-picker" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Bank Receipt (Image/PDF)</label>
+                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.bankReceipt}</label>
                                 <div className="border border-white/10 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-colors cursor-pointer relative group">
                                     <svg className="h-10 w-10 text-zinc-600 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{depositReceipt ? (depositReceipt as File).name : "Select Document"}</span>
+                                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{depositReceipt ? (depositReceipt as File).name : t.selectDocument}</span>
                                     <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositReceipt(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,.pdf" />
                                 </div>
                             </div>
                             <button onClick={handleDepositSubmit} disabled={isSubmitting || !depositAmount || !depositReceipt} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:-translate-y-1">
-                                {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : "Confirm Deposit"}
+                                {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.confirmDeposit}
                             </button>
                         </div>
                     </div>
@@ -1318,19 +1434,19 @@ export default function DashboardClient() {
             {isWithdrawModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
                     <div className="bg-[#1a1a1a] border border-white/10 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-3xl font-black text-white tracking-tighter uppercase">Withdrawal</h2>
+                         <div className="flex justify-between items-center">
+                            <h2 className="text-3xl font-black text-white tracking-tighter uppercase">{t.withdrawTitle}</h2>
                             <button onClick={() => setIsWithdrawModalOpen(false)} className="text-zinc-600 hover:text-white transition-colors">
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">Amount (MYR)</label>
+                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
                                 <input type="number" value={withdrawAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                             </div>
                              <button onClick={() => handleWithdrawInitiate()} disabled={!withdrawAmount} className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50">
-                                Request Withdrawal
+                                {t.requestWithdraw}
                             </button>
                         </div>
                     </div>
@@ -1363,7 +1479,7 @@ export default function DashboardClient() {
                                 {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.confirmWithdraw}
                             </button>
                             <button onClick={() => setIsPinModalOpen(false)} className="text-zinc-600 font-bold hover:text-white transition-colors uppercase tracking-widest text-xs">
-                                Cancel Transaction
+                                {t.cancelTx}
                             </button>
                         </div>
                     </div>
@@ -1381,10 +1497,10 @@ export default function DashboardClient() {
                         <svg className="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
                     </div>
                     <h2 className="text-5xl font-black mb-4 uppercase tracking-tighter text-white">
-                        {kycShowSuccess ? "Documents Submitted" : t.successTitle}
+                        {kycShowSuccess ? t.docSubmitted : t.successTitle}
                     </h2>
                     <p className="text-zinc-400 max-w-md font-medium text-lg leading-relaxed mb-6">
-                        {kycShowSuccess ? "Our compliance team will review your account within 24 hours. Your portfolio will activate automatically upon approval." : t.successDesc}
+                        {kycShowSuccess ? t.docSubmittedDesc : t.successDesc}
                     </p>
                     {successRefId && !kycShowSuccess && (
                         <div className="bg-white/10 px-8 py-4 rounded-full border border-emerald-500/30 text-emerald-400 font-black tracking-widest uppercase text-lg animate-in zoom-in-95 delay-150 duration-500 text-center flex items-center gap-3">
@@ -1403,17 +1519,21 @@ export default function DashboardClient() {
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
-                        {actionToast.actionUrl && (
-                            <button
-                                onClick={() => {
-                                    setActionToast(null);
-                                    router.push(actionToast.actionUrl as string);
-                                }}
-                                className="w-full bg-gv-gold text-black font-black py-3 px-6 rounded-xl uppercase tracking-widest text-xs hover:bg-gv-gold/90 transition-all shadow-lg active:scale-95"
-                            >
-                                {actionToast.actionText}
-                            </button>
-                        )}
+                        {(() => {
+                            const toast = actionToast;
+                            if (!toast.actionUrl) return null;
+                            return (
+                                <button
+                                    onClick={() => {
+                                        setActionToast(null);
+                                        router.push(toast.actionUrl as string);
+                                    }}
+                                    className="w-full bg-gv-gold text-black font-black py-3 px-6 rounded-xl uppercase tracking-widest text-xs hover:bg-gv-gold/90 transition-all shadow-lg active:scale-95"
+                                >
+                                    {toast.actionText}
+                                </button>
+                            );
+                        })()}
                     </div>
                 </div>
             )}

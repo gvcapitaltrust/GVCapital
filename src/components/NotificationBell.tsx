@@ -13,9 +13,25 @@ interface Notification {
 
 interface NotificationBellProps {
     userId: string;
+    lang?: "en" | "zh";
 }
 
-export default function NotificationBell({ userId }: NotificationBellProps) {
+export default function NotificationBell({ userId, lang = "en" }: NotificationBellProps) {
+    const t = {
+        en: {
+            notifications: "Notifications",
+            new: "New",
+            noNotifications: "No notifications yet",
+            endOfFeed: "End of feed"
+        },
+        zh: {
+            notifications: "通知中心",
+            new: "新",
+            noNotifications: "暂无通知",
+            endOfFeed: "已加载全部通知"
+        }
+    }[lang];
+
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -113,8 +129,8 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
             {isOpen && (
                 <div className="absolute right-0 mt-4 w-80 bg-[#1a1a1a] border border-white/10 rounded-[32px] shadow-2xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="p-6 border-b border-white/10 flex justify-between items-center bg-[#121212]/50">
-                        <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">Notifications</h3>
-                        {unreadCount > 0 && <span className="text-[10px] bg-gv-gold text-black font-black px-2 py-0.5 rounded-full">{unreadCount} New</span>}
+                        <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">{t.notifications}</h3>
+                        {unreadCount > 0 && <span className="text-[10px] bg-gv-gold text-black font-black px-2 py-0.5 rounded-full">{unreadCount} {t.new}</span>}
                     </div>
                     <div className="max-h-[400px] overflow-y-auto divide-y divide-white/[0.03]">
                         {notifications.length > 0 ? notifications.map((notification) => (
@@ -129,13 +145,13 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
                             </div>
                         )) : (
                             <div className="p-10 text-center text-zinc-600 font-bold uppercase tracking-widest text-[10px]">
-                                No notifications yet
+                                {t.noNotifications}
                             </div>
                         )}
                     </div>
                     {notifications.length > 0 && (
                         <div className="p-4 bg-[#121212]/30 text-center">
-                            <span className="text-[9px] font-black text-zinc-700 uppercase tracking-[0.2em]">End of feed</span>
+                            <span className="text-[9px] font-black text-zinc-700 uppercase tracking-[0.2em]">{t.endOfFeed}</span>
                         </div>
                     )}
                 </div>
