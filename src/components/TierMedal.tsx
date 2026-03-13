@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Medal, Shield, Star, Trophy } from "lucide-react";
+import { Medal, Shield, Star, Trophy, X } from "lucide-react";
 
 interface TierMedalProps {
   tierId: string;
@@ -25,6 +25,8 @@ export default function TierMedal({ tierId, className = "", size = "md" }: TierM
         return <Star className={`${sizeMap[size]} text-gv-gold drop-shadow-[0_0_10px_rgba(212,175,55,0.5)]`} />;
       case "silver":
         return <Medal className={`${sizeMap[size]} text-slate-300 drop-shadow-[0_0_10px_rgba(148,163,184,0.3)]`} />;
+      case "none":
+        return <X className={`${sizeMap[size]} text-zinc-400`} />;
       default:
         return <Shield className={`${sizeMap[size]} text-zinc-500`} />;
     }
@@ -38,6 +40,8 @@ export default function TierMedal({ tierId, className = "", size = "md" }: TierM
         return "bg-gradient-to-br from-gv-gold via-[#B8860B] to-[#45362E]";
       case "silver":
         return "bg-gradient-to-br from-slate-200 via-slate-400 to-slate-600";
+      case "none":
+        return "bg-gradient-to-br from-zinc-800 via-zinc-900 to-black";
       default:
         return "bg-gradient-to-br from-zinc-400 via-zinc-600 to-zinc-800";
     }

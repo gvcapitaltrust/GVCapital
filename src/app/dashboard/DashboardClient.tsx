@@ -578,6 +578,7 @@ export default function DashboardClient() {
             resumeVerification: "Resume Verification",
             startVerification: "Start Verification",
             activeStatus: "Active Status",
+            noTier: "No Tier",
             noDividendData: "No Dividend Data Yet",
             noDepositsFound: "No Deposits Found",
             statementCenter: "Statement Center",
@@ -900,15 +901,15 @@ export default function DashboardClient() {
                     {activeTab === "overview" ? (
                             (!user?.is_verified && user?.email !== "thenja96@gmail.com") ? (
                                 (user?.kyc_status === 'Pending' || user?.kyc_status === 'pending') ? (
-                                    <div className="bg-amber-400 p-12 rounded-[40px] text-center space-y-8 py-24 animate-in fade-in zoom-in-95 duration-700 max-w-3xl mx-auto shadow-[0_30px_60px_rgba(0,0,0,0.5)] border border-amber-500/20">
-                                        <div className="h-28 w-28 bg-amber-950/20 rounded-full flex items-center justify-center mx-auto border-4 border-amber-950/10">
-                                            <svg className="h-16 w-16 text-amber-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                    <div className="bg-amber-400 p-8 rounded-[32px] text-center space-y-6 py-12 animate-in fade-in zoom-in-95 duration-700 max-w-2xl mx-auto shadow-xl border border-amber-500/20">
+                                        <div className="h-20 w-20 bg-amber-950/10 rounded-full flex items-center justify-center mx-auto border-2 border-amber-950/5">
+                                            <svg className="h-10 w-10 text-amber-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         </div>
-                                        <div className="space-y-6 text-amber-950">
-                                            <h2 className="text-4xl font-black uppercase tracking-tighter">{t.verificationInProgress}</h2>
-                                            <p className="text-amber-900 font-bold text-xl leading-relaxed max-w-2xl mx-auto">
+                                        <div className="space-y-4 text-amber-950">
+                                            <h2 className="text-2xl font-black uppercase tracking-tighter">{t.verificationInProgress}</h2>
+                                            <p className="text-amber-900 font-bold text-base leading-relaxed max-w-lg mx-auto">
                                                 {t.verificationInProgressDesc}
                                             </p>
                                         </div>
@@ -1024,14 +1025,24 @@ export default function DashboardClient() {
                                             <div className="flex justify-between items-center pr-4">
                                                 <div className="flex flex-col gap-1">
                                                     <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                                                        {getTierByAmount(Number(user?.balance || 0) / forexRate).name}
+                                                        {Number(user?.balance || 0) > 0 
+                                                            ? getTierByAmount(Number(user?.balance || 0) / forexRate).name 
+                                                            : t.noTier}
                                                     </h2>
                                                     <div className="flex items-center gap-2 mt-2">
-                                                        <div className="h-2 w-2 rounded-full bg-gv-gold animate-pulse"></div>
-                                                        <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">{t.activeStatus}</span>
+                                                        <div className={`h-2 w-2 rounded-full border border-black/20 ${Number(user?.balance || 0) > 0 ? 'bg-gv-gold animate-pulse' : 'bg-red-500'}`}></div>
+                                                        <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">
+                                                            {Number(user?.balance || 0) > 0 ? t.activeStatus : t.noTier}
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                <TierMedal tierId={getTierByAmount(Number(user?.balance || 0) / forexRate).id} size="md" className="shrink-0" />
+                                                <TierMedal 
+                                                    tierId={Number(user?.balance || 0) > 0 
+                                                        ? getTierByAmount(Number(user?.balance || 0) / forexRate).id 
+                                                        : "none"} 
+                                                    size="md" 
+                                                    className="shrink-0" 
+                                                />
                                             </div>
                                             <div className="absolute top-0 right-0 p-4 opacity-10">
                                                 <svg className="h-12 w-12 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
@@ -1537,21 +1548,28 @@ export default function DashboardClient() {
 
             {/* Success Overlays */}
             {(showSuccess || kycShowSuccess) && (
-                <div className="fixed inset-0 z-[500] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-500 px-8">
-                    <div className="h-32 w-32 bg-emerald-500 rounded-full flex items-center justify-center mb-10 shadow-[0_0_80px_rgba(16,185,129,0.3)] animate-bounce-subtle">
-                        <svg className="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
-                    </div>
-                    <h2 className="text-5xl font-black mb-4 uppercase tracking-tighter text-white">
-                        {kycShowSuccess ? t.docSubmitted : t.successTitle}
-                    </h2>
-                    <p className="text-zinc-400 max-w-md font-medium text-lg leading-relaxed mb-6">
-                        {kycShowSuccess ? t.docSubmittedDesc : t.successDesc}
-                    </p>
-                    {successRefId && !kycShowSuccess && (
-                        <div className="bg-white/10 px-8 py-4 rounded-full border border-emerald-500/30 text-emerald-400 font-black tracking-widest uppercase text-lg animate-in zoom-in-95 delay-150 duration-500 text-center flex items-center gap-3">
-                           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>Ref: {successRefId}
+                <div className="fixed inset-0 z-[500] bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
+                    <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[40px] p-10 max-w-md w-full text-center space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-500">
+                        <div className="h-20 w-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_50px_rgba(16,185,129,0.2)] animate-bounce-subtle">
+                            <svg className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
                         </div>
-                    )}
+                        <div className="space-y-4">
+                            <h2 className="text-3xl font-black mb-2 uppercase tracking-tighter text-white">
+                                {kycShowSuccess ? t.docSubmitted : t.successTitle}
+                            </h2>
+                            <p className="text-zinc-400 font-medium text-base leading-relaxed">
+                                {kycShowSuccess ? t.docSubmittedDesc : t.successDesc}
+                            </p>
+                        </div>
+                        {successRefId && !kycShowSuccess && (
+                            <div className="bg-white/5 px-6 py-3 rounded-2xl border border-emerald-500/20 text-emerald-400 font-black tracking-widest uppercase text-sm flex items-center justify-center gap-3">
+                               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>Ref: {successRefId}
+                            </div>
+                        )}
+                        <button onClick={() => { setShowSuccess(false); setKycShowSuccess(false); }} className="w-full bg-gv-gold text-black font-black py-4 rounded-2xl uppercase tracking-widest text-sm shadow-xl hover:-translate-y-1 transition-all">
+                            Dismiss
+                        </button>
+                    </div>
                 </div>
             )}
             {/* Action Toast */}

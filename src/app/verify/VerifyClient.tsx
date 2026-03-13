@@ -647,12 +647,19 @@ export default function VerifyPage() {
             <GlobalFooter />
 
             {showSuccess && (
-                <div className="fixed inset-0 z-[500] bg-black/95 backdrop-blur-3xl flex flex-col items-center justify-center animate-in fade-in duration-700 text-center px-10">
-                    <div className="h-32 w-32 bg-gv-gold rounded-full flex items-center justify-center mb-10 shadow-[0_0_80px_rgba(212,175,55,0.3)] animate-bounce">
-                        <svg className="h-16 w-16 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
+                <div className="fixed inset-0 z-[500] bg-black/80 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-700">
+                    <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[40px] p-10 max-w-md w-full text-center space-y-8 shadow-2xl animate-in zoom-in-95 duration-500">
+                        <div className="h-20 w-20 bg-gv-gold rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_50px_rgba(212,175,55,0.2)] animate-bounce-subtle">
+                            <svg className="h-10 w-10 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                        <div className="space-y-4">
+                            <h2 className="text-3xl font-black uppercase tracking-tighter text-white">{t.verificationStarted}</h2>
+                            <p className="text-gv-gold/60 text-base font-black uppercase tracking-widest">{t.complianceReview}</p>
+                        </div>
+                        <button onClick={() => router.push(`/dashboard?lang=${lang}`)} className="w-full bg-gv-gold text-black font-black py-4 rounded-2xl uppercase tracking-widest text-sm shadow-xl hover:-translate-y-1 transition-all">
+                            Back to Dashboard
+                        </button>
                     </div>
-                    <h2 className="text-5xl font-black mb-4 uppercase tracking-tighter text-white">{t.verificationStarted}</h2>
-                    <p className="text-gv-gold/60 text-lg max-w-md font-black uppercase tracking-widest">{t.complianceReview}</p>
                 </div>
             )}
         </div>
