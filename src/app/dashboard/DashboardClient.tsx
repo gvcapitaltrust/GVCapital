@@ -87,7 +87,7 @@ export default function DashboardClient() {
                     .from('profiles')
                     .select('*', { count: 'exact' })
                     .eq('id', authUser.id)
-                    .single();
+                    .maybeSingle();
 
                 if (profile) {
                     let dbIsVerified = profile.role === 'admin' || profile.is_verified === true || profile.is_verified === 'Approved' || profile.is_verified === 'true';

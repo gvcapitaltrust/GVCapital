@@ -28,7 +28,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 .from('platform_settings')
                 .select('value')
                 .eq('key', 'usd_to_myr_rate')
-                .single();
+                .maybeSingle();
             
             if (psRate && !psError) {
                 setForexRate(parseFloat(psRate.value) || 4.0);
@@ -39,7 +39,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 .from('platform_settings')
                 .select('value')
                 .eq('key', 'monthly_return_rate')
-                .single();
+                .maybeSingle();
             
             if (psMonthly && !mError) {
                 setMonthlyRate(parseFloat(psMonthly.value) || 0.08);
@@ -49,7 +49,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 .from('platform_settings')
                 .select('value')
                 .eq('key', 'yearly_return_rate')
-                .single();
+                .maybeSingle();
             
             if (psYearly && !yError) {
                 setYearlyRate(parseFloat(psYearly.value) || 0.96);
@@ -60,7 +60,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 .from('platform_settings')
                 .select('value')
                 .eq('key', 'maintenance_mode')
-                .single();
+                .maybeSingle();
             
             if (psMaint && !maintError) {
                 setMaintenanceMode(psMaint.value === 'true');

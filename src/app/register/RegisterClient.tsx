@@ -86,7 +86,7 @@ export default function RegisterPage() {
                 .from('profiles')
                 .select('username')
                 .eq('username', username)
-                .single();
+                .maybeSingle();
 
             if (data) {
                 setIsUsernameValid(false);
