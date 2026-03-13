@@ -16,7 +16,7 @@ import ComparisonTable from "@/components/ComparisonTable";
 import { TIERS, getTierByAmount, formatUSD } from "@/lib/tierUtils";
 
 export default function DashboardClient() {
-    const { user: authUser, role: authRole, isVerified: authVerified, refresh: refreshAuth } = useAuth();
+    const { user: authUser, role: authRole, isVerified: authVerified, refresh: refreshAuth, loading: authLoading } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [lang, setLang] = useState<"en" | "zh">("en");
@@ -67,8 +67,10 @@ export default function DashboardClient() {
         const urlLang = searchParams?.get("lang") || "en";
         setLang(urlLang as "en" | "zh");
         
+        if (authLoading) return;
+
         if (!authUser) {
-            if (!isCheckingAuth) setIsCheckingAuth(false);
+            setIsCheckingAuth(false);
             return;
         }
 

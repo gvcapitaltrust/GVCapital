@@ -77,6 +77,7 @@ export default function LoginPage() {
             .single();
 
         if (maintenance?.value === 'true' && email !== "admin@gvcapital.trust") {
+            setIsLoading(false);
             router.push('/maintenance');
             return;
         }
