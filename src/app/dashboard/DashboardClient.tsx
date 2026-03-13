@@ -1381,9 +1381,10 @@ export default function DashboardClient() {
                                             <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.bankStatement}</p>
                                             {user?.bank_statement_url ? (
                                                 <button 
-                                                    onClick={() => {
-                                                        const { data } = supabase.storage.from('agreements').getPublicUrl(user.bank_statement_url);
-                                                        window.open(data.publicUrl, '_blank');
+                                                    onClick={async () => {
+                                                        const { data, error } = await supabase.storage.from('agreements').createSignedUrl(user.bank_statement_url, 3600);
+                                                        if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+                                                        else alert("Could not generate secure link for your statement.");
                                                     }}
                                                     className="inline-flex items-center gap-2 bg-white/5 hover:bg-gv-gold hover:text-black border border-white/10 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all mt-2"
                                                 >

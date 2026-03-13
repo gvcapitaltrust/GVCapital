@@ -258,7 +258,7 @@ export default function VerifyPage() {
         const fileName = `${side}_${Date.now()}_${file.name}`;
         const filePath = `${user.id}/${fileName}`;
         const { data, error } = await supabase.storage
-            .from('kyc-documents')
+            .from('agreements')
             .upload(filePath, file);
         if (error) throw error;
         return data.path;
