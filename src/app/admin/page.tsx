@@ -1696,7 +1696,23 @@ export default function AdminPortal() {
                                                         <td className="px-8 py-6 text-zinc-400 font-mono text-xs whitespace-nowrap">
                                                             {d.created_at ? new Date(d.created_at).toLocaleString() : "N/A"}
                                                         </td>
-                                                        <td className="px-8 py-6 text-right">
+                                                        <td className="px-8 py-6 text-right flex items-center justify-end gap-3">
+                                                            {d.status === 'Pending' && (
+                                                                <>
+                                                                    <button 
+                                                                        onClick={() => handleRejectDeposit(d)}
+                                                                        className="text-red-500 hover:text-red-400 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase transition-all"
+                                                                    >
+                                                                        Reject
+                                                                    </button>
+                                                                    <button 
+                                                                        onClick={() => handleApproveDeposit(d)}
+                                                                        className="bg-emerald-500 text-black px-4 py-1.5 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all"
+                                                                    >
+                                                                        Approve
+                                                                    </button>
+                                                                </>
+                                                            )}
                                                             <button 
                                                                 onClick={() => { setSelectedDepositTx(d); setIsDepositDrawerOpen(true); }}
                                                                 className="text-[10px] font-black uppercase text-gv-gold hover:underline"
