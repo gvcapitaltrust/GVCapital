@@ -240,16 +240,26 @@ export default function RegisterPage() {
             if (error) throw error;
 
             if (user) {
-                // Initialize profile in public.profiles table
+                // Safely resolve referral ID if exists
+                let resolvedReferralId = null;
+                if (inviterUsername) {
+                    const { data: refData } = await supabase
+                        .from('profiles')
+                        .select('id')
+                        .eq('username', inviterUsername.toLowerCase())
+                        .single();
+                    resolvedReferralId = refData?.id || null;
+                }
+
                 const profileData: any = {
                     id: user.id,
-                    email: email, // Required for several views and code references
+                    email: email,
                     full_name: fullName,
                     username: ownUsername.toLowerCase(),
                     balance: 0,
                     profit: 0,
                     kyc_completed: false,
-                    referred_by: inviterUsername ? (await supabase.from('profiles').select('id').eq('username', inviterUsername).single()).data?.id : null
+                    referred_by: resolvedReferralId
                 };
 
                 const { error: profileError } = await supabase
@@ -263,7 +273,8 @@ export default function RegisterPage() {
             }
 
         } catch (error: any) {
-            setErrorMsg(error.message);
+            console.error("REGISTRATION ERROR:", error);
+            setErrorMsg(error.error_description || error.message || "An unexpected error occurred during registration.");
         } finally {
             setIsLoading(false);
         }
