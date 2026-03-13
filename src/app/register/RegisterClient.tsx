@@ -230,6 +230,7 @@ export default function RegisterPage() {
                 options: {
                     data: {
                         full_name: fullName,
+                        username: ownUsername.toLowerCase(),
                         kyc_completed: false,
                         role: 'User'
                     }
