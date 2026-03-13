@@ -100,16 +100,21 @@ export default function DashboardClient() {
                         profile.role = "admin";
                     }
 
-                    const totalAssetsCalc = Number(profile.balance || 0) + Number(profile.profit || 0);
-                    console.log('Balance:', profile.balance, 'Profit:', profile.profit, 'Total Assets Calc:', totalAssetsCalc, 'Rate:', forexRate);
+                    // Standardizing RM-Base with USD-Anchored Tiers
+                    const totalAssetsRM = Number(profile.balance || 0) + Number(profile.profit || 0);
+                    const balUSD = Number(profile.balance || 0) / forexRate;
+                    
+                    console.log('Balance (RM):', profile.balance, 'Profit (RM):', profile.profit, 'Total Assets (RM):', totalAssetsRM, 'USD Equiv for Tier:', balUSD);
+                    
                     setUser({
                         ...authUser,
                         ...profile,
                         is_verified: dbIsVerified,
                         kyc_completed: kycApproved,
                         fullName: profile.full_name || authUser.user_metadata?.full_name,
-                        total_assets: totalAssetsCalc,
-                        totalEquity: totalAssetsCalc
+                        total_assets: totalAssetsRM, // Now in RM
+                        totalEquity: totalAssetsRM,  // Now in RM
+                        balanceUSD: balUSD           // Used for Tier check
                     });
                 } else {
                     console.warn("No profile found for ID:", authUser.id);
@@ -828,11 +833,11 @@ export default function DashboardClient() {
                                             <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors">{t.totalAssets}</p>
                                             <div className="flex flex-col gap-2">
                                                 <h2 className="text-3xl font-black tracking-tighter">
-                                                    {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${(Number(user?.total_assets || 0) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
+                                                    {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
                                                 </h2>
                                                 {!isCheckingAuth && user?.kyc_completed && (
                                                     <p className="text-[10px] font-bold text-zinc-500">
-                                                        (${(Number(user?.total_assets || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                                                        (${(Number(user?.total_assets || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
                                                     </p>
                                                 )}
                                             </div>
@@ -846,11 +851,11 @@ export default function DashboardClient() {
                                             </div>
                                             <div className="flex flex-col gap-2">
                                                 <h2 className="text-3xl font-black tracking-tighter text-gv-gold">
-                                                    {isCheckingAuth ? "..." : `RM ${(Number(user?.balance || 0) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                    {isCheckingAuth ? "..." : `RM ${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                 </h2>
                                                 {!isCheckingAuth && (
                                                     <p className="text-[10px] font-bold text-zinc-500">
-                                                        (${(Number(user?.balance || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                                                        (${(Number(user?.balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
                                                     </p>
                                                 )}
                                             </div>
@@ -864,11 +869,11 @@ export default function DashboardClient() {
                                             </div>
                                             <div className="flex flex-col gap-2">
                                                 <h2 className="text-3xl font-black tracking-tighter text-emerald-500">
-                                                    {isCheckingAuth ? "..." : `RM ${(Number(user?.profit || 0) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                    {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                 </h2>
                                                 {!isCheckingAuth && (
                                                     <p className="text-[10px] font-bold text-zinc-500">
-                                                        (${(Number(user?.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                                                        (${(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
                                                     </p>
                                                 )}
                                             </div>
@@ -879,7 +884,7 @@ export default function DashboardClient() {
                                             <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
                                             <div className="flex flex-col gap-1">
                                                 <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                                                    {getTierByAmount(Number(user?.balance || 0)).name}
+                                                    {getTierByAmount(Number(user?.balance || 0) / forexRate).name}
                                                 </h2>
                                                 <div className="flex items-center gap-2 mt-2">
                                                     <div className="h-2 w-2 rounded-full bg-gv-gold animate-pulse"></div>
@@ -901,17 +906,17 @@ export default function DashboardClient() {
                                             </div>
                                             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
                                             {(() => {
-                                                const currentTier = getTierByAmount(Number(user?.balance || 0));
-                                                const monthlyMin = Number(user?.balance || 0) * currentTier.minDividend * forexRate;
-                                                const monthlyMax = Number(user?.balance || 0) * currentTier.maxDividend * forexRate;
+                                                const currentTier = getTierByAmount(Number(user?.balance || 0) / forexRate);
+                                                const monthlyMin = Number(user?.balance || 0) * currentTier.minDividend;
+                                                const monthlyMax = Number(user?.balance || 0) * currentTier.maxDividend;
                                                 return (
                                                     <h3 className="text-3xl font-black text-white">
-                                                        RM {monthlyMin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} - {monthlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                        RM {monthlyMin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} - RM {monthlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                                     </h3>
                                                 );
                                             })()}
                                             <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">
-                                                Based on {getTierByAmount(Number(user?.balance || 0)).minDividend * 100}-{getTierByAmount(Number(user?.balance || 0)).maxDividend * 100}% {getTierByAmount(Number(user?.balance || 0)).name} Returns
+                                                Based on {getTierByAmount(Number(user?.balance || 0) / forexRate).minDividend * 100}-{getTierByAmount(Number(user?.balance || 0) / forexRate).maxDividend * 100}% {getTierByAmount(Number(user?.balance || 0) / forexRate).name} Returns
                                             </p>
                                         </div>
                                         <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
@@ -920,16 +925,16 @@ export default function DashboardClient() {
                                             </div>
                                             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
                                             {(() => {
-                                                const currentTier = getTierByAmount(Number(user?.balance || 0));
-                                                const yearlyMin = Number(user?.balance || 0) * currentTier.minDividend * 12 * forexRate;
-                                                const yearlyMax = Number(user?.balance || 0) * currentTier.maxDividend * 12 * forexRate;
+                                                const currentTier = getTierByAmount(Number(user?.balance || 0) / forexRate);
+                                                const yearlyMin = Number(user?.balance || 0) * currentTier.minDividend * 12;
+                                                const yearlyMax = Number(user?.balance || 0) * currentTier.maxDividend * 12;
                                                 return (
                                                     <h3 className="text-3xl font-black text-emerald-500">
-                                                        RM {yearlyMin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} - {yearlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                        RM {yearlyMin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} - RM {yearlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                                     </h3>
                                                 );
                                             })()}
-                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Yearly Forecast (Based on {getTierByAmount(Number(user?.balance || 0)).name})</p>
+                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">Yearly Forecast (Based on {getTierByAmount(Number(user?.balance || 0) / forexRate).name})</p>
                                         </div>
                                     </section>
 

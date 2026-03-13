@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
+import { useSettings } from "@/providers/SettingsProvider";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -64,19 +65,16 @@ export default function LoginPage() {
 
     const t = content[lang];
 
+
+    const { maintenanceMode } = useSettings();
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setErrorMsg("");
 
-        // Check Maintenance Mode
-        const { data: maintenance } = await supabase
-            .from('settings')
-            .select('value')
-            .eq('key', 'maintenance_mode')
-            .single();
-
-        if (maintenance?.value === 'true' && email !== "admin@gvcapital.trust") {
+        // Check Maintenance Mode (Standardized from useSettings)
+        if (maintenanceMode && email !== "admin@gvcapital.trust") {
             setIsLoading(false);
             router.push('/maintenance');
             return;

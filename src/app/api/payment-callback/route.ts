@@ -50,19 +50,18 @@ export async function POST(request: Request) {
             if (profileError) throw profileError;
 
             const updatedBalanceMYR = (Number(currentProfile?.balance) || 0) + amount_myr;
-            const updatedBalanceUSD = (Number(currentProfile?.balance_usd) || 0) + amount_usd;
 
             const { error: updateError } = await supabase
                 .from('profiles')
                 .update({
-                    balance: updatedBalanceUSD,
-                    balance_usd: updatedBalanceUSD
+                    balance: updatedBalanceMYR,
+                    balance_usd: (Number(currentProfile?.balance_usd) || 0) + amount_usd
                 })
                 .eq('id', userId);
 
             if (updateError) throw updateError;
 
-            // 4. Save the transaction record with both the RM paid and the USD credited
+            // 4. Save the transaction record (RM is the primary amount)
             const { error: txError } = await supabase
                 .from('transactions')
                 .insert([{
@@ -72,7 +71,7 @@ export async function POST(request: Request) {
                     amount_usd: amount_usd,
                     status: 'Approved',
                     ref_id: refId || `PAY-${Date.now()}`,
-                    description: `Automated Payment gateway deposit (RM ${amount_myr} -> $${amount_usd.toFixed(2)} USD)`
+                    description: `Automated Deposit (RM ${amount_myr}) - USD Equiv: $${amount_usd.toFixed(2)}`
                 }]);
 
             if (txError) throw txError;

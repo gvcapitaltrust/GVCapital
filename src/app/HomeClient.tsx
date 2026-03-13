@@ -19,7 +19,7 @@ export default function HomeClient() {
 
         const checkMaintenance = async () => {
             try {
-                const { data } = await supabase.from('settings').select('value').eq('key', 'maintenance_mode').single();
+                const { data } = await supabase.from('platform_settings').select('value').eq('key', 'maintenance_mode').single();
                 if (data?.value === 'true') {
                     router.push('/maintenance');
                 }

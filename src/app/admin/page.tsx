@@ -69,6 +69,11 @@ export default function AdminPortal() {
     const [searchQuery, setSearchQuery] = useState("");
     const [userSearchQuery, setUserSearchQuery] = useState("");
     const [userStatusFilter, setUserStatusFilter] = useState("All");
+    const [kycSearchQuery, setKycSearchQuery] = useState("");
+    const [withdrawalSearchQuery, setWithdrawalSearchQuery] = useState("");
+    const [withdrawalStatusFilter, setWithdrawalStatusFilter] = useState("All");
+    const [depositSearchQuery, setDepositSearchQuery] = useState("");
+    const [depositStatusFilter, setDepositStatusFilter] = useState("All");
     const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
     const [agentReferrals, setAgentReferrals] = useState<Partial<Profile>[]>([]);
     const [isLoadingSales, setIsLoadingSales] = useState(false);
@@ -281,7 +286,7 @@ export default function AdminPortal() {
     };
 
     const checkMaintenance = async () => {
-        const { data } = await supabase.from('settings').select('value').eq('key', 'maintenance_mode').single();
+        const { data } = await supabase.from('platform_settings').select('value').eq('key', 'maintenance_mode').single();
         if (data) setMaintenanceMode(data.value === 'true');
     };
 
@@ -294,8 +299,8 @@ export default function AdminPortal() {
         const newVal = !maintenanceMode;
         setMaintenanceMode(newVal);
         try {
-            console.log('Saving settings with:', { key: 'maintenance_mode', value: String(newVal) });
-            const { error } = await supabase.from('settings').upsert({ key: 'maintenance_mode', value: String(newVal) }, { onConflict: 'key' });
+            console.log('Saving platform_settings with:', { key: 'maintenance_mode', value: String(newVal) });
+            const { error } = await supabase.from('platform_settings').upsert({ key: 'maintenance_mode', value: String(newVal) }, { onConflict: 'key' });
             if (error) throw error;
         } catch (err: any) {
             if (err.code === '42501' || err.status === 403) {
@@ -632,12 +637,12 @@ export default function AdminPortal() {
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
                                 {(() => {
-                                    const totalUsd = users.reduce((acc: number, u: Profile) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
+                                    const totalAssetsRm = users.reduce((acc: number, u: Profile) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
                                     return (
                                         <>
                                             <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Assets</p>
-                                            <h2 className="text-2xl font-black text-white">RM {(totalUsd * forexRate).toFixed(2)}</h2>
-                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">(${(totalUsd).toFixed(2)} USD)</p>
+                                            <h2 className="text-2xl font-black text-white">RM {totalAssetsRm.toFixed(2)}</h2>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">(${(totalAssetsRm / forexRate).toFixed(2)} USD)</p>
                                         </>
                                     );
                                 })()}
@@ -672,93 +677,173 @@ export default function AdminPortal() {
                         {/* Content Area */}
                         <div className="bg-[#121212] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
                             {activeTab === "kyc" && (
-                                <table className="w-full text-left">
-                                    <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                        <tr>
-                                            <th className="px-8 py-6">Client</th>
-                                            <th className="px-8 py-6">Submission Date</th>
-                                            <th className="px-8 py-6">Country</th>
-                                            <th className="px-8 py-6 text-center">Status</th>
-                                            <th className="px-8 py-6 text-right">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-white/[0.02]">
-                                        {kycQueue.map((u: any, i: number) => (
-                                            <tr 
-                                                key={i} 
-                                                className="text-sm font-bold group hover:bg-white/[0.01] cursor-pointer"
-                                                onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
-                                            >
-                                                <td className="px-8 py-6">
-                                                    <div className="text-white">{u.full_name || u.email}</div>
-                                                    <div className="text-[10px] text-zinc-500 font-medium">{u.email}</div>
-                                                </td>
-                                                <td className="px-8 py-6 text-zinc-400 font-mono text-xs">
-                                                    {u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A"}
-                                                </td>
-                                                <td className="px-8 py-6 text-zinc-400">{u.country || u.kyc_data?.country || "N/A"}</td>
-                                                <td className="px-8 py-6 text-center">
-                                                    <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[9px] uppercase font-black border border-amber-500/20">
-                                                        {u.kyc_status}
-                                                    </span>
-                                                </td>
-                                                <td className="px-8 py-6 text-right">
-                                                    <button className="text-[10px] font-black uppercase text-gv-gold hover:underline">Review Profile</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                        {kycQueue.length === 0 && (
-                                            <tr>
-                                                <td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">
-                                                    No pending KYC applications
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
+                                <div className="animate-in fade-in duration-500">
+                                    <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                        <div>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">KYC Verification Queue</h3>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Identify & Verify Clients</p>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-4">
+                                            <div className="relative group w-full md:w-64">
+                                                <input 
+                                                    type="text"
+                                                    placeholder="Search Name or Email..."
+                                                    value={kycSearchQuery}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setKycSearchQuery(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all text-white"
+                                                />
+                                                <svg className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="overflow-hidden border border-white/5 mx-8 mb-8 rounded-3xl">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                                <tr>
+                                                    <th className="px-8 py-6">Client</th>
+                                                    <th className="px-8 py-6">Submission Date</th>
+                                                    <th className="px-8 py-6">Country</th>
+                                                    <th className="px-8 py-6 text-center">Status</th>
+                                                    <th className="px-8 py-6 text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-white/[0.02]">
+                                                {kycQueue.filter((u: any) => {
+                                                    const query = kycSearchQuery.toLowerCase();
+                                                    return (u.full_name || "").toLowerCase().includes(query) || (u.email || "").toLowerCase().includes(query);
+                                                }).map((u: any, i: number) => (
+                                                    <tr 
+                                                        key={i} 
+                                                        className="text-sm font-bold group hover:bg-white/[0.01] cursor-pointer"
+                                                        onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
+                                                    >
+                                                        <td className="px-8 py-6">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-white font-black">{u.full_name || "New Client"}</span>
+                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{u.email}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-8 py-6 text-zinc-400 font-mono text-xs">
+                                                            {u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A"}
+                                                        </td>
+                                                        <td className="px-8 py-6 text-zinc-400">{u.country || u.kyc_data?.country || "N/A"}</td>
+                                                        <td className="px-8 py-6 text-center">
+                                                            <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[9px] uppercase font-black border border-amber-500/20">
+                                                                {u.kyc_status}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-8 py-6 text-right">
+                                                            <button className="text-[10px] font-black uppercase text-gv-gold hover:underline">Review Profile</button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {kycQueue.filter((u: any) => {
+                                                    const query = kycSearchQuery.toLowerCase();
+                                                    return (u.full_name || "").toLowerCase().includes(query) || (u.email || "").toLowerCase().includes(query);
+                                                }).length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">
+                                                            {kycQueue.length === 0 ? "No pending KYC applications" : "No matching KYC applications"}
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             )}
 
                             {activeTab === "withdrawals" && (
-                                <table className="w-full text-left">
-                                    <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                        <tr><th className="px-8 py-6">Name</th><th className="px-8 py-6">Bank Details</th><th className="px-8 py-6">Ref ID</th><th className="px-8 py-6">Amount (RM)</th><th className="px-8 py-6 text-right">Action</th></tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-white/[0.02]">
-                                        {withdrawals.map((w: any, i: number) => (
-                                            <tr key={i} className="text-sm font-bold group hover:bg-white/[0.01]">
-                                                <td className="px-8 py-6 text-white">
-                                                    <div className="flex flex-col">
-                                                        <span>{w.profiles?.full_name || w.profiles?.email || w.user_id}</span>
-                                                        <span className="text-[10px] text-zinc-500 lowercase font-medium">{w.profiles?.email}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <div className="text-white text-xs">{w.profiles?.bank_name || 'N/A'}</div>
-                                                    <div className="font-mono text-[10px] text-zinc-500">{w.profiles?.bank_account_number || 'N/A'}</div>
-                                                </td>
-                                                <td className="px-8 py-4 font-mono text-xs opacity-50">{w.ref_id}</td>
-                                                <td className="px-8 py-6 text-red-400">
-                                                    <div className="flex flex-col">
-                                                        <span>RM {Math.abs(Number(w.amount || 0)).toFixed(2)}</span>
-                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(w.amount || 0)) / forexRate).toFixed(2)})</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
-                                                    <button onClick={() => handleRejectWithdrawal(w)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">Reject</button>
-                                                    <button onClick={() => handleApproveWithdrawal(w)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Approve Withdrawal</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                        {withdrawals.length === 0 && (
-                                            <tr>
-                                                <td colSpan={5} className="px-8 py-20 text-center">
-                                                    <p className="text-zinc-600 font-bold uppercase tracking-widest text-xs">No withdrawals found</p>
-                                                    <p className="text-[10px] text-zinc-800 mt-2 font-black uppercase tracking-widest">No data in state</p>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
+                                <div className="animate-in fade-in duration-500">
+                                    <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                        <div>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">Withdrawal Requests</h3>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Manage Payouts</p>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-4">
+                                            <div className="relative group w-full md:w-64">
+                                                <input 
+                                                    type="text"
+                                                    placeholder="Search Name or Email..."
+                                                    value={withdrawalSearchQuery}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawalSearchQuery(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all text-white"
+                                                />
+                                                <svg className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                            </div>
+                                            <select 
+                                                value={withdrawalStatusFilter}
+                                                onChange={(e) => setWithdrawalStatusFilter(e.target.value)}
+                                                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 transition-all cursor-pointer"
+                                            >
+                                                <option value="All">All Status</option>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Approved">Approved</option>
+                                                <option value="Rejected">Rejected</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="overflow-hidden border border-white/5 mx-8 mb-8 rounded-3xl">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                                <tr><th className="px-8 py-6">Client</th><th className="px-8 py-6">Bank Details</th><th className="px-8 py-6">Ref ID</th><th className="px-8 py-6">Amount (RM)</th><th className="px-8 py-6 text-right">Action</th></tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-white/[0.02]">
+                                                {withdrawals.filter((w: any) => {
+                                                    const query = withdrawalSearchQuery.toLowerCase();
+                                                    const matchesSearch = (w.profiles?.full_name || "").toLowerCase().includes(query) || (w.profiles?.email || "").toLowerCase().includes(query);
+                                                    const matchesStatus = withdrawalStatusFilter === "All" || w.status === withdrawalStatusFilter;
+                                                    return matchesSearch && matchesStatus;
+                                                }).map((w: any, i: number) => (
+                                                    <tr key={i} className="text-sm font-bold group hover:bg-white/[0.01]">
+                                                        <td className="px-8 py-6">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-white font-black">{w.profiles?.full_name || "Client"}</span>
+                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{w.profiles?.email}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-8 py-6">
+                                                            <div className="text-white text-xs">{w.profiles?.bank_name || 'N/A'}</div>
+                                                            <div className="font-mono text-[10px] text-zinc-500">{w.profiles?.bank_account_number || 'N/A'}</div>
+                                                        </td>
+                                                        <td className="px-8 py-4 font-mono text-xs opacity-50">{w.ref_id}</td>
+                                                        <td className="px-8 py-6 text-red-400">
+                                                            <div className="flex flex-col">
+                                                                <span>RM {Math.abs(Number(w.amount || 0)).toFixed(2)}</span>
+                                                                <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(w.amount || 0)) / forexRate).toFixed(2)})</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
+                                                            {w.status === 'Pending' && (
+                                                                <>
+                                                                    <button onClick={() => handleRejectWithdrawal(w)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">Reject</button>
+                                                                    <button onClick={() => handleApproveWithdrawal(w)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Approve Withdrawal</button>
+                                                                </>
+                                                            )}
+                                                            {w.status !== 'Pending' && (
+                                                                <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${w.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                                                                    {w.status}
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {withdrawals.filter((w: any) => {
+                                                    const query = withdrawalSearchQuery.toLowerCase();
+                                                    const matchesSearch = (w.profiles?.full_name || "").toLowerCase().includes(query) || (w.profiles?.email || "").toLowerCase().includes(query);
+                                                    const matchesStatus = withdrawalStatusFilter === "All" || w.status === withdrawalStatusFilter;
+                                                    return matchesSearch && matchesStatus;
+                                                }).length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={5} className="px-8 py-20 text-center">
+                                                            <p className="text-zinc-600 font-bold uppercase tracking-widest text-xs">{withdrawals.length === 0 ? "No withdrawals found" : "No matching withdrawals"}</p>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             )}
                             {activeTab === "sales" && (
                                 <div className="p-8 space-y-8">
@@ -964,7 +1049,7 @@ export default function AdminPortal() {
                                             <div className="relative group w-full md:w-64">
                                                 <input 
                                                     type="text"
-                                                    placeholder="Search Email..."
+                                                    placeholder="Search Name or Email..."
                                                     value={userSearchQuery}
                                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserSearchQuery(e.target.value)}
                                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all text-white"
@@ -999,7 +1084,8 @@ export default function AdminPortal() {
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
                                                 {users.filter((u: any) => {
-                                                    const matchesSearch = (u.email || "").toLowerCase().includes(userSearchQuery.toLowerCase());
+                                                    const query = userSearchQuery.toLowerCase();
+                                                    const matchesSearch = (u.full_name || "").toLowerCase().includes(query) || (u.email || "").toLowerCase().includes(query);
                                                     let matchesFilter = true;
                                                     if (userStatusFilter === "Verified") {
                                                         matchesFilter = u.is_verified === true;
@@ -1010,86 +1096,88 @@ export default function AdminPortal() {
                                                     }
                                                     return matchesSearch && matchesFilter;
                                                 }).map((u: any, i: number) => (
-                                            <tr 
-                                                key={i} 
-                                                className="text-sm font-bold group hover:bg-white/[0.01] cursor-pointer"
-                                                onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
-                                            >
-                                                <td className="px-8 py-6 text-white">{u.full_name || u.email}</td>
-                                                 <td className="px-8 py-6">
-                                                      <div className="flex flex-col">
-                                                          <span className="text-emerald-400 font-black">RM {Number(u.balance || 0).toFixed(2)}</span>
-                                                          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${(Number(u.balance || 0) / 4).toFixed(2)})</span>
-                                                      </div>
-                                                  </td>
-                                                  <td className="px-8 py-6 text-gv-gold font-mono text-xs">RM {Number(u.profit || 0).toFixed(2)}</td>
-                                                  <td className="px-8 py-6 text-white font-black">
-                                                      <div className="flex flex-col">
-                                                          <span>RM {(Number(u.balance || 0) + Number(u.profit || 0)).toFixed(2)}</span>
-                                                          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${( (Number(u.balance || 0) + Number(u.profit || 0)) / 4).toFixed(2)})</span>
-                                                      </div>
-                                                  </td>
-                                                <td className="px-8 py-6">
-                                                    <div className="flex justify-center">
-                                                        <span className={`px-3 py-1 rounded-full text-[9px] uppercase font-black text-center ${u.kyc_completed ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-500"}`}>{u.kyc_status || 'KYC Pending'}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6 text-center">
-                                                    {u.is_verified ? (
-                                                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Verified</span>
-                                                    ) : (
-                                                        <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Pending</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-8 py-6 text-right space-x-3" onClick={(e: React.MouseEvent<HTMLTableCellElement>) => e.stopPropagation()}>
-                                                    {!u.is_verified ? (
-                                                        <div className="flex flex-col md:flex-row items-end md:items-center justify-end gap-3">
-                                                            <input 
-                                                                type="text"
-                                                                placeholder="Rejection Reason..."
-                                                                value={rejectionReasons[u.id] || ""}
-                                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRejectionReasons({ ...rejectionReasons, [u.id]: e.target.value })}
-                                                                className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[9px] focus:outline-none focus:border-red-500/50 w-full md:w-32"
-                                                            />
-                                                            <div className="flex gap-2">
-                                                                <button
-                                                                    onClick={() => handleVerifyUser(u.id)}
-                                                                    className="bg-emerald-500 text-black px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all whitespace-nowrap"
-                                                                >
-                                                                    Manual Verify
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleRejectUser(u.id)}
-                                                                    className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-red-500/20 hover:scale-105 transition-all whitespace-nowrap"
-                                                                >
-                                                                    Reject
-                                                                </button>
+                                                    <tr 
+                                                        key={i} 
+                                                        className="text-sm font-bold group hover:bg-white/[0.01] cursor-pointer"
+                                                        onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
+                                                    >
+                                                        <td className="px-8 py-6">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-white font-black">{u.full_name || "New Client"}</span>
+                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{u.email}</span>
                                                             </div>
-                                                        </div>
-                                                    ) : (
-                                                        <span className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-500 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase">
-                                                            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
-                                                            Verified
-                                                        </span>
-                                                    )}
-                                                </td>
-                                            </tr>
+                                                        </td>
+                                                        <td className="px-8 py-6">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-emerald-400 font-black">RM {Number(u.balance || 0).toFixed(2)}</span>
+                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${(Number(u.balance || 0) / forexRate).toFixed(2)} USD)</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-8 py-6 text-gv-gold font-mono text-xs">RM {Number(u.profit || 0).toFixed(2)}</td>
+                                                        <td className="px-8 py-6 text-white font-black">
+                                                            <div className="flex flex-col">
+                                                                <span>RM {(Number(u.balance || 0) + Number(u.profit || 0)).toFixed(2)}</span>
+                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${( (Number(u.balance || 0) + Number(u.profit || 0)) / forexRate).toFixed(2)} USD)</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-8 py-6">
+                                                            <div className="flex justify-center">
+                                                                <span className={`px-3 py-1 rounded-full text-[9px] uppercase font-black text-center ${u.kyc_status === 'Verified' ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-500"}`}>{u.kyc_status || 'Pending'}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-8 py-6 text-center">
+                                                            {u.is_verified ? (
+                                                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Verified</span>
+                                                            ) : (
+                                                                <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Pending</span>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-8 py-6 text-right space-x-3" onClick={(e: React.MouseEvent<HTMLTableCellElement>) => e.stopPropagation()}>
+                                                            {!u.is_verified ? (
+                                                                <div className="flex flex-col md:flex-row items-end md:items-center justify-end gap-3">
+                                                                    <input 
+                                                                        type="text"
+                                                                        placeholder="Rejection Reason..."
+                                                                        value={rejectionReasons[u.id] || ""}
+                                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRejectionReasons({ ...rejectionReasons, [u.id]: e.target.value })}
+                                                                        className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[9px] focus:outline-none focus:border-red-500/50 w-full md:w-32"
+                                                                    />
+                                                                    <div className="flex gap-2">
+                                                                        <button
+                                                                            onClick={() => handleVerifyUser(u.id)}
+                                                                            className="bg-emerald-500 text-black px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all whitespace-nowrap"
+                                                                        >
+                                                                            Manual Verify
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => handleRejectUser(u.id)}
+                                                                            className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-red-500/20 hover:scale-105 transition-all whitespace-nowrap"
+                                                                        >
+                                                                            Reject
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            ) : (
+                                                                <span className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-500 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase">
+                                                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
+                                                                    Verified
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                    </tr>
                                                 ))}
                                                 {users.filter((u: any) => {
-                                                    const matchesSearch = (u.email || "").toLowerCase().includes(userSearchQuery.toLowerCase());
+                                                    const query = userSearchQuery.toLowerCase();
+                                                    const matchesSearch = (u.full_name || "").toLowerCase().includes(query) || (u.email || "").toLowerCase().includes(query);
                                                     let matchesFilter = true;
-                                                    if (userStatusFilter === "Verified") {
-                                                        matchesFilter = u.is_verified === true;
-                                                    } else if (userStatusFilter === "KYC Pending") {
-                                                        matchesFilter = !u.is_verified && u.kyc_step === 3;
-                                                    } else if (userStatusFilter === "Unverified") {
-                                                        matchesFilter = !u.is_verified && (u.kyc_step || 0) < 3;
-                                                    }
+                                                    if (userStatusFilter === "Verified") matchesFilter = u.is_verified === true;
+                                                    else if (userStatusFilter === "KYC Pending") matchesFilter = !u.is_verified && u.kyc_step === 3;
+                                                    else if (userStatusFilter === "Unverified") matchesFilter = !u.is_verified && (u.kyc_step || 0) < 3;
                                                     return matchesSearch && matchesFilter;
                                                 }).length === 0 && (
                                                     <tr>
-                                                        <td colSpan={6} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">
-                                                            No users found
+                                                        <td colSpan={7} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">
+                                                            {users.length === 0 ? "No users found" : "No matching users"}
                                                         </td>
                                                     </tr>
                                                 )}
@@ -1100,73 +1188,104 @@ export default function AdminPortal() {
                             )}
 
                             {activeTab === "deposits" && (
-                                <table className="w-full text-left">
-                                    <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                        <tr>
-                                            <th className="px-8 py-6">Name</th>
-                                            <th className="px-8 py-6">Ref ID</th>
-                                            <th className="px-8 py-6">Amount (RM)</th>
-                                            <th className="px-8 py-6">Status</th>
-                                            <th className="px-8 py-6">Date</th>
-                                            <th className="px-8 py-6">Receipt</th>
-                                            <th className="px-8 py-6 text-right">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-white/[0.02]">
-                                        {deposits.map((d: any, i: number) => (
-                                            <tr key={i} className="text-sm font-bold group hover:bg-white/[0.01]">
-                                                <td className="px-8 py-6 text-white">
-                                                    <div className="flex flex-col">
-                                                        <span>{d.profiles?.full_name || d.profiles?.email || "Unknown"}</span>
-                                                        <span className="text-[10px] text-zinc-500 lowercase font-medium">{d.profiles?.email}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6 font-bold text-emerald-400">
-                                                    RM {Number(d.amount || 0).toFixed(2)}
-                                                    <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(d.amount || 0) / 4).toFixed(2)})</span>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                                                        d.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-500' :
-                                                        d.status === 'Rejected' ? 'bg-red-500/20 text-red-500' :
-                                                        'bg-amber-500/20 text-amber-500'
-                                                    }`}>
-                                                        { (d.status === 'Approved' || d.status === 'Rejected') ? d.status : 'Pending' }
-                                                    </span>
-                                                </td>
-                                                <td className="px-8 py-6 text-zinc-400 font-mono text-xs whitespace-nowrap">
-                                                    {d.created_at ? new Date(d.created_at).toLocaleString() : "N/A"}
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    {d.receipt_url ? (
-                                                        <button 
-                                                            onClick={() => openDepositReceipt(d)}
-                                                            className="text-gv-gold text-[10px] uppercase tracking-widest hover:underline flex items-center gap-2"
-                                                        >
-                                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg> View
-                                                        </button>
-                                                    ) : <span className="text-zinc-600 text-[10px] uppercase">No File</span>}
-                                                </td>
-                                                <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
-                                                    {d.status === 'Pending' && (
-                                                        <>
-                                                            <button onClick={() => handleRejectDeposit(d)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">Reject</button>
-                                                            <button onClick={() => handleApproveDeposit(d)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Verify & Credit</button>
-                                                        </>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                        {deposits.length === 0 && (
-                                            <tr>
-                                                <td colSpan={6} className="px-8 py-20 text-center">
-                                                    <p className="text-zinc-600 font-bold uppercase tracking-widest text-xs">No deposits found</p>
-                                                    <p className="text-[10px] text-zinc-800 mt-2 font-black uppercase tracking-widest">No data in state</p>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
+                                <div className="animate-in fade-in duration-500">
+                                    <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                        <div>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">Deposit Management</h3>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Review & Approve Funds</p>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-4">
+                                            <div className="relative group w-full md:w-64">
+                                                <input 
+                                                    type="text"
+                                                    placeholder="Search Name or Email..."
+                                                    value={depositSearchQuery}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositSearchQuery(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all text-white"
+                                                />
+                                                <svg className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                            </div>
+                                            <select 
+                                                value={depositStatusFilter}
+                                                onChange={(e) => setDepositStatusFilter(e.target.value)}
+                                                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 transition-all cursor-pointer"
+                                            >
+                                                <option value="All">All Status</option>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Approved">Approved</option>
+                                                <option value="Rejected">Rejected</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="overflow-hidden border border-white/5 mx-8 mb-8 rounded-3xl">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                                <tr>
+                                                    <th className="px-8 py-6">Client</th>
+                                                    <th className="px-8 py-6">Ref ID</th>
+                                                    <th className="px-8 py-6">Amount (RM)</th>
+                                                    <th className="px-8 py-6">Status</th>
+                                                    <th className="px-8 py-6">Date</th>
+                                                    <th className="px-8 py-6 text-right">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-white/[0.02]">
+                                                {deposits.filter((d: any) => {
+                                                    const query = depositSearchQuery.toLowerCase();
+                                                    const matchesSearch = (d.profiles?.full_name || "").toLowerCase().includes(query) || (d.profiles?.email || "").toLowerCase().includes(query);
+                                                    const matchesStatus = depositStatusFilter === "All" || d.status === depositStatusFilter;
+                                                    return matchesSearch && matchesStatus;
+                                                }).map((d: any) => (
+                                                    <tr key={d.id} className="text-sm font-bold group hover:bg-white/[0.01]">
+                                                        <td className="px-8 py-6">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-white font-black">{d.profiles?.full_name || d.profiles?.email || 'N/A'}</span>
+                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{d.profiles?.email}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-8 py-4 font-mono text-xs opacity-50">{d.ref_id}</td>
+                                                        <td className="px-8 py-6 font-bold text-emerald-400">
+                                                            RM {Number(d.amount || 0).toFixed(2)}
+                                                            <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(d.amount || 0) / forexRate).toFixed(2)})</span>
+                                                        </td>
+                                                        <td className="px-8 py-6">
+                                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                                                d.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-500' :
+                                                                d.status === 'Rejected' ? 'bg-red-500/20 text-red-500' :
+                                                                'bg-amber-500/20 text-amber-500'
+                                                            }`}>
+                                                                {d.status}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-8 py-6 text-zinc-400 font-mono text-xs whitespace-nowrap">
+                                                            {d.created_at ? new Date(d.created_at).toLocaleString() : "N/A"}
+                                                        </td>
+                                                        <td className="px-8 py-6 text-right">
+                                                            <button 
+                                                                onClick={() => { setSelectedDepositTx(d); setIsDepositDrawerOpen(true); }}
+                                                                className="text-[10px] font-black uppercase text-gv-gold hover:underline"
+                                                            >
+                                                                Details
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {deposits.filter((d: any) => {
+                                                    const query = depositSearchQuery.toLowerCase();
+                                                    const matchesSearch = (d.profiles?.full_name || "").toLowerCase().includes(query) || (d.profiles?.email || "").toLowerCase().includes(query);
+                                                    const matchesStatus = depositStatusFilter === "All" || d.status === depositStatusFilter;
+                                                    return matchesSearch && matchesStatus;
+                                                }).length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={6} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">
+                                                            {deposits.length === 0 ? "No deposits recorded" : "No matching deposits"}
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             )}
 
                             {activeTab === "audit" && (
@@ -1222,34 +1341,46 @@ export default function AdminPortal() {
                                                 {verificationLogs
                                                     .filter(log => {
                                                         const query = auditSearchQuery.toLowerCase();
+                                                        const targetUser = users.find(u => u.email === log.user_email);
                                                         const matchesSearch = log.user_email?.toLowerCase().includes(query) || 
-                                                                            log.admin_username?.toLowerCase().includes(query);
+                                                                            log.admin_username?.toLowerCase().includes(query) ||
+                                                                            (targetUser?.full_name || "").toLowerCase().includes(query);
                                                         const matchesFilter = auditStatusFilter === "All" || log.action === auditStatusFilter;
                                                         return matchesSearch && matchesFilter;
                                                     })
-                                                    .map((log: any, i: number) => (
-                                                    <tr key={i} className="text-xs font-bold hover:bg-white/[0.01] transition-colors">
-                                                        <td className="px-8 py-4 text-zinc-400 font-mono">{new Date(log.created_at).toLocaleString()}</td>
-                                                        <td className="px-8 py-4 text-white">
-                                                            <div className="flex flex-col">
-                                                                <span>{log.admin_username}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-8 py-4 text-zinc-300">{log.user_email}</td>
-                                                        <td className="px-8 py-4">
-                                                            <span className={`px-2 py-1 rounded-md text-[9px] uppercase font-black ${log.action === 'Verified' ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"}`}>
-                                                                {log.action}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-8 py-4 text-zinc-500 italic max-w-xs truncate overflow-hidden" title={log.rejection_reason}>
-                                                            {log.rejection_reason || "-"}
-                                                        </td>
-                                                    </tr>
-                                                ))}
+                                                    .map((log: any, i: number) => {
+                                                        const targetUser = users.find(u => u.email === log.user_email);
+                                                        return (
+                                                            <tr key={i} className="text-xs font-bold hover:bg-white/[0.01] transition-colors">
+                                                                <td className="px-8 py-4 text-zinc-400 font-mono">{new Date(log.created_at).toLocaleString()}</td>
+                                                                <td className="px-8 py-4 text-white">
+                                                                    <div className="flex flex-col">
+                                                                        <span>{log.admin_username}</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="px-8 py-4">
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-white font-black">{targetUser?.full_name || "New Client"}</span>
+                                                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{log.user_email}</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="px-8 py-4">
+                                                                    <span className={`px-2 py-1 rounded-md text-[9px] uppercase font-black ${log.action === 'Verified' ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"}`}>
+                                                                        {log.action}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-8 py-4 text-zinc-500 italic max-w-xs truncate overflow-hidden" title={log.rejection_reason}>
+                                                                    {log.rejection_reason || "-"}
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
                                                 {verificationLogs.filter(log => {
                                                     const query = auditSearchQuery.toLowerCase();
+                                                    const targetUser = users.find(u => u.email === log.user_email);
                                                     const matchesSearch = log.user_email?.toLowerCase().includes(query) || 
-                                                                        log.admin_username?.toLowerCase().includes(query);
+                                                                        log.admin_username?.toLowerCase().includes(query) ||
+                                                                        (targetUser?.full_name || "").toLowerCase().includes(query);
                                                     const matchesFilter = auditStatusFilter === "All" || log.action === auditStatusFilter;
                                                     return matchesSearch && matchesFilter;
                                                 }).length === 0 && (
@@ -1360,8 +1491,8 @@ export default function AdminPortal() {
                                                 <span className="text-xs font-black uppercase text-gv-gold tracking-widest">Total Assets</span>
                                             </div>
                                             <div className="text-right flex flex-col items-end">
-                                                <div className="text-xl font-black text-white">RM {(Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)).toFixed(2)}</div>
-                                                <div className="text-[10px] font-bold text-zinc-500">(${( (Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)) / 4).toFixed(2)} USD)</div>
+                                                <div className="text-xl font-black text-white">RM {(Number(selectedUser?.balance || 0) + Number(selectedUser?.profit || 0)).toFixed(2)}</div>
+                                                <div className="text-[10px] font-bold text-zinc-500">(${( (Number(selectedUser?.balance || 0) + Number(selectedUser?.profit || 0)) / forexRate).toFixed(2)} USD)</div>
                                             </div>
                                         </div>
                                         <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between">
@@ -1372,8 +1503,8 @@ export default function AdminPortal() {
                                                 <span className="text-xs font-black uppercase text-zinc-400 tracking-widest">Total Equity</span>
                                             </div>
                                             <div className="text-right flex flex-col items-end">
-                                                <div className="text-xl font-black text-white">RM {(Number(selectedUser.balance || 0)).toFixed(2)}</div>
-                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser.balance || 0) / 4).toFixed(2)} USD)</div>
+                                                <div className="text-xl font-black text-white">RM {(Number(selectedUser?.balance || 0)).toFixed(2)}</div>
+                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser?.balance || 0) / forexRate).toFixed(2)} USD)</div>
                                             </div>
                                         </div>
                                     </div>
@@ -1531,7 +1662,7 @@ export default function AdminPortal() {
                                             RM {Number(selectedDepositTx.amount || 0).toFixed(2)}
                                         </h3>
                                         <div className="text-sm text-zinc-500 font-bold uppercase tracking-widest mt-2">
-                                            (${(Number(selectedDepositTx.amount || 0) / 4).toFixed(2)} USD)
+                                            (${(Number(selectedDepositTx.amount || 0) / forexRate).toFixed(2)} USD)
                                         </div>
                                         <div className="mt-4 flex flex-col items-center gap-1 text-center">
                                             <div className="text-white text-sm font-bold uppercase tracking-widest">{selectedDepositTx.profiles?.full_name || 'Client'}</div>

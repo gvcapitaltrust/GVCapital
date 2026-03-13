@@ -53,16 +53,15 @@ export default function ApprovalsClient() {
 
     const handleApprove = async (tx: any) => {
         const displayRm = Number(tx.amount || 0).toFixed(2);
-        const creditUsd = (Number(tx.amount || 0) / forexRate).toFixed(2);
-        if (!confirm(`Confirming deposit of RM ${displayRm} (Credit: $${creditUsd} USD) for ${tx.profiles.full_name}?`)) return;
+        if (!confirm(`Confirming deposit of RM ${displayRm} for ${tx.profiles.full_name}?`)) return;
 
         try {
             // Use RPC for atomic update of transaction and profile balance
-            const creditUsd = Number(tx.amount || 0) / forexRate;
+            // Standardized to RM storage, so we pass tx.amount directly
             const { error: rpcError } = await supabase.rpc('approve_deposit', {
                 p_tx_id: tx.id,
                 p_user_id: tx.user_id,
-                p_amount: creditUsd
+                p_amount: Number(tx.amount || 0)
             });
 
             if (rpcError) throw rpcError;
@@ -87,16 +86,15 @@ export default function ApprovalsClient() {
             if (fetchError) throw fetchError;
 
             for (const user of users) {
-                const dividend = (user.total_equity || 0) * 0.01;
+                // Basis for dividend is the RM balance (Investment)
+                const dividend = (user.balance || 0) * 0.01;
                 if (dividend <= 0) continue;
 
-                // Update Profile
+                // Update Profile: Credits go to withdrawable profit
                 await supabase
                     .from('profiles')
                     .update({
-                        balance: (user.balance || 0) + dividend,
-                        profit: (user.profit || 0) + dividend,
-                        total_equity: (user.total_equity || 0) + dividend
+                        profit: (user.profit || 0) + dividend
                     })
                     .eq('id', user.id);
 

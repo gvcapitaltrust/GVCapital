@@ -7,6 +7,7 @@ interface SettingsContextType {
     forexRate: number;
     monthlyRate: number;
     yearlyRate: number;
+    maintenanceMode: boolean;
     loading: boolean;
     refresh: () => Promise<void>;
 }
@@ -17,6 +18,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     const [forexRate, setForexRate] = useState(4.0); // Safe Default
     const [monthlyRate, setMonthlyRate] = useState(0.08); // 8% Default
     const [yearlyRate, setYearlyRate] = useState(0.96); // 96% Default
+    const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [loading, setLoading] = useState(true);
 
     const fetchSettings = async () => {
@@ -53,19 +55,15 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 setYearlyRate(parseFloat(psYearly.value) || 0.96);
             }
 
-            // Fallback to legacy 'settings' table if platform_settings doesn't have rates yet
-            if (!psMonthly || !psYearly) {
-                const { data: legacyRates } = await supabase
-                    .from('settings')
-                    .select('*')
-                    .in('key', ['monthly_return_rate', 'yearly_return_rate']);
-                
-                if (legacyRates) {
-                    const m = legacyRates.find((r: any) => r.key === 'monthly_return_rate')?.value;
-                    const y = legacyRates.find((r: any) => r.key === 'yearly_return_rate')?.value;
-                    if (m) setMonthlyRate(parseFloat(m));
-                    if (y) setYearlyRate(parseFloat(y));
-                }
+            // 3. Fetch Maintenance Mode
+            const { data: psMaint, error: maintError } = await supabase
+                .from('platform_settings')
+                .select('value')
+                .eq('key', 'maintenance_mode')
+                .single();
+            
+            if (psMaint && !maintError) {
+                setMaintenanceMode(psMaint.value === 'true');
             }
         } catch (err) {
             console.error("[SETTINGS] Fetch failed:", err);
@@ -92,6 +90,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                     setMonthlyRate(parseFloat(updated.value));
                 } else if (updated.key === 'yearly_return_rate') {
                     setYearlyRate(parseFloat(updated.value));
+                } else if (updated.key === 'maintenance_mode') {
+                    setMaintenanceMode(updated.value === 'true');
                 }
             })
             .subscribe();
@@ -102,7 +102,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     return (
-        <SettingsContext.Provider value={{ forexRate, monthlyRate, yearlyRate, loading, refresh: fetchSettings }}>
+        <SettingsContext.Provider value={{ forexRate, monthlyRate, yearlyRate, maintenanceMode, loading, refresh: fetchSettings }}>
             {children}
         </SettingsContext.Provider>
     );
