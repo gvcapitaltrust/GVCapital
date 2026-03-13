@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { TIERS, getTierByAmount, calculateDividendRange, formatUSD } from "@/lib/tierUtils";
 import ProductCard from "./ProductCard";
+import TierMedal from "./TierMedal";
 import { Info, TrendingUp, Wallet } from "lucide-react";
 
 interface ProductSelectionProps {
@@ -34,6 +35,7 @@ export default function ProductSelection({
       compare: "Compare Tiers",
       cta: "Proceed to Deposit",
       currentTier: "Current Tier",
+      noTier: "No Tier",
       potentialUpgrade: "Potential Upgrade",
       increaseBy: "Increase by",
       toReach: "to reach"
@@ -46,6 +48,7 @@ export default function ProductSelection({
       compare: "比较等级",
       cta: "前往入金",
       currentTier: "当前等级",
+      noTier: "无等级",
       potentialUpgrade: "潜在升级",
       increaseBy: "增加",
       toReach: "即可达到"
@@ -129,8 +132,13 @@ export default function ProductSelection({
                 <span className="text-xs font-black uppercase tracking-widest">Investment Summary</span>
               </div>
               <div className="space-y-1">
-                <p className="text-zinc-400 text-xs font-medium">Your current tier is based on your total balance.</p>
-                <p className="text-white text-sm font-bold">{t.currentTier}: <span className="text-gv-gold font-black uppercase text-center">{qualifiedTier.name.replace(/ package/gi, '')}</span></p>
+                <p className="text-zinc-400 text-[10px] font-medium uppercase tracking-widest">{t.currentTier}</p>
+                <div className="flex items-center justify-center gap-3">
+                  <TierMedal tierId={currentInvestment > 0 ? qualifiedTier.id : "none"} size="sm" />
+                  <span className="text-white text-sm font-black uppercase tracking-tight">
+                    {currentInvestment > 0 ? qualifiedTier.name.replace(/ package/gi, '') : t.noTier}
+                  </span>
+                </div>
               </div>
               {amount > currentInvestment && (
                 <div className="pt-2 border-t border-gv-gold/10 w-full">
@@ -152,7 +160,7 @@ export default function ProductSelection({
             key={tier.id}
             tier={tier}
             isActive={activeTier.id === tier.id}
-            isQualified={qualifiedTier.id === tier.id}
+            isQualified={currentInvestment > 0 && qualifiedTier.id === tier.id}
           />
         ))}
       </div>

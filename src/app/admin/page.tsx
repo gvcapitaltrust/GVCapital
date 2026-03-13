@@ -48,6 +48,10 @@ export default function AdminPortal() {
         portfolio_account_password?: string;
         internal_remarks?: string;
         selected_tier?: string;
+        bank_name?: string;
+        account_number?: string;
+        bank_account_holder?: string;
+        bank_statement_url?: string;
     }
 
     const [activeTab, setActiveTab] = useState("deposits");
@@ -104,6 +108,7 @@ export default function AdminPortal() {
     const [adjustmentReason, setAdjustmentReason] = useState<string>("");
     const [isUpdatingBalance, setIsUpdatingBalance] = useState(false);
     const [isUpdatingPortfolio, setIsUpdatingPortfolio] = useState(false);
+    const [isVerifying, setIsVerifying] = useState(false);
     const [portfolioData, setPortfolioData] = useState({
         platform: "",
         account_id: "",
@@ -457,7 +462,7 @@ export default function AdminPortal() {
         console.log('Admin Fetching Transactions from: transactions...');
         const { data: txList, error: txError } = await supabase
             .from('transactions')
-            .select('*, profiles(email, full_name, role)')
+            .select('*, profiles(*)')
             .order('created_at', { ascending: false });
             
         console.log('Raw Data from Supabase:', txList);
@@ -627,16 +632,22 @@ export default function AdminPortal() {
         const userToVerify = users.find((u: any) => u.id === userId);
         if (!userToVerify) return;
 
+        setIsVerifying(true);
         try {
             const { error: updateError } = await supabase
                 .from('profiles')
                 .update({
                     is_verified: true,
+                    kyc_status: 'Verified',
                     verified_at: new Date().toISOString()
                 })
                 .eq('id', userId);
 
             if (updateError) throw updateError;
+
+            // Update local state for immediate feedback
+            setSelectedUser(prev => prev ? { ...prev, is_verified: true, kyc_status: 'Verified' } : null);
+            setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_verified: true, kyc_status: 'Verified' } : u));
 
             // Log the verification
             await supabase
@@ -649,10 +660,12 @@ export default function AdminPortal() {
                     created_at: new Date().toISOString()
                 });
 
+            showToast(`User ${userToVerify.email} successfully verified.`);
             fetchData();
-            showToast(`User ${userToVerify.email} successfully verified by ${adminProfile?.username || adminProfile?.email?.split('@')[0] || 'Admin'}.`);
         } catch (err: any) {
             alert(err.message);
+        } finally {
+            setIsVerifying(false);
         }
     };
 
@@ -666,17 +679,22 @@ export default function AdminPortal() {
             return;
         }
 
+        setIsVerifying(true);
         try {
             const { error: updateError } = await supabase
                 .from('profiles')
                 .update({
-                    kyc_status: 'rejected',
+                    kyc_status: 'Rejected',
                     is_verified: false,
                     rejection_reason: reason
                 })
                 .eq('id', userId);
 
             if (updateError) throw updateError;
+
+            // Update local state
+            setSelectedUser(prev => prev ? { ...prev, is_verified: false, kyc_status: 'Rejected' } : null);
+            setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_verified: false, kyc_status: 'Rejected' } : u));
 
             // Log the rejection
             await supabase
@@ -697,10 +715,12 @@ export default function AdminPortal() {
                 return next;
             });
 
-            fetchData();
             showToast(`User successfully rejected.`);
+            fetchData();
         } catch (err: any) {
             alert(err.message);
+        } finally {
+            setIsVerifying(false);
         }
     };
 
@@ -1237,7 +1257,7 @@ export default function AdminPortal() {
                                                         </td>
                                                         <td className="px-8 py-6">
                                                             <div className="text-white text-xs">{w.profiles?.bank_name || 'N/A'}</div>
-                                                            <div className="font-mono text-[10px] text-zinc-500">{w.profiles?.bank_account_number || 'N/A'}</div>
+                                                            <div className="font-mono text-[10px] text-zinc-500">{w.profiles?.account_number || 'N/A'}</div>
                                                         </td>
                                                         <td className="px-8 py-4 font-mono text-xs opacity-50">{w.ref_id}</td>
                                                         <td className="px-8 py-6 text-red-400">
@@ -1867,7 +1887,7 @@ export default function AdminPortal() {
                 </main>
 
                 {toast.visible && (
-                    <div className="fixed bottom-8 right-8 bg-emerald-500 text-white px-8 py-4 rounded-2xl shadow-2xl z-[100] animate-in slide-in-from-bottom-10 duration-500 font-bold border border-white/20 flex items-center gap-3">
+                    <div className="fixed bottom-8 right-8 bg-emerald-500 text-white px-8 py-4 rounded-2xl shadow-2xl z-[1000] animate-in slide-in-from-bottom-10 duration-500 font-bold border border-white/20 flex items-center gap-3">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                         {toast.message}
                     </div>
@@ -1924,15 +1944,17 @@ export default function AdminPortal() {
                                                 <>
                                                     <button 
                                                         onClick={() => handleVerifyUser(selectedUser.id)}
-                                                        className="flex-1 bg-emerald-500 text-black py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20"
+                                                        disabled={isVerifying}
+                                                        className="flex-1 bg-emerald-500 text-black py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 disabled:opacity-50"
                                                     >
-                                                        Approve KYC
+                                                        {isVerifying ? "Processing..." : "Approve KYC"}
                                                     </button>
                                                     <button 
                                                         onClick={() => handleRejectUser(selectedUser.id)}
-                                                        className="flex-1 bg-red-500 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-500/20"
+                                                        disabled={isVerifying}
+                                                        className="flex-1 bg-red-500 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-500/20 disabled:opacity-50"
                                                     >
-                                                        Reject
+                                                        {isVerifying ? "Processing..." : "Reject"}
                                                     </button>
                                                 </>
                                             ) : (
@@ -2051,6 +2073,43 @@ export default function AdminPortal() {
                                             >
                                                 {isUpdatingPortfolio ? "Saving..." : "Update Portfolio Details"}
                                             </button>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* Section: Banking Information */}
+                                <section className="space-y-4 pt-6 border-t border-white/10">
+                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
+                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                                        Banking Information
+                                    </h3>
+                                    <div className="bg-white/5 border border-white/10 p-6 rounded-[32px] space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Bank Name</p>
+                                                <p className="text-sm font-bold text-white">{selectedUser.bank_name || "N/A"}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Account Number</p>
+                                                <p className="text-sm font-bold text-white font-mono">{selectedUser.account_number || "N/A"}</p>
+                                            </div>
+                                            <div className="col-span-2 pt-2 border-t border-white/5">
+                                                <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Account Holder</p>
+                                                <p className="text-sm font-bold text-white">{selectedUser.bank_account_holder || "N/A"}</p>
+                                            </div>
+                                            {selectedUser.bank_statement_url && (
+                                                <div className="col-span-2 pt-2">
+                                                    <a 
+                                                        href={supabase.storage.from('kyc-documents').getPublicUrl(selectedUser.bank_statement_url).data.publicUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-2 bg-white/10 hover:bg-gv-gold hover:text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+                                                    >
+                                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                        View Bank Statement
+                                                    </a>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </section>

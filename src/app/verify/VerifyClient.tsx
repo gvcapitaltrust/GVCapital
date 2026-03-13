@@ -66,6 +66,12 @@ export default function VerifyPage() {
             purposes: ["Investment", "Hedging", "Speculation"],
             employments: ["Full-time", "Part-time", "Freelancer", "Business Owner", "Retired", "Unemployed", "Student"],
             docTypes: ["ID Card", "Driver's License", "Passport", "Military ID", "Residence Permit"],
+            bankDetails: "Bank Information",
+            bankName: "Bank Name",
+            accNumber: "Account Number",
+            accHolder: "Account Holder Name",
+            bankStatement: "Bank Statement",
+            uploadStatement: "Upload Bank Statement (PDF/Image)",
             footerNote: "By providing your identity document, you authorize GV Capital Trust to perform security and compliance screenings in accordance with global AML/KYC regulations."
         },
         zh: {
@@ -122,6 +128,12 @@ export default function VerifyPage() {
             purposes: ["投资", "对冲", "投机"],
             employments: ["全职", "兼职", "自由职业者", "企业主", "已退休", "失业", "学生"],
             docTypes: ["身份证", "驾驶执照", "护照", "军工卡", "居留证"],
+            bankDetails: "银行信息",
+            bankName: "银行名称",
+            accNumber: "银行账号",
+            accHolder: "账户持有人姓名",
+            bankStatement: "银行账单",
+            uploadStatement: "上传银行账单 (PDF/图片)",
             footerNote: "通过提供您的身份证件，您授权 GV 资本信托根据全球 AML/KYC 法规进行安全和合规筛选。"
         }
     };
@@ -160,6 +172,9 @@ export default function VerifyPage() {
         is_not_pep: boolean;
         id_type: string;
         country: string;
+        bank_name: string;
+        account_number: string;
+        bank_account_holder: string;
     }
 
     // Form State
@@ -184,13 +199,18 @@ export default function VerifyPage() {
         risk_acknowledged: false,
         is_not_pep: false,
         id_type: "Passport",
-        country: "Malaysia" // Default
+        country: "Malaysia", // Default
+        bank_name: "",
+        account_number: "",
+        bank_account_holder: ""
     });
 
     const [idFront, setIdFront] = useState<File | null>(null);
     const [idBack, setIdBack] = useState<File | null>(null);
+    const [bankStatement, setBankStatement] = useState<File | null>(null);
     const [idFrontRef, setIdFrontRef] = useState<string | null>(null);
     const [idBackRef, setIdBackRef] = useState<string | null>(null);
+    const [bankStatementRef, setBankStatementRef] = useState<string | null>(null);
 
     useEffect(() => {
         const l = searchParams?.get("lang") || "en";
@@ -226,18 +246,20 @@ export default function VerifyPage() {
                     
                     if (profile.kyc_id_front) setIdFrontRef(profile.kyc_id_front);
                     if (profile.kyc_id_back) setIdBackRef(profile.kyc_id_back);
+                    if (profile.bank_statement_url) setBankStatementRef(profile.bank_statement_url);
                 }
             }
         };
         fetchUser();
     }, [searchParams, router]);
 
-    const handleUpload = async (file: File, side: 'front' | 'back') => {
+    const handleUpload = async (file: File, side: 'front' | 'back' | 'statement') => {
         if (!user) return null;
-        const fileName = `${user.id}_${side}_${Date.now()}_${file.name}`;
+        const fileName = `${side}_${Date.now()}_${file.name}`;
+        const filePath = `${user.id}/${fileName}`;
         const { data, error } = await supabase.storage
-            .from('agreements')
-            .upload(fileName, file);
+            .from('kyc-documents')
+            .upload(filePath, file);
         if (error) throw error;
         return data.path;
     };
@@ -274,6 +296,14 @@ export default function VerifyPage() {
                 alert("Please acknowledge all compliance requirements.");
                 return;
             }
+            if (!formData.bank_name || !formData.account_number || !formData.bank_account_holder) {
+                alert("Please complete all bank information fields.");
+                return;
+            }
+            if (!bankStatement && !bankStatementRef) {
+                alert("Please upload your bank statement for verification.");
+                return;
+            }
         }
 
         setIsLoading(true);
@@ -283,11 +313,18 @@ export default function VerifyPage() {
 
             if (idFront) frontPath = await handleUpload(idFront, 'front');
             if (idBack) backPath = await handleUpload(idBack, 'back');
+            
+            let statementPath = bankStatementRef;
+            if (bankStatement) statementPath = await handleUpload(bankStatement, 'statement');
 
             const payload = {
                 ...formData,
                 kyc_id_front: frontPath,
                 kyc_id_back: backPath,
+                bank_statement_url: statementPath,
+                bank_name: formData.bank_name,
+                account_number: formData.account_number,
+                bank_account_holder: formData.bank_account_holder,
                 kyc_status: status,
                 kyc_completed: status === 'Pending',
                 full_name: `${formData.first_name} ${formData.last_name}`,
@@ -616,6 +653,26 @@ export default function VerifyPage() {
                                         )}
                                         <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdBack(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
                                     </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.bankStatement}</label>
+                                <div className="relative group border-2 border-white/5 border-dashed rounded-[32px] overflow-hidden bg-white/[0.02] min-h-[160px] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all border-dashed-2">
+                                    {bankStatement ? (
+                                        <div className="flex flex-col items-center justify-center space-y-2 p-6">
+                                            <svg className="h-12 w-12 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                            <span className="text-[10px] font-black uppercase text-white tracking-widest">{bankStatement.name}</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center space-y-4 p-6">
+                                            <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-gv-gold group-hover:text-black transition-all">
+                                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
+                                            </div>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">{t.uploadStatement}</span>
+                                        </div>
+                                    )}
+                                    <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBankStatement(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
                                 </div>
                             </div>
 

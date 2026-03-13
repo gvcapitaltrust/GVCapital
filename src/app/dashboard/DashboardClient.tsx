@@ -565,6 +565,9 @@ export default function DashboardClient() {
             riskProfile: "Risk Profile",
             bankName: "Bank Name",
             accNumber: "Account Number",
+            accHolder: "Account Holder Name",
+            bankStatement: "Bank Statement",
+            viewStatement: "View Bank Statement",
             pendingVerification: "Account Pending Verification. Please contact your Agent or Admin to activate your account.",
             verificationInProgress: "Account Verification in Progress",
             verificationInProgressDesc: "Thank you for choosing GV Capital. Our Compliance Team is currently reviewing your documents. Manual verification typically takes 1 to 3 business days. Once approved, you will have full access to our investment and deposit features.",
@@ -682,6 +685,9 @@ export default function DashboardClient() {
             riskProfile: "风险评估",
             bankName: "银行名称",
             accNumber: "银行账号",
+            accHolder: "账户持有人姓名",
+            bankStatement: "银行账单",
+            viewStatement: "查看银行账单",
             pendingVerification: "账户待审核。请联系您的代理或管理员以激活您的账户。",
             verificationInProgress: "账户核实中",
             verificationInProgressDesc: "感谢您选择 GV 资本。我们的合规团队正在审核您的文件。人工核实通常需要 1 到 3 个工作日。一旦批准，您将可以完全访问我们的投资和存款功能。",
@@ -1069,7 +1075,9 @@ export default function DashboardClient() {
                                                 );
                                             })()}
                                             <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">
-                                                {t.basedOn} {getTierByAmount(Number(user?.balance || 0) / forexRate).minDividend * 100}-{getTierByAmount(Number(user?.balance || 0) / forexRate).maxDividend * 100}% {getTierByAmount(Number(user?.balance || 0) / forexRate).name} {t.returns}
+                                                {t.basedOn} {Number(user?.balance || 0) > 0 
+                                                    ? `${getTierByAmount(Number(user?.balance || 0) / forexRate).minDividend * 100}-${getTierByAmount(Number(user?.balance || 0) / forexRate).maxDividend * 100}% ${getTierByAmount(Number(user?.balance || 0) / forexRate).name}` 
+                                                    : t.noTier} {t.returns}
                                             </p>
                                         </div>
                                         <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
@@ -1361,6 +1369,30 @@ export default function DashboardClient() {
                                         <div className="space-y-1 flex-1">
                                             <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.accNumber}</p>
                                             <p className="text-2xl font-black text-white tracking-[0.2em] font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col md:flex-row gap-12 mt-8 pt-8 border-t border-white/5">
+                                        <div className="space-y-1 flex-1">
+                                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.accHolder}</p>
+                                            <p className="text-2xl font-black text-white tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
+                                        </div>
+                                        <div className="space-y-1 flex-1">
+                                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.bankStatement}</p>
+                                            {user?.bank_statement_url ? (
+                                                <button 
+                                                    onClick={() => {
+                                                        const { data } = supabase.storage.from('agreements').getPublicUrl(user.bank_statement_url);
+                                                        window.open(data.publicUrl, '_blank');
+                                                    }}
+                                                    className="inline-flex items-center gap-2 bg-white/5 hover:bg-gv-gold hover:text-black border border-white/10 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all mt-2"
+                                                >
+                                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                    {t.viewStatement}
+                                                </button>
+                                            ) : (
+                                                <p className="text-zinc-600 font-bold uppercase text-[10px] mt-2 italic">Not Provided</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
