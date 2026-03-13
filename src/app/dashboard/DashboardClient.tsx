@@ -65,8 +65,7 @@ export default function DashboardClient() {
     const fetchedRef = React.useRef<string | null>(null);
 
     useEffect(() => {
-        const urlLang = searchParams?.get("lang") || "en";
-        setLang(urlLang as "en" | "zh");
+        setLang("en"); // Force English for now
         
         if (authLoading) return;
 
@@ -758,18 +757,7 @@ export default function DashboardClient() {
                         </button>
                     </nav>
                 </div>
-                <div className="space-y-4">
-                    {/* DEBUG MODE INFO */}
-                    <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-left space-y-1">
-                        <div className="text-[9px] font-black uppercase text-red-500 tracking-widest">{t.debugMode}</div>
-                        <div className="text-[10px] text-white/50 font-mono truncate">{user?.email}</div>
-                        <div className="text-xs text-white font-mono">{t.role}: {user?.role || 'null'}</div>
-                        <div className="text-xs text-white font-mono">{t.verified}: {String(user?.is_verified)}</div>
-                    </div>
-
-                    <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/5 transition-all text-zinc-400">
-                        {lang === "en" ? "切换至 简体中文" : "Switch to English"}
-                    </button>
+                <div className="space-y-4 pt-4 border-t border-white/5">
                     <button onClick={handleLogout} className="w-full text-zinc-500 hover:text-red-400 transition-colors text-sm font-medium flex items-center gap-3 px-4 py-2">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
                         {t.logout}
@@ -838,10 +826,7 @@ export default function DashboardClient() {
                         </button>
                     </nav>
                 </div>
-                <div className="space-y-4">
-                    <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/5 transition-all text-zinc-400">
-                        {lang === "en" ? "切换至 简体中文" : "Switch to English"}
-                    </button>
+                <div className="space-y-4 pt-4 border-t border-white/5">
                     <button onClick={handleLogout} className="w-full text-zinc-500 hover:text-red-400 transition-colors text-sm font-medium flex items-center gap-3 px-4 py-2">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
                         {t.logout}
@@ -1342,7 +1327,7 @@ export default function DashboardClient() {
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
                             <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
-                                <div className="relative z-10 max-w-xl text-center mx-auto space-y-10">
+                                <div className="relative z-10 max-w-xl text-left space-y-10">
                                     <div>
                                         <h2 className="text-3xl font-black uppercase tracking-tighter mb-2 text-white">{t.securityTitle}</h2>
                                         <p className="text-zinc-500 font-medium">{t.securitySubtitle}</p>
