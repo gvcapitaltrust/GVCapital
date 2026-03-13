@@ -3,6 +3,7 @@
 import React from "react";
 import { Tier, formatUSD } from "@/lib/tierUtils";
 import { Check } from "lucide-react";
+import TierMedal from "./TierMedal";
 
 interface ProductCardProps {
   tier: Tier;
@@ -39,10 +40,15 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
         </div>
       )}
 
-      <h3 className="text-xl font-black mb-1 uppercase tracking-tighter">{tier.name}</h3>
-      <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">
-        {formatUSD(tier.minAmount)} - {formatUSD(tier.maxAmount)}
-      </p>
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h3 className="text-xl font-black mb-1 uppercase tracking-tighter">{tier.name}</h3>
+          <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+            {formatUSD(tier.minAmount)} - {formatUSD(tier.maxAmount)}
+          </p>
+        </div>
+        <TierMedal tierId={tier.id} size="md" className="shrink-0" />
+      </div>
 
       <div className="mb-6">
         <span className="text-3xl font-black text-white">

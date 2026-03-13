@@ -6,6 +6,7 @@ import AuthGuard from "@/components/AuthGuard";
 import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
 import { useSettings } from "@/providers/SettingsProvider";
+import TierMedal from "@/components/TierMedal";
 
 export default function AdminPortal() {
     const router = useRouter();
@@ -42,6 +43,11 @@ export default function AdminPortal() {
         profit?: number;
         verified_at: string;
         created_at?: string;
+        portfolio_platform_name?: string;
+        portfolio_account_id?: string;
+        portfolio_account_password?: string;
+        internal_remarks?: string;
+        selected_tier?: string;
     }
 
     const [activeTab, setActiveTab] = useState("deposits");
@@ -88,9 +94,21 @@ export default function AdminPortal() {
     const [isLoadingDocs, setIsLoadingDocs] = useState(false);
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
     const [rejectReasonText, setRejectReasonText] = useState("");
+    const [depositReceiptUrl, setDepositReceiptUrl] = useState<string | null>(null);
     const [isDepositDrawerOpen, setIsDepositDrawerOpen] = useState(false);
     const [selectedDepositTx, setSelectedDepositTx] = useState<any>(null);
-    const [depositReceiptUrl, setDepositReceiptUrl] = useState<string | null>(null);
+    const [adjustmentAmount, setAdjustmentAmount] = useState<string>("");
+    const [adjustmentType, setAdjustmentType] = useState<"balance" | "profit">("balance");
+    const [adjustmentReason, setAdjustmentReason] = useState<string>("");
+    const [isUpdatingBalance, setIsUpdatingBalance] = useState(false);
+    const [isUpdatingPortfolio, setIsUpdatingPortfolio] = useState(false);
+    const [portfolioData, setPortfolioData] = useState({
+        platform: "",
+        account_id: "",
+        password: "",
+        remarks: ""
+    });
+    const [kycFilter, setKycFilter] = useState<string>("Pending"); // New KYC filter
 
     const hasFetchedRef = React.useRef(false);
 
@@ -219,8 +237,12 @@ export default function AdminPortal() {
         console.log('Fetched Profiles Data:', profileList, 'Error:', profileError);
         
         if (profileList) {
-            setUsers(profileList as Profile[]);
-            setKycQueue((profileList as Profile[]).filter((p: Profile) => p.kyc_status === 'Pending'));
+            const sortedUsers = (profileList as Profile[]).sort((a, b) => 
+                new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+            );
+            setUsers(sortedUsers);
+            // kycQueue will now be a filtered version of users in the UI, but we'll keep the state for compatibility if needed
+            setKycQueue(sortedUsers.filter((p: Profile) => p.kyc_status === 'Pending'));
         }
 
         console.log('Admin Fetching Transactions from: transactions...');
@@ -510,6 +532,90 @@ export default function AdminPortal() {
     };
 
 
+    const handleAdjustBalance = async () => {
+        if (!selectedUser || !adjustmentAmount || !adjustmentReason) return;
+        if (adminProfile?.role !== 'admin' && adminProfile?.email !== 'thenja96@gmail.com') {
+            showToast("Permission denied.");
+            return;
+        }
+
+        setIsUpdatingBalance(true);
+        try {
+            const amount = Number(adjustmentAmount);
+            const type = adjustmentType; // 'balance' or 'profit'
+            
+            // 1. Update Profile
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ [type]: Number(selectedUser[type] || 0) + amount })
+                .eq('id', selectedUser.id);
+            
+            if (profileError) throw profileError;
+
+            // 2. Log Transaction
+            const { error: txError } = await supabase
+                .from('transactions')
+                .insert({
+                    user_id: selectedUser.id,
+                    type: 'Adjustment',
+                    amount: amount,
+                    status: 'Approved',
+                    ref_id: `ADJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+                    description: `Admin Adjustment: ${adjustmentReason}`
+                });
+            
+            if (txError) throw txError;
+
+            showToast(`Successfully adjusted ${type} by RM ${amount.toFixed(2)}`);
+            setAdjustmentAmount("");
+            setAdjustmentReason("");
+            fetchData();
+            // Refresh local state if possible
+            setSelectedUser(prev => prev ? { ...prev, [type]: Number(prev[type] || 0) + amount } : null);
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setIsUpdatingBalance(false);
+        }
+    };
+
+    const handleUpdatePortfolio = async () => {
+        if (!selectedUser) return;
+        setIsUpdatingPortfolio(true);
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    portfolio_platform_name: portfolioData.platform,
+                    portfolio_account_id: portfolioData.account_id,
+                    portfolio_account_password: portfolioData.password,
+                    internal_remarks: portfolioData.remarks
+                })
+                .eq('id', selectedUser.id);
+            
+            if (error) throw error;
+            showToast("Portfolio details updated successfully.");
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        } finally {
+            setIsUpdatingPortfolio(false);
+        }
+    };
+
+    const handleResetUserPassword = async (email: string) => {
+        if (!confirm(`Send password reset email to ${email}?`)) return;
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.host === 'localhost:3000' ? 'http://localhost:3000' : 'https://' + window.location.host}/reset-password`,
+            });
+            if (error) throw error;
+            showToast("Password reset email sent.");
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
     const openDepositReceipt = async (tx: any) => {
         setSelectedDepositTx(tx);
         setDepositReceiptUrl(null);
@@ -634,7 +740,7 @@ export default function AdminPortal() {
                 <main className="flex-1 p-8 overflow-y-auto">
                     <div className="max-w-7xl mx-auto space-y-12 pb-20">
                         {/* Summary Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px] hover:border-gv-gold/20 transition-all">
                                 {(() => {
                                     const totalAssetsRm = users.reduce((acc: number, u: Profile) => acc + (Number(u.balance || 0) + Number(u.profit || 0)), 0);
@@ -649,11 +755,15 @@ export default function AdminPortal() {
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC Pending</p>
-                                <h2 className="text-2xl font-black text-gv-gold">{kycQueue.length}</h2>
+                                <h2 className="text-2xl font-black text-gv-gold">{users.filter(u => u.kyc_status === 'Pending').length}</h2>
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
-                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Pending Deposit Approval</p>
+                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Pending Deposit</p>
                                 <h2 className="text-2xl font-black text-emerald-500">{deposits.filter((d: any) => d.status?.toLowerCase() === 'pending').length}</h2>
+                            </div>
+                            <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
+                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Pending Withdrawal</p>
+                                <h2 className="text-2xl font-black text-red-500">{withdrawals.filter((w: any) => w.status?.toLowerCase() === 'pending').length}</h2>
                             </div>
                             <div className="bg-[#121212] border border-white/5 p-6 rounded-[32px]">
                                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Clients</p>
@@ -684,6 +794,17 @@ export default function AdminPortal() {
                                             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Identify & Verify Clients</p>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-4">
+                                            <select 
+                                                value={kycFilter}
+                                                onChange={(e) => setKycFilter(e.target.value)}
+                                                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 focus:outline-none focus:border-gv-gold/50 transition-all"
+                                            >
+                                                <option value="All">All Status</option>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Verified">Verified</option>
+                                                <option value="Rejected">Rejected</option>
+                                                <option value="Draft">Draft</option>
+                                            </select>
                                             <div className="relative group w-full md:w-64">
                                                 <input 
                                                     type="text"
@@ -708,14 +829,25 @@ export default function AdminPortal() {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
-                                                {kycQueue.filter((u: any) => {
+                                                {users.filter((u: any) => {
                                                     const query = kycSearchQuery.toLowerCase();
-                                                    return (u.full_name || "").toLowerCase().includes(query) || (u.email || "").toLowerCase().includes(query);
+                                                    const matchesSearch = (u.full_name || "").toLowerCase().includes(query) || (u.email || "").toLowerCase().includes(query);
+                                                    const matchesStatus = kycFilter === "All" || u.kyc_status === kycFilter;
+                                                    return matchesSearch && matchesStatus;
                                                 }).map((u: any, i: number) => (
                                                     <tr 
                                                         key={i} 
                                                         className="text-sm font-bold group hover:bg-white/[0.01] cursor-pointer"
-                                                        onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
+                                                        onClick={() => { 
+                                                            setSelectedUser(u); 
+                                                            setPortfolioData({
+                                                                platform: u.portfolio_platform_name || "",
+                                                                account_id: u.portfolio_account_id || "",
+                                                                password: u.portfolio_account_password || "",
+                                                                remarks: u.internal_remarks || ""
+                                                            });
+                                                            setIsDetailModalOpen(true); 
+                                                        }}
                                                     >
                                                         <td className="px-8 py-6">
                                                             <div className="flex flex-col">
@@ -1077,9 +1209,10 @@ export default function AdminPortal() {
                                                     <th className="px-8 py-6">Total Balance (RM/USD)</th>
                                                     <th className="px-8 py-6">Profit Earned</th>
                                                     <th className="px-8 py-6">Total Assets</th>
+                                                    <th className="px-8 py-6 text-center">Tier</th>
                                                     <th className="px-8 py-6 text-center">KYC</th>
                                                     <th className="px-8 py-6 text-center">Status</th>
-                                                    <th className="px-8 py-6 text-right">Actions</th>
+                                                    <th className="px-8 py-6 text-right">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
@@ -1120,6 +1253,14 @@ export default function AdminPortal() {
                                                                 <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${( (Number(u.balance || 0) + Number(u.profit || 0)) / forexRate).toFixed(2)} USD)</span>
                                                             </div>
                                                         </td>
+                                                        <td className="px-8 py-6 text-center">
+                                                            <div className="flex flex-col items-center gap-1">
+                                                                <TierMedal tierId={u.selected_tier || "Basic"} size="sm" />
+                                                                <span className="px-3 py-1 rounded-full bg-gv-gold/10 text-gv-gold text-[9px] uppercase font-black border border-gv-gold/20">
+                                                                    {u.selected_tier || "Basic"}
+                                                                </span>
+                                                            </div>
+                                                        </td>
                                                         <td className="px-8 py-6">
                                                             <div className="flex justify-center">
                                                                 <span className={`px-3 py-1 rounded-full text-[9px] uppercase font-black text-center ${u.kyc_status === 'Verified' ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-500"}`}>{u.kyc_status || 'Pending'}</span>
@@ -1132,37 +1273,22 @@ export default function AdminPortal() {
                                                                 <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Pending</span>
                                                             )}
                                                         </td>
-                                                        <td className="px-8 py-6 text-right space-x-3" onClick={(e: React.MouseEvent<HTMLTableCellElement>) => e.stopPropagation()}>
-                                                            {!u.is_verified ? (
-                                                                <div className="flex flex-col md:flex-row items-end md:items-center justify-end gap-3">
-                                                                    <input 
-                                                                        type="text"
-                                                                        placeholder="Rejection Reason..."
-                                                                        value={rejectionReasons[u.id] || ""}
-                                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRejectionReasons({ ...rejectionReasons, [u.id]: e.target.value })}
-                                                                        className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[9px] focus:outline-none focus:border-red-500/50 w-full md:w-32"
-                                                                    />
-                                                                    <div className="flex gap-2">
-                                                                        <button
-                                                                            onClick={() => handleVerifyUser(u.id)}
-                                                                            className="bg-emerald-500 text-black px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all whitespace-nowrap"
-                                                                        >
-                                                                            Manual Verify
-                                                                        </button>
-                                                                        <button
-                                                                            onClick={() => handleRejectUser(u.id)}
-                                                                            className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-[9px] font-black uppercase shadow-lg shadow-red-500/20 hover:scale-105 transition-all whitespace-nowrap"
-                                                                        >
-                                                                            Reject
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                <span className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-500 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase">
-                                                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
-                                                                    Verified
-                                                                </span>
-                                                            )}
+                                                        <td className="px-8 py-6 text-right" onClick={(e: React.MouseEvent<HTMLTableCellElement>) => {
+                                                            e.stopPropagation();
+                                                            setSelectedUser(u);
+                                                            setPortfolioData({
+                                                                platform: u.portfolio_platform_name || "",
+                                                                account_id: u.portfolio_account_id || "",
+                                                                password: u.portfolio_account_password || "",
+                                                                remarks: u.internal_remarks || ""
+                                                            });
+                                                            setIsDetailModalOpen(true);
+                                                        }}>
+                                                            <button 
+                                                                className="text-gv-gold text-[10px] font-black uppercase tracking-widest hover:underline"
+                                                            >
+                                                                Details
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -1482,103 +1608,184 @@ export default function AdminPortal() {
                                     <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest pt-2">
                                         Account Created: {selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString() : 'N/A'}
                                     </p>
-                                    <div className="mt-6 space-y-4">
-                                        <div className="bg-gv-gold/10 border border-gv-gold/30 p-4 rounded-2xl flex items-center justify-between shadow-[0_0_15px_rgba(238,206,128,0.1)]">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded-full bg-gv-gold text-black flex items-center justify-center">
-                                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                </div>
-                                                <span className="text-xs font-black uppercase text-gv-gold tracking-widest">Total Assets</span>
-                                            </div>
-                                            <div className="text-right flex flex-col items-end">
-                                                <div className="text-xl font-black text-white">RM {(Number(selectedUser?.balance || 0) + Number(selectedUser?.profit || 0)).toFixed(2)}</div>
-                                                <div className="text-[10px] font-bold text-zinc-500">(${( (Number(selectedUser?.balance || 0) + Number(selectedUser?.profit || 0)) / forexRate).toFixed(2)} USD)</div>
-                                            </div>
+                                    <div className="mt-8 grid grid-cols-2 gap-4">
+                                        <div className="bg-gv-gold/10 border border-gv-gold/30 p-5 rounded-2xl shadow-[0_0_15px_rgba(238,206,128,0.1)]">
+                                            <p className="text-[10px] font-black text-gv-gold uppercase tracking-widest mb-1">Total Assets</p>
+                                            <p className="text-xl font-black text-white">RM {(Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)).toFixed(2)}</p>
+                                            <p className="text-[10px] font-bold text-zinc-500">(${( (Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)) / forexRate).toFixed(2)} USD)</p>
                                         </div>
-                                        <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded-full bg-white/10 text-zinc-400 flex items-center justify-center">
-                                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                                </div>
-                                                <span className="text-xs font-black uppercase text-zinc-400 tracking-widest">Total Equity</span>
+                                        <div className="bg-white/5 border border-white/10 p-5 rounded-2xl flex items-center justify-between">
+                                            <div>
+                                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Current Tier</p>
+                                                <p className="text-xl font-black text-gv-gold uppercase tracking-tighter">{selectedUser.selected_tier || "Basic"}</p>
+                                                <p className="text-[10px] font-bold text-zinc-500">Status: {selectedUser.is_verified ? "Verified" : "Unverified"}</p>
                                             </div>
-                                            <div className="text-right flex flex-col items-end">
-                                                <div className="text-xl font-black text-white">RM {(Number(selectedUser?.balance || 0)).toFixed(2)}</div>
-                                                <div className="text-[10px] font-bold text-zinc-500">(${(Number(selectedUser?.balance || 0) / forexRate).toFixed(2)} USD)</div>
-                                            </div>
+                                            <TierMedal tierId={selectedUser.selected_tier || "Basic"} size="md" className="shrink-0" />
                                         </div>
                                     </div>
                                 </header>
-                                
-                                <section className="space-y-4">
-                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold">Current Status</h3>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-white/5 border border-white/10 p-5 rounded-xl">
-                                            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">KYC Step</p>
-                                            <p className="text-2xl font-black text-white">{selectedUser.kyc_step || 0} / 3</p>
+
+                                {/* Section: Financial Adjustments */}
+                                <section className="space-y-4 pt-6 border-t border-white/10">
+                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
+                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        Wallet Adjustments
+                                    </h3>
+                                    <div className="bg-white/5 border border-white/10 p-6 rounded-[32px] space-y-4">
+                                        <div className="flex gap-2">
+                                            <button 
+                                                onClick={() => setAdjustmentType("balance")}
+                                                className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${adjustmentType === "balance" ? "bg-gv-gold text-black" : "bg-white/5 text-zinc-500"}`}
+                                            >
+                                                Balance
+                                            </button>
+                                            <button 
+                                                onClick={() => setAdjustmentType("profit")}
+                                                className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${adjustmentType === "profit" ? "bg-gv-gold text-black" : "bg-white/5 text-zinc-500"}`}
+                                            >
+                                                Profit
+                                            </button>
                                         </div>
-                                        <div className="bg-white/5 border border-white/10 p-5 rounded-xl">
-                                            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Verification</p>
-                                            <p className={`text-sm font-black uppercase mt-2 ${selectedUser.is_verified ? "text-emerald-500" : "text-amber-500"}`}>
-                                                {selectedUser.is_verified ? "Verified" : "Unverified"}
-                                            </p>
+                                        <div className="space-y-3">
+                                            <input 
+                                                type="number"
+                                                placeholder="Amount (e.g. 500 or -500)"
+                                                value={adjustmentAmount}
+                                                onChange={(e) => setAdjustmentAmount(e.target.value)}
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:border-gv-gold/50 outline-none transition-all"
+                                            />
+                                            <input 
+                                                type="text"
+                                                placeholder="Reason for adjustment..."
+                                                value={adjustmentReason}
+                                                onChange={(e) => setAdjustmentReason(e.target.value)}
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:border-gv-gold/50 outline-none transition-all"
+                                            />
+                                            <button 
+                                                onClick={handleAdjustBalance}
+                                                disabled={isUpdatingBalance || !adjustmentAmount || !adjustmentReason}
+                                                className="w-full bg-white text-black font-black py-3 rounded-xl text-[10px] uppercase tracking-widest hover:bg-gv-gold transition-all disabled:opacity-50"
+                                            >
+                                                {isUpdatingBalance ? "Processing..." : "Apply Adjustment"}
+                                            </button>
                                         </div>
                                     </div>
                                 </section>
 
-                                <section className="space-y-4">
-                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold">Compliance Documents</h3>
-                                    <div className="space-y-3">
-                                        {isLoadingDocs ? (
-                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-zinc-500 animate-pulse">
-                                                Loading documents...
+                                {/* Section: Investment Portfolio */}
+                                <section className="space-y-4 pt-6 border-t border-white/10">
+                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
+                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                                        Investment Portfolio
+                                    </h3>
+                                    <div className="bg-white/5 border border-white/10 p-6 rounded-[32px] space-y-4">
+                                        <div className="space-y-3">
+                                            <div>
+                                                <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest ml-1 mb-1 block">Platform Name</label>
+                                                <input 
+                                                    type="text"
+                                                    value={portfolioData.platform}
+                                                    onChange={(e) => setPortfolioData({...portfolioData, platform: e.target.value})}
+                                                    placeholder="MetaTrader 5 / IC Markets / etc."
+                                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-gv-gold/50 transition-all font-mono"
+                                                />
                                             </div>
-                                        ) : userKycDocs.length > 0 ? (
+                                            <div>
+                                                <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest ml-1 mb-1 block">Account ID</label>
+                                                <input 
+                                                    type="text"
+                                                    value={portfolioData.account_id}
+                                                    onChange={(e) => setPortfolioData({...portfolioData, account_id: e.target.value})}
+                                                    placeholder="Login ID"
+                                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-gv-gold/50 transition-all font-mono"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest ml-1 mb-1 block">Investor Password</label>
+                                                <div className="relative">
+                                                    <input 
+                                                        type="text"
+                                                        value={portfolioData.password}
+                                                        onChange={(e) => setPortfolioData({...portfolioData, password: e.target.value})}
+                                                        placeholder="Portfolio Password"
+                                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-gv-gold/50 transition-all font-mono"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest ml-1 mb-1 block">Internal Remarks</label>
+                                                <textarea 
+                                                    value={portfolioData.remarks}
+                                                    onChange={(e) => setPortfolioData({...portfolioData, remarks: e.target.value})}
+                                                    placeholder="Internal notes about this user..."
+                                                    rows={3}
+                                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-gv-gold/50 transition-all resize-none"
+                                                />
+                                            </div>
+                                            <button 
+                                                onClick={handleUpdatePortfolio}
+                                                disabled={isUpdatingPortfolio}
+                                                className="w-full bg-gv-gold text-black font-black py-3 rounded-xl text-[10px] uppercase tracking-widest hover:shadow-lg hover:shadow-gv-gold/20 transition-all disabled:opacity-50"
+                                            >
+                                                {isUpdatingPortfolio ? "Saving..." : "Update Portfolio Details"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* Section: Compliance Documents */}
+                                <section className="space-y-4 pt-6 border-t border-white/10">
+                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gv-gold">Compliance & KYC</h3>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-2xl">
+                                          <div className="flex flex-col">
+                                            <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">KYC Status</span>
+                                            <span className={`text-xs font-black uppercase mt-1 ${selectedUser.kyc_status === 'Verified' ? "text-emerald-500" : "text-amber-500"}`}>
+                                                {selectedUser.kyc_status || "Pending"}
+                                            </span>
+                                          </div>
+                                          {!selectedUser.is_verified && (
+                                            <button 
+                                                onClick={() => handleVerifyUser(selectedUser.id)}
+                                                className="bg-emerald-500 text-black px-4 py-2 rounded-lg text-[10px] font-black uppercase shadow-lg shadow-emerald-500/20"
+                                            >
+                                                Verify Now
+                                            </button>
+                                          )}
+                                        </div>
+                                        {userKycDocs.length > 0 ? (
                                             userKycDocs.map((doc, idx) => (
                                                 <div key={idx} className="flex flex-col gap-3 p-4 bg-white/5 border border-white/10 rounded-xl hover:border-gv-gold/30 transition-all group">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-3 overflow-hidden">
-                                                            <svg className="h-5 w-5 text-zinc-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                                            <span className="text-xs font-bold text-white truncate pr-4">{doc.name}</span>
-                                                        </div>
-                                                        <a 
-                                                            href={doc.url} 
-                                                            target="_blank" 
-                                                            rel="noopener noreferrer" 
-                                                            className="text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-white/10 hover:bg-gv-gold hover:text-black hover:shadow-[0_0_15px_rgba(238,206,128,0.3)] text-white rounded-lg transition-all flex-shrink-0"
-                                                        >
-                                                            Open Full
-                                                        </a>
-                                                    </div>
-                                                    <div className="w-full mt-2 rounded-lg overflow-hidden border border-white/10 bg-black/50 aspect-video flex items-center justify-center relative">
-                                                         {doc.name.toLowerCase().endsWith('.pdf') ? (
-                                                             <iframe src={doc.url} className="w-full h-full" title={doc.name} />
-                                                         ) : (
-                                                             <img src={doc.url} alt={doc.name} className="w-full h-full object-contain cursor-zoom-in group-hover:scale-105 transition-transform duration-500" onClick={() => window.open(doc.url, '_blank')} />
-                                                         )}
+                                                    <div className="flex items-center justify-between font-mono">
+                                                        <span className="text-[10px] font-bold text-white truncate pr-4">{doc.name}</span>
+                                                        <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 bg-white/10 hover:bg-gv-gold hover:text-black rounded-lg transition-all">Open</a>
                                                     </div>
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-zinc-600">No documents uploaded yet.</div>
+                                            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl text-center text-[10px] font-bold text-zinc-600 uppercase">No documents uploaded.</div>
                                         )}
                                     </div>
                                 </section>
 
-                                <div className="pt-8 border-t border-white/10 space-y-4">
-                                    <button 
-                                        onClick={() => { handleVerifyUser(selectedUser.id); setIsDetailModalOpen(false); }}
-                                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-black py-4 rounded-xl text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
-                                    >
-                                        Verify User
-                                    </button>
-                                    <button 
-                                        onClick={() => { setRejectReasonText(""); setIsRejectModalOpen(true); }}
-                                        className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 font-black py-4 rounded-xl text-xs uppercase tracking-widest transition-all active:scale-95"
-                                    >
-                                        Reject / Reset KYC
-                                    </button>
-                                </div>
+                                {/* Section: Security & DANGER ZONE */}
+                                <section className="space-y-4 pt-6 border-t border-white/10 pb-10">
+                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-red-500">Security Actions</h3>
+                                    <div className="space-y-3">
+                                        <button 
+                                            onClick={() => handleResetUserPassword(selectedUser.email)}
+                                            className="w-full bg-white/5 border border-white/10 text-white font-black py-4 rounded-xl text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition-all"
+                                        >
+                                            Reset Account Password
+                                        </button>
+                                        <button 
+                                            onClick={() => { setRejectReasonText(""); setIsRejectModalOpen(true); }}
+                                            className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/10 font-black py-4 rounded-xl text-[10px] uppercase tracking-widest transition-all"
+                                        >
+                                            Reset KYC / Reject Submission
+                                        </button>
+                                    </div>
+                                </section>
                             </div>
                         </div>
                     </>

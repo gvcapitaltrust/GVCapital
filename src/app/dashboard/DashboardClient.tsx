@@ -14,6 +14,7 @@ import { useSettings } from "@/providers/SettingsProvider";
 import ProductSelection from "@/components/ProductSelection";
 import ComparisonTable from "@/components/ComparisonTable";
 import { TIERS, getTierByAmount, formatUSD } from "@/lib/tierUtils";
+import TierMedal from "@/components/TierMedal";
 
 export default function DashboardClient() {
     const { user: authUser, role: authRole, isVerified: authVerified, refresh: refreshAuth, loading: authLoading } = useAuth();
@@ -472,7 +473,7 @@ export default function DashboardClient() {
             totalProfit: "Total Dividend",
             totalEquity: "Total Investment",
             dividendNote: "(Withdrawable)",
-            investmentNote: "(6 month lock period)",
+            investmentNote: "(Secure Capital)",
             currentPackage: "Current Package",
             deposit: "Deposit",
             withdraw: "Withdraw",
@@ -528,7 +529,7 @@ export default function DashboardClient() {
             totalProfit: "总股息",
             totalEquity: "总投资",
             dividendNote: "(可提取)",
-            investmentNote: "(6个月锁定期)",
+            investmentNote: "(安全资本)",
             currentPackage: "当前配套",
             deposit: "入金",
             withdraw: "提款",
@@ -847,16 +848,18 @@ export default function DashboardClient() {
                                         <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
                                             <div className="flex justify-between items-start mb-4">
                                                 <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest group-hover:text-zinc-400 transition-colors">{t.totalEquity}</p>
-                                                <span className="text-[8px] font-black text-gv-gold border border-gv-gold/20 px-2 py-0.5 rounded-full uppercase">{t.investmentNote}</span>
                                             </div>
                                             <div className="flex flex-col gap-2">
                                                 <h2 className="text-3xl font-black tracking-tighter text-gv-gold">
                                                     {isCheckingAuth ? "..." : `RM ${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                 </h2>
                                                 {!isCheckingAuth && (
-                                                    <p className="text-[10px] font-bold text-zinc-500">
-                                                        (${(Number(user?.balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
-                                                    </p>
+                                                    <div className="flex flex-col gap-1">
+                                                        <p className="text-[10px] font-bold text-zinc-500">
+                                                            (${(Number(user?.balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                                                        </p>
+                                                        <span className="text-[10px] font-black text-gv-gold/60 uppercase tracking-widest">{t.investmentNote}</span>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
@@ -865,16 +868,18 @@ export default function DashboardClient() {
                                         <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
                                             <div className="flex justify-between items-start mb-4">
                                                 <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest group-hover:text-zinc-400 transition-colors">{t.totalProfit}</p>
-                                                <span className="text-[8px] font-black text-emerald-500 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase">{t.dividendNote}</span>
                                             </div>
                                             <div className="flex flex-col gap-2">
                                                 <h2 className="text-3xl font-black tracking-tighter text-emerald-500">
                                                     {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                 </h2>
                                                 {!isCheckingAuth && (
-                                                    <p className="text-[10px] font-bold text-zinc-500">
-                                                        (${(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
-                                                    </p>
+                                                    <div className="flex flex-col gap-1">
+                                                        <p className="text-[10px] font-bold text-zinc-500">
+                                                            (${(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                                                        </p>
+                                                        <span className="text-[10px] font-black text-emerald-500/60 uppercase tracking-widest">{t.dividendNote}</span>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
@@ -882,14 +887,17 @@ export default function DashboardClient() {
                                         {/* Current Package */}
                                         <div className="bg-gv-gold/5 border border-gv-gold/10 p-8 rounded-[40px] shadow-xl relative overflow-hidden group">
                                             <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
-                                            <div className="flex flex-col gap-1">
-                                                <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                                                    {getTierByAmount(Number(user?.balance || 0) / forexRate).name}
-                                                </h2>
-                                                <div className="flex items-center gap-2 mt-2">
-                                                    <div className="h-2 w-2 rounded-full bg-gv-gold animate-pulse"></div>
-                                                    <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">Active Status</span>
+                                            <div className="flex justify-between items-center pr-4">
+                                                <div className="flex flex-col gap-1">
+                                                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
+                                                        {getTierByAmount(Number(user?.balance || 0) / forexRate).name}
+                                                    </h2>
+                                                    <div className="flex items-center gap-2 mt-2">
+                                                        <div className="h-2 w-2 rounded-full bg-gv-gold animate-pulse"></div>
+                                                        <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">Active Status</span>
+                                                    </div>
                                                 </div>
+                                                <TierMedal tierId={getTierByAmount(Number(user?.balance || 0) / forexRate).id} size="lg" className="shrink-0" />
                                             </div>
                                             <div className="absolute top-0 right-0 p-4 opacity-10">
                                                 <svg className="h-12 w-12 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
