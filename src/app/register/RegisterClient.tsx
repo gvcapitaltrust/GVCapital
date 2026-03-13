@@ -259,14 +259,18 @@ export default function RegisterPage() {
                     balance: 0,
                     profit: 0,
                     kyc_completed: false,
-                    referred_by: resolvedReferralId
+                    referred_by: resolvedReferralId,
+                    referred_by_username: inviterUsername || null
                 };
 
                 const { error: profileError } = await supabase
                     .from('profiles')
-                    .upsert([profileData]);
+                    .upsert([profileData], { onConflict: 'id' });
 
-                if (profileError) throw profileError; // Throw so it's caught by the try-catch block
+                if (profileError) {
+                    console.error("UPSERT ERROR:", profileError);
+                    throw new Error(profileError.message || "Failed to create user profile.");
+                }
 
                 // Immediate redirect to dashboard
                 router.push(`/dashboard?lang=${lang}`);
