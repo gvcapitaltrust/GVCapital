@@ -314,8 +314,10 @@ export default function RegisterPage() {
 
                 <form onSubmit={handleSubmit} className="w-full space-y-6">
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.name}</label>
+                        <label htmlFor="full_name" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.name}</label>
                         <input
+                            id="full_name"
+                            name="full_name"
                             type="text"
                             required
                             value={fullName}
@@ -326,8 +328,10 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.emailLabel}</label>
+                        <label htmlFor="email" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.emailLabel}</label>
                         <input
+                            id="email"
+                            name="email"
                             type="email"
                             required
                             value={email}
@@ -338,8 +342,10 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.passwordLabel}</label>
+                        <label htmlFor="password" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.passwordLabel}</label>
                         <input
+                            id="password"
+                            name="password"
                             type="password"
                             required
                             value={password}
@@ -350,8 +356,10 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.usernameLabel}</label>
+                        <label htmlFor="username" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.usernameLabel}</label>
                         <input
+                            id="username"
+                            name="username"
                             type="text"
                             required
                             value={ownUsername}
@@ -363,8 +371,10 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.referralLabel}</label>
+                        <label htmlFor="referral_code" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.referralLabel}</label>
                         <input
+                            id="referral_code"
+                            name="referral_code"
                             type="text"
                             required
                             value={referralCode}
@@ -384,8 +394,10 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="space-y-4 pt-2">
-                        <label className="flex items-start gap-3 cursor-pointer group">
+                        <label htmlFor="agreement" className="flex items-start gap-3 cursor-pointer group">
                             <input
+                                id="agreement"
+                                name="agreement"
                                 type="checkbox"
                                 checked={isAgreed}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIsAgreed(e.target.checked)}
