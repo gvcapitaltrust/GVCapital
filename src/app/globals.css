@@ -17,6 +17,8 @@
 :root {
   --background: #121212;
   --foreground: #ededed;
+  --color-gv-gold: #D4AF37;
+  color-scheme: dark;
 }
 
 body {
@@ -24,6 +26,12 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   overflow-x: hidden;
+  accent-color: var(--color-gv-gold);
+}
+
+::selection {
+  background-color: var(--color-gv-gold);
+  color: #000;
 }
 
 @keyframes slide-in-right {
