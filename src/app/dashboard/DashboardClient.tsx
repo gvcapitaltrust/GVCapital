@@ -246,7 +246,39 @@ export default function DashboardClient() {
     };
 
     const handleWithdrawInitiate = () => {
-        if (!withdrawAmount) return;
+        if (!withdrawAmount || !user) return;
+        const amount = parseFloat(withdrawAmount);
+        
+        // 1. Check for at least one successful deposit
+        const approvedDeposits = transactions.filter(tx => tx.type === 'Deposit' && tx.status === 'Approved');
+        if (approvedDeposits.length === 0) {
+            alert("You must have at least one successful deposit before requesting a withdrawal.");
+            return;
+        }
+
+        // 2. Calculate Locked Capital (Approved deposits < 180 days old)
+        const now = new Date();
+        const lockPeriodDays = 180;
+        const lockedCapital = approvedDeposits.reduce((acc, tx) => {
+            const txDate = new Date(tx.created_at || tx.transfer_date);
+            const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
+            return diffDays < lockPeriodDays ? acc + Number(tx.amount) : acc;
+        }, 0);
+
+        // 3. Calculate Withdrawable Amount
+        const withdrawableProfit = Number(user.profit || 0);
+        const withdrawableCapital = Math.max(0, Number(user.balance || 0) - lockedCapital);
+        const totalWithdrawable = withdrawableProfit + withdrawableCapital;
+
+        if (amount > totalWithdrawable) {
+            if (lockedCapital > 0 && amount <= Number(user.total_assets)) {
+                alert(`Some of your capital is still within the 6-month lock-in period. Currently, you can only withdraw RM ${totalWithdrawable.toLocaleString(undefined, { minimumFractionDigits: 2 })} (Dividends + matured capital).`);
+            } else {
+                alert(`Insufficient balance. Your maximum withdrawable amount is RM ${totalWithdrawable.toLocaleString(undefined, { minimumFractionDigits: 2 })}.`);
+            }
+            return;
+        }
+
         setIsPinModalOpen(true);
     };
 
@@ -1426,9 +1458,37 @@ export default function DashboardClient() {
                             </button>
                         </div>
                         <div className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
-                                <input type="number" value={withdrawAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
+                                    <input type="number" value={withdrawAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                                </div>
+                                
+                                {(() => {
+                                    const approvedDeposits = transactions.filter(tx => tx.type === 'Deposit' && tx.status === 'Approved');
+                                    const now = new Date();
+                                    const lockedCapital = approvedDeposits.reduce((acc, tx) => {
+                                        const txDate = new Date(tx.created_at || tx.transfer_date);
+                                        const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
+                                        return diffDays < 180 ? acc + Number(tx.amount) : acc;
+                                    }, 0);
+                                    const withdrawable = Number(user?.profit || 0) + Math.max(0, Number(user?.balance || 0) - lockedCapital);
+                                    
+                                    return (
+                                        <div className="px-1 space-y-2">
+                                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                                                <span className="text-zinc-500">Withdrawable Balance</span>
+                                                <span className="text-emerald-500">RM {withdrawable.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            </div>
+                                            {lockedCapital > 0 && (
+                                                <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-tighter">
+                                                    <span className="text-zinc-600">Locked (6-month term)</span>
+                                                    <span className="text-amber-500/70">RM {lockedCapital.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
                             </div>
                              <button onClick={() => handleWithdrawInitiate()} disabled={!withdrawAmount} className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50">
                                 {t.requestWithdraw}
