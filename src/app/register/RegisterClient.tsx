@@ -242,21 +242,20 @@ export default function RegisterPage() {
                 // Initialize profile in public.profiles table
                 const profileData: any = {
                     id: user.id,
+                    email: email, // Required for several views and code references
                     full_name: fullName,
                     username: ownUsername.toLowerCase(),
                     balance: 0,
-                    balance_usd: 0,
-                    investment: 0,
                     profit: 0,
                     kyc_completed: false,
-                    referred_by_username: inviterUsername || null
+                    referred_by: inviterUsername ? (await supabase.from('profiles').select('id').eq('username', inviterUsername).single()).data?.id : null
                 };
 
                 const { error: profileError } = await supabase
                     .from('profiles')
-                    .insert([profileData]);
+                    .upsert([profileData]);
 
-                if (profileError) console.error("Profile creation failed", profileError);
+                if (profileError) throw profileError; // Throw so it's caught by the try-catch block
 
                 // Immediate redirect to dashboard
                 router.push(`/dashboard?lang=${lang}`);
