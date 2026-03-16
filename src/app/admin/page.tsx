@@ -1138,7 +1138,7 @@ export default function AdminPortal() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="overflow-hidden border border-white/5 mx-8 mb-8 rounded-3xl">
+                                    <div className="overflow-x-auto border border-white/5 mx-8 mb-8 rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
@@ -1146,7 +1146,7 @@ export default function AdminPortal() {
                                                     <th className="px-8 py-6">{t.table.date}</th>
                                                     <th className="px-8 py-6">Country</th>
                                                     <th className="px-8 py-6 text-center">{t.table.status}</th>
-                                                    <th className="px-8 py-6 text-right">{t.table.actions}</th>
+                                                    <th className="px-8 py-6 text-right min-w-[200px]">{t.table.actions}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
@@ -1236,10 +1236,10 @@ export default function AdminPortal() {
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="overflow-hidden border border-white/5 mx-8 mb-8 rounded-3xl">
+                                    <div className="overflow-x-auto border border-white/5 mx-8 mb-8 rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                                <tr><th className="px-8 py-6">{t.table.user}</th><th className="px-8 py-6">Bank Details</th><th className="px-8 py-6">{t.table.refId}</th><th className="px-8 py-6">{t.table.amount} (RM)</th><th className="px-8 py-6 text-right">{t.table.actions}</th></tr>
+                                                <tr><th className="px-8 py-6">{t.table.user}</th><th className="px-8 py-6">Bank Details</th><th className="px-8 py-6">{t.table.refId}</th><th className="px-8 py-6">{t.table.amount} (RM)</th><th className="px-8 py-6 text-right min-w-[200px]">{t.table.actions}</th></tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
                                                 {withdrawals.filter((w: any) => {
@@ -1521,7 +1521,7 @@ export default function AdminPortal() {
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="overflow-hidden border border-white/5 rounded-3xl">
+                                    <div className="overflow-x-auto border border-white/5 rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
@@ -1530,7 +1530,7 @@ export default function AdminPortal() {
                                                     <th className="px-8 py-6">{t.users.dividendEarned || "Dividend Earned"}</th>
                                                     <th className="px-8 py-6 text-center">{t.table.tier}</th>
                                                     <th className="px-8 py-6 text-center">{t.table.status}</th>
-                                                    <th className="px-8 py-6 text-right">{t.table.actions}</th>
+                                                    <th className="px-8 py-6 text-right min-w-[200px]">{t.table.actions}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
@@ -1627,14 +1627,14 @@ export default function AdminPortal() {
                                 <div className="animate-in fade-in duration-500">
                                     <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                         <div>
-                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">{t.tabs.deposits}</h3>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter text-white">{t.tabs.deposits} Review</h3>
                                             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{t.status.all} {t.tabs.deposits}</p>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-4">
                                             <div className="relative group w-full md:w-64">
                                                 <input 
                                                     type="text"
-                                                    placeholder="Search Name or Email..."
+                                                    placeholder={t.users.searchNameEmail}
                                                     value={depositSearchQuery}
                                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositSearchQuery(e.target.value)}
                                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-10 py-2.5 text-xs focus:outline-none focus:border-gv-gold/50 transition-all text-white"
@@ -1653,7 +1653,7 @@ export default function AdminPortal() {
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="overflow-hidden border border-white/5 mx-8 mb-8 rounded-3xl">
+                                    <div className="overflow-x-auto border border-white/5 mx-8 mb-8 rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
@@ -1662,7 +1662,7 @@ export default function AdminPortal() {
                                                     <th className="px-8 py-6">{t.table.amount} (RM)</th>
                                                     <th className="px-8 py-6">{t.table.status}</th>
                                                     <th className="px-8 py-6">{t.table.date}</th>
-                                                    <th className="px-8 py-6 text-right">{t.table.actions}</th>
+                                                    <th className="px-8 py-6 text-right min-w-[200px]">{t.table.actions}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">

@@ -74,6 +74,26 @@ export default function ApprovalsClient() {
         }
     };
 
+    const handleReject = async (tx: any) => {
+        const displayRm = Number(tx.amount || 0).toFixed(2);
+        if (!confirm(`Reject deposit of RM ${displayRm} for ${tx.profiles?.full_name || 'Client'}?`)) return;
+
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .update({ status: 'Rejected' })
+                .eq('id', tx.id);
+
+            if (error) throw error;
+
+            alert("Deposit rejected.");
+            fetchPending();
+            router.refresh();
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
     const handleDistributeDividends = async () => {
         if (!confirm("Distribute 1% monthly dividends to ALL users?")) return;
 
@@ -207,14 +227,24 @@ export default function ApprovalsClient() {
                                                  View Slip
                                              </button>
                                          </td>
-                                        <td className="px-8 py-6 text-right">
-                                            <button
-                                                onClick={() => handleApprove(tx)}
-                                                className="bg-gv-gold hover:bg-gv-gold/90 text-black px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-gv-gold/10 active:scale-95 transition-all"
-                                            >
-                                                Approve
-                                            </button>
-                                        </td>
+                                         <td className="px-8 py-6 text-right">
+                                            {tx.status === 'Pending' && (
+                                                <div className="flex justify-end gap-3">
+                                                    <button
+                                                        onClick={() => handleReject(tx)}
+                                                        className="bg-white/5 hover:bg-red-500/10 text-red-500 border border-white/10 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all"
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleApprove(tx)}
+                                                        className="bg-gv-gold hover:bg-gv-gold/90 text-black px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-gv-gold/10 active:scale-95 transition-all"
+                                                    >
+                                                        Approve
+                                                    </button>
+                                                </div>
+                                            )}
+                                         </td>
                                     </tr>
                                 ))}
                                 {pendingDeposits.length === 0 && (
