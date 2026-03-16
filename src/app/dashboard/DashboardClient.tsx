@@ -1155,25 +1155,32 @@ export default function DashboardClient() {
                             <section className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-96 h-96 bg-gv-gold/5 blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
                                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-10">
-                                    <div className="space-y-4 max-w-lg">
-                                        <h3 className="text-2xl font-black uppercase tracking-tighter">{t.referTitle}</h3>
-                                        <p className="text-zinc-500 font-medium leading-relaxed">{t.referSubtitle}</p>
-                                        <div className="flex items-center gap-4 mt-8">
-                                            <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl">
-                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-1">{t.yourCode}</p>
-                                                <p className="text-xl font-black text-gv-gold tracking-widest">{user?.username}</p>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    navigator.clipboard.writeText(user?.username);
-                                                    alert(t.copied);
-                                                }}
-                                                className="h-full px-6 py-4 bg-gv-gold text-black font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-gv-gold/90 transition-all shadow-lg"
-                                            >
-                                                {t.copyCode}
-                                            </button>
-                                        </div>
-                                    </div>
+                                     <div className="flex-1 space-y-4">
+                                         <h3 className="text-2xl font-black uppercase tracking-tighter">{t.referTitle}</h3>
+                                         <p className="text-zinc-500 text-sm font-medium leading-relaxed">
+                                             {t.referSubtitle}
+                                         </p>
+                                         <div className="flex items-stretch gap-3">
+                                             <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl flex-1">
+                                                 <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-1">{t.yourCode}</p>
+                                                 <p className="text-xl font-black text-gv-gold tracking-widest uppercase">
+                                                     {user?.username?.length > 15 ? user.username.substring(0, 8) + '...' : user?.username || "-"}
+                                                 </p>
+                                             </div>
+                                             <button
+                                                 onClick={() => {
+                                                     if (user?.username) {
+                                                         navigator.clipboard.writeText(user.username);
+                                                         alert(t.copied);
+                                                     }
+                                                 }}
+                                                 className="px-6 py-4 bg-gv-gold text-black font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-gv-gold/90 transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                                                 disabled={!user?.username}
+                                             >
+                                                 {t.copyCode}
+                                             </button>
+                                         </div>
+                                     </div>
                                     <div className="flex flex-col items-center gap-6 text-center md:text-right md:items-end">
                                         <div className="bg-[#222] border border-white/10 p-6 rounded-[32px] w-full md:w-auto">
                                             <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-1">{t.totalReferred}</p>

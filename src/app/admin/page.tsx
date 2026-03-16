@@ -792,7 +792,10 @@ export default function AdminPortal() {
                     amount: amount,
                     status: 'Approved',
                     ref_id: `ADJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-                    metadata: { reason: adjustmentReason }
+                    metadata: { 
+                        reason: adjustmentReason,
+                        description: adjustmentReason || "Balance Adjustment" 
+                    }
                 });
             
             if (txError) throw txError;
@@ -1597,37 +1600,37 @@ export default function AdminPortal() {
                                                         className="text-xs font-bold group hover:bg-white/[0.01] cursor-pointer"
                                                         onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
                                                     >
-                                                        <td className="px-6 py-4">
+                                                        <td className="px-3 py-3">
                                                             <div className="flex flex-col">
-                                                                <span className="text-white font-black">{u.full_name || "New Client"}</span>
-                                                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{u.email}</span>
+                                                                <span className="text-white font-black text-[11px] leading-tight">{u.full_name || "New Client"}</span>
+                                                                <span className="text-[8px] text-zinc-500 font-bold uppercase tracking-widest">{u.email}</span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4">
+                                                        <td className="px-3 py-3 whitespace-nowrap">
                                                             <div className="flex flex-col">
-                                                                <span className="text-emerald-400 font-black">RM {Number(u.balance || 0).toFixed(2)}</span>
-                                                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-tighter">(${(Number(u.balance || 0) / forexRate).toFixed(2)} USD)</span>
+                                                                <span className="text-emerald-400 font-black text-[11px]">RM {Number(u.balance || 0).toFixed(2)}</span>
+                                                                <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(u.balance || 0) / forexRate).toFixed(2)} USD)</span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4 text-gv-gold font-mono text-[10px]">RM {Number(u.profit || 0).toFixed(2)}</td>
-                                                        <td className="px-6 py-4 text-center">
+                                                        <td className="px-3 py-3 text-gv-gold font-mono text-[9px] whitespace-nowrap">RM {Number(u.profit || 0).toFixed(2)}</td>
+                                                        <td className="px-3 py-3 text-center">
                                                             {(() => {
                                                                 const userTier = getTierByAmount(Number(u.balance || 0) / forexRate);
                                                                 return (
-                                                                    <div className="flex flex-col items-center gap-1">
-                                                                        <TierMedal tierId={userTier.id} size="sm" />
-                                                                        <span className="px-2 py-0.5 rounded-full bg-gv-gold/10 text-gv-gold text-[8px] uppercase font-black border border-gv-gold/20">
+                                                                    <div className="flex flex-col items-center">
+                                                                        <TierMedal tierId={userTier.id} size="xs" />
+                                                                        <span className="px-1.5 py-0 rounded-full bg-gv-gold/10 text-gv-gold text-[7px] uppercase font-black border border-gv-gold/20">
                                                                             {userTier.name}
                                                                         </span>
                                                                     </div>
                                                                 );
                                                             })()}
                                                         </td>
-                                                        <td className="px-6 py-4 text-center">
+                                                        <td className="px-3 py-3 text-center">
                                                             {u.is_verified ? (
-                                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">{t.status.verified}</span>
+                                                                <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Verified</span>
                                                             ) : (
-                                                                <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">{t.status.pending}</span>
+                                                                <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Pending</span>
                                                             )}
                                                         </td>
                                                         <td className="px-6 py-4 text-right space-x-2" onClick={(e: React.MouseEvent<HTMLTableCellElement>) => {
