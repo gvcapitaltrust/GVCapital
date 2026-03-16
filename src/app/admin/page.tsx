@@ -61,6 +61,7 @@ export default function AdminPortal() {
     const [adminProfile, setAdminProfile] = useState<Profile | null>(null);
     const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: "", visible: false });
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     const showToast = (msg: string) => {
         setToast({ message: msg, visible: true });
@@ -949,10 +950,18 @@ export default function AdminPortal() {
                 <title>{`${t.adminPortal} | GV Capital Trust`}</title>
 
                 {/* Sidebar (Desktop) */}
-                <aside className="w-64 border-r border-white/10 p-6 flex flex-col justify-between hidden lg:flex bg-[#0a0a0a]">
+                <aside className={`border-r border-white/10 flex flex-col justify-between hidden lg:flex bg-[#0a0a0a] transition-all duration-500 ease-in-out relative group/sidebar ${isSidebarCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
+                    {/* Collapse Toggle */}
+                    <button 
+                        onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                        className="absolute -right-3 top-24 z-10 h-6 w-6 bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-gv-gold hover:text-black transition-all shadow-xl opacity-0 group-hover/sidebar:opacity-100"
+                    >
+                        <svg className={`h-3 w-3 transition-transform duration-500 ${isSidebarCollapsed ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+
                     <div className="space-y-12">
-                        <div className="flex items-center gap-2">
-                            <img src="/logo.png" alt="GV Capital" className="h-[60px] w-auto object-contain mix-blend-screen" />
+                        <div className={`flex items-center transition-all duration-500 ${isSidebarCollapsed ? "justify-center" : "gap-2"}`}>
+                            <img src="/logo.png" alt="GV Capital" className={`transition-all duration-500 object-contain mix-blend-screen ${isSidebarCollapsed ? "h-8" : "h-[60px]"}`} />
                         </div>
 
                         <nav className="space-y-2">
@@ -965,31 +974,53 @@ export default function AdminPortal() {
                                 if (tab === "sales") label = t.tabs.sales;
                                 if (tab === "audit") label = t.tabs.audit;
                                 if (tab === "forex") label = t.settings.forexRate;
-                                if (tab === "security") label = "Admin Account";
+                                if (tab === "security") label = "Account";
+
+                                const icons = {
+                                    deposits: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>,
+                                    kyc: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>,
+                                    withdrawals: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M8 7l4-4m0 0l4 4m-4-4v18"/></svg>,
+                                    users: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>,
+                                    sales: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>,
+                                    forex: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM12 7v5l3 3"/></svg>,
+                                    audit: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>,
+                                    security: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>,
+                                };
 
                                 return (
                                     <button
                                         key={tab}
                                         onClick={() => setActiveTab(tab)}
-                                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                                        className={`w-full flex items-center transition-all duration-300 relative group/item ${
+                                            isSidebarCollapsed ? "justify-center p-3 rounded-xl" : "gap-4 px-4 py-2.5 rounded-2xl"
+                                        } ${activeTab === tab ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
+                                        title={isSidebarCollapsed ? label : ""}
                                     >
-                                        <span>{label}</span>
+                                        {icons[tab as keyof typeof icons]}
+                                        {!isSidebarCollapsed && (
+                                            <span className="text-[10px] font-black uppercase tracking-widest truncate">{label}</span>
+                                        )}
+                                        {isSidebarCollapsed && (
+                                            <div className="absolute left-full ml-4 px-3 py-1.5 bg-gv-gold text-black text-[9px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover/item:opacity-100 transition-all z-[100] shadow-2xl whitespace-nowrap">
+                                                {label}
+                                            </div>
+                                        )}
                                     </button>
                                 );
                             })}
                         </nav>
                     </div>
                     
-                    <div className="space-y-4 pt-4 border-t border-white/5">
-                        <div className="flex items-center justify-between px-4 pb-2">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.settings.maintenance}</span>
-                            <button onClick={toggleMaintenance} className={`h-5 w-10 rounded-full relative transition-all ${maintenanceMode ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "bg-white/10"}`}>
-                                <div className={`h-3.5 w-3.5 bg-white rounded-full absolute top-0.75 transition-all ${maintenanceMode ? "right-0.75" : "left-0.75"}`}></div>
+                    <div className="space-y-4 pt-4 border-t border-white/5 overflow-hidden">
+                        <div className={`flex items-center px-4 pb-2 transition-all duration-500 ${isSidebarCollapsed ? "justify-center" : "justify-between"}`}>
+                            {!isSidebarCollapsed && <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.settings.maintenance}</span>}
+                            <button onClick={toggleMaintenance} className={`h-5 rounded-full relative transition-all ${isSidebarCollapsed ? "w-8" : "w-10"} ${maintenanceMode ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "bg-white/10"}`}>
+                                <div className={`h-3.5 w-3.5 bg-white rounded-full absolute top-0.75 transition-all ${maintenanceMode ? (isSidebarCollapsed ? "right-0.5" : "right-0.75") : (isSidebarCollapsed ? "left-0.5" : "left-0.75")}`}></div>
                             </button>
                         </div>
-                        <button onClick={() => { supabase.auth.signOut(); router.push("/login"); }} className="w-full text-zinc-500 hover:text-red-400 transition-colors text-sm font-medium flex items-center gap-3 px-4 py-2">
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
-                            Logout
+                        <button onClick={() => { supabase.auth.signOut(); router.push("/login"); }} className={`w-full text-zinc-500 hover:text-red-400 transition-colors text-sm font-medium flex items-center transition-all ${isSidebarCollapsed ? "justify-center p-3" : "gap-3 px-4 py-2"}`}>
+                            <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
+                            {!isSidebarCollapsed && <span>Logout</span>}
                         </button>
                     </div>
                 </aside>
@@ -1028,12 +1059,24 @@ export default function AdminPortal() {
                                 if (tab === "forex") label = t.settings.forexRate;
                                 if (tab === "security") label = "Admin Account";
 
+                                const icons = {
+                                    deposits: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>,
+                                    kyc: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>,
+                                    withdrawals: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M8 7l4-4m0 0l4 4m-4-4v18"/></svg>,
+                                    users: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>,
+                                    sales: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>,
+                                    forex: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM12 7v5l3 3"/></svg>,
+                                    audit: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>,
+                                    security: <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>,
+                                };
+
                                 return (
                                     <button
                                         key={tab}
                                         onClick={() => { setActiveTab(tab); setIsSidebarOpen(false); }}
-                                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
                                     >
+                                        {icons[tab as keyof typeof icons]}
                                         <span>{label}</span>
                                     </button>
                                 );
@@ -1044,19 +1087,19 @@ export default function AdminPortal() {
 
                 <main className="flex-1 overflow-y-auto bg-[#121212] flex flex-col relative">
                     {/* Header with hamburger */}
-                    <header className="border-b border-white/5 bg-[#0a0a0a] px-8 py-4 flex items-center justify-between sticky top-0 z-50 lg:hidden">
-                        <div className="flex items-center gap-4">
+                    <header className="border-b border-white/5 bg-[#0a0a0a] px-4 md:px-8 py-3 md:py-4 flex items-center justify-between sticky top-0 z-50 lg:hidden">
+                        <div className="flex items-center gap-3">
                             <button
                                 onClick={() => setIsSidebarOpen(true)}
-                                className="p-2 rounded-xl bg-white/5 border border-white/10 text-white lg:hidden"
+                                className="p-2 rounded-xl bg-white/5 border border-white/10 text-white lg:hidden active:scale-95 transition-all"
                             >
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                             </button>
-                            <img src="/logo.png" className="h-8 w-auto mix-blend-screen" />
+                            <img src="/logo.png" className="h-7 md:h-8 w-auto mix-blend-screen" />
                         </div>
                         <div className="flex items-center p-1 bg-white/5 rounded-xl border border-white/10">
-                            <button onClick={() => setLang("en")} className={`px-2 py-1 rounded-lg text-[8px] font-black ${lang === "en" ? "bg-gv-gold text-black" : "text-zinc-500"}`}>EN</button>
-                            <button onClick={() => setLang("zh")} className={`px-2 py-1 rounded-lg text-[8px] font-black ${lang === "zh" ? "bg-gv-gold text-black" : "text-zinc-500"}`}>ZH</button>
+                            <button onClick={() => setLang("en")} className={`px-3 py-1.5 rounded-lg text-[9px] font-black ${lang === "en" ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/10" : "text-zinc-500 hover:text-white"}`}>EN</button>
+                            <button onClick={() => setLang("zh")} className={`px-3 py-1.5 rounded-lg text-[9px] font-black ${lang === "zh" ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/10" : "text-zinc-500 hover:text-white"}`}>ZH</button>
                         </div>
                     </header>
 
@@ -1079,25 +1122,25 @@ export default function AdminPortal() {
                             </div>
                         </div>
                     </header>
-                        <div className="p-8 space-y-12">
+                        <div className="p-4 md:p-8 space-y-8 md:space-y-12">
                             {/* Summary Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-8 shadow-xl">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-6 md:p-8 shadow-xl">
                                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">Total Capital</p>
-                                    <div className="text-3xl font-black text-white tracking-tighter">RM {totalCapital.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                    <div className="text-2xl md:text-3xl font-black text-white tracking-tighter drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]">RM {totalCapital.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                                     <p className="text-[10px] text-zinc-600 font-bold mt-1 tracking-widest">≈ ${(totalCapital / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</p>
                                 </div>
-                                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-8 shadow-xl">
+                                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-6 md:p-8 shadow-xl">
                                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">Pending Deposits</p>
-                                    <div className={`text-3xl font-black tracking-tighter ${pendingDeposits > 0 ? "text-gv-gold" : "text-white/20"}`}>{pendingDeposits}</div>
+                                    <div className={`text-2xl md:text-3xl font-black tracking-tighter ${pendingDeposits > 0 ? "text-gv-gold drop-shadow-[0_0_15px_rgba(238,206,128,0.3)]" : "text-white/20"}`}>{pendingDeposits}</div>
                                     <p className="text-[10px] text-zinc-600 font-bold mt-1 tracking-widest uppercase">Action Required</p>
                                 </div>
-                                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-8 shadow-xl">
+                                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-6 md:p-8 shadow-xl">
                                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">Pending KYC</p>
-                                    <div className={`text-3xl font-black tracking-tighter ${pendingKyc > 0 ? "text-gv-gold" : "text-white/20"}`}>{pendingKyc}</div>
+                                    <div className={`text-2xl md:text-3xl font-black tracking-tighter ${pendingKyc > 0 ? "text-gv-gold drop-shadow-[0_0_15px_rgba(238,206,128,0.3)]" : "text-white/20"}`}>{pendingKyc}</div>
                                     <p className="text-[10px] text-zinc-600 font-bold mt-1 tracking-widest uppercase">Action Required</p>
                                 </div>
-                                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-8 shadow-xl">
+                                <div className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-6 md:p-8 shadow-xl">
                                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">Pending Withdrawals</p>
                                     <div className={`text-3xl font-black tracking-tighter ${pendingWithdrawals > 0 ? "text-red-500" : "text-white/20"}`}>{pendingWithdrawals}</div>
                                     <p className="text-[10px] text-zinc-600 font-bold mt-1 tracking-widest uppercase">Action Required</p>
@@ -1138,7 +1181,7 @@ export default function AdminPortal() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="overflow-x-auto border border-white/5 mx-8 mb-8 rounded-3xl">
+                                    <div className="overflow-x-auto border border-white/5 mx-0 md:mx-8 mb-8 rounded-2xl md:rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
@@ -1239,7 +1282,7 @@ export default function AdminPortal() {
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="overflow-x-auto border border-white/5 mx-8 mb-8 rounded-3xl">
+                                    <div className="overflow-x-auto border border-white/5 mx-0 md:mx-8 mb-8 rounded-2xl md:rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr><th className="px-6 py-4">{t.table.user}</th><th className="px-6 py-4">Bank Details</th><th className="px-6 py-4">{t.table.refId}</th><th className="px-6 py-4">{t.table.amount} (RM)</th><th className="px-6 py-4 text-right min-w-[150px]">{t.table.actions}</th></tr>
@@ -1656,7 +1699,7 @@ export default function AdminPortal() {
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="overflow-x-auto border border-white/5 mx-8 mb-8 rounded-3xl">
+                                    <div className="overflow-x-auto border border-white/5 mx-0 md:mx-8 mb-8 rounded-2xl md:rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
