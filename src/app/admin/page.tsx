@@ -7,6 +7,7 @@ import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
 import { useSettings } from "@/providers/SettingsProvider";
 import TierMedal from "@/components/TierMedal";
+import { getTierByAmount } from "@/lib/tierUtils";
 
 export default function AdminPortal() {
     const router = useRouter();
@@ -791,7 +792,7 @@ export default function AdminPortal() {
                     amount: amount,
                     status: 'Approved',
                     ref_id: `ADJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-                    description: `Admin Adjustment: ${adjustmentReason}`
+                    metadata: { reason: adjustmentReason }
                 });
             
             if (txError) throw txError;
@@ -1610,12 +1611,17 @@ export default function AdminPortal() {
                                                         </td>
                                                         <td className="px-6 py-4 text-gv-gold font-mono text-[10px]">RM {Number(u.profit || 0).toFixed(2)}</td>
                                                         <td className="px-6 py-4 text-center">
-                                                            <div className="flex flex-col items-center gap-1">
-                                                                <TierMedal tierId={u.selected_tier || "Basic"} size="sm" />
-                                                                <span className="px-2 py-0.5 rounded-full bg-gv-gold/10 text-gv-gold text-[8px] uppercase font-black border border-gv-gold/20">
-                                                                    {u.selected_tier || "Basic"}
-                                                                </span>
-                                                            </div>
+                                                            {(() => {
+                                                                const userTier = getTierByAmount(Number(u.balance || 0) / forexRate);
+                                                                return (
+                                                                    <div className="flex flex-col items-center gap-1">
+                                                                        <TierMedal tierId={userTier.id} size="sm" />
+                                                                        <span className="px-2 py-0.5 rounded-full bg-gv-gold/10 text-gv-gold text-[8px] uppercase font-black border border-gv-gold/20">
+                                                                            {userTier.name}
+                                                                        </span>
+                                                                    </div>
+                                                                );
+                                                            })()}
                                                         </td>
                                                         <td className="px-6 py-4 text-center">
                                                             {u.is_verified ? (
@@ -1986,13 +1992,23 @@ export default function AdminPortal() {
                                             <p className="text-xl font-black text-white">RM {(Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)).toFixed(2)}</p>
                                             <p className="text-[10px] font-bold text-zinc-500">(${( (Number(selectedUser.balance || 0) + Number(selectedUser.profit || 0)) / forexRate).toFixed(2)} USD)</p>
                                         </div>
-                                        <div className="bg-white/5 border border-white/10 p-5 rounded-2xl flex items-center justify-between">
+                                        <div className="bg-white/5 border border-white/10 p-5 rounded-2xl flex items-center justify-between gap-3">
                                             <div>
-                                                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">{t.users.currentTier || "Current Tier"}</p>
-                                                <p className="text-xl font-black text-gv-gold uppercase tracking-tighter">{(selectedUser.selected_tier || "Basic").replace(/ package/gi, '')}</p>
-                                                <p className="text-[10px] font-bold text-zinc-500">{t.table.status}: {selectedUser.is_verified ? t.status.verified : t.status.unverified}</p>
+                                                {(() => {
+                                                    const userTier = getTierByAmount(Number(selectedUser.balance || 0) / forexRate);
+                                                    return (
+                                                        <>
+                                                            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">{t.users.currentTier || "Current Tier"}</p>
+                                                            <p className="text-xl font-black text-gv-gold uppercase tracking-tighter">{userTier.name}</p>
+                                                            <p className="text-[10px] font-bold text-zinc-500">{t.table.status}: {selectedUser.is_verified ? t.status.verified : t.status.unverified}</p>
+                                                        </>
+                                                    );
+                                                })()}
                                             </div>
-                                            <TierMedal tierId={selectedUser.selected_tier || "Basic"} size="md" className="shrink-0" />
+                                            {(() => {
+                                                const userTier = getTierByAmount(Number(selectedUser.balance || 0) / forexRate);
+                                                return <TierMedal tierId={userTier.id} size="md" className="shrink-0" />;
+                                            })()}
                                         </div>
                                     </div>
                                 </header>
@@ -2053,13 +2069,16 @@ export default function AdminPortal() {
                                             </button>
                                         </div>
                                         <div className="space-y-3">
-                                            <input 
-                                                type="number"
-                                                placeholder="Amount (e.g. 500 or -500)"
-                                                value={adjustmentAmount}
-                                                onChange={(e) => setAdjustmentAmount(e.target.value)}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:border-gv-gold/50 outline-none transition-all"
-                                            />
+                                            <div className="relative">
+                                                <input 
+                                                    type="number"
+                                                    placeholder="Adjustment Amount (e.g. 500 or -500)"
+                                                    value={adjustmentAmount}
+                                                    onChange={(e) => setAdjustmentAmount(e.target.value)}
+                                                    className="w-full bg-black/40 border border-white/10 rounded-xl pl-4 pr-12 py-3 text-xs text-white focus:border-gv-gold/50 outline-none transition-all"
+                                                />
+                                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-gv-gold/40 tracking-widest">RM</span>
+                                            </div>
                                             <input 
                                                 type="text"
                                                 placeholder="Reason for adjustment..."

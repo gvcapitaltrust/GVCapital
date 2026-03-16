@@ -71,7 +71,7 @@ export async function POST(request: Request) {
                     amount_usd: amount_usd,
                     status: 'Approved',
                     ref_id: refId || `PAY-${Date.now()}`,
-                    description: `Automated Deposit (RM ${amount_myr}) - USD Equiv: $${amount_usd.toFixed(2)}`
+                    metadata: { description: `Automated Deposit (RM ${amount_myr}) - USD Equiv: $${amount_usd.toFixed(2)}` }
                 }]);
 
             if (txError) throw txError;
