@@ -1145,8 +1145,11 @@ export default function AdminPortal() {
                                                     <th className="px-8 py-6">{t.table.user}</th>
                                                     <th className="px-8 py-6">{t.table.date}</th>
                                                     <th className="px-8 py-6">Country</th>
-                                                    <th className="px-8 py-6 text-center">{t.table.status}</th>
-                                                    <th className="px-8 py-6 text-right min-w-[200px]">{t.table.actions}</th>
+                                                    <th className="px-6 py-4">{t.table.user}</th>
+                                                    <th className="px-6 py-4">{t.table.date}</th>
+                                                    <th className="px-6 py-4">Country</th>
+                                                    <th className="px-6 py-4 text-center">{t.table.status}</th>
+                                                    <th className="px-6 py-4 text-right min-w-[150px]">{t.table.actions}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
@@ -1158,7 +1161,7 @@ export default function AdminPortal() {
                                                 }).map((u: any, i: number) => (
                                                     <tr 
                                                         key={i} 
-                                                        className="text-sm font-bold group hover:bg-white/[0.01] cursor-pointer"
+                                                        className="text-xs font-bold group hover:bg-white/[0.01] cursor-pointer"
                                                         onClick={() => { 
                                                             setSelectedUser(u); 
                                                             setPortfolioData({
@@ -1170,23 +1173,23 @@ export default function AdminPortal() {
                                                             setIsDetailModalOpen(true); 
                                                         }}
                                                     >
-                                                        <td className="px-8 py-6">
+                                                        <td className="px-6 py-4">
                                                             <div className="flex flex-col">
                                                                 <span className="text-white font-black">{u.full_name || "New Client"}</span>
-                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{u.email}</span>
+                                                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{u.email}</span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-8 py-6 text-zinc-400 font-mono text-xs">
+                                                        <td className="px-6 py-4 text-zinc-400 font-mono text-[10px]">
                                                             {u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A"}
                                                         </td>
-                                                        <td className="px-8 py-6 text-zinc-400">{u.country || u.kyc_data?.country || "N/A"}</td>
-                                                        <td className="px-8 py-6 text-center">
-                                                            <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[9px] uppercase font-black border border-amber-500/20">
+                                                        <td className="px-6 py-4 text-zinc-400 text-xs">{u.country || u.kyc_data?.country || "N/A"}</td>
+                                                        <td className="px-6 py-4 text-center">
+                                                            <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[8px] uppercase font-black border border-amber-500/20">
                                                                 {u.kyc_status}
                                                             </span>
                                                         </td>
-                                                        <td className="px-8 py-6 text-right">
-                                                            <button className="text-[10px] font-black uppercase text-gv-gold hover:underline">Review Profile</button>
+                                                        <td className="px-6 py-4 text-right">
+                                                            <button className="text-[9px] font-black uppercase text-gv-gold hover:underline">Review Profile</button>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -1239,7 +1242,7 @@ export default function AdminPortal() {
                                     <div className="overflow-x-auto border border-white/5 mx-8 mb-8 rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                                <tr><th className="px-8 py-6">{t.table.user}</th><th className="px-8 py-6">Bank Details</th><th className="px-8 py-6">{t.table.refId}</th><th className="px-8 py-6">{t.table.amount} (RM)</th><th className="px-8 py-6 text-right min-w-[200px]">{t.table.actions}</th></tr>
+                                                <tr><th className="px-6 py-4">{t.table.user}</th><th className="px-6 py-4">Bank Details</th><th className="px-6 py-4">{t.table.refId}</th><th className="px-6 py-4">{t.table.amount} (RM)</th><th className="px-6 py-4 text-right min-w-[150px]">{t.table.actions}</th></tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
                                                 {withdrawals.filter((w: any) => {
@@ -1248,33 +1251,33 @@ export default function AdminPortal() {
                                                     const matchesStatus = withdrawalStatusFilter === "All" || w.status === withdrawalStatusFilter;
                                                     return matchesSearch && matchesStatus;
                                                 }).map((w: any, i: number) => (
-                                                    <tr key={i} className="text-sm font-bold group hover:bg-white/[0.01]">
-                                                        <td className="px-8 py-6">
+                                                    <tr key={i} className="text-xs font-bold group hover:bg-white/[0.01]">
+                                                        <td className="px-6 py-4">
                                                             <div className="flex flex-col">
-                                                                <span className="text-white font-black">{w.profiles?.full_name || "Client"}</span>
-                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{w.profiles?.email}</span>
+                                                                <span className="text-white font-black uppercase tracking-tight">{w.profiles?.full_name || "Client"}</span>
+                                                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{w.profiles?.email}</span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-8 py-6">
-                                                            <div className="text-white text-xs">{w.profiles?.bank_name || 'N/A'}</div>
-                                                            <div className="font-mono text-[10px] text-zinc-500">{w.profiles?.account_number || 'N/A'}</div>
+                                                        <td className="px-6 py-4">
+                                                            <div className="text-white text-[10px] uppercase font-black">{w.profiles?.bank_name || 'N/A'}</div>
+                                                            <div className="font-mono text-[9px] text-zinc-500">{w.profiles?.account_number || 'N/A'}</div>
                                                         </td>
-                                                        <td className="px-8 py-4 font-mono text-xs opacity-50">{w.ref_id}</td>
-                                                        <td className="px-8 py-6 text-red-400">
+                                                        <td className="px-6 py-3 font-mono text-[10px] opacity-50">{w.ref_id}</td>
+                                                        <td className="px-6 py-4 text-red-400">
                                                             <div className="flex flex-col">
-                                                                <span>RM {Math.abs(Number(w.amount || 0)).toFixed(2)}</span>
-                                                                <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(w.amount || 0)) / forexRate).toFixed(2)})</span>
+                                                                <span className="font-black">RM {Math.abs(Number(w.amount || 0)).toFixed(2)}</span>
+                                                                <span className="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(w.amount || 0)) / forexRate).toFixed(2)})</span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-8 py-6 text-right flex items-center justify-end gap-3 h-full pt-4">
+                                                        <td className="px-6 py-4 text-right flex items-center justify-end gap-2 h-full pt-4">
                                                             {w.status === 'Pending' && (
                                                                 <>
-                                                                    <button onClick={() => handleRejectWithdrawal(w)} className="text-red-500 hover:text-red-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all hidden md:block">{t.kyc.reject}</button>
-                                                                    <button onClick={() => handleApproveWithdrawal(w)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">{t.kyc.approve} Withdrawal</button>
+                                                                    <button onClick={() => handleRejectWithdrawal(w)} className="text-red-500 hover:bg-red-500/10 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase transition-all hidden md:block">Reject</button>
+                                                                    <button onClick={() => handleApproveWithdrawal(w)} className="bg-emerald-500 text-black px-4 py-1.5 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">Approve</button>
                                                                 </>
                                                             )}
                                                             {w.status !== 'Pending' && (
-                                                                <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${w.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                                                                <span className={`px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${w.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
                                                                     {w.status === 'Approved' ? t.status.approved : w.status === 'Rejected' ? t.status.rejected : w.status}
                                                                 </span>
                                                             )}
@@ -1321,10 +1324,10 @@ export default function AdminPortal() {
                                             <table className="w-full text-left">
                                                 <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                     <tr>
-                                                        <th className="px-6 py-4">Rank</th>
-                                                        <th className="px-6 py-4">{t.table.user}</th>
-                                                        <th className="px-6 py-4">Total Ref</th>
-                                                        <th className="px-6 py-4">Total Capital</th>
+                                                        <th className="px-4 py-4">Rank</th>
+                                                        <th className="px-4 py-4">{t.table.user}</th>
+                                                        <th className="px-4 py-4">Total Ref</th>
+                                                        <th className="px-4 py-4">Total Capital</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-white/[0.02]">
@@ -1333,25 +1336,25 @@ export default function AdminPortal() {
                                                         .map((agent: any, index: number) => (
                                                             <tr
                                                                 key={agent.agent_username}
-                                                                className={`text-sm group hover:bg-white/[0.02] transition-colors cursor-pointer ${selectedAgent === agent.agent_username ? "bg-gv-gold/5 border-gv-gold/20" : ""}`}
+                                                                className={`text-xs group hover:bg-white/[0.02] transition-colors cursor-pointer ${selectedAgent === agent.agent_username ? "bg-gv-gold/5 border-gv-gold/20" : ""}`}
                                                                 onClick={() => fetchAgentReferrals(agent.agent_username)}
                                                             >
-                                                                <td className="px-6 py-5">
+                                                                <td className="px-4 py-3">
                                                                     <div className="flex items-center gap-2">
-                                                                        <span className="font-mono text-zinc-500 text-xs">#{(index + 1).toString().padStart(2, '0')}</span>
-                                                                        {index === 0 && <span className="text-lg">馃</span>}
-                                                                        {index === 1 && <span className="text-lg">馃</span>}
-                                                                        {index === 2 && <span className="text-lg">馃</span>}
+                                                                        <span className="font-mono text-zinc-500 text-[10px]">#{(index + 1).toString().padStart(2, '0')}</span>
+                                                                        {index === 0 && <span className="text-lg">🥇</span>}
+                                                                        {index === 1 && <span className="text-lg">🥈</span>}
+                                                                        {index === 2 && <span className="text-lg">🥉</span>}
                                                                     </div>
                                                                 </td>
-                                                                <td className="px-6 py-5">
-                                                                    <div className="font-black text-white group-hover:text-gv-gold transition-colors">{agent.agent_username}</div>
+                                                                <td className="px-4 py-3">
+                                                                    <div className="font-black text-white group-hover:text-gv-gold transition-colors uppercase tracking-tight">{agent.agent_username}</div>
                                                                 </td>
-                                                                <td className="px-6 py-5 font-bold text-zinc-400">{agent.total_referrals}</td>
-                                                                <td className="px-6 py-5 font-black text-emerald-400">
+                                                                <td className="px-4 py-3 font-bold text-zinc-400">{agent.total_referrals}</td>
+                                                                <td className="px-4 py-3 font-black text-emerald-400">
                                                                     <div className="flex flex-col">
                                                                         <span>RM {Number(agent.total_referred_capital || 0).toFixed(2)}</span>
-                                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(agent.total_referred_capital || 0) / forexRate).toFixed(2)})</span>
+                                                                        <span className="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(agent.total_referred_capital || 0) / forexRate).toFixed(2)})</span>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -1398,7 +1401,7 @@ export default function AdminPortal() {
                                                 </div>
                                             ) : (
                                                 <div className="h-full flex flex-col items-center justify-center text-center p-10">
-                                                    <div className="text-4xl mb-4 opacity-20">馃搳</div>
+                                                    <div className="text-4xl mb-4 opacity-20">📊</div>
                                                     <div className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Select an agent to view drill-down performance</div>
                                                 </div>
                                             )}
@@ -1411,7 +1414,7 @@ export default function AdminPortal() {
                                 adminProfile?.role !== 'admin' && adminProfile?.email !== 'thenja96@gmail.com' ? (
                                     <div className="min-h-[400px] flex items-center justify-center text-center p-12">
                                         <div className="space-y-4">
-                                            <div className="text-4xl">馃攼</div>
+                                            <div className="text-4xl">🔒</div>
                                             <h3 className="text-xl font-bold text-white uppercase tracking-tighter">Access Restricted</h3>
                                             <p className="text-zinc-500 text-sm max-w-xs">You do not have the necessary permissions to access global pricing controls.</p>
                                         </div>
@@ -1455,11 +1458,11 @@ export default function AdminPortal() {
                                             <table className="w-full text-left">
                                                 <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                     <tr>
-                                                        <th className="px-8 py-4">Date</th>
-                                                        <th className="px-8 py-4">Old Rate</th>
-                                                        <th className="px-8 py-4">New Rate</th>
-                                                        <th className="px-8 py-4">Change %</th>
-                                                        <th className="px-8 py-4">Admin</th>
+                                                        <th className="px-6 py-4">Date</th>
+                                                        <th className="px-6 py-4">Old Rate</th>
+                                                        <th className="px-6 py-4">New Rate</th>
+                                                        <th className="px-6 py-4">Change %</th>
+                                                        <th className="px-6 py-4">Admin</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-white/[0.02]">
@@ -1467,13 +1470,13 @@ export default function AdminPortal() {
                                                         const change = ((h.new_rate - h.old_rate) / h.old_rate) * 100;
                                                         return (
                                                             <tr key={i} className="text-xs font-bold hover:bg-white/[0.01] transition-colors">
-                                                                <td className="px-8 py-4 text-zinc-400 font-mono">{new Date(h.created_at).toLocaleString()}</td>
-                                                                <td className="px-8 py-4 text-zinc-500">RM {h.old_rate.toFixed(3)}</td>
-                                                                <td className="px-8 py-4 text-white">RM {h.new_rate.toFixed(3)}</td>
-                                                                <td className={`px-8 py-4 ${change >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                                                                <td className="px-6 py-4 text-zinc-400 font-mono">{new Date(h.created_at).toLocaleString()}</td>
+                                                                <td className="px-6 py-4 text-zinc-500">RM {h.old_rate.toFixed(3)}</td>
+                                                                <td className="px-6 py-4 text-white">RM {h.new_rate.toFixed(3)}</td>
+                                                                <td className={`px-6 py-4 ${change >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                                                                     {change >= 0 ? "+" : ""}{change.toFixed(2)}%
                                                                 </td>
-                                                                <td className="px-8 py-4 text-zinc-500">{h.changed_by}</td>
+                                                                <td className="px-6 py-4 text-zinc-500">{h.changed_by}</td>
                                                             </tr>
                                                         );
                                                     })}
@@ -1525,12 +1528,12 @@ export default function AdminPortal() {
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
-                                                    <th className="px-8 py-6">{t.table.user}</th>
-                                                    <th className="px-8 py-6">{t.users.totalInvestment || "Total Investment"}</th>
-                                                    <th className="px-8 py-6">{t.users.dividendEarned || "Dividend Earned"}</th>
-                                                    <th className="px-8 py-6 text-center">{t.table.tier}</th>
-                                                    <th className="px-8 py-6 text-center">{t.table.status}</th>
-                                                    <th className="px-8 py-6 text-right min-w-[200px]">{t.table.actions}</th>
+                                                    <th className="px-6 py-4">{t.table.user}</th>
+                                                    <th className="px-6 py-4">{t.users.totalInvestment || "Total Investment"}</th>
+                                                    <th className="px-6 py-4">{t.users.dividendEarned || "Dividend Earned"}</th>
+                                                    <th className="px-6 py-4 text-center">{t.table.tier}</th>
+                                                    <th className="px-6 py-4 text-center">{t.table.status}</th>
+                                                    <th className="px-6 py-4 text-right min-w-[150px]">{t.table.actions}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
@@ -1547,38 +1550,38 @@ export default function AdminPortal() {
                                                 }).map((u: any, i: number) => (
                                                     <tr 
                                                         key={i} 
-                                                        className="text-sm font-bold group hover:bg-white/[0.01] cursor-pointer"
+                                                        className="text-xs font-bold group hover:bg-white/[0.01] cursor-pointer"
                                                         onClick={() => { setSelectedUser(u); setIsDetailModalOpen(true); }}
                                                     >
-                                                        <td className="px-8 py-6">
+                                                        <td className="px-6 py-4">
                                                             <div className="flex flex-col">
                                                                 <span className="text-white font-black">{u.full_name || "New Client"}</span>
-                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{u.email}</span>
+                                                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{u.email}</span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-8 py-6">
+                                                        <td className="px-6 py-4">
                                                             <div className="flex flex-col">
                                                                 <span className="text-emerald-400 font-black">RM {Number(u.balance || 0).toFixed(2)}</span>
-                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tighter">(${(Number(u.balance || 0) / forexRate).toFixed(2)} USD)</span>
+                                                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-tighter">(${(Number(u.balance || 0) / forexRate).toFixed(2)} USD)</span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-8 py-6 text-gv-gold font-mono text-xs">RM {Number(u.profit || 0).toFixed(2)}</td>
-                                                        <td className="px-8 py-6 text-center">
+                                                        <td className="px-6 py-4 text-gv-gold font-mono text-[10px]">RM {Number(u.profit || 0).toFixed(2)}</td>
+                                                        <td className="px-6 py-4 text-center">
                                                             <div className="flex flex-col items-center gap-1">
                                                                 <TierMedal tierId={u.selected_tier || "Basic"} size="sm" />
-                                                                <span className="px-3 py-1 rounded-full bg-gv-gold/10 text-gv-gold text-[9px] uppercase font-black border border-gv-gold/20">
+                                                                <span className="px-2 py-0.5 rounded-full bg-gv-gold/10 text-gv-gold text-[8px] uppercase font-black border border-gv-gold/20">
                                                                     {u.selected_tier || "Basic"}
                                                                 </span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-8 py-6 text-center">
+                                                        <td className="px-6 py-4 text-center">
                                                             {u.is_verified ? (
-                                                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{t.status.verified}</span>
+                                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">{t.status.verified}</span>
                                                             ) : (
-                                                                <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{t.status.pending}</span>
+                                                                <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">{t.status.pending}</span>
                                                             )}
                                                         </td>
-                                                        <td className="px-8 py-6 text-right space-x-4" onClick={(e: React.MouseEvent<HTMLTableCellElement>) => {
+                                                        <td className="px-6 py-4 text-right space-x-2" onClick={(e: React.MouseEvent<HTMLTableCellElement>) => {
                                                             e.stopPropagation();
                                                             setSelectedUser(u);
                                                             setPortfolioData({
@@ -1590,12 +1593,12 @@ export default function AdminPortal() {
                                                             setIsDetailModalOpen(true);
                                                         }}>
                                                             <button 
-                                                                className="bg-gv-gold/10 text-gv-gold text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl hover:bg-gv-gold hover:text-black transition-all"
+                                                                className="bg-gv-gold/10 text-gv-gold text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl hover:bg-gv-gold hover:text-black transition-all"
                                                             >
                                                                 {t.users.adjust}
                                                             </button>
                                                             <button 
-                                                                className="text-white text-[10px] font-black uppercase tracking-widest hover:underline"
+                                                                className="text-white text-[9px] font-black uppercase tracking-widest hover:underline"
                                                             >
                                                                 {t.users.details}
                                                             </button>
@@ -1657,12 +1660,12 @@ export default function AdminPortal() {
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
-                                                    <th className="px-8 py-6">{t.table.user}</th>
-                                                    <th className="px-8 py-6">{t.table.refId}</th>
-                                                    <th className="px-8 py-6">{t.table.amount} (RM)</th>
-                                                    <th className="px-8 py-6">{t.table.status}</th>
-                                                    <th className="px-8 py-6">{t.table.date}</th>
-                                                    <th className="px-8 py-6 text-right min-w-[200px]">{t.table.actions}</th>
+                                                    <th className="px-6 py-4">{t.table.user}</th>
+                                                    <th className="px-6 py-4">{t.table.refId}</th>
+                                                    <th className="px-6 py-4">{t.table.amount} (RM)</th>
+                                                    <th className="px-6 py-4">{t.table.status}</th>
+                                                    <th className="px-6 py-4">{t.table.date}</th>
+                                                    <th className="px-6 py-4 text-right min-w-[150px]">{t.table.actions}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
@@ -1672,20 +1675,20 @@ export default function AdminPortal() {
                                                     const matchesStatus = depositStatusFilter === "All" || d.status === depositStatusFilter;
                                                     return matchesSearch && matchesStatus;
                                                 }).map((d: any) => (
-                                                    <tr key={d.id} className="text-sm font-bold group hover:bg-white/[0.01]">
-                                                        <td className="px-8 py-6">
+                                                    <tr key={d.id} className="text-xs font-bold group hover:bg-white/[0.01]">
+                                                        <td className="px-6 py-4">
                                                             <div className="flex flex-col">
-                                                                <span className="text-white font-black">{d.profiles?.full_name || d.profiles?.email || 'N/A'}</span>
-                                                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{d.profiles?.email}</span>
+                                                                <span className="text-white font-black uppercase tracking-tight">{d.profiles?.full_name || d.profiles?.email || 'N/A'}</span>
+                                                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{d.profiles?.email}</span>
                                                             </div>
                                                         </td>
-                                                        <td className="px-8 py-4 font-mono text-xs opacity-50">{d.ref_id}</td>
-                                                        <td className="px-8 py-6 font-bold text-emerald-400">
+                                                        <td className="px-6 py-3 font-mono text-[10px] opacity-50">{d.ref_id}</td>
+                                                        <td className="px-6 py-4 font-bold text-emerald-400">
                                                             RM {Number(d.amount || 0).toFixed(2)}
-                                                            <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(d.amount || 0) / forexRate).toFixed(2)})</span>
+                                                            <span className="text-[10px] text-zinc-500 ml-1.5 font-medium">(${(Number(d.amount || 0) / forexRate).toFixed(2)})</span>
                                                         </td>
-                                                        <td className="px-8 py-6">
-                                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                                        <td className="px-6 py-4">
+                                                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
                                                                 d.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-500' :
                                                                 d.status === 'Rejected' ? 'bg-red-500/20 text-red-500' :
                                                                 'bg-amber-500/20 text-amber-500'
@@ -1693,21 +1696,21 @@ export default function AdminPortal() {
                                                                 {d.status}
                                                             </span>
                                                         </td>
-                                                        <td className="px-8 py-6 text-zinc-400 font-mono text-xs whitespace-nowrap">
+                                                        <td className="px-6 py-4 text-zinc-400 font-mono text-[10px] whitespace-nowrap">
                                                             {d.created_at ? new Date(d.created_at).toLocaleString() : "N/A"}
                                                         </td>
-                                                        <td className="px-8 py-6 text-right flex items-center justify-end gap-3">
+                                                        <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
                                                             {d.status === 'Pending' && (
                                                                 <>
                                                                     <button 
                                                                         onClick={() => handleRejectDeposit(d)}
-                                                                        className="text-red-500 hover:text-red-400 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase transition-all"
+                                                                        className="text-red-500 hover:bg-red-500/10 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase transition-all"
                                                                     >
                                                                         Reject
                                                                     </button>
                                                                     <button 
                                                                         onClick={() => handleApproveDeposit(d)}
-                                                                        className="bg-emerald-500 text-black px-4 py-1.5 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all"
+                                                                        className="bg-emerald-500 text-black px-4 py-1.5 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all"
                                                                     >
                                                                         Approve
                                                                     </button>
@@ -1715,7 +1718,7 @@ export default function AdminPortal() {
                                                             )}
                                                             <button 
                                                                 onClick={() => { setSelectedDepositTx(d); setIsDepositDrawerOpen(true); }}
-                                                                className="text-[10px] font-black uppercase text-gv-gold hover:underline"
+                                                                className="text-[9px] font-black uppercase text-gv-gold hover:underline"
                                                             >
                                                                 Details
                                                             </button>
@@ -1780,13 +1783,13 @@ export default function AdminPortal() {
 
                                     <div className="overflow-hidden border border-white/5 rounded-3xl">
                                         <table className="w-full text-left">
-                                            <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                            <thead className="bg-white/5 border-b border-white/10 text-[9px] font-black uppercase tracking-widest text-zinc-500">
                                                 <tr>
-                                                    <th className="px-8 py-4">{t.audit.dateTime}</th>
-                                                    <th className="px-8 py-4">{t.audit.admin}</th>
-                                                    <th className="px-8 py-4">{t.audit.targetUser}</th>
-                                                    <th className="px-8 py-4">{t.audit.action}</th>
-                                                    <th className="px-8 py-4">{t.audit.reason}</th>
+                                                    <th className="px-6 py-4">{t.audit.dateTime}</th>
+                                                    <th className="px-6 py-4">{t.audit.admin}</th>
+                                                    <th className="px-6 py-4">{t.audit.targetUser}</th>
+                                                    <th className="px-6 py-4">{t.audit.action}</th>
+                                                    <th className="px-6 py-4">{t.audit.reason}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
@@ -1804,24 +1807,24 @@ export default function AdminPortal() {
                                                         const targetUser = users.find(u => u.email === log.user_email);
                                                         return (
                                                             <tr key={i} className="text-xs font-bold hover:bg-white/[0.01] transition-colors">
-                                                                <td className="px-8 py-4 text-zinc-400 font-mono">{new Date(log.created_at).toLocaleString()}</td>
-                                                                <td className="px-8 py-4 text-white">
+                                                                <td className="px-6 py-3 text-zinc-400 font-mono text-[10px]">{new Date(log.created_at).toLocaleString()}</td>
+                                                                <td className="px-6 py-3 text-white">
                                                                     <div className="flex flex-col">
-                                                                        <span>{log.admin_username}</span>
+                                                                        <span className="uppercase tracking-tight">{log.admin_username}</span>
                                                                     </div>
                                                                 </td>
-                                                                <td className="px-8 py-4">
+                                                                <td className="px-6 py-3">
                                                                     <div className="flex flex-col">
-                                                                        <span className="text-white font-black">{targetUser?.full_name || "New Client"}</span>
-                                                                        <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{log.user_email}</span>
+                                                                        <span className="text-white font-black uppercase tracking-tight">{targetUser?.full_name || "New Client"}</span>
+                                                                        <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{log.user_email}</span>
                                                                     </div>
                                                                 </td>
-                                                                <td className="px-8 py-4">
-                                                                    <span className={`px-2 py-1 rounded-md text-[9px] uppercase font-black ${log.action === 'Verified' ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"}`}>
+                                                                <td className="px-6 py-3">
+                                                                    <span className={`px-2 py-0.5 rounded-md text-[8px] uppercase font-black ${log.action === 'Verified' ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"}`}>
                                                                         {log.action}
                                                                     </span>
                                                                 </td>
-                                                                <td className="px-8 py-4 text-zinc-500 italic max-w-xs truncate overflow-hidden" title={log.rejection_reason}>
+                                                                <td className="px-6 py-3 text-zinc-500 italic max-w-xs truncate overflow-hidden text-[10px]" title={log.rejection_reason}>
                                                                     {log.rejection_reason || "-"}
                                                                 </td>
                                                             </tr>

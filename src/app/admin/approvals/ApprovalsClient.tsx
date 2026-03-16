@@ -156,8 +156,8 @@ export default function ApprovalsClient() {
             <header className="max-w-7xl mx-auto mb-12 flex justify-between items-end">
                 <div>
                     <Link href="/admin" className="text-zinc-600 hover:text-white transition-colors text-xs font-black uppercase tracking-widest mb-4 inline-block">← Back to Master Control</Link>
-                    <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Approval Center</h1>
-                    <p className="text-gv-gold text-xs font-black tracking-widest uppercase mt-2">Manage pending deposits & dividend payouts</p>
+                    <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Approval Center</h1>
+                    <p className="text-gv-gold text-[10px] font-black tracking-widest uppercase mt-1">Manage pending deposits & dividend payouts</p>
                 </div>
 
                 <div className="flex gap-4">
@@ -183,31 +183,31 @@ export default function ApprovalsClient() {
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-[#1a1a1a] text-[10px] font-black uppercase tracking-widest text-zinc-500 border-b border-white/5">
                                 <tr>
-                                     <th className="px-8 py-6">Client Details</th>
-                                     <th className="px-8 py-6">Reference ID</th>
-                                     <th className="px-8 py-6">Amount (RM)</th>
-                                     <th className="px-8 py-6">Status</th>
-                                     <th className="px-8 py-6">Date</th>
-                                     <th className="px-8 py-6">Receipt</th>
-                                     <th className="px-8 py-6 text-right">Action</th>
+                                     <th className="px-4 py-4">Client Details</th>
+                                     <th className="px-4 py-4">Reference ID</th>
+                                     <th className="px-4 py-4">Amount (RM)</th>
+                                     <th className="px-4 py-4">Status</th>
+                                     <th className="px-4 py-4">Date</th>
+                                     <th className="px-4 py-4">Receipt</th>
+                                     <th className="px-4 py-4 text-right">Action</th>
                                  </tr>
                              </thead>
                              <tbody className="divide-y divide-white/[0.03]">
                                  {pendingDeposits.map((tx) => (
-                                     <tr key={tx.id} className="text-sm font-bold hover:bg-white/[0.01] transition-colors border-b border-white/[0.02]">
-                                         <td className="px-8 py-6">
-                                             <div className="text-white mb-1 uppercase tracking-tight">{tx.profiles?.full_name || tx.profiles?.email || "Unknown"}</div>
-                                             <div className="text-[10px] text-zinc-600 lowercase font-medium">{tx.profiles?.email}</div>
+                                     <tr key={tx.id} className="text-xs font-bold hover:bg-white/[0.01] transition-colors border-b border-white/[0.02]">
+                                         <td className="px-4 py-4">
+                                             <div className="text-white mb-0.5 uppercase tracking-tight">{tx.profiles?.full_name || tx.profiles?.email || "Unknown"}</div>
+                                             <div className="text-[9px] text-zinc-600 lowercase font-medium">{tx.profiles?.email}</div>
                                          </td>
-                                         <td className="px-8 py-6">
-                                             <span className="font-mono text-xs text-zinc-500">{tx.ref_id}</span>
+                                         <td className="px-4 py-4">
+                                             <span className="font-mono text-[10px] text-zinc-500">{tx.ref_id}</span>
                                          </td>
-                                          <td className="px-8 py-6 font-bold text-emerald-400">
+                                          <td className="px-4 py-4 font-bold text-emerald-400">
                                                RM {Number(tx.amount || 0).toFixed(2)}
-                                               <span className="text-xs text-zinc-500 ml-2 font-medium">(${(Number(tx.amount || 0) / forexRate).toFixed(2)})</span>
+                                               <span className="text-[10px] text-zinc-500 ml-1.5 font-medium">(${(Number(tx.amount || 0) / forexRate).toFixed(2)})</span>
                                           </td>
-                                         <td className="px-8 py-6">
-                                             <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                         <td className="px-4 py-4">
+                                             <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
                                                  tx.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-500' :
                                                  tx.status === 'Rejected' ? 'bg-red-500/20 text-red-500' :
                                                  'bg-amber-500/20 text-amber-500'
@@ -215,30 +215,30 @@ export default function ApprovalsClient() {
                                                  { (tx.status === 'Approved' || tx.status === 'Rejected') ? tx.status : 'Pending' }
                                              </span>
                                          </td>
-                                         <td className="px-8 py-6 text-zinc-400 font-mono text-xs whitespace-nowrap">
+                                         <td className="px-4 py-4 text-zinc-400 font-mono text-[10px] whitespace-nowrap">
                                              {tx.created_at ? new Date(tx.created_at).toLocaleString() : "N/A"}
                                          </td>
-                                         <td className="px-8 py-6">
+                                         <td className="px-4 py-4">
                                              <button
                                                  onClick={() => setViewingReceipt(tx.receipt_url)}
-                                                 className="bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-black uppercase px-4 py-2 rounded-xl transition-all flex items-center gap-2"
+                                                 className="bg-white/5 hover:bg-white/10 border border-white/10 text-[9px] font-black uppercase px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5"
                                              >
-                                                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                  View Slip
                                              </button>
                                          </td>
-                                         <td className="px-8 py-6 text-right">
+                                         <td className="px-4 py-4 text-right">
                                             {tx.status === 'Pending' && (
-                                                <div className="flex justify-end gap-3">
+                                                <div className="flex justify-end gap-2">
                                                     <button
                                                         onClick={() => handleReject(tx)}
-                                                        className="bg-white/5 hover:bg-red-500/10 text-red-500 border border-white/10 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all"
+                                                        className="bg-white/5 hover:bg-red-500/10 text-red-500 border border-white/10 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all"
                                                     >
                                                         Reject
                                                     </button>
                                                     <button
                                                         onClick={() => handleApprove(tx)}
-                                                        className="bg-gv-gold hover:bg-gv-gold/90 text-black px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-gv-gold/10 active:scale-95 transition-all"
+                                                        className="bg-gv-gold hover:bg-gv-gold/90 text-black px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-gv-gold/10 active:scale-95 transition-all"
                                                     >
                                                         Approve
                                                     </button>
