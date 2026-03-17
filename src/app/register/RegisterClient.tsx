@@ -23,6 +23,7 @@ export default function RegisterPage() {
     const [isReferralValid, setIsReferralValid] = useState(false); // Default to false as it's required
     const [isValidatingReferral, setIsValidatingReferral] = useState(false);
     const [referralCheckMsg, setReferralCheckMsg] = useState("");
+    const [securityPin, setSecurityPin] = useState("");
     const [ownUsername, setOwnUsername] = useState("");
     const [isUsernameValid, setIsUsernameValid] = useState(false);
     const [isValidatingUsername, setIsValidatingUsername] = useState(false);
@@ -138,6 +139,8 @@ export default function RegisterPage() {
         referralInvalid: string;
         pdpaNote: string;
         agreementBody: string;
+        securityPinLabel: string;
+        securityPinPlaceholder: string;
     }
 
     const content: Record<"en" | "zh", ContentItem> = {
@@ -175,7 +178,9 @@ export default function RegisterPage() {
                 3. REPRESENTATIONS: The Client represents that they are an accredited investor with the financial knowledge to evaluate the risks and merits of private investments. 
 
                 4. ASSET PROTECTION: GV Capital Trust employs rigorous risk management protocols and global diversification to mitigate asset volatility. 
-            `
+            `,
+            securityPinLabel: "Security PIN (6 Digits)",
+            securityPinPlaceholder: "Used for withdrawals"
         },
         zh: {
             title: "开通账户",
@@ -211,7 +216,9 @@ export default function RegisterPage() {
                 3. 陈述：客户陈述并保证他们是合格投资者，具备评估私人投资风险和优点的财务知识。
 
                 4. 资产保护：GV 资本信托采用严格的风险管理协议和全球化多元配置，以减轻资产波动。
-            `
+            `,
+            securityPinLabel: "安全密码 (6 位数字)",
+            securityPinPlaceholder: "用于提款验证"
         },
     };
 
@@ -260,7 +267,8 @@ export default function RegisterPage() {
                     profit: 0,
                     kyc_completed: false,
                     referred_by: resolvedReferralId,
-                    referred_by_username: inviterUsername || null
+                    referred_by_username: inviterUsername || null,
+                    security_pin: securityPin
                 };
 
                 const { error: profileError } = await supabase
@@ -368,6 +376,21 @@ export default function RegisterPage() {
                             placeholder={t.usernamePlaceholder}
                         />
                         {usernameCheckMsg && <p className="text-[10px] text-red-500 font-bold px-1 uppercase tracking-widest">{usernameCheckMsg}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                        <label htmlFor="security_pin" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.securityPinLabel}</label>
+                        <input
+                            id="security_pin"
+                            name="security_pin"
+                            type="password"
+                            required
+                            maxLength={6}
+                            value={securityPin}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSecurityPin(e.target.value.replace(/\D/g, ''))}
+                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
+                            placeholder={t.securityPinPlaceholder}
+                        />
                     </div>
 
                     <div className="space-y-2">

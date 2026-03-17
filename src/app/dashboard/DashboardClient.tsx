@@ -63,7 +63,6 @@ export default function DashboardClient() {
     const [kycIsLoading, setKycIsLoading] = useState(false);
     const [kycShowSuccess, setKycShowSuccess] = useState(false);
     const [isReuploading, setIsReuploading] = useState(false);
-    const [isOtpLoading, setIsOtpLoading] = useState(false);
 
     const fetchedRef = React.useRef<string | null>(null);
 
@@ -306,27 +305,7 @@ export default function DashboardClient() {
             return;
         }
 
-        handleSendOTP();
-    };
-
-    const handleSendOTP = async () => {
-        setIsOtpLoading(true);
-        try {
-            const response = await fetch('/api/otp/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user.id, email: user.email })
-            });
-            const data = await response.json();
-            if (data.error) throw new Error(data.error);
-
-            setIsPinModalOpen(true);
-            setActionToast({ message: "Security code sent to your email." });
-        } catch (err: any) {
-            alert("Failed to send security code: " + err.message);
-        } finally {
-            setIsOtpLoading(false);
-        }
+        setIsPinModalOpen(true);
     };
 
     const handleWithdrawConfirm = async () => {
@@ -337,24 +316,9 @@ export default function DashboardClient() {
         setIsSubmitting(true);
 
         try {
-            // 1. Verify OTP
-            const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('otp_code, otp_expires_at')
-                .eq('id', user.id)
-                .single();
-
-            if (profileError || !profile) throw new Error("Could not verify security code.");
-            
-            const now = new Date();
-            const expiry = new Date(profile.otp_expires_at);
-            
-            if (profile.otp_code !== withdrawPIN) {
-                throw new Error("Invalid security code. Please check your email and try again.");
-            }
-            
-            if (now > expiry) {
-                throw new Error("Security code has expired. Please request a new one.");
+            // 1. Verify Security PIN
+            if (user.security_pin !== withdrawPIN) {
+                throw new Error("Invalid security PIN. Please try again.");
             }
 
             // 2. Insert Transaction
@@ -374,9 +338,6 @@ export default function DashboardClient() {
             setIsWithdrawModalOpen(false);
             setWithdrawAmount("");
             setWithdrawPIN("");
-            
-            // Clear OTP after use
-            await supabase.from('profiles').update({ otp_code: null, otp_expires_at: null }).eq('id', user.id);
             
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
@@ -602,9 +563,9 @@ export default function DashboardClient() {
             history: "Transaction History",
             unverifiedBanner: "⚠️ Account Unverified. Access to Deposits, Withdrawals, and Trading is restricted.",
             verifyNow: "Verify Now",
-            securityPin: "Email Verification",
-            enterPin: "Enter the 6-digit security code sent to your registered email to authorize this withdrawal.",
-            confirmWithdraw: "Verify & Withdraw",
+            securityPin: "Withdrawal Security PIN",
+            enterPin: "Enter your 6-digit security PIN to authorize this request.",
+            confirmWithdraw: "Authorize Withdrawal",
             successTitle: "Submission Successful",
             successDesc: "Our team will review your request within 24 hours.",
             whatsapp: "Contact Support via WhatsApp",
@@ -728,9 +689,9 @@ export default function DashboardClient() {
             history: "交易历史",
             unverifiedBanner: "⚠️ 账户未核实。存款、取款和交易功能受限。",
             verifyNow: "立即核实",
-            securityPin: "邮件验证",
-            enterPin: "请输入发送到您注册邮箱的 6 位安全代码以授权此提款。",
-            confirmWithdraw: "验证并提款",
+            securityPin: "提款安全码",
+            enterPin: "请输入您的 6 位安全代码以授权此申请。",
+            confirmWithdraw: "授权提款",
             successTitle: "提交成功",
             successDesc: "我们的团队将在 24 小时内审核您的申请。",
             whatsapp: "通过 WhatsApp 联系支持",
@@ -883,7 +844,7 @@ export default function DashboardClient() {
                 </div>
             </aside>
 
-            {/* Mobile Sidebar (Slide-in) */}
+            {/* Mobile Drawer (Settings & Secondary Links) */}
             <div
                 className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
                     isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
@@ -891,83 +852,121 @@ export default function DashboardClient() {
                 onClick={() => setIsSidebarOpen(false)}
             />
             <aside
-                className={`fixed inset-y-0 left-0 z-[60] w-72 bg-[#0a0a0a] border-r border-white/10 p-6 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden ${
+                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#0a0a0a] border-r border-white/5 p-8 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden ${
                     isSidebarOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
                 <div className="space-y-12">
                     <div className="flex items-center justify-between">
-                        <img src="/logo.png" alt="GV Capital" className="h-[50px] w-auto object-contain mix-blend-screen" />
+                        <img src="/logo.png" alt="GV Capital" className="h-[40px] w-auto object-contain mix-blend-screen" />
                         <button
                             onClick={() => setIsSidebarOpen(false)}
-                            className="p-2 rounded-full border border-white/10 text-white"
+                            className="h-10 w-10 flex items-center justify-center rounded-full border border-white/10 text-zinc-500 hover:text-white transition-colors"
                         >
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
 
-                    <nav className="space-y-2">
-                        <button
-                            onClick={() => { setActiveTab("overview"); setIsSidebarOpen(false); }}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "overview" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                            {t.nav}
-                        </button>
-                        <button
-                            onClick={() => { setActiveTab("products"); setIsSidebarOpen(false); }}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "products" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                            {t.products}
-                        </button>
-                        <button
-                            onClick={() => { setActiveTab("statements"); setIsSidebarOpen(false); }}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "statements" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                            {t.statements}
-                        </button>
-                        <button
-                            onClick={() => { setActiveTab("profile"); setIsSidebarOpen(false); }}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "profile" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                            {t.profile}
-                        </button>
-                        <button
-                            onClick={() => { setActiveTab("security"); setIsSidebarOpen(false); }}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-left transition-all ${activeTab === "security" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            {t.securityTitle}
-                        </button>
-                    </nav>
+                    <div className="space-y-8">
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-4 px-2">Settings & Tools</p>
+                            <nav className="space-y-1">
+                                {[
+                                    { id: "statements", label: t.statements, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> },
+                                    { id: "referrals", label: t.referrals, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg> },
+                                    { id: "security", label: t.securityTitle, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg> },
+                                ].map((item) => (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => { setActiveTab(item.id as any); setIsSidebarOpen(false); }}
+                                        className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                                            activeTab === item.id ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white hover:bg-white/5"
+                                        }`}
+                                    >
+                                        {item.icon}
+                                        {item.label}
+                                    </button>
+                                ))}
+                            </nav>
+                        </div>
+
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-4 px-2">Support</p>
+                            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-white hover:bg-white/5 transition-all">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                                Contact Support
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div className="space-y-4 pt-4 border-t border-white/5">
-                    <button onClick={handleLogout} className="w-full text-zinc-500 hover:text-red-400 transition-colors text-sm font-medium flex items-center gap-3 px-4 py-2">
-                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
-                        {t.logout}
-                    </button>
+
+                <div className="space-y-6">
+                    <div className="p-6 bg-white/5 rounded-[32px] border border-white/5 space-y-4">
+                        <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-lg">
+                                {user?.fullName?.[0] || user?.email?.[0] || "U"}
+                            </div>
+                            <div>
+                                <p className="text-xs font-black text-white truncate w-32">{user?.fullName || "Member"}</p>
+                                <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{user?.tier || "Standard"}</p>
+                            </div>
+                        </div>
+                        <button onClick={handleLogout} className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
+                            {t.logout}
+                        </button>
+                    </div>
                 </div>
             </aside>
 
+            {/* Premium Bottom Navigation (Mobile Only) */}
+            <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-[#0a0a0a]/80 backdrop-blur-2xl border-t border-white/5 flex items-center justify-around px-2 md:hidden">
+                {[
+                    { id: "overview", label: "Home", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> },
+                    { id: "products", label: "Trade", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> },
+                    { id: "transactions", label: "Activity", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> },
+                    { id: "profile", label: "Account", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
+                ].map((item) => (
+                    <button
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id as any)}
+                        className={`group relative flex flex-col items-center justify-center w-16 h-16 transition-all duration-300 ${
+                            activeTab === item.id ? "text-gv-gold" : "text-zinc-500"
+                        }`}
+                    >
+                        {activeTab === item.id && (
+                            <div className="absolute -top-px left-1/2 -translate-x-1/2 w-8 h-0.5 bg-gv-gold shadow-[0_0_15px_rgba(201,168,76,0.8)] rounded-full"></div>
+                        )}
+                        <span className={`transition-transform duration-300 ${activeTab === item.id ? "scale-110 -translate-y-1" : "group-hover:scale-110"}`}>
+                            {item.icon}
+                        </span>
+                        <span className={`text-[8px] font-black uppercase tracking-widest mt-1 transition-all duration-300 ${activeTab === item.id ? "opacity-100" : "opacity-0"}`}>
+                            {item.label}
+                        </span>
+                    </button>
+                ))}
+                <button
+                    onClick={() => setIsSidebarOpen(true)}
+                    className={`flex flex-col items-center justify-center w-16 h-16 text-zinc-500`}
+                >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    <span className="text-[8px] font-black uppercase tracking-widest mt-1">Menu</span>
+                </button>
+            </nav>
+
             <main className="flex-1 overflow-y-auto bg-[#121212] relative flex flex-col">
-                <div className="flex items-center justify-between p-4 border-b border-white/5 md:hidden bg-[#0a0a0a]">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setIsSidebarOpen(true)}
-                            className="p-2 rounded-xl bg-white/5 border border-white/10 text-white"
-                        >
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
-                        </button>
-                        <img src="/logo.png" alt="GV" className="h-8 w-auto mix-blend-screen" />
+                <div className="flex items-center justify-between px-6 py-6 border-b border-white/5 md:hidden bg-[#0a0a0a]">
+                    <img src="/logo.png" alt="GV Capital" className="h-8 w-auto mix-blend-screen" />
+                    <div className="flex items-center gap-4">
+                        {user && <NotificationBell userId={user.id} lang={lang} />}
+                        <div className="h-10 w-10 rounded-xl bg-gv-gold flex items-center justify-center font-black text-black shadow-lg">
+                            {user?.fullName?.[0] || "U"}
+                        </div>
                     </div>
-                    {user && <NotificationBell userId={user.id} lang={lang} />}
                 </div>
 
                 <CurrencyExchangeTicker />
-                <div className="max-w-7xl mx-auto w-full space-y-12 flex-1 pb-20 p-6 md:p-12">
+                <div className="max-w-7xl mx-auto w-full space-y-12 flex-1 pb-32 p-4 sm:p-6 md:p-12">
                     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
                         <div>
                             <p className="text-zinc-500 text-[10px] sm:text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
@@ -1567,8 +1566,8 @@ export default function DashboardClient() {
                                         </h4>
                                         <p className="text-zinc-400 text-xs font-medium leading-relaxed">
                                             {lang === 'en' 
-                                                ? "Withdrawals are secured by Email OTP (One-Time Password). A unique code will be sent to your registered email address for every withdrawal request."
-                                                : "提款由电子邮件 OTP（一次性密码）保护。每次提款申请都会向您的注册邮箱发送唯一代码。"}
+                                                ? "Withdrawals are secured by your unique 6-digit Security PIN established during account registration."
+                                                : "提款由您在开户时设置的唯一 6 位安全密码保护。"}
                                         </p>
                                     </div>
 
@@ -1704,10 +1703,10 @@ export default function DashboardClient() {
                             </div>
                              <button 
                                 onClick={() => handleWithdrawInitiate()} 
-                                disabled={!withdrawAmount || isOtpLoading} 
+                                disabled={!withdrawAmount} 
                                 className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:bg-gv-gold hover:border-gv-gold"
                             >
-                                {isOtpLoading ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.requestWithdraw}
+                                {t.requestWithdraw}
                             </button>
                         </div>
                     </div>
@@ -1743,14 +1742,6 @@ export default function DashboardClient() {
                                 className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:-translate-y-1"
                             >
                                 {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.confirmWithdraw}
-                            </button>
-                            
-                            <button 
-                                onClick={handleSendOTP}
-                                disabled={isOtpLoading || isSubmitting}
-                                className="text-gv-gold font-black text-[10px] uppercase tracking-widest hover:underline disabled:opacity-50"
-                            >
-                                {isOtpLoading ? "Sending..." : "Resend Security Code"}
                             </button>
                             
                             <button onClick={() => setIsPinModalOpen(false)} className="w-full text-zinc-600 font-bold hover:text-white transition-colors uppercase tracking-widest text-[10px]">
