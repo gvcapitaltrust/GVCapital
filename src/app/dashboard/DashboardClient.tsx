@@ -63,6 +63,7 @@ export default function DashboardClient() {
     const [kycIsLoading, setKycIsLoading] = useState(false);
     const [kycShowSuccess, setKycShowSuccess] = useState(false);
     const [isReuploading, setIsReuploading] = useState(false);
+    const [isOtpLoading, setIsOtpLoading] = useState(false);
 
     const fetchedRef = React.useRef<string | null>(null);
 
@@ -305,7 +306,27 @@ export default function DashboardClient() {
             return;
         }
 
-        setIsPinModalOpen(true);
+        handleSendOTP();
+    };
+
+    const handleSendOTP = async () => {
+        setIsOtpLoading(true);
+        try {
+            const response = await fetch('/api/otp/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id, email: user.email })
+            });
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+
+            setIsPinModalOpen(true);
+            setActionToast({ message: "Security code sent to your email." });
+        } catch (err: any) {
+            alert("Failed to send security code: " + err.message);
+        } finally {
+            setIsOtpLoading(false);
+        }
     };
 
     const handleWithdrawConfirm = async () => {
@@ -316,6 +337,27 @@ export default function DashboardClient() {
         setIsSubmitting(true);
 
         try {
+            // 1. Verify OTP
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('otp_code, otp_expires_at')
+                .eq('id', user.id)
+                .single();
+
+            if (profileError || !profile) throw new Error("Could not verify security code.");
+            
+            const now = new Date();
+            const expiry = new Date(profile.otp_expires_at);
+            
+            if (profile.otp_code !== withdrawPIN) {
+                throw new Error("Invalid security code. Please check your email and try again.");
+            }
+            
+            if (now > expiry) {
+                throw new Error("Security code has expired. Please request a new one.");
+            }
+
+            // 2. Insert Transaction
             const { error } = await supabase
                 .from('transactions')
                 .insert([{
@@ -332,6 +374,10 @@ export default function DashboardClient() {
             setIsWithdrawModalOpen(false);
             setWithdrawAmount("");
             setWithdrawPIN("");
+            
+            // Clear OTP after use
+            await supabase.from('profiles').update({ otp_code: null, otp_expires_at: null }).eq('id', user.id);
+            
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
 
@@ -556,9 +602,9 @@ export default function DashboardClient() {
             history: "Transaction History",
             unverifiedBanner: "⚠️ Account Unverified. Access to Deposits, Withdrawals, and Trading is restricted.",
             verifyNow: "Verify Now",
-            securityPin: "Withdrawal Security PIN",
-            enterPin: "Enter your 6-digit withdrawal PIN to authorize this request.",
-            confirmWithdraw: "Authorize Withdrawal",
+            securityPin: "Email Verification",
+            enterPin: "Enter the 6-digit security code sent to your registered email to authorize this withdrawal.",
+            confirmWithdraw: "Verify & Withdraw",
             successTitle: "Submission Successful",
             successDesc: "Our team will review your request within 24 hours.",
             whatsapp: "Contact Support via WhatsApp",
@@ -682,9 +728,9 @@ export default function DashboardClient() {
             history: "交易历史",
             unverifiedBanner: "⚠️ 账户未核实。存款、取款和交易功能受限。",
             verifyNow: "立即核实",
-            securityPin: "取款安全密码",
-            enterPin: "请输入您的 6 位取款密码以授权此申请。",
-            confirmWithdraw: "授权提款",
+            securityPin: "邮件验证",
+            enterPin: "请输入发送到您注册邮箱的 6 位安全代码以授权此提款。",
+            confirmWithdraw: "验证并提款",
             successTitle: "提交成功",
             successDesc: "我们的团队将在 24 小时内审核您的申请。",
             whatsapp: "通过 WhatsApp 联系支持",
@@ -1514,6 +1560,18 @@ export default function DashboardClient() {
                             <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                 <div className="relative z-10 max-w-xl text-left space-y-10">
+                                    <div className="mb-10 p-6 bg-gv-gold/10 border border-gv-gold/20 rounded-3xl">
+                                        <h4 className="text-gv-gold font-black uppercase text-xs tracking-widest mb-2 flex items-center gap-2">
+                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A3.323 3.323 0 0010.605 7.88a3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651" /></svg>
+                                            Active Protection
+                                        </h4>
+                                        <p className="text-zinc-400 text-xs font-medium leading-relaxed">
+                                            {lang === 'en' 
+                                                ? "Withdrawals are secured by Email OTP (One-Time Password). A unique code will be sent to your registered email address for every withdrawal request."
+                                                : "提款由电子邮件 OTP（一次性密码）保护。每次提款申请都会向您的注册邮箱发送唯一代码。"}
+                                        </p>
+                                    </div>
+
                                     <div>
                                         <h2 className="text-3xl font-black uppercase tracking-tighter mb-2 text-white">{t.securityTitle}</h2>
                                         <p className="text-zinc-500 font-medium">{t.securitySubtitle}</p>
@@ -1644,8 +1702,12 @@ export default function DashboardClient() {
                                     );
                                 })()}
                             </div>
-                             <button onClick={() => handleWithdrawInitiate()} disabled={!withdrawAmount} className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50">
-                                {t.requestWithdraw}
+                             <button 
+                                onClick={() => handleWithdrawInitiate()} 
+                                disabled={!withdrawAmount || isOtpLoading} 
+                                className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:bg-gv-gold hover:border-gv-gold"
+                            >
+                                {isOtpLoading ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.requestWithdraw}
                             </button>
                         </div>
                     </div>
@@ -1665,19 +1727,33 @@ export default function DashboardClient() {
                         </div>
                         <div className="flex justify-center gap-3">
                             <input
-                                type="password"
+                                type="text"
                                 maxLength={6}
                                 value={withdrawPIN}
                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[1em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold"
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold"
                                 autoFocus
+                                placeholder="000000"
                             />
                         </div>
                         <div className="space-y-4">
-                            <button onClick={handleWithdrawConfirm} disabled={isSubmitting || withdrawPIN.length !== 6} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50">
+                            <button 
+                                onClick={handleWithdrawConfirm} 
+                                disabled={isSubmitting || withdrawPIN.length !== 6} 
+                                className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:-translate-y-1"
+                            >
                                 {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.confirmWithdraw}
                             </button>
-                            <button onClick={() => setIsPinModalOpen(false)} className="text-zinc-600 font-bold hover:text-white transition-colors uppercase tracking-widest text-xs">
+                            
+                            <button 
+                                onClick={handleSendOTP}
+                                disabled={isOtpLoading || isSubmitting}
+                                className="text-gv-gold font-black text-[10px] uppercase tracking-widest hover:underline disabled:opacity-50"
+                            >
+                                {isOtpLoading ? "Sending..." : "Resend Security Code"}
+                            </button>
+                            
+                            <button onClick={() => setIsPinModalOpen(false)} className="w-full text-zinc-600 font-bold hover:text-white transition-colors uppercase tracking-widest text-[10px]">
                                 {t.cancelTx}
                             </button>
                         </div>
