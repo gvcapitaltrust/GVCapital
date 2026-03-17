@@ -109,6 +109,7 @@ export default function AdminPortal() {
     const [adjustmentType, setAdjustmentType] = useState<"balance" | "profit">("balance");
     const [adjustmentReason, setAdjustmentReason] = useState<string>("");
     const [isUpdatingBalance, setIsUpdatingBalance] = useState(false);
+    const [combinedAuditLogs, setCombinedAuditLogs] = useState<any[]>([]);
     const [isUpdatingPortfolio, setIsUpdatingPortfolio] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
     const [portfolioData, setPortfolioData] = useState({
@@ -480,6 +481,27 @@ export default function AdminPortal() {
             .from('verification_logs')
             .select('*')
             .order('created_at', { ascending: false });
+        
+        // Merge verification logs with Bonus transactions for a unified audit trail
+        const bonusTxs = txList?.filter((t: any) => t.type?.toLowerCase() === 'bonus') || [];
+        const mergedLogs = [
+            ...(logs || []).map(l => ({ ...l, auditType: 'verification' })),
+            ...bonusTxs.map(t => ({
+                id: t.id,
+                created_at: t.created_at,
+                admin_username: t.metadata?.processed_by_name || 'Admin',
+                user_email: t.profiles?.email || 'Unknown',
+                action: 'Adjustment',
+                processed_by_name: t.metadata?.processed_by_name,
+                processed_by_email: t.metadata?.processed_by_email,
+                rejection_reason: t.metadata?.reason || t.metadata?.description || 'Wallet adjustment',
+                auditType: 'transaction',
+                amount: t.amount,
+                txType: t.type
+            }))
+        ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+        setCombinedAuditLogs(mergedLogs);
         if (logs) setVerificationLogs(logs);
     };
 
@@ -1879,6 +1901,7 @@ export default function AdminPortal() {
                                                 <option value="All">All Actions</option>
                                                 <option value="Verified">Verified Only</option>
                                                 <option value="Rejected">Rejected Only</option>
+                                                <option value="Adjustment">Adjustments Only</option>
                                             </select>
 
                                             <button onClick={fetchData} className="text-zinc-500 hover:text-gv-gold transition-colors p-2">
@@ -1900,14 +1923,16 @@ export default function AdminPortal() {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
-                                                {verificationLogs
+                                                {combinedAuditLogs
                                                     .filter(log => {
                                                         const query = auditSearchQuery.toLowerCase();
-                                                        const targetUser = users.find(u => u.email === log.user_email);
                                                         const matchesSearch = log.user_email?.toLowerCase().includes(query) || 
                                                                             log.admin_username?.toLowerCase().includes(query) ||
-                                                                            (targetUser?.full_name || "").toLowerCase().includes(query);
-                                                        const matchesFilter = auditStatusFilter === "All" || log.action === auditStatusFilter;
+                                                                            (log.processed_by_name || "").toLowerCase().includes(query);
+                                                        const matchesFilter = auditStatusFilter === "All" || 
+                                                                             (auditStatusFilter === "Verified" && log.action === "Verified") ||
+                                                                             (auditStatusFilter === "Rejected" && log.action === "Rejected") ||
+                                                                             (auditStatusFilter === "Adjustment" && log.action === "Adjustment");
                                                         return matchesSearch && matchesFilter;
                                                     })
                                                     .map((log: any, i: number) => {
@@ -1922,13 +1947,18 @@ export default function AdminPortal() {
                                                                 </td>
                                                                 <td className="px-6 py-3">
                                                                     <div className="flex flex-col">
-                                                                        <span className="text-white font-black uppercase tracking-tight">{targetUser?.full_name || "New Client"}</span>
+                                                                        <span className="text-white font-black uppercase tracking-tight">{targetUser?.full_name || "Client"}</span>
                                                                         <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">{log.user_email}</span>
                                                                     </div>
                                                                 </td>
                                                                 <td className="px-6 py-3">
-                                                                    <span className={`px-2 py-0.5 rounded-md text-[8px] uppercase font-black ${log.action === 'Verified' ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"}`}>
+                                                                    <span className={`px-2 py-0.5 rounded-md text-[8px] uppercase font-black ${
+                                                                        log.action === 'Verified' ? "bg-emerald-500/10 text-emerald-500" : 
+                                                                        log.action === 'Adjustment' ? "bg-gv-gold/10 text-gv-gold" :
+                                                                        "bg-red-500/10 text-red-500"
+                                                                    }`}>
                                                                         {log.action}
+                                                                        {log.amount && ` (RM ${Number(log.amount).toFixed(2)})`}
                                                                     </span>
                                                                 </td>
                                                                 <td className="px-6 py-3">
@@ -1948,24 +1978,22 @@ export default function AdminPortal() {
                                                                         )}
                                                                     </div>
                                                                 </td>
-                                                                <td className="px-6 py-3 text-zinc-500 italic max-w-xs truncate overflow-hidden text-[10px]" title={log.rejection_reason}>
-                                                                    {log.rejection_reason || "-"}
+                                                                <td className="px-6 py-3 text-zinc-500 italic max-w-xs truncate overflow-hidden text-[10px]" title={log.rejection_reason || log.reason}>
+                                                                    {log.rejection_reason || log.reason || "-"}
                                                                 </td>
                                                             </tr>
                                                         );
                                                     })}
-                                                {verificationLogs.filter(log => {
+                                                {combinedAuditLogs.filter(log => {
                                                     const query = auditSearchQuery.toLowerCase();
-                                                    const targetUser = users.find(u => u.email === log.user_email);
                                                     const matchesSearch = log.user_email?.toLowerCase().includes(query) || 
-                                                                        log.admin_username?.toLowerCase().includes(query) ||
-                                                                        (targetUser?.full_name || "").toLowerCase().includes(query);
+                                                                        log.admin_username?.toLowerCase().includes(query);
                                                     const matchesFilter = auditStatusFilter === "All" || log.action === auditStatusFilter;
                                                     return matchesSearch && matchesFilter;
                                                 }).length === 0 && (
                                                     <tr>
-                                                        <td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">
-                                                            {verificationLogs.length === 0 ? "No audit logs found" : "No logs found for this search"}
+                                                        <td colSpan={6} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">
+                                                            {combinedAuditLogs.length === 0 ? "No audit logs found" : "No logs found for this search"}
                                                         </td>
                                                     </tr>
                                                 )}

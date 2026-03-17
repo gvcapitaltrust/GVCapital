@@ -1149,19 +1149,38 @@ export default function DashboardClient() {
                                             </div>
                                         </div>
                                         <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] flex flex-col justify-center items-center text-center space-y-6">
-                                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{t.latestDeposit}</p>
-                                            {transactions.find((t: any) => t.type === 'Deposit') ? (
+                                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{t.latestActivity || "Latest Activity"}</p>
+                                            {transactions.length > 0 ? (
                                                 <>
-                                                    <div className={`h-24 w-24 rounded-full flex items-center justify-center border-2 ${transactions.find((t: any) => t.type === 'Deposit').status === 'Approved' ? 'border-emerald-500/20 text-emerald-500' : transactions.find((t: any) => t.type === 'Deposit').status === 'Rejected' ? 'border-red-500/20 text-red-500' : 'border-amber-500/20 text-amber-500'}`}>
-                                                        <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                    <div className={`h-24 w-24 rounded-full flex items-center justify-center border-2 ${
+                                                        transactions[0].type === 'Bonus' ? 'border-gv-gold/20 text-gv-gold' :
+                                                        transactions[0].status === 'Approved' ? 'border-emerald-500/20 text-emerald-500' : 
+                                                        transactions[0].status === 'Rejected' ? 'border-red-500/20 text-red-500' : 
+                                                        'border-amber-500/20 text-amber-500'
+                                                    }`}>
+                                                        {transactions[0].type === 'Bonus' ? (
+                                                            <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                        ) : (
+                                                            <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                        )}
                                                     </div>
                                                     <div>
-                                                        <h4 className={`text-2xl font-black uppercase tracking-tighter ${transactions.find((t: any) => t.type === 'Deposit').status === 'Approved' ? 'text-emerald-500' : transactions.find((t: any) => t.type === 'Deposit').status === 'Rejected' ? 'text-red-500' : 'text-amber-500'}`}>{transactions.find((t: any) => t.type === 'Deposit').status}</h4>
-                                                        <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1">{formatCurrency(transactions.find((t: any) => t.type === 'Deposit').amount)} Ref: {transactions.find((t: any) => t.type === 'Deposit').ref_id}</p>
+                                                        <h4 className={`text-2xl font-black uppercase tracking-tighter ${
+                                                            transactions[0].type === 'Bonus' ? 'text-gv-gold' :
+                                                            transactions[0].status === 'Approved' ? 'text-emerald-500' : 
+                                                            transactions[0].status === 'Rejected' ? 'text-red-500' : 
+                                                            'text-amber-500'
+                                                        }`}>
+                                                            {transactions[0].type === 'Bonus' ? 'Adjustment' : transactions[0].status}
+                                                        </h4>
+                                                        <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1">
+                                                            {transactions[0].type}: RM {Number(transactions[0].amount).toFixed(2)}
+                                                            {transactions[0].ref_id && ` Ref: ${transactions[0].ref_id}`}
+                                                        </p>
                                                     </div>
                                                 </>
                                             ) : (
-                                                <p className="text-zinc-700 font-black uppercase tracking-widest text-xs">{t.noDepositsFound}</p>
+                                                <p className="text-zinc-700 font-black uppercase tracking-widest text-xs">{t.noTxFound}</p>
                                             )}
                                         </div>
                                     </section>
