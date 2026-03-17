@@ -788,7 +788,7 @@ export default function AdminPortal() {
                 .from('transactions')
                 .insert({
                     user_id: selectedUser.id,
-                    type: 'Adjustment',
+                    type: 'Bonus',
                     amount: amount,
                     status: 'Approved',
                     ref_id: `ADJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
@@ -1618,7 +1618,7 @@ export default function AdminPortal() {
                                                                 const userTier = getTierByAmount(Number(u.balance || 0) / forexRate);
                                                                 return (
                                                                     <div className="flex flex-col items-center">
-                                                                        <TierMedal tierId={userTier.id} size="xs" />
+                                                                         <TierMedal tierId={userTier.id} size="sm" />
                                                                         <span className="px-1.5 py-0 rounded-full bg-gv-gold/10 text-gv-gold text-[7px] uppercase font-black border border-gv-gold/20">
                                                                             {userTier.name}
                                                                         </span>

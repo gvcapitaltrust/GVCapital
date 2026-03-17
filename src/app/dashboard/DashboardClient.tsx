@@ -969,97 +969,98 @@ export default function DashboardClient() {
                                 )
                             ) : (
                                 <>
-                                    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        {/* Total Wallet Amount */}
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                            <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors">{t.totalAssets}</p>
-                                            <div className="flex flex-col gap-2">
-                                                <h2 className="text-3xl font-black tracking-tighter">
-                                                    {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
-                                                </h2>
-                                                {!isCheckingAuth && user?.kyc_completed && (
-                                                    <p className="text-[10px] font-bold text-zinc-500">
-                                                        (${(Number(user?.total_assets || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
-                                                    </p>
-                                                )}
+                                    <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        {/* Card 1: Total Wallet & Total Dividend */}
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
+                                                <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                             </div>
-                                        </div>
-
-                                        {/* Total Investment */}
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest group-hover:text-zinc-400 transition-colors">{t.totalEquity}</p>
-                                            </div>
-                                            <div className="flex flex-col gap-2">
-                                                <h2 className="text-3xl font-black tracking-tighter text-gv-gold">
-                                                    {isCheckingAuth ? "..." : `RM ${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                                                </h2>
-                                                {!isCheckingAuth && (
-                                                    <div className="flex flex-col gap-1">
-                                                        <p className="text-[10px] font-bold text-zinc-500">
-                                                            (${(Number(user?.balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
-                                                        </p>
-                                                        <span className="text-[10px] font-black text-gv-gold/60 uppercase tracking-widest">{t.investmentNote}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Total Dividend */}
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest group-hover:text-zinc-400 transition-colors">{t.totalProfit}</p>
-                                            </div>
-                                            <div className="flex flex-col gap-2">
-                                                <h2 className="text-3xl font-black tracking-tighter text-emerald-500">
-                                                    {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                                                </h2>
-                                                {!isCheckingAuth && (
-                                                    <div className="flex flex-col gap-1">
-                                                        <p className="text-[10px] font-bold text-zinc-500">
-                                                            (${(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
-                                                        </p>
-                                                        <span className="text-[10px] font-black text-emerald-500/60 uppercase tracking-widest">{t.dividendNote}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Current Package */}
-                                        <div className="bg-gv-gold/5 border border-gv-gold/10 p-8 rounded-[40px] shadow-xl relative overflow-hidden group">
-                                            <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
-                                            <div className="flex justify-between items-center pr-4">
-                                                <div className="flex flex-col gap-1">
-                                                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                                                        {Number(user?.balance || 0) > 0 
-                                                            ? getTierByAmount(Number(user?.balance || 0) / forexRate).name 
-                                                            : t.noTier}
-                                                    </h2>
-                                                    <div className="flex items-center gap-2 mt-2">
-                                                        <div className={`h-2 w-2 rounded-full border border-black/20 ${Number(user?.balance || 0) > 0 ? 'bg-gv-gold animate-pulse' : 'bg-red-500'}`}></div>
-                                                        <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">
-                                                            {Number(user?.balance || 0) > 0 ? t.activeStatus : t.noTier}
-                                                        </span>
+                                            <div className="grid grid-cols-2 gap-8 relative z-10">
+                                                <div>
+                                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors">{t.totalAssets}</p>
+                                                    <div className="flex flex-col gap-2">
+                                                        <h2 className="text-3xl font-black tracking-tighter">
+                                                            {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
+                                                        </h2>
+                                                        {!isCheckingAuth && user?.kyc_completed && (
+                                                            <p className="text-[10px] font-bold text-zinc-500">
+                                                                (${(Number(user?.total_assets || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                                                            </p>
+                                                        )}
                                                     </div>
                                                 </div>
-                                                <TierMedal 
-                                                    tierId={Number(user?.balance || 0) > 0 
-                                                        ? getTierByAmount(Number(user?.balance || 0) / forexRate).id 
-                                                        : "none"} 
-                                                    size="md" 
-                                                    className="shrink-0" 
-                                                />
+                                                <div className="border-l border-white/5 pl-8">
+                                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors">{t.totalProfit}</p>
+                                                    <div className="flex flex-col gap-2">
+                                                        <h2 className="text-3xl font-black tracking-tighter text-emerald-500">
+                                                            {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                        </h2>
+                                                        {!isCheckingAuth && (
+                                                            <div className="flex flex-col gap-1">
+                                                                <p className="text-[10px] font-bold text-zinc-500">
+                                                                    (${(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                                                                </p>
+                                                                <span className="text-[10px] font-black text-emerald-500/60 uppercase tracking-widest">{t.dividendNote}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                                                <svg className="h-12 w-12 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                                                    <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-2.06 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946 2.06 3.42 3.42 0 012.219 4.438 3.42 3.42 0 00-2.06 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 002.06 1.946 3.42 3.42 0 01-2.219 4.438 3.42 3.42 0 00-1.946-2.06 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946 2.06 3.42 3.42 0 01-2.219-4.438 3.42 3.42 0 002.06-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00-2.06-1.946 3.42 3.42 0 012.219-4.438z" />
-                                                </svg>
+                                        </div>
+
+                                        {/* Card 2: Total Investment & Current Package */}
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
+                                                <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-8 relative z-10">
+                                                <div>
+                                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest group-hover:text-zinc-400 transition-colors">{t.totalEquity}</p>
+                                                    <div className="flex flex-col gap-2">
+                                                        <h2 className="text-3xl font-black tracking-tighter text-gv-gold">
+                                                            {isCheckingAuth ? "..." : `RM ${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                        </h2>
+                                                        {!isCheckingAuth && (
+                                                            <div className="flex flex-col gap-1">
+                                                                <p className="text-[10px] font-bold text-zinc-500">
+                                                                    (${(Number(user?.balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                                                                </p>
+                                                                <span className="text-[10px] font-black text-gv-gold/60 uppercase tracking-widest">{t.investmentNote}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="border-l border-white/5 pl-8">
+                                                    <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
+                                                    <div className="flex justify-between items-center group/tier">
+                                                        <div className="flex flex-col gap-1">
+                                                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
+                                                                {Number(user?.balance || 0) > 0 
+                                                                    ? getTierByAmount(Number(user?.balance || 0) / forexRate).name 
+                                                                    : t.noTier}
+                                                            </h2>
+                                                            <div className="flex items-center gap-2 mt-2">
+                                                                <div className={`h-2 w-2 rounded-full border border-black/20 ${Number(user?.balance || 0) > 0 ? 'bg-gv-gold animate-pulse' : 'bg-red-500'}`}></div>
+                                                                <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">
+                                                                    {Number(user?.balance || 0) > 0 ? t.activeStatus : t.noTier}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <TierMedal 
+                                                            tierId={Number(user?.balance || 0) > 0 
+                                                                ? getTierByAmount(Number(user?.balance || 0) / forexRate).id 
+                                                                : "none"} 
+                                                            size="md" 
+                                                            className="shrink-0 group-hover/tier:scale-110 transition-transform" 
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </section>
 
                                     <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
                                             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
                                                 <svg className="h-20 w-20 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                             </div>
@@ -1080,7 +1081,7 @@ export default function DashboardClient() {
                                                     : t.noTier} {t.returns}
                                             </p>
                                         </div>
-                                        <div className="bg-[#111] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
                                             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
                                                 <svg className="h-20 w-20 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                             </div>

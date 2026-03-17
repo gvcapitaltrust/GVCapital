@@ -15,7 +15,7 @@ export const TIERS: Tier[] = [
     name: "Basic",
     minAmount: 1,
     maxAmount: 999,
-    minDividend: 0.01,
+    minDividend: 0.03,
     maxDividend: 0.03,
     color: "zinc",
     benefits: ["Entry-level Access", "Standard Support", "Monthly Statements"],

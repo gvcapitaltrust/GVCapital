@@ -52,7 +52,9 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
 
       <div className="mb-6">
         <span className="text-3xl font-black text-white">
-          {(tier.minDividend * 100).toFixed(0)}-{(tier.maxDividend * 100).toFixed(0)}%
+          {tier.id === "basic" 
+            ? `min ${(tier.minDividend * 100).toFixed(0)}%` 
+            : `up to ${(tier.maxDividend * 100).toFixed(0)}%`}
         </span>
         <span className="text-[10px] font-bold text-zinc-500 ml-2 uppercase">Monthly</span>
       </div>
