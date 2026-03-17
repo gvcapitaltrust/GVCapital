@@ -482,11 +482,14 @@ export default function AdminPortal() {
             .select('*')
             .order('created_at', { ascending: false });
         
-        // Merge verification logs with Bonus transactions for a unified audit trail
-        const bonusTxs = txList?.filter((t: any) => t.type?.toLowerCase() === 'bonus') || [];
+        // Merge verification logs with Bonus/Dividend adjustments for a unified audit trail
+        const adjustmentTxs = txList?.filter((t: any) => 
+            t.type?.toLowerCase().includes('bonus') || 
+            t.type?.toLowerCase().includes('dividend')
+        ) || [];
         const mergedLogs = [
             ...(logs || []).map(l => ({ ...l, auditType: 'verification' })),
-            ...bonusTxs.map(t => ({
+            ...adjustmentTxs.map(t => ({
                 id: t.id,
                 created_at: t.created_at,
                 admin_username: t.metadata?.processed_by_name || 'Admin',
@@ -806,17 +809,18 @@ export default function AdminPortal() {
             if (profileError) throw profileError;
 
             // 2. Log Transaction
+            const txType = (type === 'balance' ? 'Bonus' : 'Dividend') + (amount >= 0 ? ' Increase' : ' Decrease');
             const { error: txError } = await supabase
                 .from('transactions')
                 .insert({
                     user_id: selectedUser.id,
-                    type: 'Bonus',
+                    type: txType,
                     amount: amount,
                     status: 'Approved',
                     ref_id: `ADJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
                     metadata: { 
                         reason: adjustmentReason,
-                        description: adjustmentReason || "Balance Adjustment",
+                        description: adjustmentReason || `${txType} Adjustment`,
                         processed_by_name: adminProfile?.full_name || adminProfile?.username || "Admin",
                         processed_by_id: adminProfile?.id,
                         processed_by_email: adminProfile?.email
@@ -1958,6 +1962,7 @@ export default function AdminPortal() {
                                                                         "bg-red-500/10 text-red-500"
                                                                     }`}>
                                                                         {log.action}
+                                                                        {log.txType ? ` - ${log.txType}` : ""}
                                                                         {log.amount && ` (RM ${Number(log.amount).toFixed(2)})`}
                                                                     </span>
                                                                 </td>

@@ -131,8 +131,9 @@ export default function DashboardClient() {
                 if (txs) {
                     setTransactions(txs);
                     setDividendHistory(txs.filter((t: any) => 
-                        t.type?.toLowerCase() === 'dividend' || 
-                        t.type?.toLowerCase() === 'bonus'
+                        (t.type?.toLowerCase().includes('dividend') || 
+                         t.type?.toLowerCase().includes('bonus')) &&
+                        t.status === 'Approved'
                     ).slice(0, 6).reverse());
                 }
 
@@ -182,8 +183,9 @@ export default function DashboardClient() {
                 if (txs) {
                     setTransactions(txs);
                     setDividendHistory(txs.filter((t: any) => 
-                        t.type?.toLowerCase() === 'dividend' || 
-                        t.type?.toLowerCase() === 'bonus'
+                        (t.type?.toLowerCase().includes('dividend') || 
+                         t.type?.toLowerCase().includes('bonus')) &&
+                        t.status === 'Approved'
                     ).slice(0, 6).reverse());
                 }
             })
@@ -401,7 +403,7 @@ export default function DashboardClient() {
             return txDate.getMonth() === targetMonth && txDate.getFullYear() === targetYear;
         });
         const periodProfit = periodTxs.filter((t: any) => 
-            (t.type?.toLowerCase() === 'dividend' || t.type?.toLowerCase() === 'bonus') && 
+            (t.type?.toLowerCase().includes('dividend') || t.type?.toLowerCase().includes('bonus')) && 
             t.status === 'Approved'
         ).reduce((acc: number, t: any) => acc + Number(t.amount), 0);
 
@@ -1153,12 +1155,12 @@ export default function DashboardClient() {
                                             {transactions.length > 0 ? (
                                                 <>
                                                     <div className={`h-24 w-24 rounded-full flex items-center justify-center border-2 ${
-                                                        transactions[0].type === 'Bonus' ? 'border-gv-gold/20 text-gv-gold' :
+                                                        (transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'border-gv-gold/20 text-gv-gold' :
                                                         transactions[0].status === 'Approved' ? 'border-emerald-500/20 text-emerald-500' : 
                                                         transactions[0].status === 'Rejected' ? 'border-red-500/20 text-red-500' : 
                                                         'border-amber-500/20 text-amber-500'
                                                     }`}>
-                                                        {transactions[0].type === 'Bonus' ? (
+                                                        {(transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? (
                                                             <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                         ) : (
                                                             <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -1166,12 +1168,12 @@ export default function DashboardClient() {
                                                     </div>
                                                     <div>
                                                         <h4 className={`text-2xl font-black uppercase tracking-tighter ${
-                                                            transactions[0].type === 'Bonus' ? 'text-gv-gold' :
+                                                            (transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'text-gv-gold' :
                                                             transactions[0].status === 'Approved' ? 'text-emerald-500' : 
                                                             transactions[0].status === 'Rejected' ? 'text-red-500' : 
                                                             'text-amber-500'
                                                         }`}>
-                                                            {transactions[0].type === 'Bonus' ? 'Adjustment' : transactions[0].status}
+                                                            {(transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'Adjustment' : transactions[0].status}
                                                         </h4>
                                                         <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1">
                                                             {transactions[0].type}: RM {Number(transactions[0].amount).toFixed(2)}

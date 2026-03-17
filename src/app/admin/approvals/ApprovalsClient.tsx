@@ -123,7 +123,7 @@ export default function ApprovalsClient() {
                     .from('transactions')
                     .insert({
                         user_id: user.id,
-                        type: 'Dividend',
+                        type: 'Dividend Increase',
                         amount: dividend,
                         status: 'Approved',
                         ref_id: `DIV-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`
