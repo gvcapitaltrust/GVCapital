@@ -50,13 +50,16 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
         <TierMedal tierId={tier.id} size="md" className="shrink-0" />
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 flex items-baseline gap-1.5">
         <span className="text-3xl font-black text-white">
+          <span className="text-xs font-black text-zinc-500 uppercase tracking-widest mr-1.5">
+            {tier.id === "basic" ? "min" : "up to"}
+          </span>
           {tier.id === "basic" 
-            ? `min ${(tier.minDividend * 100).toFixed(0)}%` 
-            : `up to ${(tier.maxDividend * 100).toFixed(0)}%`}
+            ? `${(tier.minDividend * 100).toFixed(0)}%` 
+            : `${(tier.maxDividend * 100).toFixed(0)}%`}
         </span>
-        <span className="text-[10px] font-bold text-zinc-500 ml-2 uppercase">Monthly</span>
+        <span className="text-[10px] font-bold text-zinc-500 ml-1 uppercase">Monthly</span>
       </div>
 
       <ul className="space-y-3 mb-8 flex-1">
