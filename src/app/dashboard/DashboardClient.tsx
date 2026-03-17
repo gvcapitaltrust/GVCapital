@@ -789,7 +789,7 @@ export default function DashboardClient() {
                         </button>
                         <button
                             onClick={() => setActiveTab("security")}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "security" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-left transition-all ${activeTab === "security" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             {t.securityTitle}
@@ -858,7 +858,7 @@ export default function DashboardClient() {
                         </button>
                         <button
                             onClick={() => { setActiveTab("security"); setIsSidebarOpen(false); }}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "security" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-left transition-all ${activeTab === "security" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
                         >
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             {t.securityTitle}
@@ -1222,7 +1222,16 @@ export default function DashboardClient() {
                                                 <tr key={idx} className="text-sm font-bold group hover:bg-white/[0.02] transition-colors">
                                                     <td className="px-8 py-6 text-zinc-500">{new Date(tx.created_at || tx.date).toISOString().split('T')[0]}</td>
                                                     <td className="px-8 py-6 font-mono text-xs text-white/40">{tx.ref_id || tx.ref}</td>
-                                                    <td className="px-8 py-6 uppercase tracking-widest text-[10px]">{tx.type}</td>
+                                                     <td className="px-8 py-6 uppercase tracking-widest text-[10px]">
+                                                         <div className="flex flex-col">
+                                                             <span>{tx.type}</span>
+                                                             {tx.metadata?.processed_by_name && (
+                                                                 <span className="text-[8px] text-zinc-600 font-bold lowercase tracking-tight mt-1">
+                                                                     Allocated by {tx.metadata.processed_by_name}
+                                                                 </span>
+                                                             )}
+                                                         </div>
+                                                     </td>
                                                     <td className={`px-8 py-6 text-lg tracking-tighter ${Number(tx.amount) >= 0 ? "text-emerald-400" : "text-white"}`}>
                                                         <div className="flex flex-col">
                                                             <span>RM {Number(tx.amount || 0).toFixed(2)}</span>

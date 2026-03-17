@@ -794,7 +794,9 @@ export default function AdminPortal() {
                     ref_id: `ADJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
                     metadata: { 
                         reason: adjustmentReason,
-                        description: adjustmentReason || "Balance Adjustment" 
+                        description: adjustmentReason || "Balance Adjustment",
+                        processed_by_name: adminProfile?.full_name || adminProfile?.username || "Admin",
+                        processed_by_id: adminProfile?.id
                     }
                 });
             
@@ -878,6 +880,15 @@ export default function AdminPortal() {
             });
             
             if (rpcError) throw rpcError;
+
+            // Update metadata with processor info
+            await supabase.from('transactions').update({
+                metadata: {
+                    ...tx.metadata,
+                    processed_by_name: adminProfile?.full_name || adminProfile?.username || "Admin",
+                    processed_by_id: adminProfile?.id
+                }
+            }).eq('id', tx.id);
             
             showToast("Deposit approved successfully.");
             setIsDepositDrawerOpen(false);
@@ -893,7 +904,18 @@ export default function AdminPortal() {
         const amountUsd = amountRm / forexRate;
         if (!confirm(`Reject deposit: Client sent RM ${amountRm.toFixed(2)}. This will void the $${amountUsd.toFixed(2)} USD credit for ${tx.profiles?.full_name || 'Client'}?`)) return;
         try {
-            const { error: txError } = await supabase.from('transactions').update({ status: 'Rejected' }).eq('id', tx.id);
+            const { error: txError } = await supabase
+                .from('transactions')
+                .update({ 
+                    status: 'Rejected',
+                    metadata: {
+                        ...tx.metadata,
+                        processed_by_name: adminProfile?.full_name || adminProfile?.username || "Admin",
+                        processed_by_id: adminProfile?.id,
+                        reason: "Policy violation or invalid receipt"
+                    }
+                })
+                .eq('id', tx.id);
             if (txError) throw txError;
             showToast("Deposit rejected.");
             setIsDepositDrawerOpen(false);
@@ -912,7 +934,14 @@ export default function AdminPortal() {
             // We only need to set the status to Approved
             const { error: txError } = await supabase
                 .from('transactions')
-                .update({ status: 'Approved' })
+                .update({ 
+                    status: 'Approved',
+                    metadata: {
+                        ...tx.metadata,
+                        processed_by_name: adminProfile?.full_name || adminProfile?.username || "Admin",
+                        processed_by_id: adminProfile?.id
+                    }
+                })
                 .eq('id', tx.id);
             
             if (txError) throw txError;
@@ -931,7 +960,14 @@ export default function AdminPortal() {
         try {
             const { error: txError } = await supabase
                 .from('transactions')
-                .update({ status: 'Rejected' })
+                .update({ 
+                    status: 'Rejected',
+                    metadata: {
+                        ...tx.metadata,
+                        processed_by_name: adminProfile?.full_name || adminProfile?.username || "Admin",
+                        processed_by_id: adminProfile?.id
+                    }
+                })
                 .eq('id', tx.id);
             
             if (txError) throw txError;
@@ -1289,7 +1325,7 @@ export default function AdminPortal() {
                                     <div className="overflow-x-auto border border-white/5 mx-0 md:mx-8 mb-8 rounded-2xl md:rounded-3xl">
                                         <table className="w-full text-left">
                                             <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                                                <tr><th className="px-6 py-4">{t.table.user}</th><th className="px-6 py-4">Bank Details</th><th className="px-6 py-4">{t.table.refId}</th><th className="px-6 py-4">{t.table.amount} (RM)</th><th className="px-6 py-4 text-right min-w-[150px]">{t.table.actions}</th></tr>
+                                                <tr><th className="px-6 py-4">{t.table.user}</th><th className="px-6 py-4">Bank Details</th><th className="px-6 py-4">{t.table.refId}</th><th className="px-6 py-4">{t.table.amount} (RM)</th><th className="px-6 py-4">Processed By</th><th className="px-6 py-4 text-right min-w-[150px]">{t.table.actions}</th></tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/[0.02]">
                                                 {withdrawals.filter((w: any) => {
@@ -1314,6 +1350,12 @@ export default function AdminPortal() {
                                                             <div className="flex flex-col">
                                                                 <span className="font-black">RM {Math.abs(Number(w.amount || 0)).toFixed(2)}</span>
                                                                 <span className="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(w.amount || 0)) / forexRate).toFixed(2)})</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-white font-black uppercase tracking-tight text-[10px]">{w.metadata?.processed_by_name || '-'}</span>
+                                                                {w.metadata?.processed_by_id && <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">ID: {w.metadata.processed_by_id.slice(0, 8)}</span>}
                                                             </div>
                                                         </td>
                                                         <td className="px-6 py-4 text-right flex items-center justify-end gap-2 h-full pt-4">
@@ -1716,6 +1758,7 @@ export default function AdminPortal() {
                                                     <th className="px-6 py-4">{t.table.refId}</th>
                                                     <th className="px-6 py-4">{t.table.amount} (RM)</th>
                                                     <th className="px-6 py-4">{t.table.status}</th>
+                                                    <th className="px-6 py-4">Processed By</th>
                                                     <th className="px-6 py-4">{t.table.date}</th>
                                                     <th className="px-6 py-4 text-right min-w-[150px]">{t.table.actions}</th>
                                                 </tr>
@@ -1747,6 +1790,12 @@ export default function AdminPortal() {
                                                             }`}>
                                                                 {d.status}
                                                             </span>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-white font-black uppercase tracking-tight text-[10px]">{d.metadata?.processed_by_name || '-'}</span>
+                                                                {d.metadata?.processed_by_id && <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">ID: {d.metadata.processed_by_id.slice(0, 8)}</span>}
+                                                            </div>
                                                         </td>
                                                         <td className="px-6 py-4 text-zinc-400 font-mono text-[10px] whitespace-nowrap">
                                                             {d.created_at ? new Date(d.created_at).toLocaleString() : "N/A"}
@@ -1841,6 +1890,7 @@ export default function AdminPortal() {
                                                     <th className="px-6 py-4">{t.audit.admin}</th>
                                                     <th className="px-6 py-4">{t.audit.targetUser}</th>
                                                     <th className="px-6 py-4">{t.audit.action}</th>
+                                                    <th className="px-6 py-4">Admin ID (KYC) / Processed By (TX)</th>
                                                     <th className="px-6 py-4">{t.audit.reason}</th>
                                                 </tr>
                                             </thead>
@@ -1875,6 +1925,12 @@ export default function AdminPortal() {
                                                                     <span className={`px-2 py-0.5 rounded-md text-[8px] uppercase font-black ${log.action === 'Verified' ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"}`}>
                                                                         {log.action}
                                                                     </span>
+                                                                </td>
+                                                                <td className="px-6 py-3">
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-white font-black uppercase tracking-tight text-[10px]">{log.admin_id?.slice(0, 8) || log.processed_by_name || '-'}</span>
+                                                                        {log.processed_by_id && <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">ID: {log.processed_by_id.slice(0, 8)}</span>}
+                                                                    </div>
                                                                 </td>
                                                                 <td className="px-6 py-3 text-zinc-500 italic max-w-xs truncate overflow-hidden text-[10px]" title={log.rejection_reason}>
                                                                     {log.rejection_reason || "-"}
