@@ -25,12 +25,14 @@ export default function DashboardClient() {
     const [transactions, setTransactions] = useState<any[]>([]);
     const { forexRate, monthlyRate, yearlyRate } = useSettings();
     const [dividendHistory, setDividendHistory] = useState<any[]>([]);
-    const [activeTab, setActiveTab] = useState<"overview" | "products" | "statements" | "profile" | "security">("overview");
+    const [activeTab, setActiveTab] = useState<"overview" | "products" | "statements" | "profile" | "security" | "transactions" | "referrals">("overview");
     const [isComparisonOpen, setIsComparisonOpen] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [referredCount, setReferredCount] = useState(0);
+    const [referredUsers, setReferredUsers] = useState<any[]>([]);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     // UI States
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -134,8 +136,9 @@ export default function DashboardClient() {
                     ).slice(0, 6).reverse());
                 }
 
-                const { count } = await supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('referred_by', authUser.id);
+                const { data: refs, count } = await supabase.from('profiles').select('id, full_name, username, balance, is_verified, created_at', { count: 'exact' }).eq('referred_by', authUser.id);
                 setReferredCount(count || 0);
+                if (refs) setReferredUsers(refs);
 
                 fetchedRef.current = authUser.id;
             } catch (err) {
@@ -614,6 +617,12 @@ export default function DashboardClient() {
             returns: "returns",
             yearlyForecast: "Yearly Forecast",
             yourCode: "Your Code",
+            transactions: "Transactions",
+            referrals: "Referrals",
+            accountStatus: "Account Status",
+            investmentTier: "Investment Tier",
+            registrationDate: "Registration Date",
+            referredUsersList: "Referred Users List"
         },
         zh: {
             welcome: "欢迎, ",
@@ -733,6 +742,12 @@ export default function DashboardClient() {
             returns: "回报",
             yearlyForecast: "年度预测",
             yourCode: "您的代码",
+            transactions: "交易记录",
+            referrals: "推荐记录",
+            accountStatus: "账户状态",
+            investmentTier: "投资等级",
+            registrationDate: "注册日期",
+            referredUsersList: "推荐用户列表"
         },
     };
 
@@ -752,54 +767,46 @@ export default function DashboardClient() {
         <div className="min-h-screen bg-[#121212] text-white flex font-sans overflow-hidden">
             <title>{`Dashboard | GV Capital Trust`}</title>
 
-            <aside className="w-64 border-r border-white/10 p-6 flex flex-col justify-between hidden md:flex bg-[#0a0a0a]">
+            <aside className={`border-r border-white/10 flex flex-col justify-between hidden md:flex bg-[#0a0a0a] transition-all duration-500 ease-in-out relative group/sidebar ${isSidebarCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
+                {/* Collapse Toggle */}
+                <button 
+                    onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                    className="absolute -right-3 top-24 z-10 h-6 w-6 bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-gv-gold hover:text-black transition-all shadow-xl opacity-0 group-hover/sidebar:opacity-100"
+                >
+                    <svg className={`h-3 w-3 transition-transform duration-500 ${isSidebarCollapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M15 19l-7-7 7-7" /></svg>
+                </button>
+
                 <div className="space-y-12">
-                    <div className="flex items-center gap-2">
-                        <img src="/logo.png" alt="GV Capital" className="h-[60px] w-auto object-contain mix-blend-screen" />
+                    <div className={`flex items-center gap-2 transition-all duration-500 ${isSidebarCollapsed ? "justify-center" : ""}`}>
+                        <img src="/logo.png" alt="GV Capital" className={`object-contain mix-blend-screen transition-all duration-500 ${isSidebarCollapsed ? "h-[30px]" : "h-[60px]"}`} />
                     </div>
 
                     <nav className="space-y-2">
-                        <button
-                            onClick={() => setActiveTab("overview")}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "overview" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                            {t.nav}
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("products")}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "products" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                            {t.products}
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("statements")}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "statements" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                            {t.statements}
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("profile")}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "profile" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                            {t.profile}
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("security")}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-left transition-all ${activeTab === "security" ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            {t.securityTitle}
-                        </button>
+                        {[
+                            { id: "overview", label: t.nav, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> },
+                            { id: "products", label: t.products, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg> },
+                            { id: "transactions", label: t.transactions, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
+                            { id: "referrals", label: t.referrals, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg> },
+                            { id: "statements", label: t.statements, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> },
+                            { id: "profile", label: t.profile, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
+                            { id: "security", label: t.securityTitle, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg> },
+                        ].map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => setActiveTab(item.id as any)}
+                                className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeTab === item.id ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                                title={isSidebarCollapsed ? item.label : ""}
+                            >
+                                <span className={`shrink-0 ${isSidebarCollapsed ? "mx-auto" : ""}`}>{item.icon}</span>
+                                {!isSidebarCollapsed && <span className="truncate">{item.label}</span>}
+                            </button>
+                        ))}
                     </nav>
                 </div>
-                <div className="space-y-4 pt-4 border-t border-white/5">
-                    <button onClick={handleLogout} className="w-full text-zinc-500 hover:text-red-400 transition-colors text-sm font-medium flex items-center gap-3 px-4 py-2">
-                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
-                        {t.logout}
+                <div className={`space-y-4 pt-4 border-t border-white/5 transition-all duration-500 ${isSidebarCollapsed ? "items-center" : ""}`}>
+                    <button onClick={handleLogout} className={`w-full text-zinc-500 hover:text-red-400 transition-colors text-[10px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-2 ${isSidebarCollapsed ? "justify-center" : ""}`}>
+                        <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
+                        {!isSidebarCollapsed && <span>{t.logout}</span>}
                     </button>
                 </div>
             </aside>
@@ -1152,104 +1159,143 @@ export default function DashboardClient() {
                                     {t.withdraw}
                                 </button>
                             </section>
-
-                            <section className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-96 h-96 bg-gv-gold/5 blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
-                                <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-10">
-                                     <div className="flex-1 space-y-4">
-                                         <h3 className="text-2xl font-black uppercase tracking-tighter">{t.referTitle}</h3>
-                                         <p className="text-zinc-500 text-sm font-medium leading-relaxed">
-                                             {t.referSubtitle}
-                                         </p>
-                                         <div className="flex items-stretch gap-3">
-                                             <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl flex-1">
-                                                 <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-1">{t.yourCode}</p>
-                                                 <p className="text-xl font-black text-gv-gold tracking-widest uppercase">
-                                                     {user?.username?.length > 15 ? user.username.substring(0, 8) + '...' : user?.username || "-"}
-                                                 </p>
-                                             </div>
-                                             <button
-                                                 onClick={() => {
-                                                     if (user?.username) {
-                                                         navigator.clipboard.writeText(user.username);
-                                                         alert(t.copied);
-                                                     }
-                                                 }}
-                                                 className="px-6 py-4 bg-gv-gold text-black font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-gv-gold/90 transition-all shadow-lg active:scale-95 disabled:opacity-50"
-                                                 disabled={!user?.username}
-                                             >
-                                                 {t.copyCode}
-                                             </button>
-                                         </div>
-                                     </div>
-                                    <div className="flex flex-col items-center gap-6 text-center md:text-right md:items-end">
-                                        <div className="bg-[#222] border border-white/10 p-6 rounded-[32px] w-full md:w-auto">
-                                            <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-1">{t.totalReferred}</p>
-                                            <h4 className="text-4xl font-black text-white">{referredCount}</h4>
+                        </>
+                    )) : activeTab === "transactions" ? (
+                        <section className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-8">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                                <h3 className="text-2xl font-black uppercase tracking-tighter">{t.history}</h3>
+                                <button
+                                    onClick={() => generateStatement()}
+                                    className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black text-xs py-3 px-6 rounded-xl uppercase tracking-widest transition-all flex items-center gap-2"
+                                >
+                                    <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
+                                    {t.downloadStatement}
+                                </button>
+                            </div>
+                            <div className="border border-white/10 rounded-[40px] overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
+                                <table className="w-full text-left">
+                                    <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
+                                        <tr><th className="px-8 py-6">{t.date}</th><th className="px-8 py-6">{t.refId}</th><th className="px-8 py-6">{t.type}</th><th className="px-8 py-6">{t.amount}</th><th className="px-8 py-6 text-right">{t.status}</th></tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/[0.03]">
+                                        {transactions.map((tx: any, idx: number) => (
+                                            <tr key={idx} className="text-sm font-bold group hover:bg-white/[0.02] transition-colors">
+                                                <td className="px-8 py-6 text-zinc-500">{new Date(tx.created_at || tx.date).toISOString().split('T')[0]}</td>
+                                                <td className="px-8 py-6 font-mono text-xs text-white/40">{tx.ref_id || tx.ref}</td>
+                                                 <td className="px-8 py-6 uppercase tracking-widest text-[10px]">
+                                                     <div className="flex flex-col">
+                                                         <span>{tx.type}</span>
+                                                         {tx.metadata?.processed_by_name && (
+                                                             <span className="text-[8px] text-zinc-600 font-bold lowercase tracking-tight mt-1">
+                                                                 Allocated by {tx.metadata.processed_by_name}
+                                                             </span>
+                                                         )}
+                                                     </div>
+                                                 </td>
+                                                <td className={`px-8 py-6 text-lg tracking-tighter ${Number(tx.amount) >= 0 ? "text-emerald-400" : "text-white"}`}>
+                                                    <div className="flex flex-col">
+                                                        <span>RM {Number(tx.amount || 0).toFixed(2)}</span>
+                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-8 py-6 text-right"><span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' : tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>{tx.status}</span></td>
+                                            </tr>
+                                        ))}
+                                        {transactions.length === 0 && (
+                                            <tr><td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    ) : activeTab === "referrals" ? (
+                        <section className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-12">
+                            {/* Refer-a-Friend Header */}
+                            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
+                                <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                                    <div className="space-y-6">
+                                        <h2 className="text-4xl font-black uppercase tracking-tighter text-white">{t.referTitle}</h2>
+                                        <p className="text-zinc-500 font-medium text-lg leading-relaxed">{t.referSubtitle}</p>
+                                        <div className="flex flex-col sm:flex-row gap-4">
+                                            <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex-1 flex items-center justify-between">
+                                                <span className="text-gv-gold font-black tracking-widest uppercase">{user?.username}</span>
+                                                <button 
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(user?.username || "");
+                                                        setActionToast({ message: t.copied });
+                                                    }}
+                                                    className="text-white hover:text-gv-gold transition-colors text-xs font-black uppercase tracking-widest pl-4 border-l border-white/10"
+                                                >
+                                                    {t.copyCode}
+                                                </button>
+                                            </div>
+                                            <button 
+                                                onClick={() => window.open(`https://wa.me/601139396338?text=Join%20GV%20Capital%20using%20my%20code:%20${user?.username}`, '_blank')}
+                                                className="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-8 py-5 rounded-2xl flex items-center justify-center gap-3 transition-all"
+                                            >
+                                                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                                                {t.shareWA}
+                                            </button>
                                         </div>
-                                        <button
-                                            onClick={() => {
-                                                const url = typeof window !== 'undefined' ? `${window.location.origin}/register?ref=${user?.username}` : `https://gvcapital.com/register?ref=${user?.username}`;
-                                                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t.referSubtitle + " " + url)}`);
-                                            }}
-                                            className="flex items-center gap-3 bg-[#25D366] text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl"
-                                        >
-                                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.41 0 .01 5.403.01 12.039c0 2.121.554 4.191 1.607 6.039L0 24l6.135-1.61a11.748 11.748 0 005.911 1.586h.005c6.637 0 12.04-5.403 12.04-12.039a11.82 11.82 0 00-3.417-8.416" /></svg>
-                                            {t.shareWA}
-                                        </button>
+                                    </div>
+                                    <div className="flex flex-col items-center justify-center bg-white/5 border border-white/10 rounded-[40px] p-12 text-center group-hover:bg-white/10 transition-all">
+                                        <p className="text-zinc-500 font-black uppercase tracking-[0.3em] mb-4">{t.totalReferred}</p>
+                                        <h3 className="text-7xl font-black text-gv-gold tabular-nums">{referredCount}</h3>
                                     </div>
                                 </div>
-                            </section>
+                            </div>
 
-                            <section className="space-y-8">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                                    <h3 className="text-2xl font-black uppercase tracking-tighter">{t.history}</h3>
-                                    <button
-                                        onClick={() => generateStatement()}
-                                        className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black text-xs py-3 px-6 rounded-xl uppercase tracking-widest transition-all flex items-center gap-2"
-                                    >
-                                        <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
-                                        {t.downloadStatement}
-                                    </button>
-                                </div>
+                            {/* Referred Users List */}
+                            <div className="space-y-6">
+                                <h3 className="text-2xl font-black uppercase tracking-tighter">{t.referredUsersList}</h3>
                                 <div className="border border-white/10 rounded-[40px] overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
                                     <table className="w-full text-left">
                                         <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
-                                            <tr><th className="px-8 py-6">{t.date}</th><th className="px-8 py-6">{t.refId}</th><th className="px-8 py-6">{t.type}</th><th className="px-8 py-6">{t.amount}</th><th className="px-8 py-6 text-right">{t.status}</th></tr>
+                                            <tr>
+                                                <th className="px-8 py-6">{t.username}</th>
+                                                <th className="px-8 py-6">{t.registrationDate}</th>
+                                                <th className="px-8 py-6">{t.investmentTier}</th>
+                                                <th className="px-8 py-6 text-right">{t.accountStatus}</th>
+                                            </tr>
                                         </thead>
                                         <tbody className="divide-y divide-white/[0.03]">
-                                            {transactions.map((tx: any, idx: number) => (
+                                            {referredUsers.map((ref: any, idx: number) => (
                                                 <tr key={idx} className="text-sm font-bold group hover:bg-white/[0.02] transition-colors">
-                                                    <td className="px-8 py-6 text-zinc-500">{new Date(tx.created_at || tx.date).toISOString().split('T')[0]}</td>
-                                                    <td className="px-8 py-6 font-mono text-xs text-white/40">{tx.ref_id || tx.ref}</td>
-                                                     <td className="px-8 py-6 uppercase tracking-widest text-[10px]">
-                                                         <div className="flex flex-col">
-                                                             <span>{tx.type}</span>
-                                                             {tx.metadata?.processed_by_name && (
-                                                                 <span className="text-[8px] text-zinc-600 font-bold lowercase tracking-tight mt-1">
-                                                                     Allocated by {tx.metadata.processed_by_name}
-                                                                 </span>
-                                                             )}
-                                                         </div>
-                                                     </td>
-                                                    <td className={`px-8 py-6 text-lg tracking-tighter ${Number(tx.amount) >= 0 ? "text-emerald-400" : "text-white"}`}>
-                                                        <div className="flex flex-col">
-                                                            <span>RM {Number(tx.amount || 0).toFixed(2)}</span>
-                                                            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
+                                                    <td className="px-8 py-6">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center text-xs font-black text-gv-gold">
+                                                                {ref.full_name?.[0] || 'U'}
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className="text-white">{ref.full_name}</span>
+                                                                <span className="text-[10px] text-zinc-600">@{ref.username}</span>
+                                                            </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-8 py-6 text-right"><span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' : tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>{tx.status}</span></td>
+                                                    <td className="px-8 py-6 text-zinc-500 font-mono text-xs">
+                                                        {new Date(ref.created_at).toLocaleDateString()}
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <span className="text-gv-gold uppercase text-[10px] tracking-widest font-black">
+                                                            {ref.balance > 0 ? getTierByAmount(ref.balance / forexRate).name : 'No Investment'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-8 py-6 text-right">
+                                                        <span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${ref.is_verified ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-500'}`}>
+                                                            {ref.is_verified ? 'Verified' : 'Unverified'}
+                                                        </span>
+                                                    </td>
                                                 </tr>
                                             ))}
-                                            {transactions.length === 0 && (
-                                                <tr><td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
+                                            {referredUsers.length === 0 && (
+                                                <tr><td colSpan={4} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No referrals yet</td></tr>
                                             )}
                                         </tbody>
                                     </table>
                                 </div>
-                            </section>
-                        </>
-                        )
+                            </div>
+                        </section>
                     ) : activeTab === "products" ? (
                         <ProductSelection
                             currentInvestment={Number(user?.balance || 0) / (forexRate || 4.0)}

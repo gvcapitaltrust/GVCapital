@@ -796,7 +796,8 @@ export default function AdminPortal() {
                         reason: adjustmentReason,
                         description: adjustmentReason || "Balance Adjustment",
                         processed_by_name: adminProfile?.full_name || adminProfile?.username || "Admin",
-                        processed_by_id: adminProfile?.id
+                        processed_by_id: adminProfile?.id,
+                        processed_by_email: adminProfile?.email
                     }
                 });
             
@@ -886,7 +887,8 @@ export default function AdminPortal() {
                 metadata: {
                     ...tx.metadata,
                     processed_by_name: adminProfile?.full_name || adminProfile?.username || "Admin",
-                    processed_by_id: adminProfile?.id
+                    processed_by_id: adminProfile?.id,
+                    processed_by_email: adminProfile?.email
                 }
             }).eq('id', tx.id);
             
@@ -912,6 +914,7 @@ export default function AdminPortal() {
                         ...tx.metadata,
                         processed_by_name: adminProfile?.full_name || adminProfile?.username || "Admin",
                         processed_by_id: adminProfile?.id,
+                        processed_by_email: adminProfile?.email,
                         reason: "Policy violation or invalid receipt"
                     }
                 })
@@ -939,7 +942,8 @@ export default function AdminPortal() {
                     metadata: {
                         ...tx.metadata,
                         processed_by_name: adminProfile?.full_name || adminProfile?.username || "Admin",
-                        processed_by_id: adminProfile?.id
+                        processed_by_id: adminProfile?.id,
+                        processed_by_email: adminProfile?.email
                     }
                 })
                 .eq('id', tx.id);
@@ -965,7 +969,8 @@ export default function AdminPortal() {
                     metadata: {
                         ...tx.metadata,
                         processed_by_name: adminProfile?.full_name || adminProfile?.username || "Admin",
-                        processed_by_id: adminProfile?.id
+                        processed_by_id: adminProfile?.id,
+                        processed_by_email: adminProfile?.email
                     }
                 })
                 .eq('id', tx.id);
@@ -1355,7 +1360,7 @@ export default function AdminPortal() {
                                                         <td className="px-6 py-4">
                                                             <div className="flex flex-col">
                                                                 <span className="text-white font-black uppercase tracking-tight text-[10px]">{w.metadata?.processed_by_name || '-'}</span>
-                                                                {w.metadata?.processed_by_id && <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">ID: {w.metadata.processed_by_id.slice(0, 8)}</span>}
+                                                                {w.metadata?.processed_by_email && <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">{w.metadata.processed_by_email}</span>}
                                                             </div>
                                                         </td>
                                                         <td className="px-6 py-4 text-right flex items-center justify-end gap-2 h-full pt-4">
@@ -1794,7 +1799,7 @@ export default function AdminPortal() {
                                                         <td className="px-6 py-4">
                                                             <div className="flex flex-col">
                                                                 <span className="text-white font-black uppercase tracking-tight text-[10px]">{d.metadata?.processed_by_name || '-'}</span>
-                                                                {d.metadata?.processed_by_id && <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">ID: {d.metadata.processed_by_id.slice(0, 8)}</span>}
+                                                                {d.metadata?.processed_by_email && <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">{d.metadata.processed_by_email}</span>}
                                                             </div>
                                                         </td>
                                                         <td className="px-6 py-4 text-zinc-400 font-mono text-[10px] whitespace-nowrap">
@@ -1928,8 +1933,19 @@ export default function AdminPortal() {
                                                                 </td>
                                                                 <td className="px-6 py-3">
                                                                     <div className="flex flex-col">
-                                                                        <span className="text-white font-black uppercase tracking-tight text-[10px]">{log.admin_id?.slice(0, 8) || log.processed_by_name || '-'}</span>
-                                                                        {log.processed_by_id && <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">ID: {log.processed_by_id.slice(0, 8)}</span>}
+                                                                        {log.admin_id ? (
+                                                                            <>
+                                                                                <span className="text-white font-black uppercase tracking-tight text-[10px]">{log.admin_username}</span>
+                                                                                <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">
+                                                                                    {users.find(u => u.id === log.admin_id)?.email || log.admin_id.slice(0, 8)}
+                                                                                </span>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <span className="text-white font-black uppercase tracking-tight text-[10px]">{log.processed_by_name || '-'}</span>
+                                                                                {log.processed_by_email && <span className="text-[8px] text-zinc-600 font-bold uppercase tracking-tighter">{log.processed_by_email}</span>}
+                                                                            </>
+                                                                        )}
                                                                     </div>
                                                                 </td>
                                                                 <td className="px-6 py-3 text-zinc-500 italic max-w-xs truncate overflow-hidden text-[10px]" title={log.rejection_reason}>
