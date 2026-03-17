@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         if (process.env.RESEND_API_KEY) {
             try {
                 await resend.emails.send({
-                    from: 'GV Capital <security@gvcapitaltrust.com>',
+                    from: 'GV Capital <onboarding@resend.dev>',
                     to: email,
                     subject: 'Your Withdrawal Security Code',
                     html: `
