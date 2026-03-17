@@ -98,6 +98,7 @@ export default function AdminPortal() {
     const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [viewingDoc, setViewingDoc] = useState<string | null>(null);
+    const [platformStats, setPlatformStats] = useState({ totalBalance: 0, totalProfit: 0, totalAssets: 0, userCount: 0 });
     const [userKycDocs, setUserKycDocs] = useState<{name: string, url: string}[]>([]);
     const [isLoadingDocs, setIsLoadingDocs] = useState(false);
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
@@ -458,7 +459,15 @@ export default function AdminPortal() {
                 new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
             );
             setUsers(sortedUsers);
-            // kycQueue will now be a filtered version of users in the UI, but we'll keep the state for compatibility if needed
+            
+            const stats = (profileList as Profile[]).reduce((acc, p) => ({
+                totalBalance: acc.totalBalance + Number(p.balance || 0),
+                totalProfit: acc.totalProfit + Number(p.profit || 0),
+                totalAssets: acc.totalAssets + (Number(p.balance || 0) + Number(p.profit || 0)),
+                userCount: acc.userCount + 1
+            }), { totalBalance: 0, totalProfit: 0, totalAssets: 0, userCount: 0 });
+            setPlatformStats(stats);
+
             setKycQueue(sortedUsers.filter((p: Profile) => p.kyc_status === 'Pending'));
         }
 
@@ -482,22 +491,22 @@ export default function AdminPortal() {
             .select('*')
             .order('created_at', { ascending: false });
         
-        // Merge verification logs with Bonus/Dividend adjustments for a unified audit trail
-        const adjustmentTxs = txList?.filter((t: any) => 
-            t.type?.toLowerCase().includes('bonus') || 
-            t.type?.toLowerCase().includes('dividend')
+        // Merge verification logs with ALL financial transactions for a unified platform audit trail
+        const financialTxs = txList?.filter((t: any) => 
+            t.status === 'Approved'
         ) || [];
         const mergedLogs = [
             ...(logs || []).map(l => ({ ...l, auditType: 'verification' })),
-            ...adjustmentTxs.map(t => ({
+            ...financialTxs.map(t => ({
                 id: t.id,
                 created_at: t.created_at,
-                admin_username: t.metadata?.processed_by_name || 'Admin',
+                admin_username: t.metadata?.processed_by_name || 'System',
                 user_email: t.profiles?.email || 'Unknown',
-                action: 'Adjustment',
+                action: t.type === 'Deposit' ? 'Deposit Approved' : 
+                        t.type === 'Withdrawal' ? 'Withdrawal Approved' : 'Adjustment',
                 processed_by_name: t.metadata?.processed_by_name,
                 processed_by_email: t.metadata?.processed_by_email,
-                rejection_reason: t.metadata?.reason || t.metadata?.description || 'Wallet adjustment',
+                rejection_reason: t.metadata?.reason || t.metadata?.description || `${t.type} processed`,
                 auditType: 'transaction',
                 amount: t.amount,
                 txType: t.type
@@ -1880,7 +1889,45 @@ export default function AdminPortal() {
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                                         <div>
                                             <h3 className="text-xl font-black uppercase tracking-tighter text-white">{t.tabs.audit}</h3>
-                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Tracking Administrative Actions</p>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Platform Integrity & Aggregate Audit</p>
+                                        </div>
+                                        
+                                        <div className="flex flex-wrap items-center gap-4">
+                                            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-4">
+                                                <div className="h-10 w-10 rounded-xl bg-gv-gold/10 flex items-center justify-center">
+                                                    <svg className="h-5 w-5 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Total Platform Assets</p>
+                                                    <p className="text-lg font-black text-white tracking-tighter">RM {platformStats.totalAssets.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-4">
+                                                <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                                    <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Aggregate Wallet</p>
+                                                    <p className="text-lg font-black text-white tracking-tighter">RM {platformStats.totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-4">
+                                                <div className="h-10 w-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                                                    <svg className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Total Dividends</p>
+                                                    <p className="text-lg font-black text-white tracking-tighter">RM {platformStats.totalProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                                        <div>
+                                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Detailed Administrative & Financial Ledger</p>
                                         </div>
                                         
                                         <div className="flex flex-wrap items-center gap-4">

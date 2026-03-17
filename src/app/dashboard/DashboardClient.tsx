@@ -84,10 +84,10 @@ export default function DashboardClient() {
             try {
                 console.log('Effective Forex Rate (Global):', forexRate);
 
-                // 2. Fetch Profile
+                // 1. Fetch Profile
                 const { data: profile } = await supabase
                     .from('profiles')
-                    .select('*', { count: 'exact' })
+                    .select('*')
                     .eq('id', authUser.id)
                     .maybeSingle();
 
@@ -95,46 +95,55 @@ export default function DashboardClient() {
                     let dbIsVerified = profile.role === 'admin' || profile.is_verified === true || profile.is_verified === 'Approved' || profile.is_verified === 'true';
                     let kycApproved = dbIsVerified || profile.kyc_status === 'Approved' || profile.kyc_completed === true;
 
-                    // Master Bypass
                     if (authUser.email === "thenja96@gmail.com") {
                         dbIsVerified = true;
                         kycApproved = true;
                         profile.role = "admin";
                     }
 
-                    // Standardizing RM-Base with USD-Anchored Tiers
+                    // Standardizing RM-Base
                     const totalAssetsRM = Number(profile.balance || 0) + Number(profile.profit || 0);
                     const balUSD = Number(profile.balance || 0) / forexRate;
                     
-                    console.log('Balance (RM):', profile.balance, 'Profit (RM):', profile.profit, 'Total Assets (RM):', totalAssetsRM, 'USD Equiv for Tier:', balUSD);
+                    // 2. Fetch Transactions
+                    let txQuery = supabase.from('transactions').select('*');
+                    if (authUser.email !== "thenja96@gmail.com") {
+                        txQuery = txQuery.eq('user_id', authUser.id);
+                    }
+                    const { data: txs } = await txQuery.order('created_at', { ascending: false });
                     
+                    let lockedCapital = 0;
+                    if (txs) {
+                        const approvedDeposits = txs.filter((tx: any) => tx.type === 'Deposit' && tx.status === 'Approved');
+                        const now = new Date();
+                        lockedCapital = approvedDeposits.reduce((acc, tx) => {
+                            const txDate = new Date(tx.created_at || tx.transfer_date);
+                            const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
+                            return diffDays < 180 ? acc + Number(tx.amount) : acc;
+                        }, 0);
+                        setTransactions(txs);
+                        setDividendHistory(txs.filter((t: any) => 
+                            (t.type?.toLowerCase().includes('dividend') || t.type?.toLowerCase().includes('bonus')) &&
+                            t.status === 'Approved'
+                        ).slice(0, 6).reverse());
+                    }
+
+                    const withdrawableBalance = Math.max(0, (Number(profile.balance || 0) - lockedCapital) + Number(profile.profit || 0));
+
                     setUser({
                         ...authUser,
                         ...profile,
                         is_verified: dbIsVerified,
                         kyc_completed: kycApproved,
                         fullName: profile.full_name || authUser.user_metadata?.full_name,
-                        total_assets: totalAssetsRM, // Now in RM
-                        totalEquity: totalAssetsRM,  // Now in RM
-                        balanceUSD: balUSD           // Used for Tier check
+                        total_assets: totalAssetsRM,
+                        withdrawable_balance: withdrawableBalance,
+                        locked_capital: lockedCapital,
+                        totalEquity: totalAssetsRM,  
+                        balanceUSD: balUSD           
                     });
                 } else {
                     console.warn("No profile found for ID:", authUser.id);
-                }
-
-                // 3. Fetch Transactions
-                let txQuery = supabase.from('transactions').select('*');
-                if (authUser.email !== "thenja96@gmail.com") {
-                    txQuery = txQuery.eq('user_id', authUser.id);
-                }
-                const { data: txs } = await txQuery.order('created_at', { ascending: false });
-                if (txs) {
-                    setTransactions(txs);
-                    setDividendHistory(txs.filter((t: any) => 
-                        (t.type?.toLowerCase().includes('dividend') || 
-                         t.type?.toLowerCase().includes('bonus')) &&
-                        t.status === 'Approved'
-                    ).slice(0, 6).reverse());
                 }
 
                 const { data: refs, count } = await supabase.from('profiles').select('id, full_name, username, balance, is_verified, created_at', { count: 'exact' }).eq('referred_by', authUser.id);
@@ -327,7 +336,7 @@ export default function DashboardClient() {
                 .insert([{
                     user_id: user.id,
                     type: 'Withdrawal',
-                    amount: -Math.abs(parseFloat(withdrawAmount)),
+                    amount: Math.abs(parseFloat(withdrawAmount)),
                     status: 'Pending',
                     ref_id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`
                 }]);
@@ -1037,6 +1046,21 @@ export default function DashboardClient() {
                                                 {t.completeProfileDesc}
                                             </p>
                                         </div>
+                                        <div>
+                                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{t.totalEquity}</p>
+                                            <div className="flex items-baseline gap-2">
+                                                <h3 className="text-4xl font-black text-[#e0c872] tracking-tighter">
+                                                    RM {user?.total_assets?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                </h3>
+                                            </div>
+                                            <p className="text-zinc-600 text-[10px] font-bold mt-1 lowercase opacity-50">{t.investmentNote}</p>
+                                            {user?.locked_capital > 0 && (
+                                                <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+                                                    <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></div>
+                                                    <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">RM {user.locked_capital.toLocaleString()} Locked</span>
+                                                </div>
+                                            )}
+                                        </div>
                                         <Link 
                                             href={`/verify?lang=${lang}`}
                                             className="inline-block bg-gv-gold text-black font-black text-xl px-12 py-5 rounded-[28px] hover:bg-gv-gold/90 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)] uppercase tracking-widest"
@@ -1726,13 +1750,13 @@ export default function DashboardClient() {
                         </div>
                         <div className="flex justify-center gap-3">
                             <input
-                                type="text"
+                                type="password"
                                 maxLength={6}
                                 value={withdrawPIN}
-                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value)}
+                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value.replace(/\D/g, ''))}
                                 className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold"
                                 autoFocus
-                                placeholder="000000"
+                                placeholder="******"
                             />
                         </div>
                         <div className="space-y-4">
