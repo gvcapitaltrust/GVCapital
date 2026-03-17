@@ -150,8 +150,8 @@ export default function DashboardClient() {
 
         fetchUserData();
 
-        // Real-time listener
-        const channel = supabase
+        // Real-time listener: Profile updates
+        const profileChannel = supabase
             .channel(`profile-updates-${authUser.id}`)
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${authUser.id}` }, 
             (payload: any) => {
@@ -169,8 +169,29 @@ export default function DashboardClient() {
             })
             .subscribe();
 
+        // Real-time listener: Transaction updates
+        const txChannel = supabase
+            .channel(`tx-updates-${authUser.id}`)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${authUser.id}` }, 
+            async (payload: any) => {
+                console.log("[REALTIME] Transaction Change Detected:", payload.eventType);
+                
+                // Refetch transactions to ensure order and state consistency
+                let refetchTxQuery = supabase.from('transactions').select('*').eq('user_id', authUser.id);
+                const { data: txs } = await refetchTxQuery.order('created_at', { ascending: false });
+                if (txs) {
+                    setTransactions(txs);
+                    setDividendHistory(txs.filter((t: any) => 
+                        t.type?.toLowerCase() === 'dividend' || 
+                        t.type?.toLowerCase() === 'bonus'
+                    ).slice(0, 6).reverse());
+                }
+            })
+            .subscribe();
+
         return () => {
-            supabase.removeChannel(channel);
+            supabase.removeChannel(profileChannel);
+            supabase.removeChannel(txChannel);
         };
     }, [authUser, searchParams]);
 
@@ -298,7 +319,7 @@ export default function DashboardClient() {
                 .insert([{
                     user_id: user.id,
                     type: 'Withdrawal',
-                    amount: parseFloat(withdrawAmount),
+                    amount: -Math.abs(parseFloat(withdrawAmount)),
                     status: 'Pending',
                     ref_id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`
                 }]);
@@ -376,10 +397,13 @@ export default function DashboardClient() {
         doc.text("MONTHLY STATEMENT - " + monthName.toUpperCase() + " " + targetYear, 20, 32);
 
         const periodTxs = transactions.filter((tx: any) => {
-            const txDate = new Date(tx.created_at || tx.date);
+            const txDate = new Date(tx.transfer_date || tx.created_at || tx.date);
             return txDate.getMonth() === targetMonth && txDate.getFullYear() === targetYear;
         });
-        const periodProfit = periodTxs.filter((t: any) => (t.type === 'Dividend' || t.type === 'bonus') && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount), 0);
+        const periodProfit = periodTxs.filter((t: any) => 
+            (t.type?.toLowerCase() === 'dividend' || t.type?.toLowerCase() === 'bonus') && 
+            t.status === 'Approved'
+        ).reduce((acc: number, t: any) => acc + Number(t.amount), 0);
 
         doc.setFillColor(248, 250, 252);
         doc.roundedRect(140, 10, 55, 20, 3, 3, 'F');
@@ -1180,7 +1204,9 @@ export default function DashboardClient() {
                                     <tbody className="divide-y divide-white/[0.03]">
                                         {transactions.map((tx: any, idx: number) => (
                                             <tr key={idx} className="text-sm font-bold group hover:bg-white/[0.02] transition-colors">
-                                                <td className="px-8 py-6 text-zinc-500">{new Date(tx.created_at || tx.date).toISOString().split('T')[0]}</td>
+                                                <td className="px-8 py-6 text-zinc-500">
+                                                    {new Date(tx.transfer_date || tx.created_at || tx.date).toISOString().split('T')[0]}
+                                                </td>
                                                 <td className="px-8 py-6 font-mono text-xs text-white/40">{tx.ref_id || tx.ref}</td>
                                                  <td className="px-8 py-6 uppercase tracking-widest text-[10px]">
                                                      <div className="flex flex-col">
@@ -1192,7 +1218,7 @@ export default function DashboardClient() {
                                                          )}
                                                      </div>
                                                  </td>
-                                                <td className={`px-8 py-6 text-lg tracking-tighter ${Number(tx.amount) >= 0 ? "text-emerald-400" : "text-white"}`}>
+                                                <td className={`px-8 py-6 text-lg tracking-tighter ${Number(tx.amount) >= 0 ? "text-emerald-400" : "text-red-500"}`}>
                                                     <div className="flex flex-col">
                                                         <span>RM {Number(tx.amount || 0).toFixed(2)}</span>
                                                         <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
