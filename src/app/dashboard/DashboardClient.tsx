@@ -450,7 +450,7 @@ export default function DashboardClient() {
             body: [
                 ['Opening Balance', formatCurrency(openingBalance).replace("RM ", "")],
                 ['Total Deposits', formatCurrency(totalDeposits).replace("RM ", "")],
-                ['Total Dividends/Bonuses', formatCurrency(periodProfit).replace("RM ", "")],
+                ['Total Withdrawable Amount', formatCurrency(periodProfit).replace("RM ", "")],
                 ['Closing Balance', formatCurrency(closingBalance).replace("RM ", "")]
             ],
             theme: 'striped',
@@ -546,9 +546,8 @@ export default function DashboardClient() {
             products: "Products",
             statements: "Statements",
             logout: "Log Out",
-            totalAssets: "Total Wallet",
             activeInvestment: "Active Investment",
-            totalProfit: "Total Dividend",
+            totalProfit: "Total Withdrawable Amount",
             totalEquity: "Total Investment",
             dividendNote: "(Withdrawable)",
             investmentNote: "(Secure Capital)",
@@ -672,9 +671,8 @@ export default function DashboardClient() {
             products: "投资产品",
             statements: "账单中心",
             logout: "退出登录",
-            totalAssets: "总钱包",
             activeInvestment: "活跃投资",
-            totalProfit: "总股息",
+            totalProfit: "总可提现金额",
             totalEquity: "总投资值",
             dividendNote: "(可提取)",
             investmentNote: "(安全资本)",
@@ -1072,29 +1070,16 @@ export default function DashboardClient() {
                             ) : (
                                 <>
                                     <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        {/* Card 1: Total Wallet & Total Dividend */}
+                                        {/* Card 1: Total Withdrawable Amount */}
                                         <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
                                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                             </div>
-                                            <div className="grid grid-cols-2 gap-8 relative z-10">
+                                            <div className="relative z-10">
                                                 <div>
-                                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors">{t.totalAssets}</p>
-                                                    <div className="flex flex-col gap-2">
-                                                        <h2 className="text-3xl font-black tracking-tighter">
-                                                            {isCheckingAuth ? "..." : (user?.kyc_completed ? `RM ${Number(user?.total_assets || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "RM 0.00")}
-                                                        </h2>
-                                                        {!isCheckingAuth && user?.kyc_completed && (
-                                                            <p className="text-[10px] font-bold text-zinc-500">
-                                                                (${(Number(user?.total_assets || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="border-l border-white/5 pl-8">
                                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors">{t.totalProfit}</p>
                                                     <div className="flex flex-col gap-2">
-                                                        <h2 className="text-3xl font-black tracking-tighter text-emerald-500">
+                                                        <h2 className="text-4xl font-black tracking-tighter text-emerald-500">
                                                             {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                         </h2>
                                                         {!isCheckingAuth && (

@@ -154,7 +154,7 @@ export default function AdminPortal() {
                 refId: "Ref ID",
                 email: "Email",
                 totalAssets: "Total Assets",
-                totalProfit: "Total Profit",
+                totalProfit: "Total Withdrawable Amount",
                 tier: "Tier",
                 fullName: "Full Name",
                 username: "Username",
@@ -193,7 +193,7 @@ export default function AdminPortal() {
                 changeTier: "Change Tier",
                 currentTier: "Current Tier",
                 totalInvestment: "Total Investment",
-                dividendEarned: "Dividend Earned"
+                dividendEarned: "Withdrawable Amount"
             },
             settings: {
                 platformSettings: "Platform Settings",
@@ -255,7 +255,7 @@ export default function AdminPortal() {
                 refId: "参考ID",
                 email: "邮箱",
                 totalAssets: "总资产",
-                totalProfit: "总利润",
+                totalProfit: "总可提现金额",
                 tier: "等级",
                 fullName: "全名",
                 username: "用户名",
@@ -294,7 +294,7 @@ export default function AdminPortal() {
                 changeTier: "变更等级",
                 currentTier: "当前等级",
                 totalInvestment: "总投资",
-                dividendEarned: "已赚红利"
+                dividendEarned: "可提现金额"
             },
             settings: {
                 platformSettings: "平台设置",
@@ -1918,7 +1918,7 @@ export default function AdminPortal() {
                                                     <svg className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                                 </div>
                                                 <div>
-                                                    <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Total Dividends</p>
+                                                    <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Total Withdrawable Amount</p>
                                                     <p className="text-lg font-black text-white tracking-tighter">RM {platformStats.totalProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                                 </div>
                                             </div>
