@@ -53,8 +53,8 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
 
         <h2 className="text-3xl font-black text-white mb-8 uppercase tracking-tighter">{t.title}</h2>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto pb-4">
+          <table className="w-full text-left border-collapse min-w-[700px]">
             <thead>
               <tr className="border-b border-white/5">
                 <th className="py-6 px-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.feature}</th>

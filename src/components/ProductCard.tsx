@@ -41,9 +41,9 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
       )}
 
       <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-xl font-black mb-1 uppercase tracking-tighter">{tier.name}</h3>
-          <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-xl font-black mb-1 uppercase tracking-tighter truncate">{tier.name}</h3>
+          <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest truncate">
             {formatUSD(tier.minAmount)} - {formatUSD(tier.maxAmount)}
           </p>
         </div>

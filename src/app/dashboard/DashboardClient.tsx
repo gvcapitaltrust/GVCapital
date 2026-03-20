@@ -1124,7 +1124,7 @@ export default function DashboardClient() {
                                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                             </div>
-                                            <div className="grid grid-cols-2 gap-8 relative z-10">
+                                            <div className="flex flex-col sm:grid sm:grid-cols-2 gap-6 sm:gap-8 relative z-10">
                                                 <div>
                                                     <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest transition-colors">{t.totalEquity}</p>
                                                     <div className="flex flex-col gap-2">
@@ -1141,7 +1141,7 @@ export default function DashboardClient() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="border-l border-white/5 pl-8">
+                                                <div className="sm:border-l border-t sm:border-t-0 border-white/5 pt-6 sm:pt-0 sm:pl-8">
                                                     <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
                                                     <div className="flex justify-between items-center group/tier">
                                                         <div className="flex flex-col gap-1">
@@ -1213,10 +1213,10 @@ export default function DashboardClient() {
                                         </div>
                                     </section>
 
-                                    <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                        <div className="lg:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8">
+                                    <section className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                                        <div className="xl:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8 overflow-hidden">
                                             <h3 className="text-xl font-black uppercase tracking-tighter">{t.dividendTrends}</h3>
-                                            <div className="h-64 flex items-end justify-between gap-4 px-4">
+                                            <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 px-2 sm:px-4">
                                                 {dividendHistory.length > 0 ? dividendHistory.map((div: any, i: number) => (
                                                     <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
                                                         <div
@@ -1230,11 +1230,11 @@ export default function DashboardClient() {
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] flex flex-col justify-center items-center text-center space-y-6">
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-8 sm:p-10 rounded-[40px] flex flex-col justify-center items-center text-center space-y-6 overflow-hidden">
                                             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{t.latestActivity || "Latest Activity"}</p>
                                             {transactions.length > 0 ? (
                                                 <>
-                                                    <div className={`h-24 w-24 rounded-full flex items-center justify-center border-2 ${
+                                                    <div className={`h-24 w-24 rounded-full flex items-center justify-center border-2 shrink-0 ${
                                                         (transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'border-gv-gold/20 text-gv-gold' :
                                                         transactions[0].status === 'Approved' ? 'border-emerald-500/20 text-emerald-500' : 
                                                         transactions[0].status === 'Rejected' ? 'border-red-500/20 text-red-500' : 
@@ -1246,8 +1246,8 @@ export default function DashboardClient() {
                                                             <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                         )}
                                                     </div>
-                                                    <div>
-                                                        <h4 className={`text-2xl font-black uppercase tracking-tighter ${
+                                                    <div className="w-full truncate">
+                                                        <h4 className={`text-2xl font-black uppercase tracking-tighter truncate ${
                                                             (transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'text-gv-gold' :
                                                             transactions[0].status === 'Approved' ? 'text-emerald-500' : 
                                                             transactions[0].status === 'Rejected' ? 'text-red-500' : 
@@ -1255,7 +1255,7 @@ export default function DashboardClient() {
                                                         }`}>
                                                             {(transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'Adjustment' : transactions[0].status}
                                                         </h4>
-                                                        <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1">
+                                                        <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1 truncate px-2">
                                                             {transactions[0].type}: RM {Number(transactions[0].amount).toFixed(2)}
                                                             {transactions[0].ref_id && ` Ref: ${transactions[0].ref_id}`}
                                                         </p>
@@ -1297,8 +1297,8 @@ export default function DashboardClient() {
                                     {t.downloadStatement}
                                 </button>
                             </div>
-                            <div className="border border-white/10 rounded-[40px] overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
-                                <table className="w-full text-left">
+                            <div className="border border-white/10 rounded-[40px] overflow-x-auto bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
+                                <table className="w-full text-left min-w-[800px]">
                                     <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
                                         <tr><th className="px-8 py-6">{t.date}</th><th className="px-8 py-6">{t.refId}</th><th className="px-8 py-6">{t.type}</th><th className="px-8 py-6">{t.amount}</th><th className="px-8 py-6 text-right">{t.status}</th></tr>
                                     </thead>
@@ -1376,8 +1376,8 @@ export default function DashboardClient() {
                             {/* Referred Users List */}
                             <div className="space-y-6">
                                 <h3 className="text-2xl font-black uppercase tracking-tighter">{t.referredUsersList}</h3>
-                                <div className="border border-white/10 rounded-[40px] overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
-                                    <table className="w-full text-left">
+                                <div className="border border-white/10 rounded-[40px] overflow-x-auto bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
+                                    <table className="w-full text-left min-w-[800px]">
                                         <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
                                             <tr>
                                                 <th className="px-8 py-6">{t.username}</th>

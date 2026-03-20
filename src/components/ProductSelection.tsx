@@ -77,7 +77,7 @@ export default function ProductSelection({
           <TrendingUp className="h-64 w-64 text-gv-gold" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
+        <div className="flex flex-col xl:grid xl:grid-cols-2 gap-12 relative z-10">
           <div className="space-y-8">
             <div className="space-y-4">
               <div className="flex justify-between items-end">
@@ -125,7 +125,7 @@ export default function ProductSelection({
             </div>
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <div className="bg-gv-gold/10 border border-gv-gold/20 p-6 rounded-[2rem] space-y-4 w-full flex flex-col items-center text-center">
               <div className="flex items-center gap-4 text-gv-gold">
                 <Wallet className="h-5 w-5" />
