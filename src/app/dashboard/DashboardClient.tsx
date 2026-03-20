@@ -139,7 +139,9 @@ export default function DashboardClient() {
                         total_assets: totalAssetsRM,
                         withdrawable_balance: withdrawableBalance,
                         locked_capital: lockedCapital,
-                        total_deposited: txs ? txs.filter((t: any) => t.type === 'Deposit' && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0) : 0,
+                        total_deposited: txs ? txs.filter((t: any) => (t.type === 'Deposit' || t.type?.includes('Bonus Increase')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0) : 0,
+                        total_withdrawn: txs ? txs.filter((t: any) => (t.type === 'Withdrawal' || t.type?.includes('Bonus Decrease')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0) : 0,
+                        total_investment: (txs ? txs.filter((t: any) => (t.type === 'Deposit' || t.type?.includes('Bonus Increase')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0) : 0) - (txs ? txs.filter((t: any) => (t.type === 'Withdrawal' || t.type?.includes('Bonus Decrease')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0) : 0),
                         totalEquity: totalAssetsRM,  
                         balanceUSD: balUSD           
                     });
@@ -198,9 +200,10 @@ export default function DashboardClient() {
                         t.status === 'Approved'
                     ).slice(0, 6).reverse());
 
-                    // Update total_deposited in user state
-                    const newTotalDeposited = txs.filter((t: any) => t.type === 'Deposit' && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
-                    setUser((prev: any) => ({ ...prev, total_deposited: newTotalDeposited }));
+                    // Update total_deposited and total_investment in user state
+                    const deposits = txs.filter((t: any) => (t.type === 'Deposit' || t.type?.includes('Bonus Increase')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
+                    const withdrawals = txs.filter((t: any) => (t.type === 'Withdrawal' || t.type?.includes('Bonus Decrease')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
+                    setUser((prev: any) => ({ ...prev, total_deposited: deposits, total_withdrawn: withdrawals, total_investment: deposits - withdrawals }));
                 }
             })
             .subscribe();
@@ -445,9 +448,10 @@ export default function DashboardClient() {
         doc.text(`Account UID: ${user?.id?.substring(0, 8)}...`, 20, 60);
         doc.text(`Statement Date: ${statementDate}`, 140, 55);
 
-        const totalDeposits = periodTxs.filter((t: any) => t.type === 'Deposit' && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount), 0);
-        const closingBalance = user?.totalEquity || 0;
-        const openingBalance = closingBalance - totalDeposits - periodProfit;
+        const totalDeposits = periodTxs.filter((t: any) => (t.type === 'Deposit' || t.type?.includes('Bonus Increase')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount), 0);
+        const totalWithdrawals = periodTxs.filter((t: any) => (t.type === 'Withdrawal' || t.type?.includes('Bonus Decrease')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount)), 0);
+        const closingBalance = (user?.total_investment || 0) + (Number(user?.profit || 0));
+        const openingBalance = closingBalance - totalDeposits + totalWithdrawals - periodProfit;
 
         autoTable(doc, {
             startY: 70,
@@ -551,10 +555,9 @@ export default function DashboardClient() {
             products: "Products",
             statements: "Statements",
             logout: "Log Out",
-            activeInvestment: "Active Investment",
+            activeInvestment: "Total Investment",
             totalProfit: "Total Withdrawable Amount",
-            totalEquity: "Active Investment",
-            totalDepositedLabel: "Total Deposited",
+            totalEquity: "Total Investment",
             dividendNote: "(Withdrawable)",
             investmentNote: "(Secure Capital)",
             currentPackage: "Current Tier",
@@ -677,10 +680,9 @@ export default function DashboardClient() {
             products: "投资产品",
             statements: "账单中心",
             logout: "退出登录",
-            activeInvestment: "活跃投资",
+            activeInvestment: "总投资额",
             totalProfit: "总可提现金额",
-            totalEquity: "活跃投资额",
-            totalDepositedLabel: "总入金额",
+            totalEquity: "总投资额",
             dividendNote: "(可提取)",
             investmentNote: "(安全资本)",
             currentPackage: "当前等级",
@@ -984,8 +986,21 @@ export default function DashboardClient() {
                     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
                         <div>
                             <p className="text-zinc-500 text-[10px] sm:text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
-                            <h1 className="text-3xl sm:text-4xl font-black">
-                                {t.welcome}<span className="text-gv-gold tracking-tighter">{user?.fullName || "Member"}</span>
+                            <h1 className="text-3xl sm:text-4xl font-black flex flex-wrap items-center gap-2 sm:gap-4">
+                                <span>{t.welcome}</span>
+                                <span className="text-gv-gold tracking-tighter truncate max-w-[200px] sm:max-w-none">{user?.fullName || "Member"}</span>
+                                {user?.balance > 0 && (
+                                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur-md hover:bg-white/10 transition-all cursor-default group/tier-badge ml-0 sm:ml-2">
+                                        <TierMedal 
+                                            tierId={getTierByAmount(Number(user?.balance || 0) / forexRate).id} 
+                                            size="sm" 
+                                            className="group-hover/tier-badge:scale-110 transition-transform"
+                                        />
+                                        <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold/80 group-hover/tier-badge:text-gv-gold transition-colors">
+                                            {getTierByAmount(Number(user?.balance || 0) / forexRate).name}
+                                        </span>
+                                    </div>
+                                )}
                             </h1>
                         </div>
                         <div className="flex items-center gap-6 hidden sm:flex">
@@ -1107,48 +1122,35 @@ export default function DashboardClient() {
                                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                             </div>
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 relative z-10">
+                                            <div className="grid grid-cols-2 gap-8 relative z-10">
                                                 <div>
-                                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest group-hover:text-zinc-400 transition-colors uppercase">{t.totalDepositedLabel}</p>
-                                                    <div className="flex flex-col gap-2">
-                                                        <h2 className="text-2xl font-black tracking-tighter text-white/50">
-                                                            {isCheckingAuth ? "..." : `RM ${Number(user?.total_deposited || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                                                        </h2>
-                                                        {!isCheckingAuth && (
-                                                            <p className="text-[9px] font-bold text-zinc-600">
-                                                                (${(Number(user?.total_deposited || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="border-l border-white/5 pl-8">
                                                     <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest transition-colors">{t.totalEquity}</p>
                                                     <div className="flex flex-col gap-2">
                                                         <h2 className="text-3xl font-black tracking-tighter text-gv-gold">
-                                                            {isCheckingAuth ? "..." : `RM ${Number(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                            {isCheckingAuth ? "..." : `RM ${Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                         </h2>
                                                         {!isCheckingAuth && (
                                                             <div className="flex flex-col gap-1">
                                                                 <p className="text-[10px] font-bold text-zinc-500">
-                                                                    (${(Number(user?.balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                                                                    (${(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
                                                                 </p>
                                                                 <span className="text-[10px] font-black text-gv-gold/60 uppercase tracking-widest">{t.investmentNote}</span>
                                                             </div>
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="border-l border-white/5 pl-8 hidden md:block">
+                                                <div className="border-l border-white/5 pl-8">
                                                     <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
                                                     <div className="flex justify-between items-center group/tier">
                                                         <div className="flex flex-col gap-1">
-                                                            <h2 className="text-xl font-black text-white uppercase tracking-tighter">
+                                                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
                                                                 {Number(user?.balance || 0) > 0 
                                                                     ? getTierByAmount(Number(user?.balance || 0) / forexRate).name 
                                                                     : t.noTier}
                                                             </h2>
                                                             <div className="flex items-center gap-2 mt-2">
-                                                                <div className={`h-1.5 w-1.5 rounded-full ${Number(user?.balance || 0) > 0 ? 'bg-gv-gold animate-pulse' : 'bg-red-500'}`}></div>
-                                                                <span className="text-[9px] font-black text-gv-gold uppercase tracking-widest">
+                                                                <div className={`h-2 w-2 rounded-full border border-black/20 ${Number(user?.balance || 0) > 0 ? 'bg-gv-gold animate-pulse' : 'bg-red-500'}`}></div>
+                                                                <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">
                                                                     {Number(user?.balance || 0) > 0 ? t.activeStatus : t.noTier}
                                                                 </span>
                                                             </div>
@@ -1157,7 +1159,7 @@ export default function DashboardClient() {
                                                             tierId={Number(user?.balance || 0) > 0 
                                                                 ? getTierByAmount(Number(user?.balance || 0) / forexRate).id 
                                                                 : "none"} 
-                                                            size="sm" 
+                                                            size="md" 
                                                             className="shrink-0 group-hover/tier:scale-110 transition-transform" 
                                                         />
                                                     </div>
