@@ -1,0 +1,466 @@
+"use client";
+
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { useAuth } from "./AuthProvider";
+
+interface AdminContextType {
+    users: any[];
+    kycQueue: any[];
+    deposits: any[];
+    withdrawals: any[];
+    salesData: any[];
+    platformStats: {
+        totalBalance: number;
+        totalProfit: number;
+        totalAssets: number;
+        userCount: number;
+    };
+    forexHistory: any[];
+    verificationLogs: any[];
+    combinedAuditLogs: any[];
+    loading: boolean;
+    showToast: (msg: string) => void;
+    refreshData: () => Promise<void>;
+    handleApproveDeposit: (tx: any) => Promise<void>;
+    handleRejectDeposit: (tx: any) => Promise<void>;
+    handleApproveWithdrawal: (tx: any) => Promise<void>;
+    handleRejectWithdrawal: (tx: any) => Promise<void>;
+    handleAdjustBalance: (user: any, amount: number, type: "balance" | "profit", reason: string) => Promise<void>;
+    handleApproveKyc: (userId: string) => Promise<void>;
+    handleRejectKyc: (userId: string, reason: string) => Promise<void>;
+    handleUpdatePortfolio: (userId: string, data: any) => Promise<void>;
+    handleResetUserPassword: (email: string) => Promise<void>;
+    handleUpdateForexRate: (newRate: number) => Promise<void>;
+    handleUpdatePassword: (password: string) => Promise<void>;
+}
+
+const AdminContext = createContext<AdminContextType | undefined>(undefined);
+
+export function AdminProvider({ children }: { children: React.ReactNode }) {
+    const { user: authUser } = useAuth();
+    const [users, setUsers] = useState<any[]>([]);
+    const [kycQueue, setKycQueue] = useState<any[]>([]);
+    const [deposits, setDeposits] = useState<any[]>([]);
+    const [withdrawals, setWithdrawals] = useState<any[]>([]);
+    const [salesData, setSalesData] = useState<any[]>([]);
+    const [platformStats, setPlatformStats] = useState({ totalBalance: 0, totalProfit: 0, totalAssets: 0, userCount: 0 });
+    const [forexHistory, setForexHistory] = useState<any[]>([]);
+    const [verificationLogs, setVerificationLogs] = useState<any[]>([]);
+    const [combinedAuditLogs, setCombinedAuditLogs] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: "", visible: false });
+
+    const showToast = useCallback((msg: string) => {
+        setToast({ message: msg, visible: true });
+        setTimeout(() => setToast({ message: "", visible: false }), 5000);
+    }, []);
+
+    const fetchData = useCallback(async () => {
+        setLoading(true);
+        try {
+            // 1. Fetch Profiles
+            const { data: profileList } = await supabase.from('profiles').select('*');
+            if (profileList) {
+                const sortedUsers = [...profileList].sort((a, b) => 
+                    new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+                );
+                setUsers(sortedUsers);
+                setKycQueue(sortedUsers.filter((p: any) => p.kyc_status === 'Pending'));
+
+                const stats = sortedUsers.reduce((acc, p) => ({
+                    totalBalance: acc.totalBalance + Number(p.balance || 0),
+                    totalProfit: acc.totalProfit + Number(p.profit || 0),
+                    totalAssets: acc.totalAssets + (Number(p.balance || 0) + Number(p.profit || 0)),
+                    userCount: acc.userCount + 1
+                }), { totalBalance: 0, totalProfit: 0, totalAssets: 0, userCount: 0 });
+                setPlatformStats(stats);
+            }
+
+            // 2. Fetch Transactions
+            const { data: txList } = await supabase
+                .from('transactions')
+                .select('*, profiles(*)')
+                .order('created_at', { ascending: false });
+            
+            if (txList) {
+                setDeposits(txList.filter((t: any) => t.type?.toLowerCase() === 'deposit'));
+                setWithdrawals(txList.filter((t: any) => t.type?.toLowerCase() === 'withdrawal'));
+            }
+
+            // 3. Fetch Verification Logs
+            const { data: logs } = await supabase
+                .from('verification_logs')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (logs) setVerificationLogs(logs);
+
+            // 4. Combine Audit Logs
+            const financialTxs = txList?.filter((t: any) => t.status === 'Approved') || [];
+            const mergedLogs = [
+                ...(logs || []).map(l => ({ ...l, auditType: 'verification' })),
+                ...financialTxs.map(t => ({
+                    id: t.id,
+                    created_at: t.created_at,
+                    admin_username: t.metadata?.processed_by_name || 'System',
+                    user_email: t.profiles?.email || 'Unknown',
+                    action: t.type === 'Deposit' ? 'Deposit Approved' : 
+                            t.type === 'Withdrawal' ? 'Withdrawal Approved' : 'Adjustment',
+                    processed_by_name: t.metadata?.processed_by_name,
+                    rejection_reason: t.metadata?.reason || t.metadata?.description || `${t.type} processed`,
+                    auditType: 'transaction',
+                    amount: t.amount,
+                    txType: t.type
+                }))
+            ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            setCombinedAuditLogs(mergedLogs);
+
+            // 5. Fetch Sales Data
+            const { data: sales } = await supabase
+                .from('sales_leaderboard')
+                .select('*')
+                .order('total_referred_capital', { ascending: false });
+            if (sales) setSalesData(sales);
+
+            // 6. Fetch Forex History
+            const { data: fHistory } = await supabase
+                .from('forex_history')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(10);
+            if (fHistory) setForexHistory(fHistory);
+
+        } catch (error) {
+            console.error("Error fetching admin data:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const handleApproveDeposit = async (tx: any) => {
+        try {
+            const { error: rpcError } = await supabase.rpc('approve_deposit', {
+                p_tx_id: tx.id,
+                p_user_id: tx.user_id,
+                p_amount: Number(tx.amount || 0)
+            });
+            if (rpcError) throw rpcError;
+
+            await supabase.from('transactions').update({
+                metadata: {
+                    ...tx.metadata,
+                    processed_by_name: authUser?.user_metadata?.full_name || "Admin",
+                    processed_by_id: authUser?.id,
+                    processed_by_email: authUser?.email
+                }
+            }).eq('id', tx.id);
+            
+            showToast("Deposit approved successfully.");
+            fetchData();
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
+    const handleRejectDeposit = async (tx: any) => {
+        try {
+            const { error: txError } = await supabase
+                .from('transactions')
+                .update({ 
+                    status: 'Rejected',
+                    metadata: {
+                        ...tx.metadata,
+                        processed_by_name: authUser?.user_metadata?.full_name || "Admin",
+                        processed_by_id: authUser?.id,
+                        processed_by_email: authUser?.email,
+                        reason: "Policy violation or invalid receipt"
+                    }
+                })
+                .eq('id', tx.id);
+            if (txError) throw txError;
+            showToast("Deposit rejected.");
+            fetchData();
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
+    const handleApproveWithdrawal = async (tx: any) => {
+        try {
+            const { error: txError } = await supabase
+                .from('transactions')
+                .update({ 
+                    status: 'Approved',
+                    metadata: {
+                        ...tx.metadata,
+                        processed_by_name: authUser?.user_metadata?.full_name || "Admin",
+                        processed_by_id: authUser?.id,
+                        processed_by_email: authUser?.email
+                    }
+                })
+                .eq('id', tx.id);
+            
+            if (txError) throw txError;
+            showToast("Withdrawal approved.");
+            fetchData();
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
+    const handleRejectWithdrawal = async (tx: any) => {
+        try {
+            const { error: txError } = await supabase
+                .from('transactions')
+                .update({ 
+                    status: 'Rejected',
+                    metadata: {
+                        ...tx.metadata,
+                        processed_by_name: authUser?.user_metadata?.full_name || "Admin",
+                        processed_by_id: authUser?.id,
+                        processed_by_email: authUser?.email
+                    }
+                })
+                .eq('id', tx.id);
+            
+            if (txError) throw txError;
+            showToast("Withdrawal rejected.");
+            fetchData();
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
+    const handleAdjustBalance = async (user: any, amount: number, type: "balance" | "profit", reason: string) => {
+        try {
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ [type]: Number(user[type] || 0) + amount })
+                .eq('id', user.id);
+            if (profileError) throw profileError;
+
+            const txType = (type === 'balance' ? 'Bonus' : 'Dividend') + (amount >= 0 ? ' Increase' : ' Decrease');
+            const { error: txError } = await supabase
+                .from('transactions')
+                .insert({
+                    user_id: user.id,
+                    type: txType,
+                    amount: amount,
+                    status: 'Approved',
+                    ref_id: `ADJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+                    metadata: { 
+                        reason: reason,
+                        description: reason || `${txType} Adjustment`,
+                        processed_by_name: authUser?.user_metadata?.full_name || "Admin",
+                        processed_by_id: authUser?.id,
+                        processed_by_email: authUser?.email
+                    }
+                });
+            if (txError) throw txError;
+
+            showToast(`Successfully adjusted ${type} by RM ${amount.toFixed(2)}`);
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleApproveKyc = async (userId: string) => {
+        try {
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ 
+                    kyc_status: 'Verified', 
+                    is_verified: true,
+                    verified_at: new Date().toISOString()
+                })
+                .eq('id', userId);
+
+            if (updateError) throw updateError;
+
+            const user = users.find(u => u.id === userId);
+            await supabase
+                .from('verification_logs')
+                .insert({
+                    admin_id: authUser?.id,
+                    user_email: user?.email || 'Unknown',
+                    admin_username: authUser?.user_metadata?.full_name || "Admin",
+                    action: 'Verified',
+                    created_at: new Date().toISOString()
+                });
+
+            showToast(`User successfully verified.`);
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleRejectKyc = async (userId: string, reason: string) => {
+        try {
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ 
+                    kyc_status: 'Rejected', 
+                    is_verified: false,
+                    rejection_reason: reason
+                })
+                .eq('id', userId);
+
+            if (updateError) throw updateError;
+
+            const user = users.find(u => u.id === userId);
+            await supabase
+                .from('verification_logs')
+                .insert({
+                    admin_id: authUser?.id,
+                    user_email: user?.email || 'Unknown',
+                    admin_username: authUser?.user_metadata?.full_name || "Admin",
+                    action: 'Rejected',
+                    rejection_reason: reason,
+                    created_at: new Date().toISOString()
+                });
+
+            showToast(`User successfully rejected.`);
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleUpdatePortfolio = async (userId: string, data: any) => {
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    portfolio_platform_name: data.platform,
+                    portfolio_account_id: data.account_id,
+                    portfolio_account_password: data.password,
+                    internal_remarks: data.remarks
+                })
+                .eq('id', userId);
+            
+            if (error) throw error;
+            showToast("Portfolio details updated successfully.");
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleResetUserPassword = async (email: string) => {
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.host === 'localhost:3000' ? 'http://localhost:3000' : 'https://' + window.location.host}/reset-password`,
+            });
+            if (error) throw error;
+            showToast("Password reset email sent.");
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleUpdateForexRate = async (newRate: number) => {
+        try {
+            const { data: currentSettings } = await supabase
+                .from('platform_settings')
+                .select('value')
+                .eq('key', 'forex_rate')
+                .single();
+            const oldRate = Number(currentSettings?.value || 4.2);
+
+            // 1. Update Platform Settings
+            const { error: settingsError } = await supabase
+                .from('platform_settings')
+                .upsert({ key: 'forex_rate', value: String(newRate) }, { onConflict: 'key' });
+            if (settingsError) throw settingsError;
+
+            // 2. Log History
+            const { error: historyError } = await supabase
+                .from('forex_history')
+                .insert({
+                    old_rate: oldRate,
+                    new_rate: newRate,
+                    admin_id: authUser?.id,
+                    admin_username: authUser?.user_metadata?.full_name || "Admin"
+                });
+            if (historyError) throw historyError;
+
+            showToast(`Global rate updated to 1 USD = RM ${newRate.toFixed(4)}`);
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleUpdatePassword = async (password: string) => {
+        try {
+            const { error } = await supabase.auth.updateUser({ password });
+            if (error) throw error;
+            showToast("Password updated successfully.");
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+
+        const channel = supabase
+            .channel('admin-realtime-sync')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => fetchData())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchData())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'platform_settings' }, () => fetchData())
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [fetchData]);
+
+    return (
+        <AdminContext.Provider value={{ 
+            users, 
+            kycQueue, 
+            deposits, 
+            withdrawals, 
+            salesData, 
+            platformStats, 
+            forexHistory, 
+            verificationLogs, 
+            combinedAuditLogs,
+            loading, 
+            showToast,
+            refreshData: fetchData,
+            handleApproveDeposit,
+            handleRejectDeposit,
+            handleApproveWithdrawal,
+            handleRejectWithdrawal,
+            handleAdjustBalance,
+            handleApproveKyc,
+            handleRejectKyc,
+            handleUpdatePortfolio,
+            handleResetUserPassword,
+            handleUpdateForexRate,
+            handleUpdatePassword
+        }}>
+            {children}
+            
+            {/* Action Toast UI */}
+            {toast.visible && (
+                <div className="fixed bottom-6 right-6 z-[1000] bg-gv-gold text-black font-black py-4 px-8 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-5 uppercase tracking-widest text-[10px]">
+                    {toast.message}
+                </div>
+            )}
+        </AdminContext.Provider>
+    );
+}
+
+export const useAdmin = () => {
+    const context = useContext(AdminContext);
+    if (context === undefined) {
+        throw new Error("useAdmin must be used within an AdminProvider");
+    }
+    return context;
+};

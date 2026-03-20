@@ -1,12 +1,12 @@
 import React from "react";
-import AdminDashboardClient from "./DashboardClient";
+import KycClient from "./KycClient";
 
-export default function AdminPage({
+export default function AdminKycPage({
     searchParams,
 }: {
     searchParams: { lang?: string };
 }) {
     const lang = searchParams.lang === "zh" ? "zh" : "en";
 
-    return <AdminDashboardClient lang={lang} />;
+    return <KycClient lang={lang} />;
 }

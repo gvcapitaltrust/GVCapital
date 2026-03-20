@@ -1,12 +1,12 @@
 import React from "react";
-import AdminDashboardClient from "./DashboardClient";
+import SalesClient from "./SalesClient";
 
-export default function AdminPage({
+export default function AdminSalesPage({
     searchParams,
 }: {
     searchParams: { lang?: string };
 }) {
     const lang = searchParams.lang === "zh" ? "zh" : "en";
 
-    return <AdminDashboardClient lang={lang} />;
+    return <SalesClient lang={lang} />;
 }

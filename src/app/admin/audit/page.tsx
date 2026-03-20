@@ -1,12 +1,12 @@
 import React from "react";
-import AdminDashboardClient from "./DashboardClient";
+import AuditClient from "./AuditClient";
 
-export default function AdminPage({
+export default function AdminAuditPage({
     searchParams,
 }: {
     searchParams: { lang?: string };
 }) {
     const lang = searchParams.lang === "zh" ? "zh" : "en";
 
-    return <AdminDashboardClient lang={lang} />;
+    return <AuditClient lang={lang} />;
 }

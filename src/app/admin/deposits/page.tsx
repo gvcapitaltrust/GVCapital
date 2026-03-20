@@ -1,12 +1,12 @@
 import React from "react";
-import AdminDashboardClient from "./DashboardClient";
+import DepositsClient from "./DepositsClient";
 
-export default function AdminPage({
+export default function AdminDepositsPage({
     searchParams,
 }: {
     searchParams: { lang?: string };
 }) {
     const lang = searchParams.lang === "zh" ? "zh" : "en";
 
-    return <AdminDashboardClient lang={lang} />;
+    return <DepositsClient lang={lang} />;
 }

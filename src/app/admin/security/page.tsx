@@ -1,12 +1,12 @@
 import React from "react";
-import AdminDashboardClient from "./DashboardClient";
+import SecurityClient from "./SecurityClient";
 
-export default function AdminPage({
+export default function AdminSecurityPage({
     searchParams,
 }: {
     searchParams: { lang?: string };
 }) {
     const lang = searchParams.lang === "zh" ? "zh" : "en";
 
-    return <AdminDashboardClient lang={lang} />;
+    return <SecurityClient lang={lang} />;
 }

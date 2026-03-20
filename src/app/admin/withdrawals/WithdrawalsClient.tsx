@@ -1,0 +1,144 @@
+"use client";
+
+import React, { useState } from "react";
+import { useAdmin } from "@/providers/AdminProvider";
+import { useSettings } from "@/providers/SettingsProvider";
+
+export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
+    const { withdrawals, loading, handleApproveWithdrawal, handleRejectWithdrawal } = useAdmin();
+    const { forexRate } = useSettings();
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState("All");
+
+    const t = {
+        en: {
+            title: "Withdrawal Management",
+            subtitle: "Oversee and authorize outbound capital distributions to institutional client accounts.",
+            searchPlaceholder: "Search by name or email...",
+            statusAll: "All Status",
+            statusPending: "Pending",
+            statusApproved: "Approved",
+            statusRejected: "Rejected",
+            tableUser: "User",
+            tableAmount: "Amount",
+            tableDate: "Date",
+            tableStatus: "Status",
+            tableActions: "Actions",
+            approve: "Approve",
+            reject: "Reject",
+            noWithdrawals: "No withdrawal records found."
+        },
+        zh: {
+            title: "提款管理",
+            subtitle: "监督并授权向机构客户账户支出的资本分配。",
+            searchPlaceholder: "按姓名或邮箱搜索...",
+            statusAll: "全部状态",
+            statusPending: "待处理",
+            statusApproved: "已批准",
+            statusRejected: "已拒绝",
+            tableUser: "用户",
+            tableAmount: "金额",
+            tableDate: "日期",
+            tableStatus: "状态",
+            tableActions: "操作",
+            approve: "批准",
+            reject: "拒绝",
+            noWithdrawals: "未发现提款记录。"
+        }
+    }[lang];
+
+    const filteredWithdrawals = withdrawals.filter(tx => {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = (tx.profiles?.full_name || "").toLowerCase().includes(query) || (tx.profiles?.email || "").toLowerCase().includes(query);
+        const matchesStatus = statusFilter === "All" || tx.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
+
+    if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
+
+    return (
+        <div className="space-y-8 animate-in fade-in duration-500">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h2 className="text-3xl font-black uppercase tracking-tighter text-white">{t.title}</h2>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{t.subtitle}</p>
+                </div>
+                <div className="flex flex-col md:flex-row gap-4">
+                    <input
+                        type="text"
+                        placeholder={t.searchPlaceholder}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs w-full md:w-64 focus:outline-none focus:border-gv-gold transition-all"
+                    />
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-gv-gold transition-all text-white"
+                    >
+                        <option value="All" className="bg-[#111]">{t.statusAll}</option>
+                        <option value="Pending" className="bg-[#111]">{t.statusPending}</option>
+                        <option value="Approved" className="bg-[#111]">{t.statusApproved}</option>
+                        <option value="Rejected" className="bg-[#111]">{t.statusRejected}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div className="bg-[#1a1a1a]/50 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                            <tr>
+                                <th className="px-8 py-6">{t.tableUser}</th>
+                                <th className="px-8 py-6">{t.tableAmount}</th>
+                                <th className="px-8 py-6">{t.tableDate}</th>
+                                <th className="px-8 py-6">{t.tableStatus}</th>
+                                <th className="px-8 py-6 text-right">{t.tableActions}</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/[0.03]">
+                            {filteredWithdrawals.map((tx, idx) => (
+                                <tr key={idx} className="text-sm group hover:bg-white/[0.02] transition-all">
+                                    <td className="px-8 py-6">
+                                        <div className="flex flex-col">
+                                            <span className="font-black text-white uppercase tracking-tight">{tx.profiles?.full_name}</span>
+                                            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <div className="flex flex-col">
+                                            <span className="font-black text-red-500 tabular-nums">RM {Math.abs(Number(tx.amount)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(tx.amount)) / forexRate).toFixed(2)} USD)</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6 text-zinc-500 font-mono text-xs">{new Date(tx.created_at).toLocaleDateString()}</td>
+                                    <td className="px-8 py-6">
+                                        <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${
+                                            tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
+                                            tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
+                                            'bg-amber-500/10 text-amber-500'
+                                        }`}>{tx.status}</span>
+                                    </td>
+                                    <td className="px-8 py-6 text-right">
+                                        <div className="flex items-center justify-end gap-3">
+                                            {tx.status === 'Pending' && (
+                                                <>
+                                                    <button onClick={() => handleRejectWithdrawal(tx)} className="text-red-500 hover:bg-red-500/10 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">{t.reject}</button>
+                                                    <button onClick={() => handleApproveWithdrawal(tx)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">{t.approve}</button>
+                                                </>
+                                            )}
+                                            {tx.status !== 'Pending' && <span className="text-[10px] text-zinc-700 font-black uppercase italic">Completed</span>}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    {filteredWithdrawals.length === 0 && (
+                        <div className="p-20 text-center text-zinc-600 font-black uppercase tracking-[0.2em]">{t.noWithdrawals}</div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
