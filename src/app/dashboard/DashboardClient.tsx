@@ -587,7 +587,7 @@ export default function DashboardClient() {
             successDesc: "Our team will review your request within 24 hours.",
             whatsapp: "Contact Support via WhatsApp",
             expectedMonthly: "Expected Monthly Dividend",
-            projectedYearly: "Projected Yearly Profit",
+            projectedYearly: "Expected Yearly Dividend",
             latestDeposit: "Latest Deposit Status",
             dividendTrends: "6-Month Dividend Trends",
             downloadStatement: "Download Monthly Statement",
@@ -712,7 +712,7 @@ export default function DashboardClient() {
             successDesc: "我们的团队将在 24 小时内审核您的申请。",
             whatsapp: "通过 WhatsApp 联系支持",
             expectedMonthly: "预计月度股息",
-            projectedYearly: "预计年度利润",
+            projectedYearly: "预计年度股息",
             latestDeposit: "最新存款状态",
             dividendTrends: "6 个月股息趋势",
             downloadStatement: "下载月度账单",
@@ -1175,15 +1175,14 @@ export default function DashboardClient() {
                                             </div>
                                             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
                                             {(() => {
-                                                const currentTier = getTierByAmount(Number(user?.balance || 0) / forexRate);
-                                                const monthlyMin = Number(user?.balance || 0) * currentTier.minDividend;
-                                                const monthlyMax = Number(user?.balance || 0) * currentTier.maxDividend;
-                                                return (
-                                                    <h3 className="text-3xl font-black text-white">
-                                                        RM {monthlyMin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} - RM {monthlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
-                                                    </h3>
-                                                );
-                                            })()}
+                                                 const currentTier = getTierByAmount(Number(user?.balance || 0) / forexRate);
+                                                 const monthlyMax = Number(user?.balance || 0) * currentTier.maxDividend;
+                                                 return (
+                                                     <h3 className="text-3xl font-black text-white">
+                                                         up to RM {monthlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                     </h3>
+                                                 );
+                                             })()}
                                             <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">
                                                 {t.basedOn} {Number(user?.balance || 0) > 0 
                                                     ? `${getTierByAmount(Number(user?.balance || 0) / forexRate).minDividend * 100}-${getTierByAmount(Number(user?.balance || 0) / forexRate).maxDividend * 100}% ${getTierByAmount(Number(user?.balance || 0) / forexRate).name}` 
