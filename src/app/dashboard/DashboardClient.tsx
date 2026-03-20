@@ -665,6 +665,7 @@ export default function DashboardClient() {
             noTxFound: "No transaction history found",
             basedOn: "Based on",
             returns: "returns",
+            dividendRateDesc: "based on current tier dividend rate",
             yearlyForecast: "Yearly Forecast",
             yourCode: "Your Code",
             transactions: "Transactions",
@@ -713,6 +714,7 @@ export default function DashboardClient() {
             whatsapp: "通过 WhatsApp 联系支持",
             expectedMonthly: "预计月度股息",
             projectedYearly: "预计年度股息",
+            dividendRateDesc: "基于目前档位分红率",
             latestDeposit: "最新存款状态",
             dividendTrends: "6 个月股息趋势",
             downloadStatement: "下载月度账单",
@@ -1179,14 +1181,13 @@ export default function DashboardClient() {
                                                  const monthlyMax = Number(user?.balance || 0) * currentTier.maxDividend;
                                                  return (
                                                      <h3 className="text-3xl font-black text-white">
-                                                         up to RM {monthlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                         <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
+                                                         RM {monthlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                                      </h3>
                                                  );
                                              })()}
                                             <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">
-                                                {t.basedOn} {Number(user?.balance || 0) > 0 
-                                                    ? `${getTierByAmount(Number(user?.balance || 0) / forexRate).minDividend * 100}-${getTierByAmount(Number(user?.balance || 0) / forexRate).maxDividend * 100}% ${getTierByAmount(Number(user?.balance || 0) / forexRate).name}` 
-                                                    : t.noTier} {t.returns}
+                                                {t.dividendRateDesc}
                                             </p>
                                         </div>
                                         <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
@@ -1196,15 +1197,15 @@ export default function DashboardClient() {
                                             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
                                             {(() => {
                                                 const currentTier = getTierByAmount(Number(user?.balance || 0) / forexRate);
-                                                const yearlyMin = Number(user?.balance || 0) * currentTier.minDividend * 12;
                                                 const yearlyMax = Number(user?.balance || 0) * currentTier.maxDividend * 12;
                                                 return (
                                                     <h3 className="text-3xl font-black text-emerald-500">
-                                                        RM {yearlyMin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} - RM {yearlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                        <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
+                                                        RM {yearlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                                     </h3>
                                                 );
                                             })()}
-                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">{t.yearlyForecast} ({t.basedOn} {getTierByAmount(Number(user?.balance || 0) / forexRate).name})</p>
+                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">{t.dividendRateDesc}</p>
                                         </div>
                                     </section>
 
