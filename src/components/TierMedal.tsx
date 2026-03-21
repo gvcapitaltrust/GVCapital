@@ -48,9 +48,14 @@ export default function TierMedal({ tierId, className = "", size = "md" }: TierM
   };
 
   return (
-    <div className={`relative flex items-center justify-center ${className}`}>
+    <div className={`relative flex items-center justify-center shrink-0 ${sizeMap[size].replace('h-', 'h-[calc(').replace('w-', 'w-[calc(').replace(' ', ')] ')} ${
+      size === 'sm' ? 'w-6 h-6' : 
+      size === 'md' ? 'w-12 h-12' : 
+      size === 'lg' ? 'w-16 h-16' : 
+      'w-24 h-24'
+    } ${className}`}>
       <div className={`absolute inset-0 blur-2xl opacity-20 ${tierId === 'platinum' ? 'bg-amber-500' : tierId === 'gold' ? 'bg-gv-gold' : 'bg-white/10'}`} />
-      <div className={`relative rounded-full flex items-center justify-center p-2 border border-white/10 ${getGradient()} shadow-2xl`}>
+      <div className={`relative rounded-full flex items-center justify-center p-2 border border-white/10 ${getGradient()} shadow-2xl transition-transform duration-500`}>
         {getIcon()}
       </div>
     </div>

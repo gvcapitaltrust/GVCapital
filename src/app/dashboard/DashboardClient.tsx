@@ -1143,16 +1143,16 @@ export default function DashboardClient() {
                                                 </div>
                                                 <div className="sm:border-l border-t sm:border-t-0 border-white/5 pt-6 sm:pt-0 sm:pl-8">
                                                     <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
-                                                    <div className="flex justify-between items-center group/tier">
-                                                        <div className="flex flex-col gap-1">
-                                                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
+                                                    <div className="flex justify-between items-center gap-4 group/tier">
+                                                        <div className="flex flex-col gap-1 min-w-0 flex-1">
+                                                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter truncate">
                                                                 {Number(user?.total_investment || 0) > 0 
                                                                     ? getTierByAmount(Number(user?.total_investment || 0) / forexRate).name 
                                                                     : t.noTier}
                                                             </h2>
                                                             <div className="flex items-center gap-2 mt-2">
                                                                 <div className={`h-2 w-2 rounded-full border border-black/20 ${Number(user?.total_investment || 0) > 0 ? 'bg-gv-gold animate-pulse' : 'bg-red-500'}`}></div>
-                                                                <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">
+                                                                <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest whitespace-nowrap">
                                                                     {Number(user?.total_investment || 0) > 0 ? t.activeStatus : t.noTier}
                                                                 </span>
                                                             </div>
@@ -1162,7 +1162,7 @@ export default function DashboardClient() {
                                                                 ? getTierByAmount(Number(user?.total_investment || 0) / forexRate).id 
                                                                 : "none"} 
                                                             size="md" 
-                                                            className="shrink-0 group-hover/tier:scale-110 transition-transform" 
+                                                            className="shrink-0 group-hover/tier:scale-110 transition-transform duration-500" 
                                                         />
                                                     </div>
                                                 </div>
