@@ -28,45 +28,45 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
 
   return (
     <div
-      className={`relative flex flex-col p-6 rounded-[2rem] border-2 transition-all duration-500 ${
+      className={`relative flex flex-col p-4 rounded-xl border transition-all duration-500 ${
         isActive
-          ? `${colorMap[tier.color]} bg-[#1a1a1a] scale-105 ${glowMap[tier.color]} z-10`
-          : "border-white/5 bg-[#111] opacity-60 scale-95 hover:opacity-100"
+          ? `${colorMap[tier.color]} bg-[#1a1a1a] scale-[1.02] ${glowMap[tier.color]} z-10`
+          : "border-white/5 bg-[#111] opacity-60 hover:opacity-100"
       }`}
     >
       {isQualified && isActive && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gv-gold text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg text-center">
+        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gv-gold text-black text-[8px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-widest shadow-md text-center whitespace-nowrap">
           Current Tier
         </div>
       )}
 
-      <div className="flex justify-between items-start mb-4 gap-2">
+      <div className="flex justify-between items-start mb-3 gap-2">
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg xl:text-xl font-black mb-1 uppercase tracking-tighter break-words">{tier.name}</h3>
-          <p className="text-[10px] sm:text-xs font-black text-zinc-500 uppercase tracking-widest break-words mt-1">
+          <h3 className="text-sm xl:text-base font-black mb-0.5 uppercase tracking-tight break-words">{tier.name}</h3>
+          <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
             {tier.id === "diamond" ? `Over ${formatUSD(tier.minAmount)}` : `${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
           </p>
         </div>
-        <TierMedal tierId={tier.id} size="md" className="shrink-0" />
+        <TierMedal tierId={tier.id} size="sm" className="shrink-0" />
       </div>
 
-      <div className="mb-6 flex items-baseline gap-1.5 flex-wrap">
-        <span className="text-3xl font-black text-white shrink-0 flex items-baseline">
-          <span className="text-xs font-black text-zinc-500 uppercase tracking-widest mr-1.5 whitespace-nowrap">
+      <div className="mb-4 flex items-baseline gap-1">
+        <span className="text-xl font-black text-white shrink-0 flex items-baseline">
+          <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mr-1 whitespace-nowrap">
             {tier.id === "silver" ? "min" : "up to"}
           </span>
           {tier.id === "silver" 
             ? `${(tier.minDividend * 100).toFixed(0)}%` 
             : `${(tier.maxDividend * 100).toFixed(0)}%`}
         </span>
-        <span className="text-[10px] font-bold text-zinc-500 ml-1 uppercase">Monthly</span>
+        <span className="text-[9px] font-bold text-zinc-500 ml-0.5 uppercase">Monthly</span>
       </div>
 
-      <ul className="space-y-3 mb-8 flex-1">
+      <ul className="space-y-2 flex-1">
         {tier.benefits.map((benefit, idx) => (
-          <li key={idx} className="flex items-start gap-2">
+          <li key={idx} className="flex items-start gap-1.5">
             <Check className={`h-3 w-3 mt-0.5 shrink-0 ${isActive ? 'text-gv-gold' : 'text-zinc-600'}`} />
-            <span className="text-xs text-zinc-400 font-medium leading-tight">{benefit}</span>
+            <span className="text-[11px] text-zinc-400 font-medium leading-tight">{benefit}</span>
           </li>
         ))}
       </ul>
