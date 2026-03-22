@@ -37,10 +37,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // 1. Stable Identity Listener
     useEffect(() => {
-        // Initial session grab
         const initSession = async () => {
             const { data: { session: s } } = await supabase.auth.getSession();
             if (s) {
+                document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(s))}; path=/; max-age=31536000; SameSite=Lax;`;
                 currentUserId.current = s.user.id;
                 setSession(s);
             } else {
@@ -53,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.log(`[AUTH EVENT]: ${event}`);
             
             if (event === 'SIGNED_OUT') {
+                document.cookie = `gv-auth-v1=; path=/; max-age=0;`;
                 setUser(null);
                 setRole("User");
                 setIsVerified(false);
@@ -71,6 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             // Stable Identity Check: Only trigger if the user ID changed or explicitly signed in
             if (s && (s.user.id !== currentUserId.current || event === 'SIGNED_IN')) {
+                document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(s))}; path=/; max-age=31536000; SameSite=Lax;`;
                 currentUserId.current = s.user.id;
                 setSession(s);
             }

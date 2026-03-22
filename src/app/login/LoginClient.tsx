@@ -24,6 +24,8 @@ export default function LoginPage() {
         // Use onAuthStateChange for more stable session detection
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
+                // Sync session to cookie so Next.js middleware can read it before redirecting
+                document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(session))}; path=/; max-age=31536000; SameSite=Lax;`;
                 const user = session.user;
                 const isAdmin = user.user_metadata?.role === "Admin" || user.email === "admin@gvcapital.trust";
                 const redirectPath = isAdmin ? "/admin" : `/dashboard?lang=${urlLang || lang}`;
@@ -96,6 +98,7 @@ export default function LoginPage() {
             }
 
             if (data.session) {
+                document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(data.session))}; path=/; max-age=31536000; SameSite=Lax;`;
                 const user = data.session.user;
                 const isAdmin = user.user_metadata?.role === "Admin" || user.email === "admin@gvcapital.trust";
                 window.location.href = isAdmin ? "/admin" : `/dashboard?lang=${lang}`;
