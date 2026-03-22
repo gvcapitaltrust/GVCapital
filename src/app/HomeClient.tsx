@@ -150,7 +150,7 @@ export default function HomeClient() {
                         </h2>
                     </div>
 
-                    <h1 className="mb-8 text-5xl font-black tracking-tight sm:text-7xl lg:text-8xl leading-[1.1]">
+                    <h1 className="mb-6 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl leading-tight">
                         <span className="block text-white uppercase">{t.hero.title}</span>
                     </h1>
                     
@@ -179,8 +179,8 @@ export default function HomeClient() {
             <section id="about" className="py-24 relative z-10 bg-[#121212] border-y border-white/5">
                 <div className="max-w-7xl mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-16 items-center">
                     <div>
-                        <h3 className="text-gv-gold text-xs font-black uppercase tracking-[0.3em] mb-4">{t.about.title}</h3>
-                        <h2 className="text-3xl sm:text-5xl font-black mb-6 leading-tight">{t.about.subtitle}</h2>
+                        <h3 className="text-gv-gold text-[10px] font-black uppercase tracking-[0.2em] mb-3">{t.about.title}</h3>
+                        <h2 className="text-2xl sm:text-3xl font-black mb-4 leading-tight">{t.about.subtitle}</h2>
                         <p className="text-zinc-400 text-lg mb-6 leading-relaxed">
                             {t.about.desc1}
                         </p>
@@ -191,16 +191,16 @@ export default function HomeClient() {
                         {/* Stats mini-grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-8 border-t border-white/10">
                             <div>
-                                <div className="text-3xl font-black text-white mb-1">10k+</div>
-                                <div className="text-xs text-zinc-500 uppercase tracking-widest font-bold">{t.about.stats.clients}</div>
+                                <div className="text-xl font-black text-white mb-0.5">10k+</div>
+                                <div className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">{t.about.stats.clients}</div>
                             </div>
                             <div>
-                                <div className="text-3xl font-black text-white mb-1">$50M+</div>
-                                <div className="text-xs text-zinc-500 uppercase tracking-widest font-bold">{t.about.stats.volume}</div>
+                                <div className="text-xl font-black text-white mb-0.5">$50M+</div>
+                                <div className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">{t.about.stats.volume}</div>
                             </div>
                             <div className="hidden sm:block">
-                                <div className="text-3xl font-black text-white mb-1">99.9%</div>
-                                <div className="text-xs text-zinc-500 uppercase tracking-widest font-bold">{t.about.stats.uptime}</div>
+                                <div className="text-xl font-black text-white mb-0.5">99.9%</div>
+                                <div className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">{t.about.stats.uptime}</div>
                             </div>
                         </div>
                     </div>
@@ -232,7 +232,7 @@ export default function HomeClient() {
             {/* --- CORE OFFERINGS --- */}
             <section className="py-24 relative z-10">
                 <div className="max-w-7xl mx-auto px-6 lg:px-12 text-center">
-                    <h2 className="text-3xl sm:text-5xl font-black mb-16">{t.services.title}</h2>
+                    <h2 className="text-2xl sm:text-3xl font-black mb-12">{t.services.title}</h2>
                     
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {t.services.items.map((item, idx) => {
@@ -256,8 +256,8 @@ export default function HomeClient() {
             {/* --- HOW IT WORKS (Process Timeline) --- */}
             <section className="py-24 relative z-10 bg-[#121212] border-y border-white/5">
                 <div className="max-w-7xl mx-auto px-6 lg:px-12">
-                    <div className="text-center max-w-2xl mx-auto mb-16">
-                        <h2 className="text-3xl sm:text-5xl font-black mb-6">{t.process.title}</h2>
+                    <div className="text-center max-w-2xl mx-auto mb-12">
+                        <h2 className="text-2xl sm:text-3xl font-black mb-4">{t.process.title}</h2>
                     </div>
                     
                     <div className="grid md:grid-cols-4 gap-8 relative">
@@ -280,8 +280,8 @@ export default function HomeClient() {
             {/* --- TIERS PREVIEW --- */}
             <section className="py-24 relative z-10">
                 <div className="max-w-7xl mx-auto px-6 lg:px-12 text-center">
-                    <h2 className="text-3xl sm:text-5xl font-black mb-4">{t.tiers.title}</h2>
-                    <p className="text-zinc-400 text-lg mb-16 max-w-2xl mx-auto">{t.tiers.subtitle}</p>
+                    <h2 className="text-2xl sm:text-3xl font-black mb-3">{t.tiers.title}</h2>
+                    <p className="text-zinc-400 text-base mb-12 max-w-2xl mx-auto">{t.tiers.subtitle}</p>
 
                     <div className="flex flex-wrap justify-center gap-6">
                         {TIERS.map((tierData, idx) => {
@@ -316,8 +316,8 @@ export default function HomeClient() {
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-64 bg-gv-gold/10 blur-[100px] rounded-full"></div>
                 
                 <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-                    <h2 className="text-4xl sm:text-6xl font-black mb-6 uppercase tracking-tight">{t.cta.join}</h2>
-                    <p className="text-xl text-zinc-400 mb-10">{t.cta.desc}</p>
+                    <h2 className="text-3xl sm:text-4xl font-black mb-4 uppercase tracking-tight">{t.cta.join}</h2>
+                    <p className="text-lg text-zinc-400 mb-8">{t.cta.desc}</p>
                     <Link
                         href={targetLink}
                         style={{ opacity: authLoading ? 0.5 : 1 }}

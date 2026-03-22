@@ -49,7 +49,7 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
             <div>
-                <h2 className="text-3xl font-black uppercase tracking-tighter text-white">{t.title}</h2>
+                <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-white">{t.title}</h2>
                 <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{t.subtitle}</p>
             </div>
 
@@ -59,13 +59,13 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
                         <svg className="h-20 w-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <div className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.cardTotal}</div>
-                    <div className="text-4xl font-black text-white tracking-tighter tabular-nums drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">RM {totalCapital.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                    <div className="text-2xl font-black text-white tracking-tight tabular-nums drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]">RM {totalCapital.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                     <div className="text-[10px] text-gv-gold/60 font-bold uppercase tracking-[0.2em]">≈ ${(totalCapital / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
                 </div>
 
                 <Link href="/admin/deposits" className="bg-[#1a1a1a]/40 border border-white/5 rounded-[40px] p-8 space-y-4 backdrop-blur-md shadow-2xl relative overflow-hidden group transition-all hover:bg-white/[0.02] hover:-translate-y-1">
                     <div className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.cardDeposits}</div>
-                    <div className={`text-5xl font-black tracking-tighter tabular-nums ${pendingDeposits > 0 ? "text-gv-gold" : "text-white/20"}`}>{pendingDeposits}</div>
+                    <div className={`text-3xl font-black tracking-tight tabular-nums ${pendingDeposits > 0 ? "text-gv-gold" : "text-white/20"}`}>{pendingDeposits}</div>
                     <div className="flex items-center justify-between">
                         <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600">{t.actionRequired}</span>
                         <span className="text-[9px] font-black uppercase tracking-widest text-gv-gold group-hover:translate-x-1 transition-transform">{t.viewAll} →</span>
@@ -74,7 +74,7 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
 
                 <Link href="/admin/kyc" className="bg-[#1a1a1a]/40 border border-white/5 rounded-[40px] p-8 space-y-4 backdrop-blur-md shadow-2xl relative overflow-hidden group transition-all hover:bg-white/[0.02] hover:-translate-y-1">
                     <div className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.cardKyc}</div>
-                    <div className={`text-5xl font-black tracking-tighter tabular-nums ${pendingKyc > 0 ? "text-gv-gold" : "text-white/20"}`}>{pendingKyc}</div>
+                    <div className={`text-3xl font-black tracking-tight tabular-nums ${pendingKyc > 0 ? "text-gv-gold" : "text-white/20"}`}>{pendingKyc}</div>
                     <div className="flex items-center justify-between">
                         <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600">{t.actionRequired}</span>
                         <span className="text-[9px] font-black uppercase tracking-widest text-gv-gold group-hover:translate-x-1 transition-transform">{t.viewAll} →</span>
@@ -83,7 +83,7 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
 
                 <Link href="/admin/withdrawals" className="bg-[#1a1a1a]/40 border border-white/5 rounded-[40px] p-8 space-y-4 backdrop-blur-md shadow-2xl relative overflow-hidden group transition-all hover:bg-white/[0.02] hover:-translate-y-1">
                     <div className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.cardWithdrawals}</div>
-                    <div className={`text-5xl font-black tracking-tighter tabular-nums ${pendingWithdrawals > 0 ? "text-red-500" : "text-white/20"}`}>{pendingWithdrawals}</div>
+                    <div className={`text-3xl font-black tracking-tight tabular-nums ${pendingWithdrawals > 0 ? "text-red-500" : "text-white/20"}`}>{pendingWithdrawals}</div>
                     <div className="flex items-center justify-between">
                         <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600">{t.actionRequired}</span>
                         <span className="text-[9px] font-black uppercase tracking-widest text-red-500 group-hover:translate-x-1 transition-transform">{t.viewAll} →</span>
@@ -97,11 +97,11 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                         <div className="space-y-1">
                             <p className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">{t.activeInvestors}</p>
-                            <p className="text-3xl font-black text-white">{users.length}</p>
+                            <p className="text-2xl font-black text-white">{users.length}</p>
                         </div>
                         <div className="space-y-1">
                             <p className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">{t.verifiedRatio}</p>
-                            <p className="text-3xl font-black text-emerald-500">{users.length > 0 ? ((verifiedUsers / users.length) * 100).toFixed(0) : 0}%</p>
+                            <p className="text-2xl font-black text-emerald-500">{users.length > 0 ? ((verifiedUsers / users.length) * 100).toFixed(0) : 0}%</p>
                         </div>
                     </div>
                 </div>

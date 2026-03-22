@@ -1204,7 +1204,7 @@ export default function DashboardClient() {
 
                                     <section className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                                         <div className="xl:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8 overflow-hidden">
-                                            <h3 className="text-xl font-black uppercase tracking-tighter">{t.dividendTrends}</h3>
+                                            <h3 className="text-lg font-black uppercase tracking-tight">{t.dividendTrends}</h3>
                                             <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 px-2 sm:px-4">
                                                 {dividendHistory.length > 0 ? dividendHistory.map((div: any, i: number) => (
                                                     <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
@@ -1236,7 +1236,7 @@ export default function DashboardClient() {
                                                         )}
                                                     </div>
                                                     <div className="w-full truncate">
-                                                        <h4 className={`text-2xl font-black uppercase tracking-tighter truncate ${
+                                                        <h4 className={`text-xl font-black uppercase tracking-tight truncate ${
                                                             (transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'text-gv-gold' :
                                                             transactions[0].status === 'Approved' ? 'text-emerald-500' : 
                                                             transactions[0].status === 'Rejected' ? 'text-red-500' : 
@@ -1277,7 +1277,7 @@ export default function DashboardClient() {
                     )) : activeTab === "transactions" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-8">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                                <h3 className="text-2xl font-black uppercase tracking-tighter">{t.history}</h3>
+                                <h3 className="text-xl font-black uppercase tracking-tight">{t.history}</h3>
                                 <button
                                     onClick={() => generateStatement()}
                                     className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black text-xs py-3 px-6 rounded-xl uppercase tracking-widest transition-all flex items-center gap-2"
@@ -1331,8 +1331,8 @@ export default function DashboardClient() {
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                 <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                                     <div className="space-y-6">
-                                        <h2 className="text-4xl font-black uppercase tracking-tighter text-white">{t.referTitle}</h2>
-                                        <p className="text-zinc-500 font-medium text-lg leading-relaxed">{t.referSubtitle}</p>
+                                        <h2 className="text-2xl font-black uppercase tracking-tight text-white">{t.referTitle}</h2>
+                                        <p className="text-zinc-500 font-medium text-base leading-relaxed">{t.referSubtitle}</p>
                                         <div className="flex flex-col sm:flex-row gap-4">
                                             <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex-1 flex items-center justify-between">
                                                 <span className="text-gv-gold font-black tracking-widest uppercase">{user?.username}</span>
@@ -1356,15 +1356,15 @@ export default function DashboardClient() {
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-center justify-center bg-white/5 border border-white/10 rounded-[40px] p-12 text-center group-hover:bg-white/10 transition-all">
-                                        <p className="text-zinc-500 font-black uppercase tracking-[0.3em] mb-4">{t.totalReferred}</p>
-                                        <h3 className="text-7xl font-black text-gv-gold tabular-nums">{referredCount}</h3>
+                                        <p className="text-zinc-500 font-black uppercase tracking-widest mb-2 text-[10px]">{t.totalReferred}</p>
+                                        <h3 className="text-5xl font-black text-gv-gold tabular-nums">{referredCount}</h3>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Referred Users List */}
                             <div className="space-y-6">
-                                <h3 className="text-2xl font-black uppercase tracking-tighter">{t.referredUsersList}</h3>
+                                <h3 className="text-xl font-black uppercase tracking-tight">{t.referredUsersList}</h3>
                                 <div className="border border-white/10 rounded-[40px] overflow-x-auto bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
                                     <table className="w-full text-left min-w-[800px]">
                                         <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
@@ -1424,8 +1424,8 @@ export default function DashboardClient() {
                             <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl overflow-hidden relative group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                 <div className="relative z-10 max-w-2xl">
-                                    <h2 className="text-3xl font-black uppercase tracking-tighter mb-4 text-white">{t.statementCenter}</h2>
-                                    <p className="text-zinc-500 font-medium mb-12">{t.statementCenterDesc}</p>
+                                    <h2 className="text-2xl font-black uppercase tracking-tight mb-3 text-white">{t.statementCenter}</h2>
+                                    <p className="text-zinc-500 font-medium text-sm">{t.statementCenterDesc}</p>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12">
                                         <div className="space-y-4">
@@ -1596,7 +1596,7 @@ export default function DashboardClient() {
                                     </div>
 
                                     <div>
-                                        <h2 className="text-3xl font-black uppercase tracking-tighter mb-2 text-white">{t.securityTitle}</h2>
+                                        <h2 className="text-2xl font-black uppercase tracking-tight mb-2 text-white">{t.securityTitle}</h2>
                                         <p className="text-zinc-500 font-medium">{t.securitySubtitle}</p>
                                     </div>
 
@@ -1652,7 +1652,7 @@ export default function DashboardClient() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
                     <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                         <div className="flex justify-between items-center">
-                            <h2 className="text-3xl font-black text-gv-gold tracking-tighter uppercase">{t.depositTitle}</h2>
+                            <h2 className="text-xl font-black text-gv-gold tracking-tight uppercase">{t.depositTitle}</h2>
                             <button onClick={() => setIsDepositModalOpen(false)} className="text-zinc-600 hover:text-white transition-colors">
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
@@ -1687,7 +1687,7 @@ export default function DashboardClient() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
                     <div className="bg-[#1a1a1a] border border-white/10 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                          <div className="flex justify-between items-center">
-                            <h2 className="text-3xl font-black text-white tracking-tighter uppercase">{t.withdrawTitle}</h2>
+                            <h2 className="text-xl font-black text-white tracking-tight uppercase">{t.withdrawTitle}</h2>
                             <button onClick={() => setIsWithdrawModalOpen(false)} className="text-zinc-600 hover:text-white transition-colors">
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
