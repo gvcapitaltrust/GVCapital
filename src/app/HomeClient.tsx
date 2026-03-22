@@ -65,13 +65,13 @@ export default function HomeClient() {
                     { title: "Register & Verify", desc: "Create your account and complete our secure KYC verification process." },
                     { title: "Deposit Capital", desc: "Fund your account using our supported seamless payment gateways." },
                     { title: "Select Allocation", desc: "Choose your investment tier and let our experts handle the fund management." },
-                    { title: "Earn Dividends", desc: "Watch your monthly profits grow and withdraw automatically to your wallet." }
+                    { title: "Earn Dividends", desc: "Profits are automatically credited to your wallet, available for you to withdraw anytime." }
                 ]
             },
             tiers: {
                 title: "Tiered Investment System",
                 subtitle: "Unlock higher monthly returns as you upgrade your portfolio tier.",
-                levels: ["Basic", "Silver", "Gold", "Platinum"],
+                levels: ["Silver", "Gold", "Platinum", "Diamond"],
                 return: "Monthly Dividends",
                 upTo: "Up to"
             },
@@ -111,13 +111,13 @@ export default function HomeClient() {
                     { title: "注册与验证", desc: "创建您的账户并完成我们安全可靠的 KYC 验证流程。" },
                     { title: "存入资金", desc: "使用我们支持的无缝支付渠道为您的账户注入资金。" },
                     { title: "选择配置", desc: "选择您的投资等级，让我们的专家团队负责接下来的基金管理。" },
-                    { title: "获取分红", desc: "见证您的每月利润自动增长，并随时提现至您的钱包。" }
+                    { title: "获取分红", desc: "利润将自动存入您的钱包，随时可供您自由提取。" }
                 ]
             },
             tiers: {
                 title: "阶梯式投资系统",
                 subtitle: "升级您的投资组合等级，解锁更高的每月回报率。",
-                levels: ["基础级", "白银级", "黄金级", "铂金级"],
+                levels: ["白银级", "黄金级", "铂金级", "钻石级"],
                 return: "每月分红",
                 upTo: "高达"
             },
@@ -296,7 +296,7 @@ export default function HomeClient() {
                                         </span>
                                     </div>
                                     <div className="flex items-end gap-1 mb-2">
-                                        {!isFixed && <span className="text-sm font-bold text-zinc-400 mb-2 mr-1">{t.tiers.upTo as string}</span>}
+                                        <span className="text-sm font-bold text-zinc-400 mb-2 mr-1">{t.tiers.upTo as string}</span>
                                         <span className="text-4xl font-black text-white">
                                             {(tierData.maxDividend * 100).toFixed(0)}
                                         </span>
