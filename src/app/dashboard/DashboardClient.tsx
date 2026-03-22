@@ -15,6 +15,7 @@ import ProductSelection from "@/components/ProductSelection";
 import ComparisonTable from "@/components/ComparisonTable";
 import { TIERS, getTierByAmount, formatUSD } from "@/lib/tierUtils";
 import TierMedal from "@/components/TierMedal";
+import { MASTER_ADMIN_EMAIL } from "@/lib/supabaseClient";
 
 export default function DashboardClient() {
     const { user: authUser, role: authRole, isVerified: authVerified, refresh: refreshAuth, loading: authLoading } = useAuth();
@@ -93,9 +94,9 @@ export default function DashboardClient() {
 
                 if (profile) {
                     let dbIsVerified = profile.role === 'admin' || profile.is_verified === true || profile.is_verified === 'Approved' || profile.is_verified === 'true';
-                    let kycApproved = dbIsVerified || profile.kyc_status === 'Approved' || profile.kyc_completed === true;
+                    let kycApproved = dbIsVerified || profile.kyc_status === 'Approved' || profile.kyc_status === 'Verified' || profile.kyc_completed === true;
 
-                    if (authUser.email === "thenja96@gmail.com") {
+                    if (authUser.email === MASTER_ADMIN_EMAIL) {
                         dbIsVerified = true;
                         kycApproved = true;
                         profile.role = "admin";
@@ -107,7 +108,7 @@ export default function DashboardClient() {
                     
                     // 2. Fetch Transactions
                     let txQuery = supabase.from('transactions').select('*');
-                    if (authUser.email !== "thenja96@gmail.com") {
+                    if (authUser.email !== MASTER_ADMIN_EMAIL) {
                         txQuery = txQuery.eq('user_id', authUser.id);
                     }
                     const { data: txs } = await txQuery.order('created_at', { ascending: false });
@@ -212,7 +213,7 @@ export default function DashboardClient() {
             supabase.removeChannel(profileChannel);
             supabase.removeChannel(txChannel);
         };
-    }, [authUser, searchParams]);
+    }, [authUser]);
 
     const formatCurrency = (val: number) => {
         return `RM ${Number(val || 0).toFixed(2)}`;
@@ -273,13 +274,7 @@ export default function DashboardClient() {
             setSuccessRefId(refId);
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
-
-            let refetchTxQuery = supabase.from('transactions').select('*');
-            if (user?.email !== "thenja96@gmail.com") {
-                refetchTxQuery = refetchTxQuery.eq('user_id', user.id);
-            }
-            const { data: txs } = await refetchTxQuery.order('created_at', { ascending: false });
-            if (txs) setTransactions(txs);
+            // Note: real-time subscription in useEffect already handles transaction list refresh
 
         } catch (err: any) {
             alert(err.message);
@@ -358,13 +353,7 @@ export default function DashboardClient() {
             
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
-
-            let refetchWithdrawalQuery = supabase.from('transactions').select('*');
-            if (user?.email !== "thenja96@gmail.com") {
-                refetchWithdrawalQuery = refetchWithdrawalQuery.eq('user_id', user.id);
-            }
-            const { data: txs } = await refetchWithdrawalQuery.order('created_at', { ascending: false });
-            if (txs) setTransactions(txs);
+            // Note: real-time subscription in useEffect already handles transaction list refresh
 
         } catch (err: any) {
             alert(err.message);

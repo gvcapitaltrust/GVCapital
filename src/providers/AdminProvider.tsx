@@ -188,6 +188,42 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
     const handleApproveWithdrawal = async (tx: any) => {
         try {
+            // 1. Fetch current user balance/profit to calculate deduction
+            const { data: profile, error: profileFetchError } = await supabase
+                .from('profiles')
+                .select('balance, profit')
+                .eq('id', tx.user_id)
+                .single();
+            
+            if (profileFetchError) throw profileFetchError;
+
+            const withdrawAmount = Math.abs(Number(tx.amount || 0));
+            const currentProfit = Number(profile?.profit || 0);
+            const currentBalance = Number(profile?.balance || 0);
+
+            // 2. Deduct: first from profit (dividends), then from balance (capital)
+            let newProfit = currentProfit;
+            let newBalance = currentBalance;
+            let remaining = withdrawAmount;
+
+            if (remaining <= newProfit) {
+                newProfit -= remaining;
+                remaining = 0;
+            } else {
+                remaining -= newProfit;
+                newProfit = 0;
+                newBalance = Math.max(0, newBalance - remaining);
+            }
+
+            // 3. Update profile with new balance/profit
+            const { error: profileUpdateError } = await supabase
+                .from('profiles')
+                .update({ balance: newBalance, profit: newProfit })
+                .eq('id', tx.user_id);
+            
+            if (profileUpdateError) throw profileUpdateError;
+
+            // 4. Mark transaction as Approved
             const { error: txError } = await supabase
                 .from('transactions')
                 .update({ 
@@ -202,7 +238,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .eq('id', tx.id);
             
             if (txError) throw txError;
-            showToast("Withdrawal approved.");
+            showToast("Withdrawal approved and balance deducted.");
             fetchData();
         } catch (error: any) {
             alert(error.message);
@@ -373,7 +409,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             // 1. Update Platform Settings
             const { error: settingsError } = await supabase
                 .from('platform_settings')
-                .upsert({ key: 'forex_rate', value: String(newRate) }, { onConflict: 'key' });
+                .upsert({ key: 'usd_to_myr_rate', value: String(newRate) }, { onConflict: 'key' });
             if (settingsError) throw settingsError;
 
             // 2. Log History

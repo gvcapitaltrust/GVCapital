@@ -101,7 +101,7 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
                         </div>
                         <div className="space-y-1">
                             <p className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">{t.verifiedRatio}</p>
-                            <p className="text-3xl font-black text-emerald-500">{((verifiedUsers / users.length) * 100).toFixed(0)}%</p>
+                            <p className="text-3xl font-black text-emerald-500">{users.length > 0 ? ((verifiedUsers / users.length) * 100).toFixed(0) : 0}%</p>
                         </div>
                     </div>
                 </div>

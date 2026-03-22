@@ -99,7 +99,7 @@ export default function Navigation({ lang, user, setLang }: NavigationProps) {
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
         lang={lang}
-        user={user}
+        currentTab=""
       />
     </>
   );

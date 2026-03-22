@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
+import { MASTER_ADMIN_EMAIL } from "@/lib/supabaseClient";
 
 interface AuthGuardProps {
     children: React.ReactNode;
@@ -35,7 +36,7 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
     if (!user) return null;
 
     // Email bypass check for master admin
-    const isMasterAdmin = user.email === "thenja96@gmail.com";
+    const isMasterAdmin = user.email === MASTER_ADMIN_EMAIL;
 
     if (requireAdmin && !isMasterAdmin && role.toLowerCase() !== "admin") {
         return (

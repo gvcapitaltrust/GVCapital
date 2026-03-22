@@ -2,9 +2,11 @@
 
 import React, { useState } from "react";
 import { useAdmin } from "@/providers/AdminProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
-    const { handleUpdatePassword, authUser } = useAdmin();
+    const { handleUpdatePassword } = useAdmin();
+    const { user: authUser } = useAuth();
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isUpdating, setIsUpdating] = useState(false);

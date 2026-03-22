@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, useRef } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, MASTER_ADMIN_EMAIL } from "@/lib/supabaseClient";
 import { useRouter, usePathname } from "next/navigation";
 
 interface AuthContextType {
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             // Emergency Resolver for Master Admin
             let emergencyTimer: NodeJS.Timeout | null = null;
-            if (email === "thenja96@gmail.com") {
+            if (email === MASTER_ADMIN_EMAIL) {
                 emergencyTimer = setTimeout(() => {
                     if (isFetching.current) {
                         console.warn("[AUTH] Emergency Bypass Triggered for Admin.");
@@ -112,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     .from('profiles')
                     .select('*')
                     .eq('id', uid)
-                    .single();
+                    .maybeSingle();
 
                 if (emergencyTimer) clearTimeout(emergencyTimer);
 
