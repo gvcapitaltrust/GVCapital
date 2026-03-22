@@ -564,10 +564,10 @@ export default function DashboardClient() {
                 standard: "Standard",
                 reduced: "Reduced",
                 zero: "Zero",
-                footnote: "* All dividends are calculated monthly based on your average daily balance. Higher tiers enjoy lower withdrawal fees and priority liquidation."
+                footnote: "* All dividends are calculated monthly based on your investment capital. Higher tiers enjoy lower withdrawal fees and priority liquidation."
             },
             history: "Transaction History",
-            unverifiedBanner: "⚠️ Account Unverified. Access to Deposits, Withdrawals, and Trading is restricted.",
+            unverifiedBanner: "⚠️ Account Unverified. Access to Deposits, Withdrawals, and Fund Management is restricted.",
             verifyNow: "Verify Now",
             securityPin: "Withdrawal Security PIN",
             enterPin: "Enter your 6-digit security PIN to authorize this request.",
@@ -690,10 +690,10 @@ export default function DashboardClient() {
                 standard: "标准",
                 reduced: "降低",
                 zero: "零",
-                footnote: "* 所有分红均根据您的每日平均余额按月计算。更高级别享受更低的提款费和优先清算权。"
+                footnote: "* 所有分红均根据您的投资本金按月计算。更高级别享受更低的提款费和优先清算权。"
             },
             history: "交易历史",
-            unverifiedBanner: "⚠️ 账户未核实。存款、取款和交易功能受限。",
+            unverifiedBanner: "⚠️ 账户未核实。存款、取款和基金管理功能受限。",
             verifyNow: "立即核实",
             securityPin: "提款安全码",
             enterPin: "请输入您的 6 位安全代码以授权此申请。",

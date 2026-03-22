@@ -6,13 +6,14 @@ import Link from "next/link";
 import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
 import { useSettings } from "@/providers/SettingsProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function DepositClient() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { forexRate } = useSettings();
+    const { user, loading: authLoading } = useAuth();
     const [lang, setLang] = useState<"en" | "zh">("en");
-    const [user, setUser] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
@@ -26,16 +27,10 @@ export default function DepositClient() {
         const l = searchParams?.get("lang") || "en";
         setLang(l as "en" | "zh");
 
-        const checkAuth = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
-                router.push(`/login?lang=${l}`);
-                return;
-            }
-            setUser(session.user);
-        };
-        checkAuth();
-    }, [searchParams, router]);
+        if (!authLoading && !user) {
+            router.push(`/login?lang=${l}`);
+        }
+    }, [searchParams, router, user, authLoading]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,6 +54,16 @@ export default function DepositClient() {
             // 2. Insert into transactions table
             const refId = `DEP-${Math.floor(100000 + Math.random() * 900000)}`;
             const currentAmountRm = parseFloat(amount);
+            const depositUSD = currentAmountRm / forexRate;
+            const currentCapitalUSD = Number(user.balance || 0) / forexRate;
+
+            if (currentCapitalUSD + depositUSD > 10000) {
+                alert(lang === "en" 
+                    ? "Maximum allowed investment capital is $10,000 USD. Your deposit exceeds this limit." 
+                    : "最高允许的投资本金为 $10,000 USD。您的存款已超过此限制。");
+                setIsSubmitting(false);
+                return;
+            }
             
             const { error: insertError } = await supabase
                 .from('transactions')
@@ -102,6 +107,7 @@ export default function DepositClient() {
             successTitle: "Deposit Submitted",
             successDesc: "Redirecting you to dashboard...",
             estimatedCredit: "Estimated Credit",
+            maxLimit: "Maximum investment allowed: $10,000 USD. Only input amounts within your limit.",
         },
         zh: {
             title: "资金充值",
@@ -114,6 +120,7 @@ export default function DepositClient() {
             successTitle: "存款已提交",
             successDesc: "正在为您跳转到控制台...",
             estimatedCredit: "预计信用额度",
+            maxLimit: "最高允许投资: $10,000 USD。请仅输入限制内的金额。",
         }
     };
 
@@ -166,6 +173,7 @@ export default function DepositClient() {
                                         </p>
                                     </div>
                                 )}
+                                <p className="mt-2 text-xs text-zinc-500 italic px-1">{t.maxLimit}</p>
                             </div>
 
 

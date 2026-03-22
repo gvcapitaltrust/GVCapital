@@ -4,14 +4,15 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import MobileSideMenu from "./MobileSideMenu";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface NavigationProps {
   lang: "en" | "zh";
-  user?: any;
   setLang: (lang: "en" | "zh") => void;
 }
 
-export default function Navigation({ lang, user, setLang }: NavigationProps) {
+export default function Navigation({ lang, setLang }: NavigationProps) {
+  const { user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const content = {

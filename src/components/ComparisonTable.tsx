@@ -23,7 +23,7 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
       standard: "Standard",
       reduced: "Reduced",
       zero: "Zero",
-      footnote: "* All dividends are calculated monthly based on your average daily balance. Higher tiers enjoy lower withdrawal fees and priority liquidation."
+      footnote: "* All dividends are calculated monthly based on your investment capital. Higher tiers enjoy lower withdrawal fees and priority liquidation."
     },
     zh: {
       title: "比较计划",
@@ -37,7 +37,7 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
       standard: "标准",
       reduced: "降低",
       zero: "零",
-      footnote: "* 所有分红均根据您的每日平均余额按月计算。更高级别享受更低的提款费和优先清算权。"
+      footnote: "* 所有分红均根据您的投资本金按月计算。更高级别享受更低的提款费和优先清算权。"
     }
   }[lang];
 
