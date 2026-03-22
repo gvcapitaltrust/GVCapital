@@ -58,9 +58,9 @@ export default function ProductSelection({
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-        <div className="space-y-2">
-          <h2 className="text-3xl font-black uppercase tracking-tighter text-white">{t.title}</h2>
-          <p className="text-zinc-500 font-medium">{t.subtitle}</p>
+        <div className="space-y-1.5">
+          <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-white">{t.title}</h2>
+          <p className="text-zinc-500 text-sm font-medium">{t.subtitle}</p>
         </div>
         <button 
           onClick={onOpenComparison}
