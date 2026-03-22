@@ -9,7 +9,8 @@ import DashboardNavbar from "@/components/DashboardNavbar";
 import MobileSideMenu from "@/components/MobileSideMenu";
 import GlobalFooter from "@/components/GlobalFooter";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+// ─── Inner component that safely uses useSearchParams ────────────────────────
+function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     const searchParams = useSearchParams();
     const lang = (searchParams.get("lang") as "en" | "zh") || "en";
     
@@ -31,7 +32,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         lang={lang} 
                         isOpen={isMobileMenuOpen} 
                         onClose={() => setIsMobileMenuOpen(false)}
-                        currentTab="" // Will be handled by pathname in future refactors if needed
+                        currentTab=""
                     />
 
                     <main className={`flex-1 min-h-screen transition-all duration-500 ease-in-out ${isSidebarCollapsed ? "md:ml-20" : "md:ml-80"}`}>
@@ -53,10 +54,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
 }
 
-export function DashboardLayoutWrapper({ children }: { children: React.ReactNode }) {
+// ─── Default export wraps inner in Suspense ──────────────────────────────────
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center"><div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>}>
-            <DashboardLayout>{children}</DashboardLayout>
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+                <div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div>
+            </div>
+        }>
+            <DashboardLayoutInner>{children}</DashboardLayoutInner>
         </Suspense>
     );
 }

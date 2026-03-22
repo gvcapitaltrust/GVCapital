@@ -33,6 +33,7 @@ interface AdminContextType {
     handleResetUserPassword: (email: string) => Promise<void>;
     handleUpdateForexRate: (newRate: number) => Promise<void>;
     handleUpdatePassword: (password: string) => Promise<void>;
+    handleSetAdminRole: (userId: string, makeAdmin: boolean) => Promise<void>;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -430,6 +431,20 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const handleSetAdminRole = async (userId: string, makeAdmin: boolean) => {
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ role: makeAdmin ? 'admin' : 'User' })
+                .eq('id', userId);
+            if (error) throw error;
+            showToast(makeAdmin ? 'User promoted to Admin.' : 'Admin role removed.');
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
     const handleUpdatePassword = async (password: string) => {
         try {
             const { error } = await supabase.auth.updateUser({ password });
@@ -479,7 +494,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             handleUpdatePortfolio,
             handleResetUserPassword,
             handleUpdateForexRate,
-            handleUpdatePassword
+            handleUpdatePassword,
+            handleSetAdminRole
         }}>
             {children}
             

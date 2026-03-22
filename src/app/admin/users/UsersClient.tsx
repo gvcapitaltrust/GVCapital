@@ -5,7 +5,7 @@ import { useAdmin } from "@/providers/AdminProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 
 export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
-    const { users, loading, handleAdjustBalance, handleUpdatePortfolio, handleResetUserPassword } = useAdmin();
+    const { users, loading, handleAdjustBalance, handleUpdatePortfolio, handleResetUserPassword, handleSetAdminRole } = useAdmin();
     const { forexRate } = useSettings();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -16,6 +16,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
     const [adjustmentType, setAdjustmentType] = useState<"balance" | "profit">("balance");
     const [adjustmentReason, setAdjustmentReason] = useState("");
     const [isAdjusting, setIsAdjusting] = useState(false);
+    const [isRoleChanging, setIsRoleChanging] = useState(false);
 
     // Portfolio State
     const [portfolioData, setPortfolioData] = useState({
@@ -96,6 +97,19 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
         setAdjustmentAmount("");
         setAdjustmentReason("");
         setIsAdjusting(false);
+    };
+
+    const handleToggleAdmin = async () => {
+        if (!selectedUser) return;
+        const isCurrentlyAdmin = selectedUser.role?.toLowerCase() === 'admin';
+        const action = isCurrentlyAdmin ? 'remove admin from' : 'promote';
+        const confirmed = window.confirm(`Are you sure you want to ${action} ${selectedUser.full_name || selectedUser.email}?`);
+        if (!confirmed) return;
+        setIsRoleChanging(true);
+        await handleSetAdminRole(selectedUser.id, !isCurrentlyAdmin);
+        // Update local state immediately for UI feedback
+        setSelectedUser((prev: any) => ({ ...prev, role: isCurrentlyAdmin ? 'User' : 'admin' }));
+        setIsRoleChanging(false);
     };
 
     const handleExecutePortfolioUpdate = async () => {
@@ -201,6 +215,25 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
+                                {/* Admin Role Badge */}
+                                {selectedUser?.role?.toLowerCase() === 'admin' && (
+                                    <span className="flex items-center gap-1.5 px-3 py-1.5 bg-gv-gold/10 border border-gv-gold/30 rounded-xl text-[9px] font-black uppercase tracking-widest text-gv-gold">
+                                        <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm2 3h10v1a1 1 0 01-1 1H8a1 1 0 01-1-1v-1z"/></svg>
+                                        Admin
+                                    </span>
+                                )}
+                                {/* Set / Remove Admin Button */}
+                                <button
+                                    onClick={handleToggleAdmin}
+                                    disabled={isRoleChanging}
+                                    className={`text-[9px] font-black uppercase tracking-widest px-5 py-3 rounded-2xl transition-all border disabled:opacity-50 ${
+                                        selectedUser?.role?.toLowerCase() === 'admin'
+                                            ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20'
+                                            : 'bg-gv-gold/10 text-gv-gold border-gv-gold/20 hover:bg-gv-gold hover:text-black'
+                                    }`}
+                                >
+                                    {isRoleChanging ? '...' : selectedUser?.role?.toLowerCase() === 'admin' ? '⬇ Remove Admin' : '⬆ Set as Admin'}
+                                </button>
                                 <button onClick={() => handleResetUserPassword(selectedUser.email)} className="bg-white/5 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest px-6 py-3 rounded-2xl transition-all border border-white/5">{t.resetPassword}</button>
                                 <button onClick={() => setIsDetailModalOpen(false)} className="h-12 w-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-all">
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>

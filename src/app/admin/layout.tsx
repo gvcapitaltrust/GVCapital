@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import { AdminProvider } from "@/providers/AdminProvider";
 import AdminSidebar from "@/components/AdminSidebar";
 import { supabase } from "@/lib/supabaseClient";
-import { useSearchParams } from "next/navigation";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+// ─── Inner component that safely uses useSearchParams ────────────────────────
+function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     const searchParams = useSearchParams();
     const lang = searchParams.get("lang") === "zh" ? "zh" : "en";
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -83,3 +84,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </AuthGuard>
     );
 }
+
+// ─── Default export wraps inner in Suspense ──────────────────────────────────
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#121212] flex items-center justify-center">
+                <div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div>
+            </div>
+        }>
+            <AdminLayoutInner>{children}</AdminLayoutInner>
+        </Suspense>
+    );
+}
+
