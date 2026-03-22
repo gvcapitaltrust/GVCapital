@@ -53,9 +53,9 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
       <div className="mb-6 flex items-baseline gap-1.5">
         <span className="text-3xl font-black text-white">
           <span className="text-xs font-black text-zinc-500 uppercase tracking-widest mr-1.5">
-            {tier.id === "basic" ? "min" : "up to"}
+            {tier.id === "silver" ? "min" : "up to"}
           </span>
-          {tier.id === "basic" 
+          {tier.id === "silver" 
             ? `${(tier.minDividend * 100).toFixed(0)}%` 
             : `${(tier.maxDividend * 100).toFixed(0)}%`}
         </span>

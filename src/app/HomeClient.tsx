@@ -7,6 +7,7 @@ import GlobalFooter from "@/components/GlobalFooter";
 import Navigation from "@/components/Navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/providers/AuthProvider";
+import { TIERS } from "@/lib/tierUtils";
 import { ShieldCheck, TrendingUp, BarChart3, Clock, Lock, ArrowRight, CheckCircle2, Globe, Briefcase, ChevronRight, Wallet, Activity } from "lucide-react";
 
 export default function HomeClient() {
@@ -70,8 +71,9 @@ export default function HomeClient() {
             tiers: {
                 title: "Tiered Investment System",
                 subtitle: "Unlock higher monthly returns as you upgrade your portfolio tier.",
-                levels: ["Silver", "Gold", "Platinum", "Diamond"],
-                return: "Monthly Dividends"
+                levels: ["Basic", "Silver", "Gold", "Platinum"],
+                return: "Monthly Dividends",
+                upTo: "Up to"
             },
             cta: {
                 join: "Join GV Capital Trust Today",
@@ -115,8 +117,9 @@ export default function HomeClient() {
             tiers: {
                 title: "阶梯式投资系统",
                 subtitle: "升级您的投资组合等级，解锁更高的每月回报率。",
-                levels: ["白银级", "黄金级", "铂金级", "钻石级"],
-                return: "每月分红"
+                levels: ["基础级", "白银级", "黄金级", "铂金级"],
+                return: "每月分红",
+                upTo: "高达"
             },
             cta: {
                 join: "今天就加入 GV 资本信托",
@@ -281,18 +284,22 @@ export default function HomeClient() {
                     <p className="text-zinc-400 text-lg mb-16 max-w-2xl mx-auto">{t.tiers.subtitle}</p>
 
                     <div className="flex flex-wrap justify-center gap-6">
-                        {t.tiers.levels.map((tier, idx) => {
-                            const colors = ['border-zinc-400/50 text-zinc-300', 'border-yellow-500/50 text-yellow-500', 'border-teal-300/50 text-teal-300', 'border-blue-400/50 text-blue-400 shadow-[0_0_15px_rgba(96,165,250,0.5)]'];
-                            const gradients = ['from-zinc-400/10', 'from-yellow-500/10', 'from-teal-300/10', 'from-blue-400/10'];
+                        {TIERS.map((tierData, idx) => {
+                            const colors = ['border-zinc-400/50 text-zinc-300', 'border-slate-400/50 text-slate-300', 'border-yellow-500/50 text-yellow-500', 'border-amber-500/50 text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]'];
+                            const gradients = ['from-zinc-400/10', 'from-slate-400/10', 'from-yellow-500/10', 'from-amber-500/10'];
+                            const isFixed = tierData.minDividend === tierData.maxDividend;
                             return (
-                                <div key={idx} className={`w-full sm:w-[280px] rounded-3xl border border-white/5 bg-gradient-to-b ${gradients[idx]} to-transparent p-6 text-left relative overflow-hidden transition-all hover:scale-105 hover:border-white/20 hover:bg-[#1a1a1a]`}>
+                                <div key={tierData.id} className={`w-full sm:w-[280px] rounded-3xl border border-white/5 bg-gradient-to-b ${gradients[idx]} to-transparent p-6 text-left relative overflow-hidden transition-all hover:scale-105 hover:border-white/20 hover:bg-[#1a1a1a]`}>
                                     <div className="mb-8">
                                         <span className={`inline-block px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${colors[idx]}`}>
-                                            {tier}
+                                            {t.tiers.levels[idx]}
                                         </span>
                                     </div>
-                                    <div className="flex items-end gap-2 mb-2">
-                                        <span className="text-4xl font-black text-white">{idx === 0 ? '0.2' : idx === 1 ? '0.5' : idx === 2 ? '0.8' : '1.0'}</span>
+                                    <div className="flex items-end gap-1 mb-2">
+                                        {!isFixed && <span className="text-sm font-bold text-zinc-400 mb-2 mr-1">{t.tiers.upTo as string}</span>}
+                                        <span className="text-4xl font-black text-white">
+                                            {(tierData.maxDividend * 100).toFixed(0)}
+                                        </span>
                                         <span className="text-gv-gold font-bold mb-1">%</span>
                                     </div>
                                     <div className="text-zinc-500 text-xs font-bold uppercase tracking-widest">{t.tiers.return}</div>

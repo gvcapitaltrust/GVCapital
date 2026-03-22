@@ -60,7 +60,7 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                 <th className="py-6 px-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.feature}</th>
                 {TIERS.map((tier) => (
                   <th key={tier.id} className="py-6 px-4 text-center">
-                    <span className={`text-xs font-black uppercase tracking-widest ${tier.id === 'gold' ? 'text-gv-gold' : 'text-white'}`}>
+                    <span className={`text-xs font-black uppercase tracking-widest ${tier.id === 'gold' ? 'text-gv-gold' : tier.id === 'platinum' ? 'text-zinc-200' : tier.id === 'diamond' ? 'text-cyan-400' : 'text-slate-300'}`}>
                       {tier.name}
                     </span>
                   </th>

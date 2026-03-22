@@ -11,8 +11,8 @@ export interface Tier {
 
 export const TIERS: Tier[] = [
   {
-    id: "basic",
-    name: "Basic",
+    id: "silver",
+    name: "Silver",
     minAmount: 1,
     maxAmount: 999,
     minDividend: 0.03,
@@ -21,8 +21,8 @@ export const TIERS: Tier[] = [
     benefits: ["Entry-level Access", "Standard Support", "Monthly Statements"],
   },
   {
-    id: "silver",
-    name: "Silver",
+    id: "gold",
+    name: "Gold",
     minAmount: 1000,
     maxAmount: 2999,
     minDividend: 0.03,
@@ -31,8 +31,8 @@ export const TIERS: Tier[] = [
     benefits: ["Priority Support", "Quarterly Strategy Review", "Enhanced Yield"],
   },
   {
-    id: "gold",
-    name: "Gold",
+    id: "platinum",
+    name: "Platinum",
     minAmount: 3000,
     maxAmount: 4999,
     minDividend: 0.05,
@@ -41,8 +41,8 @@ export const TIERS: Tier[] = [
     benefits: ["Dedicated Account Manager", "Custom Portfolio Alerts", "VIP Events Access"],
   },
   {
-    id: "platinum",
-    name: "Platinum",
+    id: "diamond",
+    name: "Diamond",
     minAmount: 5000,
     maxAmount: 999999999, // Handle high-value deposits
     minDividend: 0.08,
