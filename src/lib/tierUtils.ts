@@ -44,7 +44,7 @@ export const TIERS: Tier[] = [
     id: "diamond",
     name: "Diamond",
     minAmount: 5000,
-    maxAmount: 999999999, // Handle high-value deposits
+    maxAmount: 1000000, // Handle high-value deposits
     minDividend: 0.08,
     maxDividend: 0.1,
     color: "amber",
@@ -75,5 +75,6 @@ export const formatUSD = (val: number) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
+    maximumFractionDigits: 0,
   }).format(val);
 };

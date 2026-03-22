@@ -40,19 +40,19 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
         </div>
       )}
 
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-4 gap-2">
         <div className="min-w-0 flex-1">
-          <h3 className="text-xl font-black mb-1 uppercase tracking-tighter truncate">{tier.name}</h3>
-          <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest truncate">
-            {formatUSD(tier.minAmount)} - {formatUSD(tier.maxAmount)}
+          <h3 className="text-lg xl:text-xl font-black mb-1 uppercase tracking-tighter break-words">{tier.name}</h3>
+          <p className="text-[10px] sm:text-xs font-black text-zinc-500 uppercase tracking-widest break-words mt-1">
+            {tier.id === "diamond" ? `Over ${formatUSD(tier.minAmount)}` : `${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
           </p>
         </div>
         <TierMedal tierId={tier.id} size="md" className="shrink-0" />
       </div>
 
-      <div className="mb-6 flex items-baseline gap-1.5">
-        <span className="text-3xl font-black text-white">
-          <span className="text-xs font-black text-zinc-500 uppercase tracking-widest mr-1.5">
+      <div className="mb-6 flex items-baseline gap-1.5 flex-wrap">
+        <span className="text-3xl font-black text-white shrink-0 flex items-baseline">
+          <span className="text-xs font-black text-zinc-500 uppercase tracking-widest mr-1.5 whitespace-nowrap">
             {tier.id === "silver" ? "min" : "up to"}
           </span>
           {tier.id === "silver" 
