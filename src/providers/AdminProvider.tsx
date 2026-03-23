@@ -312,18 +312,21 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .eq('id', user.id);
             if (profileError) throw profileError;
 
-            const txType = (type === 'balance' ? 'Bonus' : 'Dividend') + (amount >= 0 ? ' Increase' : ' Decrease');
+            const txBaseType = amount >= 0 ? 'Deposit' : 'Withdrawal';
             const { error: txError } = await supabase
                 .from('transactions')
                 .insert({
                     user_id: user.id,
-                    type: txType,
-                    amount: amount,
+                    type: txBaseType,
+                    amount: Math.abs(amount),
                     status: 'Approved',
                     ref_id: `ADJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
                     metadata: { 
+                        is_adjustment: true,
                         reason: reason,
-                        description: reason || `${txType} Adjustment`,
+                        adjustment_category: type === 'balance' ? 'Bonus' : 'Dividend',
+                        adjustment_type: amount >= 0 ? 'Increase' : 'Decrease',
+                        description: reason || `${txBaseType} ${amount >= 0 ? 'Increase' : 'Decrease'} Adjustment`,
                         processed_by_name: authUser?.user_metadata?.full_name || "Admin",
                         processed_by_id: authUser?.id,
                         processed_by_email: authUser?.email

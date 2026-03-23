@@ -60,8 +60,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 const totalAssetsRM = Number(profile.balance || 0) + Number(profile.profit || 0);
                 const withdrawableBalance = Math.max(0, (Number(profile.balance || 0) - lockedCapital) + Number(profile.profit || 0));
                 
-                const totalDeposited = txs.filter((t: any) => (t.type === 'Deposit' || t.type?.includes('Bonus Increase')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
-                const totalWithdrawn = txs.filter((t: any) => (t.type === 'Withdrawal' || t.type?.includes('Bonus Decrease')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
+                const totalDeposited = txs.filter((t: any) => 
+                    (t.type === 'Deposit' && !t.metadata?.is_adjustment) && t.status === 'Approved'
+                ).reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
+                
+                const totalWithdrawn = txs.filter((t: any) => 
+                    (t.type === 'Withdrawal' && !t.metadata?.is_adjustment) && t.status === 'Approved'
+                ).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
 
                 const fullProfile = {
                     ...user,
@@ -80,7 +85,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 setUserProfile(fullProfile);
                 setTransactions(txs);
                 setDividendHistory(txs.filter((t: any) => 
-                    (t.type?.toLowerCase().includes('dividend') || t.type?.toLowerCase().includes('bonus')) &&
+                    (t.type?.toLowerCase().includes('dividend') || 
+                     t.type?.toLowerCase().includes('bonus') ||
+                     t.metadata?.is_adjustment) &&
                     t.status === 'Approved'
                 ).slice(0, 6).reverse());
             }

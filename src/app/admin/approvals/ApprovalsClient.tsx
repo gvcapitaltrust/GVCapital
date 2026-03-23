@@ -123,10 +123,16 @@ export default function ApprovalsClient() {
                     .from('transactions')
                     .insert({
                         user_id: user.id,
-                        type: 'Dividend Increase',
+                        type: 'Deposit',
                         amount: dividend,
                         status: 'Approved',
-                        ref_id: `DIV-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`
+                        ref_id: `DIV-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
+                        metadata: {
+                            is_adjustment: true,
+                            adjustment_category: 'Dividend',
+                            adjustment_type: 'Increase',
+                            reason: 'Monthly Dividend Distribution (1%)'
+                        }
                     });
             }
 

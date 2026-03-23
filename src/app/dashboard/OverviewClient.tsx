@@ -25,11 +25,19 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
     const [showSuccess, setShowSuccess] = useState(false);
     const [successRefId, setSuccessRefId] = useState("");
     const [actionToast, setActionToast] = useState<{message: string, actionUrl?: string, actionText?: string} | null>(null);
-    const [withdrawAmount, setWithdrawAmount] = useState("");
-    const [withdrawPIN, setWithdrawPIN] = useState("");
+    const [depositReceipt, setDepositReceipt] = useState<File | null>(null);
     const [depositAmount, setDepositAmount] = useState("");
     const [depositDate, setDepositDate] = useState("");
-    const [depositReceipt, setDepositReceipt] = useState<File | null>(null);
+    const [withdrawAmount, setWithdrawAmount] = useState("");
+    const [withdrawPIN, setWithdrawPIN] = useState("");
+    const [isPinVisible, setIsPinVisible] = useState(false);
+    const [showPenaltyConfirm, setShowPenaltyConfirm] = useState(false);
+    const [penaltyInfo, setPenaltyInfo] = useState<{
+        penalty: number;
+        payout: number;
+        lockedPortion: number;
+        isApplied: boolean;
+    } | null>(null);
 
     const t = {
         en: {
@@ -183,36 +191,88 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
     const handleWithdrawInitiate = () => {
         const amount = parseFloat(withdrawAmount);
         if (!amount || amount <= 0) return;
-        if (amount > user?.withdrawable_balance) {
-            alert("Insufficient withdrawable balance.");
+        
+        if (amount > (user?.total_assets || 0)) {
+            alert("Requested amount exceeds total assets.");
             return;
         }
-        setIsWithdrawModalOpen(false);
+
+        const lockedCapital = user?.locked_capital || 0;
+        const profit = Number(user?.profit || 0);
+        const maturedCapital = Math.max(0, Number(user?.balance || 0) - lockedCapital);
+        const userWithdrawable = profit + maturedCapital;
+        
+        let lockedPortion = 0;
+        if (amount > userWithdrawable) {
+            lockedPortion = amount - userWithdrawable;
+        }
+
+        if (lockedPortion > 0) {
+            const penalty = lockedPortion * 0.4;
+            setPenaltyInfo({
+                penalty,
+                payout: amount - penalty,
+                lockedPortion,
+                isApplied: true
+            });
+            setShowPenaltyConfirm(true);
+            return;
+        } else {
+            setPenaltyInfo({
+                penalty: 0,
+                payout: amount,
+                lockedPortion: 0,
+                isApplied: false
+            });
+        }
+
         setIsPinModalOpen(true);
     };
 
     const handleWithdrawConfirm = async () => {
-        if (!user || withdrawPIN.length !== 6) return;
+        if (!user || withdrawPIN.trim().length !== 6) {
+            alert("Please enter a 6-digit Security PIN.");
+            return;
+        }
         setIsSubmitting(true);
         try {
-            const { data: p } = await supabase.from('profiles').select('withdraw_pin').eq('id', user.id).single();
-            if (p?.withdraw_pin !== withdrawPIN) {
-                alert("Incorrect Security PIN.");
-                setIsSubmitting(false);
-                return;
+            // 1. Verify Security PIN
+            const { data: p, error: pinError } = await supabase
+                .from('profiles')
+                .select('security_pin')
+                .eq('id', user.id)
+                .single();
+            
+            if (pinError) throw pinError;
+
+            const storedPin = (p?.security_pin || "").toString().trim();
+            const enteredPin = withdrawPIN.trim();
+
+            if (storedPin !== enteredPin) {
+                throw new Error("Invalid security PIN. Please try again or contact support if you forgot it.");
             }
 
+            // 2. Insert Transaction
             const refId = `WDL-${Math.floor(1000 + Math.random() * 9000)}`;
             const { error } = await supabase.from('transactions').insert([{
                 user_id: user.id,
                 type: 'Withdrawal',
-                amount: -parseFloat(withdrawAmount),
+                amount: Math.abs(parseFloat(withdrawAmount)),
                 status: 'Pending',
-                ref_id: refId
+                ref_id: refId,
+                metadata: penaltyInfo?.isApplied ? {
+                    penalty_applied: true,
+                    penalty_amount: penaltyInfo.penalty,
+                    expected_payout: penaltyInfo.payout,
+                    locked_portion: penaltyInfo.lockedPortion,
+                    penalty_rate: "40%"
+                } : null
             }]);
+            
             if (error) throw error;
 
             setIsPinModalOpen(false);
+            setIsWithdrawModalOpen(false);
             setWithdrawAmount("");
             setWithdrawPIN("");
             setSuccessRefId(refId);
@@ -385,7 +445,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                             {(transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'Adjustment' : transactions[0].status}
                                         </h4>
                                         <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1 truncate px-2">
-                                            {transactions[0].type}: RM {Number(transactions[0].amount).toFixed(2)}
+                                            {transactions[0].metadata?.is_adjustment ? transactions[0].metadata.adjustment_category : transactions[0].type}: RM {Number(transactions[0].amount).toFixed(2)}
                                         </p>
                                     </div>
                                 </>
@@ -474,12 +534,77 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             )}
 
+            {/* Penalty Confirmation Modal */}
+            {showPenaltyConfirm && penaltyInfo && (
+                <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md">
+                    <div className="bg-[#111] border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                        <div className="h-20 w-20 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto border border-amber-500/20">
+                            <svg className="h-10 w-10 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        </div>
+                        <div className="text-center space-y-4">
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Penalty Confirmation</h3>
+                            <p className="text-zinc-500 font-bold text-sm leading-relaxed">
+                                Your withdrawal of RM {parseFloat(withdrawAmount).toLocaleString()} includes capital protected by our 6-month lock-in period.
+                            </p>
+                            <div className="bg-white/5 rounded-3xl p-6 border border-white/5 space-y-4">
+                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                    <span>Locked Portion</span>
+                                    <span>RM {penaltyInfo.lockedPortion.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-red-500">
+                                    <span>Penalty (40%)</span>
+                                    <span>- RM {penaltyInfo.penalty.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                </div>
+                                <div className="h-px bg-white/5"></div>
+                                <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-emerald-500">
+                                    <span>Estimated Payout</span>
+                                    <span>RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <button 
+                                onClick={() => { setShowPenaltyConfirm(false); setIsPinModalOpen(true); }}
+                                className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all"
+                            >
+                                I Accept & Continue
+                            </button>
+                            <button onClick={() => setShowPenaltyConfirm(false)} className="w-full text-zinc-600 font-bold hover:text-white transition-colors uppercase tracking-widest text-[10px]">Back to Edit</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* PIN Modal */}
             {isPinModalOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl">
                     <div className="bg-[#111] border border-gv-gold/50 rounded-[40px] p-12 max-w-md w-full text-center space-y-10 shadow-[0_0_100px_rgba(212,175,55,0.15)] animate-in fade-in zoom-in-90 duration-300">
-                        <h3 className="text-2xl font-black text-white uppercase tracking-tighter">{t.securityPin}</h3>
-                        <input type="password" maxLength={6} value={withdrawPIN} onChange={(e) => setWithdrawPIN(e.target.value.replace(/\D/g, ''))} className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold" placeholder="******" />
+                        <div>
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">{t.securityPin}</h3>
+                            <p className="text-zinc-500 font-medium text-sm px-4">{t.enterPin}</p>
+                        </div>
+                        <div className="relative flex justify-center items-center group">
+                            <input
+                                type={isPinVisible ? "text" : "password"}
+                                maxLength={6}
+                                value={withdrawPIN}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value.replace(/\D/g, ''))}
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold placeholder:opacity-20 flex-1"
+                                autoFocus
+                                placeholder="000000"
+                            />
+                            <button 
+                                type="button"
+                                onClick={() => setIsPinVisible(!isPinVisible)}
+                                className="absolute right-4 p-2 text-zinc-600 hover:text-gv-gold transition-colors"
+                            >
+                                {isPinVisible ? (
+                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                ) : (
+                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057-5.064-7-9.542-7 1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057-5.064-7-9.542-7 1.274 4.057-5.064 7 9.542 7-4.477 0-8.268-2.943-9.542-7z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3l18 18" /></svg>
+                                )}
+                            </button>
+                        </div>
                         <div className="space-y-4">
                             <button onClick={handleWithdrawConfirm} disabled={isSubmitting || withdrawPIN.length !== 6} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all">
                                 {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.confirmWithdraw}

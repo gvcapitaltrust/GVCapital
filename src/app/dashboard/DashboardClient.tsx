@@ -58,6 +58,7 @@ export default function DashboardClient() {
         lockedPortion: number;
         isApplied: boolean;
     } | null>(null);
+    const [isPinVisible, setIsPinVisible] = useState(false);
     const [showPenaltyConfirm, setShowPenaltyConfirm] = useState(false);
 
     // Derived Withdrawal Metrics
@@ -370,8 +371,11 @@ export default function DashboardClient() {
 
         try {
             // 1. Verify Security PIN
-            if (user.security_pin !== withdrawPIN) {
-                throw new Error("Invalid security PIN. Please try again.");
+            const storedPin = (user.security_pin || "").toString().trim();
+            const enteredPin = withdrawPIN.trim();
+            
+            if (storedPin !== enteredPin) {
+                throw new Error("Invalid security PIN. Please try again or contact support if you forgot it.");
             }
 
             // 2. Insert Transaction
@@ -1859,16 +1863,27 @@ export default function DashboardClient() {
                             <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">{t.securityPin}</h3>
                             <p className="text-zinc-500 font-medium text-sm px-4">{t.enterPin}</p>
                         </div>
-                        <div className="flex justify-center gap-3">
+                        <div className="relative flex justify-center items-center group">
                             <input
-                                type="password"
+                                type={isPinVisible ? "text" : "password"}
                                 maxLength={6}
                                 value={withdrawPIN}
-                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value.replace(/\D/g, ''))}
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold"
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value.replace(/\D/g, ''))}
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold placeholder:opacity-20 flex-1"
                                 autoFocus
-                                placeholder="******"
+                                placeholder="000000"
                             />
+                            <button 
+                                type="button"
+                                onClick={() => setIsPinVisible(!isPinVisible)}
+                                className="absolute right-4 p-2 text-zinc-600 hover:text-gv-gold transition-colors"
+                            >
+                                {isPinVisible ? (
+                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                ) : (
+                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057-5.064-7-9.542-7 1.274 4.057 5.064 7 9.542 7-4.477 0-8.268-2.943-9.542-7z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057-5.064-7-9.542-7 1.274 4.057 5.064 7 9.542 7-4.477 0-8.268-2.943-9.542-7z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3l18 18" /></svg>
+                                )}
+                            </button>
                         </div>
                         <div className="space-y-4">
                             <button 
