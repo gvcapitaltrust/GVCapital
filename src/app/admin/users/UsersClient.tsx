@@ -172,7 +172,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col">
                                                 <span className="font-black text-white tabular-nums">RM {totalEquity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                <span className="text-[10px] text-gv-gold/60 font-black tracking-tighter uppercase">W: RM {Number(user.balance || 0).toFixed(0)} | D: RM {Number(user.profit || 0).toFixed(0)}</span>
+                                                <span className="text-[10px] text-gv-gold/60 font-black tracking-tighter uppercase">B: RM {Number(user.balance || 0).toFixed(0)} | D: RM {Number(user.profit || 0).toFixed(0)}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">

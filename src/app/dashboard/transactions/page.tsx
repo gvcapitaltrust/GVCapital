@@ -1,12 +1,13 @@
 import React from "react";
 import TransactionsClient from "./TransactionsClient";
 
-export default function TransactionsPage({
+export default async function TransactionsPage({
     searchParams,
 }: {
-    searchParams: { lang?: string };
+    searchParams: Promise<{ lang?: string }>;
 }) {
-    const lang = searchParams.lang === "zh" ? "zh" : "en";
+    const { lang: langParam } = await searchParams;
+    const lang = langParam === "zh" ? "zh" : "en";
 
     return (
         <div className="max-w-7xl mx-auto space-y-12">

@@ -7,7 +7,7 @@ import GlobalFooter from "@/components/GlobalFooter";
 import Navigation from "@/components/Navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/providers/AuthProvider";
-import { TIERS } from "@/lib/tierUtils";
+import { TIERS, formatUSD } from "@/lib/tierUtils";
 import { ShieldCheck, TrendingUp, BarChart3, Clock, Lock, ArrowRight, CheckCircle2, Globe, Briefcase, ChevronRight, Wallet, Activity } from "lucide-react";
 
 export default function HomeClient() {
@@ -302,7 +302,10 @@ export default function HomeClient() {
                                         </span>
                                         <span className="text-gv-gold font-bold mb-1">%</span>
                                     </div>
-                                    <div className="text-zinc-500 text-xs font-bold uppercase tracking-widest">{t.tiers.return}</div>
+                                    <div className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1">{t.tiers.return}</div>
+                                    <div className="text-zinc-500 text-[11px] font-bold">
+                                        {tierData.id === 'silver' ? 'Up to $999' : `${formatUSD(tierData.minAmount)} - ${formatUSD(tierData.maxAmount)}`}
+                                    </div>
                                 </div>
                             );
                         })}

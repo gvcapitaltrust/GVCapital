@@ -1,12 +1,13 @@
 import React from "react";
 import AuditClient from "./AuditClient";
 
-export default function AdminAuditPage({
+export default async function AdminAuditPage({
     searchParams,
 }: {
-    searchParams: { lang?: string };
+    searchParams: Promise<{ lang?: string }>;
 }) {
-    const lang = searchParams.lang === "zh" ? "zh" : "en";
+    const { lang: langParam } = await searchParams;
+    const lang = langParam === "zh" ? "zh" : "en";
 
     return <AuditClient lang={lang} />;
 }

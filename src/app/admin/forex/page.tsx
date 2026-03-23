@@ -1,12 +1,13 @@
 import React from "react";
 import ForexClient from "./ForexClient";
 
-export default function AdminForexPage({
+export default async function AdminForexPage({
     searchParams,
 }: {
-    searchParams: { lang?: string };
+    searchParams: Promise<{ lang?: string }>;
 }) {
-    const lang = searchParams.lang === "zh" ? "zh" : "en";
+    const { lang: langParam } = await searchParams;
+    const lang = langParam === "zh" ? "zh" : "en";
 
     return <ForexClient lang={lang} />;
 }

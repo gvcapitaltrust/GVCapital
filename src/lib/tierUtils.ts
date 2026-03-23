@@ -44,7 +44,7 @@ export const TIERS: Tier[] = [
     id: "diamond",
     name: "Diamond",
     minAmount: 5000,
-    maxAmount: 1000000, // Handle high-value deposits
+    maxAmount: 10000, // Capped at 10k per user request
     minDividend: 0.08,
     maxDividend: 0.1,
     color: "amber",

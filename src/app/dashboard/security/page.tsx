@@ -1,12 +1,13 @@
 import React from "react";
 import SecurityClient from "./SecurityClient";
 
-export default function SecurityPage({
+export default async function SecurityPage({
     searchParams,
 }: {
-    searchParams: { lang?: string };
+    searchParams: Promise<{ lang?: string }>;
 }) {
-    const lang = searchParams.lang === "zh" ? "zh" : "en";
+    const { lang: langParam } = await searchParams;
+    const lang = langParam === "zh" ? "zh" : "en";
 
     return (
         <div className="max-w-7xl mx-auto space-y-12">

@@ -1,12 +1,13 @@
 import React from "react";
 import ReferralsClient from "./ReferralsClient";
 
-export default function ReferralsPage({
+export default async function ReferralsPage({
     searchParams,
 }: {
-    searchParams: { lang?: string };
+    searchParams: Promise<{ lang?: string }>;
 }) {
-    const lang = searchParams.lang === "zh" ? "zh" : "en";
+    const { lang: langParam } = await searchParams;
+    const lang = langParam === "zh" ? "zh" : "en";
 
     return (
         <div className="max-w-7xl mx-auto space-y-12">

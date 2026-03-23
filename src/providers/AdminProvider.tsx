@@ -202,7 +202,39 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             const currentProfit = Number(profile?.profit || 0);
             const currentBalance = Number(profile?.balance || 0);
 
-            // 2. Deduct: first from profit (dividends), then from balance (capital)
+            // 2. Fetch User Deposits to verify lock-in period
+            const { data: deposits, error: depositsError } = await supabase
+                .from('transactions')
+                .select('*')
+                .eq('user_id', tx.user_id)
+                .eq('type', 'Deposit')
+                .eq('status', 'Approved');
+
+            if (depositsError) throw depositsError;
+
+            const now = new Date();
+            const lockPeriodDays = 180;
+            const lockedCapital = deposits?.reduce((acc: number, d: any) => {
+                const txDate = new Date(d.created_at || d.transfer_date);
+                const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
+                return diffDays < lockPeriodDays ? acc + Number(d.amount) : acc;
+            }, 0) || 0;
+
+            const withdrawableCapital = Math.max(0, currentBalance - lockedCapital);
+            const totalWithdrawable = currentProfit + withdrawableCapital;
+
+            let penalty = 0;
+            let finalPayout = withdrawAmount;
+            let penaltyApplied = false;
+
+            if (withdrawAmount > totalWithdrawable) {
+                const penalizedPortion = withdrawAmount - totalWithdrawable;
+                penalty = penalizedPortion * 0.4;
+                finalPayout = withdrawAmount - penalty;
+                penaltyApplied = true;
+            }
+
+            // 3. Deduct: first from profit (dividends), then from balance (capital)
             let newProfit = currentProfit;
             let newBalance = currentBalance;
             let remaining = withdrawAmount;
@@ -216,7 +248,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 newBalance = Math.max(0, newBalance - remaining);
             }
 
-            // 3. Update profile with new balance/profit
+            // 4. Update profile with new balance/profit
             const { error: profileUpdateError } = await supabase
                 .from('profiles')
                 .update({ balance: newBalance, profit: newProfit })
@@ -224,7 +256,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             
             if (profileUpdateError) throw profileUpdateError;
 
-            // 4. Mark transaction as Approved
+            // 5. Mark transaction as Approved
             const { error: txError } = await supabase
                 .from('transactions')
                 .update({ 
@@ -233,7 +265,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         ...tx.metadata,
                         processed_by_name: authUser?.user_metadata?.full_name || "Admin",
                         processed_by_id: authUser?.id,
-                        processed_by_email: authUser?.email
+                        processed_by_email: authUser?.email,
+                        finalized_penalty: penaltyApplied ? penalty : 0,
+                        finalized_payout: finalPayout,
+                        penalty_applied: penaltyApplied
                     }
                 })
                 .eq('id', tx.id);

@@ -44,7 +44,7 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
         <div className="min-w-0 flex-1">
           <h3 className="text-sm xl:text-base font-black mb-0.5 uppercase tracking-tight break-words">{tier.name}</h3>
           <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
-            {tier.id === "diamond" ? `Over ${formatUSD(tier.minAmount)}` : `${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
+            {`${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
           </p>
         </div>
         <TierMedal tierId={tier.id} size="sm" className="shrink-0" />

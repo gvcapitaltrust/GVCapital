@@ -44,6 +44,7 @@ export default function DashboardClient() {
     const [successRefId, setSuccessRefId] = useState("");
     const [actionToast, setActionToast] = useState<{message: string, actionUrl?: string, actionText?: string} | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
     // Form States
     const [depositAmount, setDepositAmount] = useState("");
@@ -51,6 +52,28 @@ export default function DashboardClient() {
     const [depositReceipt, setDepositReceipt] = useState<File | null>(null);
     const [withdrawAmount, setWithdrawAmount] = useState("");
     const [withdrawPIN, setWithdrawPIN] = useState("");
+    const [penaltyInfo, setPenaltyInfo] = useState<{
+        penalty: number;
+        payout: number;
+        lockedPortion: number;
+        isApplied: boolean;
+    } | null>(null);
+    const [showPenaltyConfirm, setShowPenaltyConfirm] = useState(false);
+
+    // Derived Withdrawal Metrics
+    const withdrawalMetrics = React.useMemo(() => {
+        if (!isMounted || !user) return { lockedCapital: 0, withdrawable: 0 };
+        const approvedDeposits = transactions.filter(tx => tx.type === 'Deposit' && tx.status === 'Approved');
+        const now = new Date();
+        const lockPeriodDays = 180;
+        const lockedCapital = approvedDeposits.reduce((acc, tx) => {
+            const txDate = new Date(tx.created_at || tx.transfer_date);
+            const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
+            return diffDays < lockPeriodDays ? acc + Number(tx.amount) : acc;
+        }, 0);
+        const withdrawable = Number(user.profit || 0) + Math.max(0, Number(user.balance || 0) - lockedCapital);
+        return { lockedCapital, withdrawable };
+    }, [isMounted, user, transactions, authLoading]);
 
     // KYC Form States
     const [idPhoto, setIdPhoto] = useState<File | null>(null);
@@ -68,6 +91,7 @@ export default function DashboardClient() {
     const fetchedRef = React.useRef<string | null>(null);
 
     useEffect(() => {
+        setIsMounted(true);
         setLang("en"); // Force English for now
         
         if (authLoading) return;
@@ -284,17 +308,16 @@ export default function DashboardClient() {
     };
 
     const handleWithdrawInitiate = () => {
+        console.log("WITHDRAW INITIATED", { withdrawAmount, user: !!user });
         if (!withdrawAmount || !user) return;
         const amount = parseFloat(withdrawAmount);
         
-        // 1. Check for at least one successful deposit
         const approvedDeposits = transactions.filter(tx => tx.type === 'Deposit' && tx.status === 'Approved');
         if (approvedDeposits.length === 0) {
             alert("You must have at least one successful deposit before requesting a withdrawal.");
             return;
         }
 
-        // 2. Calculate Locked Capital (Approved deposits < 180 days old)
         const now = new Date();
         const lockPeriodDays = 180;
         const lockedCapital = approvedDeposits.reduce((acc, tx) => {
@@ -303,18 +326,36 @@ export default function DashboardClient() {
             return diffDays < lockPeriodDays ? acc + Number(tx.amount) : acc;
         }, 0);
 
-        // 3. Calculate Withdrawable Amount
         const withdrawableProfit = Number(user.profit || 0);
         const withdrawableCapital = Math.max(0, Number(user.balance || 0) - lockedCapital);
         const totalWithdrawable = withdrawableProfit + withdrawableCapital;
 
-        if (amount > totalWithdrawable) {
-            if (lockedCapital > 0 && amount <= Number(user.total_assets)) {
-                alert(`Some of your capital is still within the 6-month lock-in period. Currently, you can only withdraw RM ${totalWithdrawable.toLocaleString(undefined, { minimumFractionDigits: 2 })} (Dividends + matured capital).`);
-            } else {
-                alert(`Insufficient balance. Your maximum withdrawable amount is RM ${totalWithdrawable.toLocaleString(undefined, { minimumFractionDigits: 2 })}.`);
-            }
+        if (amount > Number(user.total_assets)) {
+            alert(`Insufficient balance. Your total assets are RM ${Number(user.total_assets).toLocaleString(undefined, { minimumFractionDigits: 2 })}.`);
             return;
+        }
+
+        // Calculate Penalty if amount > withdrawable
+        if (amount > totalWithdrawable) {
+            const lockedPortion = amount - totalWithdrawable;
+            const penalty = lockedPortion * 0.4;
+            const payout = amount - penalty;
+
+            setPenaltyInfo({
+                penalty,
+                payout,
+                lockedPortion,
+                isApplied: true
+            });
+            setShowPenaltyConfirm(true);
+            return;
+        } else {
+            setPenaltyInfo({
+                penalty: 0,
+                payout: amount,
+                lockedPortion: 0,
+                isApplied: false
+            });
         }
 
         setIsPinModalOpen(true);
@@ -341,7 +382,14 @@ export default function DashboardClient() {
                     type: 'Withdrawal',
                     amount: Math.abs(parseFloat(withdrawAmount)),
                     status: 'Pending',
-                    ref_id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`
+                    ref_id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
+                    metadata: penaltyInfo?.isApplied ? {
+                        penalty_applied: true,
+                        penalty_amount: penaltyInfo.penalty,
+                        expected_payout: penaltyInfo.payout,
+                        locked_portion: penaltyInfo.lockedPortion,
+                        penalty_rate: "40%"
+                    } : null
                 }]);
 
             if (error) throw error;
@@ -639,7 +687,7 @@ export default function DashboardClient() {
             bankReceipt: "Bank Receipt (Image/PDF)",
             selectDocument: "Select Document",
             confirmDeposit: "Confirm Deposit",
-            requestWithdraw: "Request Withdrawal",
+            requestWithdraw: "Continue to PIN",
             cancelTx: "Cancel Transaction",
             docSubmitted: "Documents Submitted",
             docSubmittedDesc: "Our compliance team will review your account within 24 hours. Your portfolio will activate automatically upon approval.",
@@ -765,7 +813,7 @@ export default function DashboardClient() {
             bankReceipt: "银行收据 (图像/PDF)",
             selectDocument: "选择文件",
             confirmDeposit: "确认入金",
-            requestWithdraw: "申请提款",
+            requestWithdraw: "继续验证 PIN 码",
             cancelTx: "取消交易",
             docSubmitted: "文件已提交",
             docSubmittedDesc: "我们的合规团队将在 24 小时内审核您的账户。批准后您的投资组合将自动激活。",
@@ -793,7 +841,7 @@ export default function DashboardClient() {
 
     const t = (content as any)[lang];
 
-    if (isCheckingAuth) {
+    if (!isMounted || isCheckingAuth) {
         return <div className="min-h-screen bg-[#121212] flex items-center justify-center p-6"><div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
     }
 
@@ -1682,6 +1730,59 @@ export default function DashboardClient() {
                 </div>
             )}
 
+            {/* Penalty Confirmation Modal */}
+            {showPenaltyConfirm && penaltyInfo && (
+                <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md">
+                    <div className="bg-[#1a1a1a] border border-red-500/50 rounded-[40px] p-10 max-w-lg w-full text-center space-y-8 shadow-[0_0_50px_rgba(239,68,68,0.2)] animate-in fade-in zoom-in-95 duration-300">
+                        <div className="h-20 w-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+                            <svg className="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-4">
+                                {lang === 'en' ? "Penalty Warning" : "违约处罚提示"}
+                            </h3>
+                            <div className="space-y-4 text-left bg-white/5 p-6 rounded-2xl border border-white/10">
+                                <p className="text-zinc-400 text-sm font-medium leading-relaxed">
+                                    {lang === 'en' 
+                                        ? `Part of your withdrawal (RM ${penaltyInfo.lockedPortion.toLocaleString(undefined, { minimumFractionDigits: 2 })}) is still within the 6-month capital lock-in period. An early withdrawal penalty of 40% applies to this portion.`
+                                        : `您的提款中有一部分 (RM ${penaltyInfo.lockedPortion.toLocaleString(undefined, { minimumFractionDigits: 2 })}) 仍处于 6 个月的资金锁定期内。根据协议，该部分将收取 40% 的提前提款违约金。`}
+                                </p>
+                                <div className="pt-4 border-t border-white/10 space-y-2">
+                                    <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
+                                        <span className="text-zinc-500">{lang === 'en' ? "Penalty Amount" : "处罚金额"}</span>
+                                        <span className="text-red-500">- RM {penaltyInfo.penalty.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    </div>
+                                    <div className="flex justify-between text-base font-black uppercase tracking-tight">
+                                        <span className="text-zinc-300">{lang === 'en' ? "Estimated Payout" : "预计到账金额"}</span>
+                                        <span className="text-gv-gold">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <button 
+                                onClick={() => {
+                                    setShowPenaltyConfirm(false);
+                                    setIsPinModalOpen(true);
+                                }} 
+                                className="w-full bg-red-500 text-white font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl hover:bg-red-600 transition-all hover:-translate-y-1"
+                            >
+                                {lang === 'en' ? "I Accept Penalty" : "我接受并继续"}
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    setShowPenaltyConfirm(false);
+                                    setPenaltyInfo(null);
+                                }} 
+                                className="w-full text-zinc-500 font-bold hover:text-white transition-colors uppercase tracking-widest text-[10px]"
+                            >
+                                {lang === 'en' ? "Cancel & Re-adjust Amount" : "取消并重新调整金额"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Withdraw Modal */}
             {isWithdrawModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
@@ -1699,36 +1800,46 @@ export default function DashboardClient() {
                                     <input type="number" value={withdrawAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                                 </div>
                                 
-                                {(() => {
-                                    const approvedDeposits = transactions.filter(tx => tx.type === 'Deposit' && tx.status === 'Approved');
-                                    const now = new Date();
-                                    const lockedCapital = approvedDeposits.reduce((acc, tx) => {
-                                        const txDate = new Date(tx.created_at || tx.transfer_date);
-                                        const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
-                                        return diffDays < 180 ? acc + Number(tx.amount) : acc;
-                                    }, 0);
-                                    const withdrawable = Number(user?.profit || 0) + Math.max(0, Number(user?.balance || 0) - lockedCapital);
-                                    
-                                    return (
-                                        <div className="px-1 space-y-2">
-                                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                                                <span className="text-zinc-500">Withdrawable Balance</span>
-                                                <span className="text-emerald-500">RM {withdrawable.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                            </div>
-                                            {lockedCapital > 0 && (
-                                                <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-tighter">
-                                                    <span className="text-zinc-600">Locked (6-month term)</span>
-                                                    <span className="text-amber-500/70">RM {lockedCapital.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                </div>
-                                            )}
+                                <div className="px-1 space-y-4">
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                                            <span className="text-zinc-500">Withdrawable Balance</span>
+                                            <span className="text-emerald-500">RM {withdrawalMetrics.withdrawable.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
                                         </div>
-                                    );
-                                })()}
+                                        {withdrawalMetrics.lockedCapital > 0 && (
+                                            <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-tighter">
+                                                <span className="text-zinc-600">Locked (6-month term)</span>
+                                                <span className="text-amber-500/70">RM {withdrawalMetrics.lockedCapital.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {(() => {
+                                        const amountValue = parseFloat(withdrawAmount) || 0;
+                                        const isPenaltyRequired = amountValue > withdrawalMetrics.withdrawable;
+                                        if (isPenaltyRequired && amountValue > 0) {
+                                            return (
+                                                <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 space-y-3">
+                                                    <div className="flex items-center gap-2 text-red-500 font-black uppercase text-[10px] tracking-widest">
+                                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                                        <span>{lang === 'en' ? "Penalty Notice" : "扣除提示"}</span>
+                                                    </div>
+                                                    <p className="text-[10px] text-zinc-400 font-bold leading-relaxed">
+                                                        {lang === 'en' 
+                                                            ? "A 40% penalty will be applied to the portion of your withdrawal taken from locked capital."
+                                                            : "提款金额超出可自由提取部分，超出部分将涉及 40% 的提前提取费用。"}
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    })()}
+                                </div>
                             </div>
-                             <button 
-                                onClick={() => handleWithdrawInitiate()} 
-                                disabled={!withdrawAmount} 
-                                className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:bg-gv-gold hover:border-gv-gold"
+                            <button 
+                                onClick={handleWithdrawInitiate} 
+                                disabled={!withdrawAmount || Number(withdrawAmount) <= 0} 
+                                className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:-translate-y-1"
                             >
                                 {t.requestWithdraw}
                             </button>

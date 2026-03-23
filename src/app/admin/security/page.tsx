@@ -1,12 +1,13 @@
 import React from "react";
 import SecurityClient from "./SecurityClient";
 
-export default function AdminSecurityPage({
+export default async function AdminSecurityPage({
     searchParams,
 }: {
-    searchParams: { lang?: string };
+    searchParams: Promise<{ lang?: string }>;
 }) {
-    const lang = searchParams.lang === "zh" ? "zh" : "en";
+    const { lang: langParam } = await searchParams;
+    const lang = langParam === "zh" ? "zh" : "en";
 
     return <SecurityClient lang={lang} />;
 }

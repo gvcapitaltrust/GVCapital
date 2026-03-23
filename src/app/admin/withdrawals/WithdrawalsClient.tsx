@@ -91,6 +91,8 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                             <tr>
                                 <th className="px-8 py-6">{t.tableUser}</th>
                                 <th className="px-8 py-6">{t.tableAmount}</th>
+                                <th className="px-8 py-6">Penalty</th>
+                                <th className="px-8 py-6">Total Payout</th>
                                 <th className="px-8 py-6">{t.tableDate}</th>
                                 <th className="px-8 py-6">{t.tableStatus}</th>
                                 <th className="px-8 py-6 text-right">{t.tableActions}</th>
@@ -110,6 +112,19 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                             <span className="font-black text-red-500 tabular-nums">RM {Math.abs(Number(tx.amount)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(tx.amount)) / forexRate).toFixed(2)} USD)</span>
                                         </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        {tx.metadata?.penalty_applied || tx.metadata?.penalty_amount ? (
+                                            <div className="flex flex-col">
+                                                <span className="font-black text-red-400 tabular-nums">RM {Number(tx.metadata?.finalized_penalty || tx.metadata?.penalty_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">40% Early</span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-zinc-700 font-bold uppercase text-[10px]">-</span>
+                                        )}
+                                    </td>
+                                    <td className="px-8 py-6 font-black text-emerald-500 tabular-nums">
+                                        RM {Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </td>
                                     <td className="px-8 py-6 text-zinc-500 font-mono text-xs">{new Date(tx.created_at).toLocaleDateString()}</td>
                                     <td className="px-8 py-6">
