@@ -406,7 +406,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         <div className="xl:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8 overflow-hidden">
                             <h3 className="text-xl font-black uppercase tracking-tighter">{t.dividendTrends}</h3>
                             <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 px-2 sm:px-4">
-                                {dividendHistory && dividendHistory.length > 0 ? dividendHistory.map((div: any, i: number) => (
+                                {dividendHistory && dividendHistory.length > 0 ? dividendHistory.slice(-6).map((div: any, i: number) => (
                                     <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
                                         <div
                                             className="w-full bg-gv-gold rounded-t-xl transition-all duration-500 group-hover:brightness-125"
@@ -437,15 +437,15 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     </div>
                                     <div className="w-full truncate">
                                         <h4 className={`text-2xl font-black uppercase tracking-tighter truncate ${
-                                            (transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'text-gv-gold' :
+                                            (transactions[0].metadata?.adjustment_category === 'Dividend' || transactions[0].metadata?.adjustment_category === 'Bonus') ? 'text-gv-gold' :
                                             transactions[0].status === 'Approved' ? 'text-emerald-500' : 
                                             transactions[0].status === 'Rejected' ? 'text-red-500' : 
                                             'text-amber-500'
                                         }`}>
-                                            {(transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'Adjustment' : transactions[0].status}
+                                            {transactions[0].metadata?.adjustment_category || transactions[0].status}
                                         </h4>
                                         <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1 truncate px-2">
-                                            {transactions[0].metadata?.is_adjustment ? transactions[0].metadata.adjustment_category : transactions[0].type}: RM {Number(transactions[0].amount).toFixed(2)}
+                                            {transactions[0].metadata?.description || transactions[0].type}: RM {Number(transactions[0].amount).toFixed(2)}
                                         </p>
                                     </div>
                                 </>

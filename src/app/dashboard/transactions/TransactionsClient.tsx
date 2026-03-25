@@ -12,6 +12,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
 
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [activeFilter, setActiveFilter] = useState<'All' | 'Capital' | 'Dividends'>('All');
 
     const t = {
         en: {
@@ -43,8 +44,30 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             selectYear: "选择年份",
             generateDownload: "生成并下载 PDF",
             months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            all: "All Transactions",
+            capital: "Capital Flow",
+            dividends: "Dividends & Bonuses",
+            filterBy: "Filter by",
+            totalInView: "Total in this view",
         }
     }[lang];
+
+    const filteredTransactions = transactions.filter(tx => {
+        if (activeFilter === 'All') return true;
+        const isDiv = tx.metadata?.adjustment_category === 'Dividend' || tx.metadata?.adjustment_category === 'Bonus' || tx.type?.toLowerCase().includes('dividend') || tx.type?.toLowerCase().includes('bonus');
+        if (activeFilter === 'Dividends') return isDiv;
+        if (activeFilter === 'Capital') return !isDiv;
+        return true;
+    });
+
+    const filteredTotal = filteredTransactions
+        .filter(tx => tx.status === 'Approved')
+        .reduce((acc, tx) => {
+            const amount = Number(tx.amount);
+            if (tx.type === 'Withdrawal' && !tx.metadata?.adjustment_category) return acc - Math.abs(amount);
+            if (tx.metadata?.adjustment_type === 'Decrease') return acc - Math.abs(amount);
+            return acc + amount;
+        }, 0);
 
     const generateStatement = () => {
         if (!user) return;
@@ -76,12 +99,10 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
         });
 
-        const periodProfit = dividendHistory
-            .filter(d => {
-                const date = new Date(d.created_at);
-                return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear;
-            })
-            .reduce((acc, d) => acc + Number(d.amount), 0);
+        const periodProfit = periodTxs.filter(t => 
+            (t.metadata?.adjustment_category === 'Dividend' || t.metadata?.adjustment_category === 'Bonus' || t.type?.toLowerCase().includes('dividend') || t.type?.toLowerCase().includes('bonus')) &&
+            t.status === 'Approved'
+        ).reduce((acc, t) => acc + Number(t.amount), 0);
 
         const totalDeposits = periodTxs.filter(tx => tx.type === 'Deposit' && tx.status === 'Approved').reduce((acc, tx) => acc + Number(tx.amount), 0);
         const totalWithdrawals = periodTxs.filter(tx => tx.type === 'Withdrawal' && tx.status === 'Approved').reduce((acc, tx) => acc + Math.abs(Number(tx.amount)), 0);
@@ -124,7 +145,31 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     return (
         <div className="space-y-12 pb-20">
             <section className="space-y-6">
-                <h2 className="text-2xl font-black uppercase tracking-tighter">{t.history}</h2>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <h2 className="text-2xl font-black uppercase tracking-tighter">{t.history}</h2>
+                    
+                    <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
+                        {(['All', 'Capital', 'Dividends'] as const).map((f) => (
+                            <button
+                                key={f}
+                                onClick={() => setActiveFilter(f)}
+                                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                                    activeFilter === f ? 'bg-gv-gold text-black shadow-lg' : 'text-zinc-500 hover:text-white'
+                                }`}
+                            >
+                                {f}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-4 px-2">
+                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{t.totalInView}:</span>
+                    <span className={`text-sm font-black tabular-nums ${filteredTotal >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                        RM {filteredTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                </div>
+
                 <div className="border border-white/10 rounded-[40px] overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
                     <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-white/10">
                         <table className="w-full text-left min-w-[700px] border-collapse">
@@ -138,7 +183,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/[0.03]">
-                                {transactions.map((tx, idx) => (
+                                {filteredTransactions.map((tx, idx) => (
                                     <tr key={idx} className="text-sm font-bold group hover:bg-white/[0.02] transition-colors">
                                         <td className="px-8 py-6 text-zinc-500 font-mono text-xs">{new Date(tx.created_at || tx.transfer_date).toLocaleDateString()}</td>
                                         <td className="px-8 py-6 text-zinc-400 font-mono text-xs opacity-50">{tx.ref_id || "-"}</td>
@@ -155,7 +200,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                         </td>
                                     </tr>
                                 ))}
-                                {transactions.length === 0 && (
+                                {filteredTransactions.length === 0 && (
                                     <tr><td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
                                 )}
                             </tbody>
