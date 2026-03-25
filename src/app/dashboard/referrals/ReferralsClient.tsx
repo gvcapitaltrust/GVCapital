@@ -60,12 +60,12 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
     return (
         <div className="space-y-12 pb-20">
             {/* Header / Share Section */}
-            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
+            <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                 <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div className="space-y-6">
-                        <h2 className="text-4xl font-black uppercase tracking-tighter text-white">{t.referTitle}</h2>
-                        <p className="text-zinc-500 font-medium text-lg leading-relaxed">{t.referSubtitle}</p>
+                        <h2 className="text-2xl font-bold uppercase tracking-tight text-white">{t.referTitle}</h2>
+                        <p className="text-zinc-500 font-medium text-base leading-relaxed">{t.referSubtitle}</p>
                         <div className="flex flex-col sm:flex-row gap-4">
                             <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex-1 flex items-center justify-between">
                                 <span className="text-gv-gold font-black tracking-widest uppercase">{user?.username}</span>
@@ -80,31 +80,31 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                             </button>
                         </div>
                     </div>
-                    <div className="flex flex-col items-center justify-center bg-white/5 border border-white/10 rounded-[40px] p-12 text-center group-hover:bg-white/10 transition-all">
-                        <p className="text-zinc-500 font-black uppercase tracking-[0.3em] mb-4">{t.totalReferred}</p>
-                        <h3 className="text-7xl font-black text-gv-gold tabular-nums">{referredCount}</h3>
+                    <div className="flex flex-col items-center justify-center bg-white/5 border border-white/10 rounded-3xl p-8 text-center group-hover:bg-white/10 transition-all">
+                        <p className="text-zinc-500 font-black uppercase tracking-[0.3em] mb-4 text-xs">{t.totalReferred}</p>
+                        <h3 className="text-5xl font-bold tracking-tight text-gv-gold tabular-nums">{referredCount}</h3>
                     </div>
                 </div>
             </div>
 
             {/* List Section */}
             <div className="space-y-6">
-                <h3 className="text-2xl font-black uppercase tracking-tighter">{t.referredUsersList}</h3>
-                <div className="border border-white/10 rounded-[40px] overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
+                <h3 className="text-xl font-bold uppercase tracking-tight">{t.referredUsersList}</h3>
+                <div className="border border-white/10 rounded-3xl overflow-hidden bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left min-w-[800px]">
                             <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
                                 <tr>
-                                    <th className="px-8 py-6">{t.username}</th>
-                                    <th className="px-8 py-6">{t.registrationDate}</th>
-                                    <th className="px-8 py-6">{t.investmentTier}</th>
-                                    <th className="px-8 py-6 text-right">{t.accountStatus}</th>
+                                    <th className="px-6 py-4">{t.username}</th>
+                                    <th className="px-6 py-4">{t.registrationDate}</th>
+                                    <th className="px-6 py-4">{t.investmentTier}</th>
+                                    <th className="px-6 py-4 text-right">{t.accountStatus}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/[0.03]">
                                 {referredUsers.map((ref, idx) => (
                                     <tr key={idx} className="text-sm font-bold group hover:bg-white/[0.02] transition-colors">
-                                        <td className="px-8 py-6">
+                                        <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center text-xs font-black text-gv-gold">{ref.full_name?.[0] || 'U'}</div>
                                                 <div className="flex flex-col">
@@ -113,13 +113,13 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6 text-zinc-500 font-mono text-xs">{new Date(ref.created_at).toLocaleDateString()}</td>
-                                        <td className="px-8 py-6">
+                                        <td className="px-6 py-4 text-zinc-500 font-mono text-xs">{new Date(ref.created_at).toLocaleDateString()}</td>
+                                        <td className="px-6 py-4">
                                             <span className="text-gv-gold uppercase text-[10px] tracking-widest font-black">
                                                 {ref.balance > 0 ? getTierByAmount(ref.balance / forexRate).name : t.noInvestment}
                                             </span>
                                         </td>
-                                        <td className="px-8 py-6 text-right">
+                                        <td className="px-6 py-4 text-right">
                                             <span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${ref.is_verified ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-500'}`}>
                                                 {ref.is_verified ? t.verified : t.unverified}
                                             </span>
@@ -127,7 +127,7 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                                     </tr>
                                 ))}
                                 {referredUsers.length === 0 && (
-                                    <tr><td colSpan={4} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">{t.noReferrals}</td></tr>
+                                    <tr><td colSpan={4} className="px-6 py-12 text-center text-zinc-600 font-bold uppercase tracking-widest">{t.noReferrals}</td></tr>
                                 )}
                             </tbody>
                         </table>

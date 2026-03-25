@@ -53,7 +53,7 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
-            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group max-w-2xl">
+            <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                 <div className="relative z-10 space-y-10">
                     <div className="mb-10 p-6 bg-gv-gold/10 border border-gv-gold/20 rounded-3xl">
@@ -69,8 +69,8 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                     </div>
 
                     <div className="space-y-4">
-                        <h2 className="text-3xl font-black uppercase tracking-tighter text-white">{t.securityTitle}</h2>
-                        <p className="text-zinc-500 font-medium leading-relaxed">{t.securitySubtitle}</p>
+                        <h2 className="text-2xl font-bold uppercase tracking-tight text-white">{t.securityTitle}</h2>
+                        <p className="text-zinc-500 font-medium leading-relaxed max-w-lg">{t.securitySubtitle}</p>
                     </div>
 
                     <form onSubmit={handlePasswordUpdate} className="grid gap-6">
@@ -85,7 +85,7 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                                     name={field.name}
                                     type="password"
                                     required
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-base font-bold focus:outline-none focus:border-gv-gold transition-all"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -93,7 +93,7 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full bg-gv-gold text-black font-black py-6 rounded-2xl uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-4 mt-8"
+                            className="w-full bg-gv-gold text-black font-black py-4 rounded-xl uppercase tracking-widest text-sm shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-4 mt-8"
                         >
                             {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.updateBtn}
                         </button>

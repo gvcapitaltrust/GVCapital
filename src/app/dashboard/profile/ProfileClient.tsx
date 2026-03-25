@@ -61,10 +61,10 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Personal Information */}
-                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2"></div>
                     <div className="relative z-10 space-y-8">
-                        <h3 className="text-xl font-black uppercase tracking-tighter text-gv-gold flex items-center gap-3">
+                        <h3 className="text-lg font-bold uppercase tracking-tight text-gv-gold flex items-center gap-3">
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                             {t.personalInfo}
                         </h3>
@@ -76,17 +76,17 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                             ].map((item, i) => (
                                 <div key={i} className="space-y-1">
                                     <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{item.label}</p>
-                                    <p className="text-lg font-bold text-white tracking-tight">{item.value || "-"}</p>
+                                    <p className="text-base font-semibold text-white tracking-tight">{item.value || "-"}</p>
                                 </div>
                             ))}
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-1">
                                     <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.phone}</p>
-                                    <p className="text-lg font-bold text-white tracking-tight">{user?.phone || "-"}</p>
+                                    <p className="text-base font-semibold text-white tracking-tight">{user?.phone || "-"}</p>
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.country}</p>
-                                    <p className="text-lg font-bold text-white tracking-tight">{user?.country || "-"}</p>
+                                    <p className="text-base font-semibold text-white tracking-tight">{user?.country || "-"}</p>
                                 </div>
                             </div>
                         </div>
@@ -94,10 +94,10 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
 
                 {/* Compliance */}
-                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2"></div>
                     <div className="relative z-10 space-y-8">
-                        <h3 className="text-xl font-black uppercase tracking-tighter text-gv-gold flex items-center gap-3">
+                        <h3 className="text-lg font-bold uppercase tracking-tight text-gv-gold flex items-center gap-3">
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                             {t.compliance}
                         </h3>
@@ -110,7 +110,7 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                             ].map((item, i) => (
                                 <div key={i} className="space-y-1">
                                     <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{item.label}</p>
-                                    <p className={`text-lg font-bold tracking-tight ${item.className || "text-white"}`}>{item.value || "-"}</p>
+                                    <p className={`text-base font-semibold tracking-tight ${item.className || "text-white"}`}>{item.value || "-"}</p>
                                 </div>
                             ))}
                         </div>
@@ -119,27 +119,27 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
             </div>
 
             {/* Bank Details */}
-            <div className="bg-gv-gold/5 border border-gv-gold/10 p-10 rounded-[40px] shadow-2xl relative overflow-hidden group">
+            <div className="bg-gv-gold/5 border border-gv-gold/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
                 <div className="relative z-10 space-y-8">
-                    <h3 className="text-xl font-black uppercase tracking-tighter text-gv-gold flex items-center gap-3">
+                    <h3 className="text-lg font-bold uppercase tracking-tight text-gv-gold flex items-center gap-3">
                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 00-3 3z" /></svg>
                         {t.bankDetails}
                     </h3>
                     <div className="flex flex-col md:flex-row gap-12">
                         <div className="space-y-1 flex-1">
                             <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.bankName}</p>
-                            <p className="text-2xl font-black text-white tracking-widest uppercase">{user?.bank_name || "-"}</p>
+                            <p className="text-lg font-bold text-white tracking-widest uppercase">{user?.bank_name || "-"}</p>
                         </div>
                         <div className="space-y-1 flex-1">
                             <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.accNumber}</p>
-                            <p className="text-2xl font-black text-white tracking-[0.2em] font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
+                            <p className="text-lg font-bold text-white tracking-widest font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-12 pt-8 border-t border-white/5">
                         <div className="space-y-1 flex-1">
                             <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.accHolder}</p>
-                            <p className="text-2xl font-black text-white tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
+                            <p className="text-lg font-bold text-white tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
                         </div>
                         <div className="space-y-1 flex-1">
                             <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.bankStatement}</p>

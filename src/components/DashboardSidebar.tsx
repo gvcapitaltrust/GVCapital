@@ -64,10 +64,11 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
             <aside className={`fixed inset-y-0 left-0 z-50 bg-[#0a0a0a] border-r border-white/5 p-6 flex flex-col justify-between transition-all duration-500 ease-in-out hidden md:flex ${isCollapsed ? "w-20" : "w-80"}`}>
                 <div className="space-y-12">
                     <div className={`flex items-center gap-4 px-2 transition-all duration-500 ${isCollapsed ? "justify-center" : ""}`}>
-                        <div className="h-10 w-10 bg-gv-gold rounded-xl flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(212,175,55,0.3)]">
-                            <span className="text-black font-black text-xl">G</span>
-                        </div>
-                        {!isCollapsed && <span className="text-white font-black text-2xl tracking-tighter">GV CAPITAL</span>}
+                        {isCollapsed ? (
+                            <img src="/logo.png" alt="GV Capital" className="h-8 w-auto object-contain mix-blend-screen" />
+                        ) : (
+                            <img src="/logo.png" alt="GV Capital" className="h-[21px] w-[170px] object-contain mix-blend-screen" />
+                        )}
                     </div>
 
                     <nav className="space-y-2">
