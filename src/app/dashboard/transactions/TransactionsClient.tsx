@@ -174,28 +174,28 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-white/10">
                         <table className="w-full text-left min-w-[700px] border-collapse">
                             <thead className="bg-white/5 border-b border-white/10 sticky top-0 z-10 backdrop-blur-md">
-                                <tr className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
-                                    <th className="px-8 py-6">{t.date}</th>
-                                    <th className="px-8 py-6">{t.refId}</th>
-                                    <th className="px-8 py-6">{t.type}</th>
-                                    <th className="px-8 py-6">{t.status}</th>
-                                    <th className="px-8 py-6 text-right">{t.amount}</th>
+                                <tr className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">
+                                    <th className="px-6 py-4">{t.date}</th>
+                                    <th className="px-6 py-4">{t.refId}</th>
+                                    <th className="px-6 py-4">{t.type}</th>
+                                    <th className="px-6 py-4">{t.status}</th>
+                                    <th className="px-6 py-4 text-right">{t.amount}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/[0.03]">
                                 {filteredTransactions.map((tx, idx) => (
-                                    <tr key={idx} className="text-sm font-bold group hover:bg-white/[0.02] transition-colors">
-                                        <td className="px-8 py-6 text-zinc-500 font-mono text-xs">{new Date(tx.created_at || tx.transfer_date).toLocaleDateString()}</td>
-                                        <td className="px-8 py-6 text-zinc-400 font-mono text-xs opacity-50">{tx.ref_id || "-"}</td>
-                                        <td className="px-8 py-6 uppercase tracking-widest text-[10px]">{tx.metadata?.description || tx.type}</td>
-                                        <td className="px-8 py-6">
-                                            <span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${
-                                                tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' :
-                                                tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
-                                                'bg-amber-500/10 text-amber-400'
+                                    <tr key={idx} className="text-sm font-medium group hover:bg-white/[0.03] transition-colors border-t border-white/[0.02]">
+                                        <td className="px-6 py-4 text-zinc-400 font-mono text-xs">{new Date(tx.created_at || tx.transfer_date).toLocaleDateString()}</td>
+                                        <td className="px-6 py-4 text-zinc-500 font-mono text-[11px] opacity-70">{tx.ref_id || "-"}</td>
+                                        <td className="px-6 py-4 uppercase tracking-widest text-[10px] font-bold text-white">{tx.metadata?.description || tx.type}</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1.5 rounded-lg text-[9px] uppercase font-bold tracking-widest ${
+                                                tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                                tx.status === 'Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                                                'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                                             }`}>{tx.status}</span>
                                         </td>
-                                        <td className={`px-8 py-6 text-right font-black tabular-nums ${Number(tx.amount) >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                        <td className={`px-6 py-4 text-right font-black tabular-nums ${Number(tx.amount) >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
                                             {Number(tx.amount) >= 0 ? '+' : ''}{Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                         </td>
                                     </tr>
@@ -209,28 +209,28 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </section>
 
-            <section className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
+            <section className="bg-[#1a1a1a] border border-white/5 p-8 rounded-[32px] shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                 <div className="relative z-10 max-w-2xl">
-                    <h2 className="text-3xl font-black uppercase tracking-tighter mb-4">{t.statementCenter}</h2>
-                    <p className="text-zinc-500 font-medium mb-12">{t.statementCenterDesc}</p>
+                    <h2 className="text-2xl font-bold uppercase tracking-tight mb-3">{t.statementCenter}</h2>
+                    <p className="text-zinc-500 text-sm font-medium mb-8">{t.statementCenterDesc}</p>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
-                        <div className="space-y-4">
-                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.selectMonth}</label>
-                            <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all text-white">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                        <div className="space-y-3">
+                            <label className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest px-1">{t.selectMonth}</label>
+                            <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-base font-semibold focus:outline-none focus:border-gv-gold transition-all text-white">
                                 {t.months.map((m, i) => <option key={i} value={i} className="bg-[#111]">{m}</option>)}
                             </select>
                         </div>
-                        <div className="space-y-4">
-                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.selectYear}</label>
-                            <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all text-white">
+                        <div className="space-y-3">
+                            <label className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest px-1">{t.selectYear}</label>
+                            <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-base font-semibold focus:outline-none focus:border-gv-gold transition-all text-white">
                                 {[2024, 2025, 2026].map(y => <option key={y} value={y} className="bg-[#111]">{y}</option>)}
                             </select>
                         </div>
                     </div>
 
-                    <button onClick={generateStatement} className="bg-gv-gold text-black font-black py-6 px-12 rounded-[28px] uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">{t.generateDownload}</button>
+                    <button onClick={generateStatement} className="bg-gv-gold text-black font-bold py-4 px-8 rounded-2xl text-sm uppercase tracking-widest shadow-xl hover:-translate-y-0.5 transition-all">{t.generateDownload}</button>
                 </div>
             </section>
         </div>
