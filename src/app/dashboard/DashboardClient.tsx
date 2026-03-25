@@ -149,7 +149,7 @@ export default function DashboardClient() {
                         }, 0);
                         setTransactions(txs);
                         setDividendHistory(txs.filter((t: any) => 
-                            (t.type?.toLowerCase().includes('dividend') || t.type?.toLowerCase().includes('bonus')) &&
+                            (t.metadata?.adjustment_category === 'Dividend' || t.metadata?.adjustment_category === 'Bonus' || t.type?.toLowerCase().includes('dividend') || t.type?.toLowerCase().includes('bonus')) &&
                             t.status === 'Approved'
                         ).slice(0, 6).reverse());
                     }
@@ -165,9 +165,9 @@ export default function DashboardClient() {
                         total_assets: totalAssetsRM,
                         withdrawable_balance: withdrawableBalance,
                         locked_capital: lockedCapital,
-                        total_deposited: txs ? txs.filter((t: any) => (t.type === 'Deposit' || t.type?.includes('Bonus Increase')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0) : 0,
-                        total_withdrawn: txs ? txs.filter((t: any) => (t.type === 'Withdrawal' || t.type?.includes('Bonus Decrease')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0) : 0,
-                        total_investment: (txs ? txs.filter((t: any) => (t.type === 'Deposit' || t.type?.includes('Bonus Increase')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0) : 0) - (txs ? txs.filter((t: any) => (t.type === 'Withdrawal' || t.type?.includes('Bonus Decrease')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0) : 0),
+                        total_deposited: txs ? txs.filter((t: any) => (t.type === 'Deposit' && t.metadata?.adjustment_category !== 'Dividend') && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0) : 0,
+                        total_withdrawn: txs ? txs.filter((t: any) => (t.type === 'Withdrawal' && t.metadata?.adjustment_category !== 'Dividend') && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0) : 0,
+                        total_investment: (txs ? txs.filter((t: any) => (t.type === 'Deposit' && t.metadata?.adjustment_category !== 'Dividend') && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0) : 0) - (txs ? txs.filter((t: any) => (t.type === 'Withdrawal' && t.metadata?.adjustment_category !== 'Dividend') && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0) : 0),
                         totalEquity: totalAssetsRM,  
                         balanceUSD: balUSD           
                     });
@@ -221,14 +221,13 @@ export default function DashboardClient() {
                 if (txs) {
                     setTransactions(txs);
                     setDividendHistory(txs.filter((t: any) => 
-                        (t.type?.toLowerCase().includes('dividend') || 
-                         t.type?.toLowerCase().includes('bonus')) &&
+                        (t.metadata?.adjustment_category === 'Dividend' || t.metadata?.adjustment_category === 'Bonus' || t.type?.toLowerCase().includes('dividend') || t.type?.toLowerCase().includes('bonus')) &&
                         t.status === 'Approved'
                     ).slice(0, 6).reverse());
 
                     // Update total_deposited and total_investment in user state
-                    const deposits = txs.filter((t: any) => (t.type === 'Deposit' || t.type?.includes('Bonus Increase')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
-                    const withdrawals = txs.filter((t: any) => (t.type === 'Withdrawal' || t.type?.includes('Bonus Decrease')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
+                    const deposits = txs.filter((t: any) => (t.type === 'Deposit' && t.metadata?.adjustment_category !== 'Dividend') && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
+                    const withdrawals = txs.filter((t: any) => (t.type === 'Withdrawal' && t.metadata?.adjustment_category !== 'Dividend') && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
                     setUser((prev: any) => ({ ...prev, total_deposited: deposits, total_withdrawn: withdrawals, total_investment: deposits - withdrawals }));
                 }
             })
@@ -468,7 +467,7 @@ export default function DashboardClient() {
             return txDate.getMonth() === targetMonth && txDate.getFullYear() === targetYear;
         });
         const periodProfit = periodTxs.filter((t: any) => 
-            (t.type?.toLowerCase().includes('dividend') || t.type?.toLowerCase().includes('bonus')) && 
+            (t.metadata?.adjustment_category === 'Dividend' || t.metadata?.adjustment_category === 'Bonus' || t.type?.toLowerCase().includes('dividend') || t.type?.toLowerCase().includes('bonus')) && 
             t.status === 'Approved'
         ).reduce((acc: number, t: any) => acc + Number(t.amount), 0);
 
@@ -489,8 +488,8 @@ export default function DashboardClient() {
         doc.text(`Account UID: ${user?.id?.substring(0, 8)}...`, 20, 60);
         doc.text(`Statement Date: ${statementDate}`, 140, 55);
 
-        const totalDeposits = periodTxs.filter((t: any) => (t.type === 'Deposit' || t.type?.includes('Bonus Increase')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount), 0);
-        const totalWithdrawals = periodTxs.filter((t: any) => (t.type === 'Withdrawal' || t.type?.includes('Bonus Decrease')) && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount)), 0);
+        const totalDeposits = periodTxs.filter((t: any) => (t.type === 'Deposit' && t.metadata?.adjustment_category !== 'Dividend') && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.amount), 0);
+        const totalWithdrawals = periodTxs.filter((t: any) => (t.type === 'Withdrawal' && t.metadata?.adjustment_category !== 'Dividend') && t.status === 'Approved').reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount)), 0);
         const closingBalance = (user?.total_investment || 0) + (Number(user?.profit || 0));
         const openingBalance = closingBalance - totalDeposits + totalWithdrawals - periodProfit;
 
@@ -1352,7 +1351,7 @@ export default function DashboardClient() {
                                                 <td className="px-8 py-6 font-mono text-xs text-white/40">{tx.ref_id || tx.ref}</td>
                                                  <td className="px-8 py-6 uppercase tracking-widest text-[10px]">
                                                      <div className="flex flex-col">
-                                                         <span>{tx.type}</span>
+                                                         <span>{tx.metadata?.description || tx.type}</span>
                                                          {tx.metadata?.processed_by_name && (
                                                              <span className="text-[8px] text-zinc-600 font-bold lowercase tracking-tight mt-1">
                                                                  Allocated by {tx.metadata.processed_by_name}

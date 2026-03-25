@@ -109,7 +109,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             body: periodTxs.map(tx => [
                 new Date(tx.created_at || tx.transfer_date).toLocaleDateString(),
                 tx.ref_id || "-",
-                tx.type,
+                tx.metadata?.description || tx.type,
                 tx.status,
                 Number(tx.amount).toFixed(2)
             ]),
@@ -142,7 +142,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                     <tr key={idx} className="text-sm font-bold group hover:bg-white/[0.02] transition-colors">
                                         <td className="px-8 py-6 text-zinc-500 font-mono text-xs">{new Date(tx.created_at || tx.transfer_date).toLocaleDateString()}</td>
                                         <td className="px-8 py-6 text-zinc-400 font-mono text-xs opacity-50">{tx.ref_id || "-"}</td>
-                                        <td className="px-8 py-6 uppercase tracking-widest text-[10px]">{tx.type}</td>
+                                        <td className="px-8 py-6 uppercase tracking-widest text-[10px]">{tx.metadata?.description || tx.type}</td>
                                         <td className="px-8 py-6">
                                             <span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${
                                                 tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' :
