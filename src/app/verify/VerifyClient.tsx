@@ -656,6 +656,26 @@ export default function VerifyPage() {
                                 </div>
                             </div>
 
+                            <div className="pt-8 border-t border-white/5 space-y-6">
+                                <div>
+                                    <h3 className="text-sm font-black text-white tracking-widest uppercase">{t.bankDetails}</h3>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.bankName}</label>
+                                        <input type="text" value={formData.bank_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, bank_name: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="e.g. Maybank, CIMB" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.accNumber}</label>
+                                        <input type="text" value={formData.account_number} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, account_number: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Enter account number" />
+                                    </div>
+                                    <div className="md:col-span-2 space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.accHolder}</label>
+                                        <input type="text" value={formData.bank_account_holder} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, bank_account_holder: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="Full name as per bank records" />
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="space-y-4">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.bankStatement}</label>
                                 <div className="relative group border-2 border-white/5 border-dashed rounded-[32px] overflow-hidden bg-white/[0.02] min-h-[160px] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all border-dashed-2">
