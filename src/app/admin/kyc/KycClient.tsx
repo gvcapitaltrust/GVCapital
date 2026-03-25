@@ -152,12 +152,15 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                         {userDocs.map((doc, i) => (
                                             <div key={i} className="space-y-4">
                                                 <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-2">{doc.name}</p>
-                                                <div className="aspect-video bg-black rounded-3xl border border-white/5 overflow-hidden flex items-center justify-center">
-                                                    {doc.name.toLowerCase().endsWith('.pdf') ? (
-                                                        <iframe src={doc.url} className="w-full h-full" />
-                                                    ) : (
-                                                        <img src={doc.url} alt={doc.name} className="max-w-full max-h-full object-contain" />
-                                                    )}
+                                                <div className="bg-white/5 border border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center text-center space-y-4 hover:bg-white/10 transition-all group shadow-xl">
+                                                    <div className="h-16 w-16 bg-gv-gold/20 text-gv-gold rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-sm font-bold text-white mb-1">Document Attachment</h4>
+                                                        <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest truncate max-w-[200px]">{doc.name}</p>
+                                                    </div>
+                                                    <a href={doc.url} target="_blank" rel="noopener noreferrer" className="mt-4 bg-gv-gold text-black font-black uppercase tracking-widest text-xs px-6 py-3 rounded-xl shadow-lg hover:shadow-gv-gold/20 transition-all inline-block hover:-translate-y-0.5">View Document</a>
                                                 </div>
                                             </div>
                                         ))}
@@ -168,7 +171,7 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
 
                             {/* Actions & Info */}
-                            <div className="space-y-8 flex flex-col">
+                            <div className="space-y-8 flex flex-col overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-white/10">
                                 <div className="space-y-6 flex-1">
                                     <div className="bg-white/5 p-6 rounded-3xl border border-white/5 space-y-4">
                                         <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-2">User Profile Summary</p>

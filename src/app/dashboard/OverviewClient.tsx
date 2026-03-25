@@ -293,44 +293,45 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-10">
             {(!user?.is_verified && user?.email !== "thenja96@gmail.com") ? (
                 (user?.kyc_status === 'Pending' || user?.kyc_status === 'pending') ? (
-                    <div className="bg-amber-400 p-8 rounded-[32px] text-center space-y-6 py-12 animate-in fade-in zoom-in-95 duration-700 max-w-2xl mx-auto shadow-xl border border-amber-500/20">
-                        <div className="h-20 w-20 bg-amber-950/10 rounded-full flex items-center justify-center mx-auto border-2 border-amber-950/5">
-                            <svg className="h-10 w-10 text-amber-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <div className="bg-amber-400/10 border border-amber-400/20 p-6 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-4 animate-in fade-in duration-700 max-w-4xl mx-auto">
+                        <div className="h-12 w-12 bg-amber-400/20 rounded-full flex items-center justify-center shrink-0">
+                            <svg className="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
-                        <div className="space-y-4 text-amber-950">
-                            <h2 className="text-2xl font-black uppercase tracking-tighter">{t.verificationInProgress}</h2>
-                            <p className="text-amber-900 font-bold text-base leading-relaxed max-w-lg mx-auto">{t.verificationInProgressDesc}</p>
+                        <div className="space-y-1">
+                            <h2 className="text-xl font-bold text-amber-500">{t.verificationInProgress}</h2>
+                            <p className="text-zinc-400 text-sm leading-relaxed">{t.verificationInProgressDesc}</p>
                         </div>
                     </div>
                 ) : (user?.kyc_status === 'Rejected' || user?.kyc_status === 'rejected') ? (
-                    <div className="bg-red-500 p-12 rounded-[40px] text-center space-y-8 py-24 animate-in fade-in zoom-in-95 duration-700 max-w-3xl mx-auto shadow-[0_30px_60px_rgba(239,68,68,0.3)] border border-red-600/20">
-                        <div className="h-28 w-28 bg-white/20 rounded-full flex items-center justify-center mx-auto border-4 border-white/10">
-                            <svg className="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                        </div>
-                        <div className="space-y-6 text-white">
-                            <h2 className="text-4xl font-black uppercase tracking-tighter">{t.verificationUnsuccessful}</h2>
-                            <div className="bg-white/10 p-6 rounded-3xl border border-white/20 max-w-2xl mx-auto">
-                                <p className="text-white font-bold text-xl leading-relaxed">
-                                    {t.verificationUnsuccessfulDesc}<br/>
-                                    <span className="text-black bg-white/90 px-3 py-1 mt-3 inline-block rounded-xl font-black uppercase tracking-tight">
-                                        {user?.rejection_reason || t.rejectionReasonLabel}
-                                    </span>
+                    <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center gap-6 animate-in fade-in duration-700 justify-between max-w-4xl mx-auto">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                            <div className="h-12 w-12 bg-red-500/20 rounded-full flex items-center justify-center shrink-0">
+                                <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                            </div>
+                            <div className="space-y-1">
+                                <h2 className="text-xl font-bold text-red-500">{t.verificationUnsuccessful}</h2>
+                                <p className="text-zinc-400 text-sm leading-relaxed">
+                                    {t.verificationUnsuccessfulDesc} <span className="text-white font-medium ml-1 bg-red-500/20 px-2 py-0.5 rounded-md">{user?.rejection_reason || t.rejectionReasonLabel}</span>
                                 </p>
                             </div>
-                            <p className="text-white/80 font-medium">{t.reuploadPrompt}</p>
-                            <Link href={`/verify?lang=${lang}`} className="inline-block bg-white text-red-600 font-black px-10 py-5 rounded-2xl uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all">{t.reuploadBtn}</Link>
                         </div>
+                        <Link href={`/verify?lang=${lang}`} className="shrink-0 bg-red-500/20 text-red-500 hover:bg-red-500/30 font-bold px-6 py-3 rounded-xl transition-all text-sm">{t.reuploadBtn}</Link>
                     </div>
                 ) : (
-                    <div className="bg-[#1a1a1a] p-12 rounded-[40px] border border-white/5 shadow-xl space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700 text-center py-20">
-                        <div className="h-24 w-24 bg-gv-gold/10 rounded-full flex items-center justify-center mx-auto text-gv-gold shadow-[0_0_50px_rgba(212,175,55,0.15)]">
-                            <svg className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    <div className="bg-gv-gold/5 border border-gv-gold/20 p-8 rounded-[32px] flex flex-col md:flex-row items-center gap-8 animate-in fade-in duration-700 justify-between relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 opacity-5">
+                            <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                         </div>
-                        <div className="space-y-4">
-                            <h2 className="text-3xl font-black uppercase tracking-tighter">{t.completeProfile}</h2>
-                            <p className="text-zinc-500 font-medium leading-relaxed max-w-lg mx-auto">{t.completeProfileDesc}</p>
+                        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10 text-center sm:text-left">
+                            <div className="h-16 w-16 bg-gv-gold/20 rounded-full flex items-center justify-center shrink-0 text-gv-gold">
+                                <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            </div>
+                            <div className="space-y-2">
+                                <h2 className="text-2xl font-bold text-gv-gold">{t.completeProfile}</h2>
+                                <p className="text-zinc-400 text-sm leading-relaxed max-w-lg">{t.completeProfileDesc}</p>
+                            </div>
                         </div>
-                        <Link href={`/verify?lang=${lang}`} className="inline-block bg-gv-gold text-black font-black text-xl px-12 py-5 rounded-[28px] hover:bg-gv-gold/90 transition-all shadow-[0_20px_40px_rgba(212,175,55,0.2)] uppercase tracking-widest">{t.startVerification}</Link>
+                        <Link href={`/verify?lang=${lang}`} className="relative z-10 shrink-0 bg-gv-gold text-black hover:bg-gv-gold/90 font-bold px-8 py-4 rounded-2xl transition-all shadow-[0_10px_20px_rgba(212,175,55,0.15)]">{t.startVerification}</Link>
                     </div>
                 )
             ) : (

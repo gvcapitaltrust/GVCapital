@@ -701,12 +701,14 @@ export default function VerifyPage() {
                                 <button 
                                     onClick={() => handleFinalSubmit('Draft')} 
                                     disabled={isLoading}
-                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px]"
+                                    className="flex-1 bg-white/5 border border-white/10 text-white font-black py-5 rounded-2xl hover:bg-white/10 transition-all uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {isLoading ? <div className="h-4 w-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div> : t.saveClose}
+                                    {isLoading && <div className="h-4 w-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div>}
+                                    <span>{t.saveClose}</span>
                                 </button>
-                                <button onClick={() => handleFinalSubmit('Pending')} disabled={isLoading} className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-2xl transition-all uppercase tracking-[0.2em] text-[11px] shadow-[0_20px_40px_rgba(212,175,55,0.2)] flex items-center justify-center gap-3">
-                                    {isLoading ? <div className="h-4 w-4 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.submitDocument}
+                                <button onClick={() => handleFinalSubmit('Pending')} disabled={isLoading} className="flex-[2] bg-gv-gold text-black font-black py-5 rounded-2xl transition-all uppercase tracking-[0.2em] text-[11px] shadow-[0_20px_40px_rgba(212,175,55,0.2)] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {isLoading && <div className="h-4 w-4 border-2 border-black border-t-transparent animate-spin rounded-full"></div>}
+                                    <span>{t.submitDocument}</span>
                                 </button>
                             </div>
                         </div>
