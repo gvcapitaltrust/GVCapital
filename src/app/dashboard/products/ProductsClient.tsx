@@ -13,17 +13,22 @@ export default function ProductsPageContent({ lang }: { lang: "en" | "zh" }) {
 
     return (
         <div className="max-w-7xl mx-auto space-y-6">
-            <header className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                    <div className="h-0.5 w-6 bg-gv-gold rounded-full"></div>
-                    <span className="text-gv-gold text-[9px] font-black uppercase tracking-[0.25em]">Investment Tiers</span>
+            <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
+                <div className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                        <div className="h-0.5 w-6 bg-gv-gold rounded-full"></div>
+                        <span className="text-gv-gold text-[9px] font-black uppercase tracking-[0.25em]">Investment Tiers</span>
+                    </div>
+                    <h1 className="text-xl md:text-2xl font-bold uppercase tracking-tight leading-none text-white">
+                        {lang === "en" ? "Products & Portfolios" : "理财产品与组合"}
+                    </h1>
+                    <p className="text-zinc-500 text-xs max-w-lg mt-2">
+                        {lang === "en" ? "Explore our fund management tiers with fixed dividends and priority capital processing." : "探索我们专业的基金管理等级，享受固定分红和优先资金处理。"}
+                    </p>
                 </div>
-                <h1 className="text-xl md:text-2xl font-bold uppercase tracking-tight leading-none text-white">
-                    {lang === "en" ? "Products & Portfolios" : "理财产品与组合"}
-                </h1>
-                <p className="text-zinc-500 text-xs max-w-lg">
-                    {lang === "en" ? "Explore our fund management tiers with fixed dividends and priority capital processing." : "探索我们专业的基金管理等级，享受固定分红和优先资金处理。"}
-                </p>
+                <a href="/deposit" className="inline-flex shrink-0 items-center justify-center bg-gv-gold text-black font-black uppercase tracking-widest text-xs px-8 py-4 rounded-2xl hover:-translate-y-1 transition-all shadow-xl hover:shadow-gv-gold/20">
+                    {lang === 'en' ? 'Deposit Now' : '立即存款'}
+                </a>
             </header>
 
             <ProductSelection

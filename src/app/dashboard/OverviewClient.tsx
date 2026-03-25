@@ -352,25 +352,36 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10 w-full">
-                                <div>
-                                    <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest">{t.totalEquity}</p>
-                                    <h2 className="text-3xl font-black tracking-tighter text-gv-gold">RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</h2>
-                                    <p className="text-[10px] font-bold text-zinc-500 mt-2">(${(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD)</p>
-                                </div>
-                                <div className="sm:border-l border-white/5 sm:pl-8 flex flex-col justify-center">
-                                    <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
-                                    <div className="flex justify-between items-center group/tier">
-                                        <div className="flex flex-col gap-1">
-                                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                                                {Number(user?.total_investment || 0) > 0 ? getTierByAmount(Number(user?.total_investment || 0) / forexRate).name : t.noTier}
-                                            </h2>
-                                            <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">{t.activeStatus}</span>
+                                {Number(user?.total_investment || 0) > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10 w-full">
+                                        <div>
+                                            <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest">{t.totalEquity}</p>
+                                            <h2 className="text-3xl font-black tracking-tighter text-gv-gold">RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</h2>
+                                            <p className="text-[10px] font-bold text-zinc-500 mt-2">(${(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD)</p>
                                         </div>
-                                        <TierMedal tierId={getTierByAmount(Number(user?.total_investment || 0) / forexRate).id} size="md" className="shrink-0" />
+                                        <div className="sm:border-l border-white/5 sm:pl-8 flex flex-col justify-center">
+                                            <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
+                                            <div className="flex justify-between items-center group/tier">
+                                                <div className="flex flex-col gap-1">
+                                                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
+                                                        {getTierByAmount(Number(user?.total_investment || 0) / forexRate).name}
+                                                    </h2>
+                                                    <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">{t.activeStatus}</span>
+                                                </div>
+                                                <TierMedal tierId={getTierByAmount(Number(user?.total_investment || 0) / forexRate).id} size="md" className="shrink-0" />
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                ) : (
+                                    <div className="relative z-10 w-full flex flex-col items-center justify-center text-center py-2">
+                                        <div className="h-14 w-14 bg-gv-gold/10 text-gv-gold rounded-full flex items-center justify-center mb-4 ring-1 ring-gv-gold/20">
+                                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                        </div>
+                                        <h2 className="text-2xl font-black tracking-tighter text-white mb-2 uppercase">{lang === 'en' ? 'Start Investing Now' : '立即开始投资'}</h2>
+                                        <p className="text-zinc-500 text-xs font-medium mb-6 max-w-[250px]">{lang === 'en' ? 'Choose from our tier packages to start earning daily dividends.' : '探索我们专业的理财产品，开启您的财富增长之旅。'}</p>
+                                        <a href="/dashboard/products" className="bg-gv-gold text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-2xl shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/20 transition-all border border-gv-gold/50">{lang === 'en' ? 'View Products' : '查看产品'}</a>
+                                    </div>
+                                )}
                         </div>
                     </section>
 
