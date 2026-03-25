@@ -12,6 +12,7 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
     const [isLoadingDocs, setIsLoadingDocs] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
+    const [viewDocumentUrl, setViewDocumentUrl] = useState<string | null>(null);
 
     const t = {
         en: {
@@ -152,15 +153,17 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                         {userDocs.map((doc, i) => (
                                             <div key={i} className="space-y-4">
                                                 <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-2">{doc.name}</p>
-                                                <div className="bg-white/5 border border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center text-center space-y-4 hover:bg-white/10 transition-all group shadow-xl">
-                                                    <div className="h-16 w-16 bg-gv-gold/20 text-gv-gold rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between hover:bg-white/10 transition-all group shadow-md gap-4 min-w-0">
+                                                    <div className="flex items-center gap-4 min-w-0">
+                                                        <div className="h-10 w-10 bg-gv-gold/20 text-gv-gold rounded-full flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                        </div>
+                                                        <div className="min-w-0 truncate">
+                                                            <h4 className="text-sm font-bold text-white mb-0.5 truncate">Document Attachment</h4>
+                                                            <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest truncate">{doc.name}</p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <h4 className="text-sm font-bold text-white mb-1">Document Attachment</h4>
-                                                        <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest truncate max-w-[200px]">{doc.name}</p>
-                                                    </div>
-                                                    <a href={doc.url} target="_blank" rel="noopener noreferrer" className="mt-4 bg-gv-gold text-black font-black uppercase tracking-widest text-xs px-6 py-3 rounded-xl shadow-lg hover:shadow-gv-gold/20 transition-all inline-block hover:-translate-y-0.5">View Document</a>
+                                                    <button onClick={() => setViewDocumentUrl(doc.url)} className="shrink-0 bg-white/10 text-white font-black uppercase tracking-widest text-[10px] px-4 py-2 rounded-xl shadow-lg hover:bg-white/20 transition-all hover:-translate-y-0.5">View</button>
                                                 </div>
                                             </div>
                                         ))}
@@ -224,6 +227,27 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* In-page Document Viewer (Lightbox) */}
+            {viewDocumentUrl && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-12 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-black/95 backdrop-blur-3xl" onClick={() => setViewDocumentUrl(null)}></div>
+                    <div className="relative w-full max-w-5xl h-full flex flex-col pointer-events-none">
+                        <div className="w-full flex justify-end mb-4 pointer-events-auto">
+                            <button onClick={() => setViewDocumentUrl(null)} className="h-12 w-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 hover:scale-105 text-white transition-all shadow-xl backdrop-blur-md">
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                        <div className="w-full flex-1 relative bg-[#0a0a0a] rounded-3xl overflow-hidden border border-white/10 pointer-events-auto shadow-[0_0_100px_rgba(0,0,0,0.5)] flex items-center justify-center p-2">
+                            {viewDocumentUrl.toLowerCase().split('?')[0].endsWith('.pdf') ? (
+                                <iframe src={viewDocumentUrl} className="w-full h-full rounded-2xl bg-white" />
+                            ) : (
+                                <img src={viewDocumentUrl} alt="Document View" className="max-w-full max-h-full object-contain rounded-2xl" />
+                            )}
                         </div>
                     </div>
                 </div>
