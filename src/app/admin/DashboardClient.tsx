@@ -6,7 +6,7 @@ import { useSettings } from "@/providers/SettingsProvider";
 import Link from "next/link";
 
 export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
-    const { users, deposits, withdrawals, loading } = useAdmin();
+    const { users, kycQueue, deposits, withdrawals, loading } = useAdmin();
     const { forexRate } = useSettings();
 
     const t = {
@@ -41,7 +41,7 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
     const totalCapital = users.reduce((sum, u) => sum + (Number(u.balance) || 0), 0);
     const pendingDeposits = deposits.filter(d => d.status === 'Pending').length;
     const pendingWithdrawals = withdrawals.filter(w => w.status === 'Pending').length;
-    const pendingKyc = users.filter(u => u.kyc_status === 'Pending').length;
+    const pendingKyc = kycQueue.length;
     const verifiedUsers = users.filter(u => u.kyc_status === 'Verified').length;
 
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;

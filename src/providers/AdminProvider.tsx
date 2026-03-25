@@ -60,16 +60,25 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            // 1. Fetch Profiles
-            const { data: profileList } = await supabase.from('profiles').select('*');
-            if (profileList) {
-                const sortedUsers = [...profileList].sort((a, b) => 
-                    new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-                );
-                setUsers(sortedUsers);
-                setKycQueue(sortedUsers.filter((p: any) => p.kyc_status === 'Pending'));
+            // 1. Fetch Profiles (Latest 1,000 for general management)
+            const { data: profileList } = await supabase
+                .from('profiles')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(1000);
 
-                const stats = sortedUsers.reduce((acc, p) => ({
+            // 2. Fetch KYC Queue (Specifically all users with 'Pending' status)
+            const { data: kycPendingList } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('kyc_status', 'Pending')
+                .order('created_at', { ascending: false });
+
+            if (profileList) {
+                setUsers(profileList);
+                setKycQueue(kycPendingList || []);
+
+                const stats = profileList.reduce((acc, p) => ({
                     totalBalance: acc.totalBalance + Number(p.balance || 0),
                     totalProfit: acc.totalProfit + Number(p.profit || 0),
                     totalAssets: acc.totalAssets + (Number(p.balance || 0) + Number(p.profit || 0)),
