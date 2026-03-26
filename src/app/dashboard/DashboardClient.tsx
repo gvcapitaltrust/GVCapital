@@ -97,8 +97,10 @@ export default function DashboardClient() {
         
         if (authLoading) return;
 
-        if (!authUser) {
+        if (!authUser && !authLoading) {
+            console.log("No authUser found, redirecting to login");
             setIsCheckingAuth(false);
+            router.push("/login");
             return;
         }
 
