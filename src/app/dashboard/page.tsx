@@ -12,7 +12,7 @@ export default async function DashboardPage({
     return (
         <div className="max-w-7xl mx-auto space-y-12">
             <header className="space-y-4">
-                <div className="flex items-center gap-3">
+                <div className="hidden md:flex items-center gap-3">
                     <div className="h-1 w-12 bg-gv-gold rounded-full"></div>
                     <span className="text-gv-gold text-sm font-semibold tracking-wider">Institutional Access</span>
                 </div>
