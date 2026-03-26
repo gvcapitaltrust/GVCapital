@@ -160,18 +160,18 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
             {isDrawerOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-300">
                     <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={() => setIsDrawerOpen(false)}></div>
-                    <div className="relative bg-[#111] border border-white/10 rounded-[40px] w-full max-w-5xl h-full flex flex-col overflow-hidden shadow-2xl">
-                        <div className="p-8 border-b border-white/5 flex items-center justify-between shrink-0">
+                    <div className="relative bg-[#111] border border-white/10 rounded-[40px] w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+                        <div className="p-6 border-b border-white/5 flex items-center justify-between shrink-0">
                             <div>
-                                <h3 className="text-2xl font-black uppercase tracking-tighter text-white">Deposit Verification</h3>
-                                <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">Ref: {selectedTx?.ref_id}</p>
+                                <h3 className="text-xl font-black uppercase tracking-tighter text-white">Deposit Verification</h3>
+                                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Ref: {selectedTx?.ref_id}</p>
                             </div>
-                            <button onClick={() => setIsDrawerOpen(false)} className="h-12 w-12 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-all">
-                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                            <button onClick={() => setIsDrawerOpen(false)} className="h-10 w-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-all">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
                         
-                        <div className="flex-1 p-8 grid grid-cols-1 lg:grid-cols-2 gap-8 overflow-hidden">
+                        <div className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto">
                             <div className="h-full rounded-2xl border border-white/10 bg-black overflow-hidden relative">
                                 {receiptUrl ? (
                                     <img src={receiptUrl} alt="Receipt" className="w-full h-full object-contain" />
@@ -181,27 +181,27 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                             <div className="space-y-8 flex flex-col justify-between">
                                 <div className="space-y-6">
-                                    <div className="bg-white/5 p-6 rounded-3xl border border-white/5">
-                                        <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-4">Transaction Details</p>
-                                        <div className="grid grid-cols-2 gap-6">
+                                    <div className="bg-white/5 p-5 rounded-3xl border border-white/5">
+                                        <p className="text-[9px] text-zinc-500 font-black uppercase tracking-widest mb-3">Transaction Details</p>
+                                        <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <p className="text-[8px] font-black uppercase text-zinc-600 tracking-tighter">Amount MYR</p>
-                                                <p className="text-2xl font-black text-white">RM {Number(selectedTx?.amount).toFixed(2)}</p>
+                                                <p className="text-xl font-black text-white">RM {Number(selectedTx?.amount).toFixed(2)}</p>
                                             </div>
                                             <div>
                                                 <p className="text-[8px] font-black uppercase text-zinc-600 tracking-tighter">Credit USD</p>
-                                                <p className="text-2xl font-black text-gv-gold">${(Number(selectedTx?.amount) / forexRate).toFixed(2)}</p>
+                                                <p className="text-xl font-black text-gv-gold">${(Number(selectedTx?.amount) / forexRate).toFixed(2)}</p>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="space-y-4">
+                                    <div className="space-y-3">
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Client Identity</span>
-                                            <span className="text-lg font-black text-white uppercase">{selectedTx?.profiles?.full_name}</span>
+                                            <span className="text-[9px] text-zinc-500 font-black uppercase tracking-widest">Client Identity</span>
+                                            <span className="text-base font-black text-white uppercase">{selectedTx?.profiles?.full_name}</span>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Transfer Reference</span>
-                                            <span className="text-lg font-black text-zinc-400 font-mono italic">{selectedTx?.metadata?.bank_reference || "None Provided"}</span>
+                                            <span className="text-[9px] text-zinc-500 font-black uppercase tracking-widest">Transfer Reference</span>
+                                            <span className="text-base font-black text-zinc-400 font-mono italic">{selectedTx?.metadata?.bank_reference || "None Provided"}</span>
                                         </div>
                                     </div>
                                 </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import { useSettings } from "@/providers/SettingsProvider";
+import { getTierByAmount } from "@/lib/tierUtils";
 
 interface DashboardSidebarProps {
     lang: "en" | "zh";
@@ -16,7 +17,8 @@ interface DashboardSidebarProps {
 export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, onOpenMobileMenu }: DashboardSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const { user } = useAuth();
+    const { user, totalAssets } = useAuth();
+    const { forexRate } = useSettings();
 
     const t = {
         en: {
@@ -92,17 +94,37 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                     </nav>
                 </div>
 
-                <div className={`space-y-4 pt-4 border-t border-white/5 transition-all duration-500 ${isCollapsed ? "items-center" : ""}`}>
-                    <button 
-                        onClick={onToggleCollapse} 
-                        className={`w-full text-zinc-600 hover:text-gv-gold transition-colors p-2 flex items-center ${isCollapsed ? "justify-center" : "justify-end"}`}
-                    >
-                        <svg className={`h-5 w-5 transition-transform duration-500 ${isCollapsed ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
-                    </button>
-                    <button onClick={handleLogout} className={`w-full text-zinc-500 hover:text-red-400 transition-colors text-[10px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-2 ${isCollapsed ? "justify-center" : ""}`}>
-                        <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
-                        {!isCollapsed && <span>{t.logout}</span>}
-                    </button>
+                <div className="space-y-4">
+                    {user && !isCollapsed && (
+                        <div className="mx-2 p-4 bg-white/5 rounded-2xl border border-white/5 animate-in fade-in duration-500">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-sm shrink-0 border border-gv-gold/30">
+                                    {(user.fullName?.[0] || user.full_name?.[0] || user.email?.[0] || "U").toUpperCase()}
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-[10px] font-black text-white uppercase tracking-tight truncate">
+                                        {user.fullName || user.full_name || user.email?.split('@')[0] || "User"}
+                                    </p>
+                                    <p className="text-[8px] font-bold text-gv-gold uppercase tracking-[0.2em] mt-0.5">
+                                        {getTierByAmount(totalAssets / (forexRate || 4)).name}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex flex-col gap-2">
+                        <button 
+                            onClick={onToggleCollapse} 
+                            className={`w-full text-zinc-600 hover:text-gv-gold transition-colors p-2 flex items-center ${isCollapsed ? "justify-center" : "justify-end"}`}
+                        >
+                            <svg className={`h-5 w-5 transition-transform duration-500 ${isCollapsed ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
+                        </button>
+                        <button onClick={handleLogout} className={`w-full text-zinc-500 hover:text-red-400 transition-colors text-[10px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-3 rounded-2xl ${isCollapsed ? "justify-center" : "hover:bg-red-500/5"}`}>
+                            <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
+                            {!isCollapsed && <span>{t.logout}</span>}
+                        </button>
+                    </div>
                 </div>
             </aside>
 
