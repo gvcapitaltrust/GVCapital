@@ -5,7 +5,7 @@ import { useAdmin } from "@/providers/AdminProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 
 export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
-    const { users, combinedAuditLogs, loading, handleAdjustBalance, handleUpdatePortfolio, handleResetUserPassword, handleSetAdminRole } = useAdmin();
+    const { users, combinedAuditLogs, loading, handleAdjustBalance, handleUpdatePortfolio, handleResetUserPassword, handleSetAdminRole, handleDeleteUser, handleToggleUserStatus } = useAdmin();
     const { forexRate } = useSettings();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -17,6 +17,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
     const [adjustmentReason, setAdjustmentReason] = useState("");
     const [isAdjusting, setIsAdjusting] = useState(false);
     const [isRoleChanging, setIsRoleChanging] = useState(false);
+    const [isProcessingAction, setIsProcessingAction] = useState(false);
 
     // Portfolio State
     const [portfolioData, setPortfolioData] = useState({
@@ -50,7 +51,10 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             portfolioSubmit: "Update Mapping",
             resetPassword: "Reset Password",
             typeBalance: "Main Wallet",
-            typeProfit: "Dividend Wallet"
+            typeProfit: "Dividend Wallet",
+            deleteUser: "Delete User",
+            deactivateUser: "Suspend User",
+            reactivateUser: "Reactivate User"
         },
         zh: {
             title: "客户目录",
@@ -76,6 +80,9 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             resetPassword: "重置密码",
             typeBalance: "主钱包",
             typeProfit: "红利钱包",
+            deleteUser: "删除用户",
+            deactivateUser: "暂停用户",
+            reactivateUser: "重新激活用户",
             txHistory: "Transaction Audit History",
             txDate: "Date",
             txAction: "Action / Category",
@@ -117,6 +124,21 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
         // Update local state immediately for UI feedback
         setSelectedUser((prev: any) => ({ ...prev, role: isCurrentlyAdmin ? 'User' : 'admin' }));
         setIsRoleChanging(false);
+    };
+
+    const executeDeleteUser = async () => {
+        setIsProcessingAction(true);
+        await handleDeleteUser(selectedUser.id);
+        setIsProcessingAction(false);
+        setIsDetailModalOpen(false);
+    };
+
+    const executeToggleStatus = async () => {
+        setIsProcessingAction(true);
+        const isDeactivating = selectedUser.kyc_status !== 'Suspended';
+        await handleToggleUserStatus(selectedUser.id, isDeactivating);
+        setSelectedUser((prev: any) => ({ ...prev, kyc_status: isDeactivating ? 'Suspended' : 'Pending' }));
+        setIsProcessingAction(false);
     };
 
     const handleExecutePortfolioUpdate = async () => {
@@ -240,6 +262,20 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                     }`}
                                 >
                                     {isRoleChanging ? '...' : selectedUser?.role?.toLowerCase() === 'admin' ? '⬇ Remove Admin' : '⬆ Set as Admin'}
+                                </button>
+                                <button 
+                                    onClick={executeToggleStatus} 
+                                    disabled={isProcessingAction}
+                                    className="bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white text-[9px] font-black uppercase tracking-widest px-6 py-3 rounded-2xl transition-all border border-orange-500/20 disabled:opacity-50"
+                                >
+                                    {isProcessingAction ? "..." : (selectedUser?.kyc_status === 'Suspended' ? t.reactivateUser : t.deactivateUser)}
+                                </button>
+                                <button 
+                                    onClick={executeDeleteUser} 
+                                    disabled={isProcessingAction}
+                                    className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white text-[9px] font-black uppercase tracking-widest px-6 py-3 rounded-2xl transition-all border border-red-500/20 disabled:opacity-50"
+                                >
+                                    {isProcessingAction ? "..." : t.deleteUser}
                                 </button>
                                 <button onClick={() => handleResetUserPassword(selectedUser.email)} className="bg-white/5 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest px-6 py-3 rounded-2xl transition-all border border-white/5">{t.resetPassword}</button>
                                 <button onClick={() => setIsDetailModalOpen(false)} className="h-12 w-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-all">

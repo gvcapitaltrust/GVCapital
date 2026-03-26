@@ -34,6 +34,8 @@ interface AdminContextType {
     handleUpdateForexRate: (newRate: number) => Promise<void>;
     handleUpdatePassword: (password: string) => Promise<void>;
     handleSetAdminRole: (userId: string, makeAdmin: boolean) => Promise<void>;
+    handleDeleteUser: (userId: string) => Promise<void>;
+    handleToggleUserStatus: (userId: string, isDeactivated: boolean) => Promise<void>;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -519,6 +521,54 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const handleDeleteUser = async (userId: string) => {
+        try {
+            if (!confirm("Are you sure you want to permanently delete this user? This action cannot be undone.")) return;
+            
+            const res = await fetch("/api/admin/users/delete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userId,
+                    adminId: authUser?.id,
+                    adminName: authUser?.user_metadata?.full_name
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to delete user");
+            
+            showToast("User permanently deleted.");
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleToggleUserStatus = async (userId: string, isDeactivated: boolean) => {
+        try {
+            const actionText = isDeactivated ? "deactivate" : "reactivate";
+            if (!confirm(`Are you sure you want to ${actionText} this user?`)) return;
+
+            const res = await fetch("/api/admin/users/status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userId,
+                    isDeactivated,
+                    adminId: authUser?.id,
+                    adminName: authUser?.user_metadata?.full_name
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || `Failed to ${actionText} user`);
+            
+            showToast(`User ${isDeactivated ? "deactivated" : "reactivated"} successfully.`);
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
     useEffect(() => {
         fetchData();
 
@@ -559,7 +609,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             handleResetUserPassword,
             handleUpdateForexRate,
             handleUpdatePassword,
-            handleSetAdminRole
+            handleSetAdminRole,
+            handleDeleteUser,
+            handleToggleUserStatus
         }}>
             {children}
             
