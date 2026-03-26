@@ -206,8 +206,14 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <button onClick={() => handleRejectDeposit(selectedTx)} className="bg-red-500/10 border border-red-500/20 text-red-500 font-black py-4 rounded-2xl uppercase tracking-widest text-[10px] hover:bg-red-500 hover:text-white transition-all">{t.reject}</button>
-                                    <button onClick={() => handleApproveDeposit(selectedTx)} className="bg-gv-gold text-black font-black py-4 rounded-2xl uppercase tracking-widest text-[10px] hover:-translate-y-1 transition-all shadow-xl shadow-gv-gold/20">{t.approve}</button>
+                                    <button onClick={async () => {
+                                        await handleRejectDeposit(selectedTx);
+                                        setIsDrawerOpen(false);
+                                    }} className="bg-red-500/10 border border-red-500/20 text-red-500 font-black py-4 rounded-2xl uppercase tracking-widest text-[10px] hover:bg-red-500 hover:text-white transition-all">{t.reject}</button>
+                                    <button onClick={async () => {
+                                        await handleApproveDeposit(selectedTx);
+                                        setIsDrawerOpen(false);
+                                    }} className="bg-gv-gold text-black font-black py-4 rounded-2xl uppercase tracking-widest text-[10px] hover:-translate-y-1 transition-all shadow-xl shadow-gv-gold/20">{t.approve}</button>
                                 </div>
                             </div>
                         </div>

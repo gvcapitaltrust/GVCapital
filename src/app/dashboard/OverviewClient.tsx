@@ -364,11 +364,11 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className="flex justify-between items-center group/tier">
                                                 <div className="flex flex-col gap-1">
                                                     <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                                                        {getTierByAmount(Number(user?.total_investment || 0) / forexRate).name}
+                                                        {getTierByAmount(Number(user?.total_investment || 0)).name}
                                                     </h2>
                                                     <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">{t.activeStatus}</span>
                                                 </div>
-                                                <TierMedal tierId={getTierByAmount(Number(user?.total_investment || 0) / forexRate).id} size="md" className="shrink-0" />
+                                                <TierMedal tierId={getTierByAmount(Number(user?.total_investment || 0)).id} size="md" className="shrink-0" />
                                             </div>
                                         </div>
                                     </div>
@@ -389,7 +389,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
                            {(() => {
-                               const tier = getTierByAmount(Number(user?.total_investment || 0) / forexRate);
+                               const tier = getTierByAmount(Number(user?.total_investment || 0));
                                const max = Number(user?.total_investment || 0) * tier.maxDividend;
                                return (
                                    <>
@@ -402,7 +402,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
                            {(() => {
-                               const tier = getTierByAmount(Number(user?.total_investment || 0) / forexRate);
+                               const tier = getTierByAmount(Number(user?.total_investment || 0));
                                const max = Number(user?.total_investment || 0) * tier.maxDividend * 12;
                                return (
                                    <>

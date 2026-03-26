@@ -15,7 +15,7 @@ interface MobileSideMenuProps {
 }
 
 export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: MobileSideMenuProps) {
-    const { user, totalAssets, loading: authLoading } = useAuth();
+    const { user, totalAssets, balance, loading: authLoading } = useAuth();
     const { forexRate } = useSettings();
     const router = useRouter();
 
@@ -132,7 +132,7 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                                         {user?.fullName || user?.full_name || user?.email?.split('@')[0] || "User"}
                                     </p>
                                     <p className="text-[9px] font-bold text-gv-gold uppercase tracking-widest">
-                                        {getTierByAmount(totalAssets / (forexRate || 4)).name}
+                                        {getTierByAmount(Number(balance || 0)).name}
                                     </p>
                                 </div>
                             </div>

@@ -57,17 +57,17 @@ export const TIERS: Tier[] = [
   },
 ];
 
-export const getTierByAmount = (amountUSD: number): Tier => {
-  // Find highest tier where amountUSD is greater than or equal to minAmount
-  const matchingTiers = TIERS.filter((t) => amountUSD >= t.minAmount);
+export const getTierByAmount = (amount: number): Tier => {
+  // Find highest tier where amount is greater than or equal to minAmount
+  const matchingTiers = TIERS.filter((t) => amount >= t.minAmount);
   if (matchingTiers.length === 0) return TIERS[0];
   return matchingTiers[matchingTiers.length - 1];
 };
 
-export const calculateDividendRange = (amountUSD: number, tier: Tier) => {
+export const calculateDividendRange = (amount: number, tier: Tier) => {
   return {
-    min: amountUSD * tier.minDividend,
-    max: amountUSD * tier.maxDividend,
+    min: amount * tier.minDividend,
+    max: amount * tier.maxDividend,
   };
 };
 

@@ -975,12 +975,12 @@ export default function DashboardClient() {
                                 {Number(user?.total_investment || 0) > 0 && (
                                     <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur-md hover:bg-white/10 transition-all cursor-default group/tier-badge ml-0 sm:ml-2">
                                         <TierMedal 
-                                            tierId={getTierByAmount(Number(user?.total_investment || 0) / forexRate).id} 
+                                            tierId={getTierByAmount(Number(user?.total_investment || 0)).id} 
                                             size="sm" 
                                             className="group-hover/tier-badge:scale-110 transition-transform"
                                         />
                                         <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold/80 group-hover/tier-badge:text-gv-gold transition-colors">
-                                            {getTierByAmount(Number(user?.total_investment || 0) / forexRate).name}
+                                            {getTierByAmount(Number(user?.total_investment || 0)).name}
                                         </span>
                                     </div>
                                 )}
@@ -1132,7 +1132,7 @@ export default function DashboardClient() {
                                                         <div className="flex flex-col gap-1 min-w-0 flex-1">
                                                             <h2 className="text-2xl font-black text-white uppercase tracking-tighter truncate">
                                                                 {Number(user?.total_investment || 0) > 0 
-                                                                    ? getTierByAmount(Number(user?.total_investment || 0) / forexRate).name 
+                                                                    ? getTierByAmount(Number(user?.total_investment || 0)).name 
                                                                     : t.noTier}
                                                             </h2>
                                                             <div className="flex items-center gap-2 mt-2">
@@ -1144,7 +1144,7 @@ export default function DashboardClient() {
                                                         </div>
                                                         <TierMedal 
                                                             tierId={Number(user?.total_investment || 0) > 0 
-                                                                ? getTierByAmount(Number(user?.total_investment || 0) / forexRate).id 
+                                                                ? getTierByAmount(Number(user?.total_investment || 0)).id 
                                                                 : "none"} 
                                                             size="md" 
                                                             className="shrink-0 group-hover/tier:scale-110 transition-transform duration-500" 
@@ -1155,48 +1155,50 @@ export default function DashboardClient() {
                                         </div>
                                     </section>
 
-                                    <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
-                                            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
-                                                <svg className="h-20 w-20 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    {(Number(user?.total_investment || 0) > 0 || Number(user?.profit || 0) > 0) && (
+                                        <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
+                                                <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
+                                                    <svg className="h-20 w-20 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                </div>
+                                                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
+                                                {(() => {
+                                                    const currentTier = getTierByAmount(Number(user?.total_investment || 0));
+                                                    const monthlyMax = Number(user?.total_investment || 0) * currentTier.maxDividend;
+                                                    return (
+                                                        <>
+                                                            <h3 className="text-3xl font-black text-white">
+                                                                <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
+                                                                RM {monthlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                            </h3>
+                                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">
+                                                                {t.dividendRateDesc} ({t.basedOn} {currentTier.name})
+                                                            </p>
+                                                        </>
+                                                    );
+                                                })()}
                                             </div>
-                                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
-                                            {(() => {
-                                                 const currentTier = getTierByAmount(Number(user?.total_investment || 0) / forexRate);
-                                                 const monthlyMax = Number(user?.total_investment || 0) * currentTier.maxDividend;
-                                                 return (
-                                                     <>
-                                                         <h3 className="text-3xl font-black text-white">
-                                                             <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
-                                                             RM {monthlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
-                                                         </h3>
-                                                         <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">
-                                                             {t.dividendRateDesc} ({t.basedOn} {currentTier.name})
-                                                         </p>
-                                                     </>
-                                                 );
-                                             })()}
-                                        </div>
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
-                                            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
-                                                <svg className="h-20 w-20 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                            <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
+                                                <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
+                                                    <svg className="h-20 w-20 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                                </div>
+                                                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
+                                                {(() => {
+                                                    const currentTier = getTierByAmount(Number(user?.total_investment || 0));
+                                                    const yearlyMax = Number(user?.total_investment || 0) * currentTier.maxDividend * 12;
+                                                    return (
+                                                        <>
+                                                            <h3 className="text-3xl font-black text-emerald-500">
+                                                                <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
+                                                                RM {yearlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                            </h3>
+                                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">{t.dividendRateDesc} ({t.basedOn} {currentTier.name})</p>
+                                                        </>
+                                                    );
+                                                })()}
                                             </div>
-                                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
-                                            {(() => {
-                                                const currentTier = getTierByAmount(Number(user?.total_investment || 0) / forexRate);
-                                                const yearlyMax = Number(user?.total_investment || 0) * currentTier.maxDividend * 12;
-                                                return (
-                                                    <>
-                                                        <h3 className="text-3xl font-black text-emerald-500">
-                                                            <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
-                                                            RM {yearlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
-                                                        </h3>
-                                                        <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">{t.dividendRateDesc} ({t.basedOn} {currentTier.name})</p>
-                                                    </>
-                                                );
-                                            })()}
-                                        </div>
-                                    </section>
+                                        </section>
+                                    )}
 
                                     <section className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                                         <div className="xl:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8 overflow-hidden">

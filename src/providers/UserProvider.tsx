@@ -50,9 +50,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             // 3. Process Data
             if (profile && txs) {
                 const now = new Date();
-                const approvedDeposits = txs.filter((tx: any) => tx.type === 'Deposit' && tx.status === 'Approved');
+                const approvedDeposits = txs.filter((tx: any) => 
+                    tx.type === 'Deposit' && ['Approved', 'Completed'].includes(tx.status)
+                );
                 const lockedCapital = approvedDeposits.reduce((acc, tx) => {
-                    const txDate = new Date(tx.created_at || tx.transfer_date);
+                    const rawDate = tx.transfer_date || tx.created_at;
+                    const txDate = new Date(rawDate);
+                    if (isNaN(txDate.getTime())) return acc;
+                    
                     const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
                     return diffDays < 180 ? acc + Number(tx.amount) : acc;
                 }, 0);
@@ -60,13 +65,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 const totalAssetsRM = Number(profile.balance || 0) + Number(profile.profit || 0);
                 const withdrawableBalance = Math.max(0, (Number(profile.balance || 0) - lockedCapital) + Number(profile.profit || 0));
                 
-                const totalDeposited = txs.filter((t: any) => 
-                    (t.type === 'Deposit' && t.metadata?.adjustment_category !== 'Dividend') && ['Approved', 'Completed'].includes(t.status)
-                ).reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
-                
-                const totalWithdrawn = txs.filter((t: any) => 
-                    (t.type === 'Withdrawal' && t.metadata?.adjustment_category !== 'Dividend') && ['Approved', 'Completed', 'Pending Release'].includes(t.status)
-                ).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
+                const totalDeposited = txs.filter((t: any) => {
+                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                    const isCapital = t.type === 'Deposit' && 
+                                     category !== 'dividend' && 
+                                     category !== 'bonus';
+                    return isCapital && ['Approved', 'Completed'].includes(t.status);
+                }).reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
+
+                const totalWithdrawn = txs.filter((t: any) => {
+                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                    const isCapitalWithdrawal = t.type === 'Withdrawal' && 
+                                               category !== 'dividend' && 
+                                               category !== 'bonus';
+                    return isCapitalWithdrawal && ['Approved', 'Completed', 'Pending Release'].includes(t.status);
+                }).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
 
                 const fullProfile = {
                     ...user,

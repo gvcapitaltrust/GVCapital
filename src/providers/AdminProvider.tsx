@@ -221,14 +221,17 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .select('*')
                 .eq('user_id', tx.user_id)
                 .eq('type', 'Deposit')
-                .eq('status', 'Approved');
+                .in('status', ['Approved', 'Completed']);
 
             if (depositsError) throw depositsError;
 
             const now = new Date();
             const lockPeriodDays = 180;
             const lockedCapital = deposits?.reduce((acc: number, d: any) => {
-                const txDate = new Date(d.created_at || d.transfer_date);
+                const rawDate = d.transfer_date || d.created_at;
+                const txDate = new Date(rawDate);
+                if (isNaN(txDate.getTime())) return acc;
+                
                 const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
                 return diffDays < lockPeriodDays ? acc + Number(d.amount) : acc;
             }, 0) || 0;
@@ -417,9 +420,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
     const handleAdjustBalance = async (user: any, amount: number, type: "balance" | "profit", reason: string) => {
         try {
+            const isDividendOrBonus = type === 'profit' || reason?.toLowerCase().includes('dividend') || reason?.toLowerCase().includes('bonus');
+            const targetField = isDividendOrBonus ? 'profit' : 'balance';
+
             const { error: profileError } = await supabase
                 .from('profiles')
-                .update({ [type]: Number(user[type] || 0) + amount })
+                .update({ [targetField]: Number(user[targetField] || 0) + amount })
                 .eq('id', user.id);
             if (profileError) throw profileError;
 
@@ -435,7 +441,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     metadata: { 
                         is_adjustment: true,
                         reason: reason,
-                        adjustment_category: type === 'balance' ? 'Bonus' : 'Dividend',
+                        adjustment_category: isDividendOrBonus ? 'Dividend' : 'Capital',
                         adjustment_type: amount >= 0 ? 'Increase' : 'Decrease',
                         description: reason || `${txBaseType} ${amount >= 0 ? 'Increase' : 'Decrease'} Adjustment`,
                         processed_by_name: authUser?.user_metadata?.full_name || "Admin",
@@ -445,7 +451,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 });
             if (txError) throw txError;
 
-            showToast(`Successfully adjusted ${type} by RM ${amount.toFixed(2)}`);
+            showToast(`Successfully adjusted ${targetField} by RM ${amount.toFixed(2)}`);
             fetchData();
         } catch (err: any) {
             alert(err.message);
