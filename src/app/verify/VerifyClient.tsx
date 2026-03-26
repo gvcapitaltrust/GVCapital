@@ -356,8 +356,13 @@ export default function VerifyPage() {
         await syncProgress(currentStep, formData);
         const next = Math.min(currentStep + 1, 3);
         setCurrentStep(next);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-    const prevStep = () => setCurrentStep((prev: number) => Math.max(prev - 1, 1));
+
+    const prevStep = () => {
+        setCurrentStep((prev: number) => Math.max(prev - 1, 1));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const industries = t.industries;
     const wealthSources = t.wealthSources;
@@ -609,6 +614,17 @@ export default function VerifyPage() {
                                 </div>
                             </div>
 
+                            {/* Mobile Quick Navigation */}
+                            <div className="md:hidden flex justify-end">
+                                <button 
+                                    onClick={() => document.getElementById('bank-info-section')?.scrollIntoView({ behavior: 'smooth' })}
+                                    className="text-[10px] font-black uppercase tracking-widest text-gv-gold flex items-center gap-2 bg-gv-gold/10 px-4 py-2 rounded-full border border-gv-gold/20"
+                                >
+                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                                    Jump to Bank Info
+                                </button>
+                            </div>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.frontDoc}</label>
@@ -632,31 +648,33 @@ export default function VerifyPage() {
                                         <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdFront(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
                                     </div>
                                 </div>
-                                <div className="space-y-4">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.backDoc}</label>
-                                    <div className="relative group border-2 border-white/5 border-dashed rounded-[32px] overflow-hidden bg-white/[0.02] aspect-[3/2] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all border-dashed-2">
-                                        {idBack ? (
-                                            <div className="absolute inset-0 p-4">
-                                                <img src={URL.createObjectURL(idBack)} className="w-full h-full object-cover rounded-2xl opacity-50" />
-                                                <div className="absolute inset-0 flex flex-col items-center justify-center space-y-2">
-                                                    <svg className="h-10 w-10 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                                                    <span className="text-[9px] font-black uppercase text-white tracking-widest">{idBack.name}</span>
+                                {formData.id_type !== "Passport" && (
+                                    <div className="space-y-4">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-1">{t.backDoc}</label>
+                                        <div className="relative group border-2 border-white/5 border-dashed rounded-[32px] overflow-hidden bg-white/[0.02] aspect-[3/2] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all border-dashed-2">
+                                            {idBack ? (
+                                                <div className="absolute inset-0 p-4">
+                                                    <img src={URL.createObjectURL(idBack)} className="w-full h-full object-cover rounded-2xl opacity-50" />
+                                                    <div className="absolute inset-0 flex flex-col items-center justify-center space-y-2">
+                                                        <svg className="h-10 w-10 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                                                        <span className="text-[9px] font-black uppercase text-white tracking-widest">{idBack.name}</span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-col items-center space-y-4">
-                                                <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-gv-gold group-hover:text-black transition-all">
-                                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /></svg>
+                                            ) : (
+                                                <div className="flex flex-col items-center space-y-4">
+                                                    <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-gv-gold group-hover:text-black transition-all">
+                                                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /></svg>
+                                                    </div>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">{t.uploadPrompt}</span>
                                                 </div>
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">{t.uploadPrompt}</span>
-                                            </div>
-                                        )}
-                                        <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdBack(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                            )}
+                                            <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdBack(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
 
-                            <div className="pt-8 border-t border-white/5 space-y-6">
+                            <div id="bank-info-section" className="pt-8 border-t border-white/5 space-y-6">
                                 <div>
                                     <h3 className="text-sm font-black text-white tracking-widest uppercase">{t.bankDetails}</h3>
                                 </div>
