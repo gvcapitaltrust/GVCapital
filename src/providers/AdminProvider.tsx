@@ -60,8 +60,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         setTimeout(() => setToast({ message: "", visible: false }), 5000);
     }, []);
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
+    const fetchData = useCallback(async (isSilent = false) => {
+        if (!isSilent) setLoading(true);
         try {
             // 1. Fetch Profiles (Latest 1,000 for general management)
             const { data: profileList } = await supabase
@@ -74,7 +74,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             const { data: kycPendingList } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('kyc_status', 'Pending')
+                .in('kyc_status', ['Pending', 'Draft'])
                 .order('created_at', { ascending: false });
 
             if (profileList) {
@@ -148,7 +148,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
             console.error("Error fetching admin data:", error);
         } finally {
-            setLoading(false);
+            if (!isSilent) setLoading(false);
         }
     }, []);
 
@@ -276,7 +276,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     .from('transactions')
                     .update({ 
                         status: 'Pending Release',
-                        amount: finalPayout,
+                        amount: -Math.abs(finalPayout),
                         metadata: {
                             ...tx.metadata,
                             description: "Capital Withdrawal (Net)",
@@ -288,9 +288,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                             penalty_applied: true,
                             original_request_amount: withdrawAmount,
                             approved_at: new Date().toISOString(),
-                            bank_name: profile.bank_name || profile.kyc_data?.bank_name,
-                            account_number: profile.account_number || profile.kyc_data?.account_number,
-                            bank_account_holder: profile.bank_account_holder || profile.kyc_data?.bank_account_holder
+                            bank_name: profile.bank_name || profile.kyc_data?.bank_name || tx.metadata?.bank_name,
+                            account_number: profile.account_number || profile.kyc_data?.account_number || tx.metadata?.account_number,
+                            bank_account_holder: profile.bank_account_holder || profile.kyc_data?.bank_account_holder || tx.metadata?.bank_account_holder
                         }
                     })
                     .eq('id', tx.id);
@@ -303,8 +303,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     .insert({
                         user_id: tx.user_id,
                         type: 'Withdrawal',
-                        amount: penalty,
-                        status: 'Completed', // Penalty is deducted immediately
+                        amount: -Math.abs(penalty),
+                        status: 'Pending Release', // Keep it in the queue for visibility
                         ref_id: `PEN-${tx.ref_id || Math.random().toString(36).substring(2, 8).toUpperCase()}`,
                         metadata: {
                             description: "Early Withdrawal Penalty (40%)",
@@ -312,7 +312,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                             parent_withdrawal_id: tx.id,
                             processed_by_name: authUser?.user_metadata?.full_name || "Admin",
                             processed_by_id: authUser?.id,
-                            processed_by_email: authUser?.email
+                            processed_by_email: authUser?.email,
+                            approved_at: new Date().toISOString()
                         }
                     });
                 
@@ -322,6 +323,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     .from('transactions')
                     .update({ 
                         status: 'Pending Release',
+                        amount: -Math.abs(withdrawAmount),
                         metadata: {
                             ...tx.metadata,
                             description: "Capital Withdrawal",
@@ -332,9 +334,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                             finalized_payout: withdrawAmount,
                             penalty_applied: false,
                             approved_at: new Date().toISOString(),
-                            bank_name: profile.bank_name || profile.kyc_data?.bank_name,
-                            account_number: profile.account_number || profile.kyc_data?.account_number,
-                            bank_account_holder: profile.bank_account_holder || profile.kyc_data?.bank_account_holder
+                            bank_name: profile.bank_name || profile.kyc_data?.bank_name || tx.metadata?.bank_name,
+                            account_number: profile.account_number || profile.kyc_data?.account_number || tx.metadata?.account_number,
+                            bank_account_holder: profile.bank_account_holder || profile.kyc_data?.bank_account_holder || tx.metadata?.bank_account_holder
                         }
                     })
                     .eq('id', tx.id);
@@ -366,6 +368,23 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .eq('id', tx.id);
             
             if (txError) throw txError;
+
+            // Also complete associated penalty if it exists
+            // Since it's a JSONB search, we use the specific condition
+            await supabase
+                .from('transactions')
+                .update({ 
+                    status: 'Completed',
+                    metadata: {
+                        ...tx.metadata, // Optional: could just be current time
+                        description: "Early Withdrawal Penalty (40%) - Collected",
+                        released_at: new Date().toISOString(),
+                        completed_at: new Date().toISOString()
+                    }
+                })
+                .eq('type', 'Withdrawal')
+                .eq('status', 'Pending Release')
+                .filter('metadata->>parent_withdrawal_id', 'eq', tx.id);
             showToast("Withdrawal released and marked as completed.");
             fetchData();
         } catch (error: any) {
@@ -638,10 +657,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
         const channel = supabase
             .channel('admin-realtime-sync')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => fetchData())
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchData())
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'platform_settings' }, () => fetchData())
-            .subscribe();
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => fetchData(true))
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchData(true))
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'platform_settings' }, () => fetchData(true))
+            .subscribe((status) => {
+                console.log(`[ADMIN REALTIME] Subscription: ${status}`);
+            });
 
         return () => {
             supabase.removeChannel(channel);

@@ -82,65 +82,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [router]);
 
     // 2. Atomic Profile Fetcher
+    const fetchProfile = async () => {
+        if (!session?.user) return;
+        if (isFetching.current) return;
+        
+        isFetching.current = true;
+        const uid = session.user.id;
+
+        try {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', uid)
+                .maybeSingle();
+
+            if (profile) {
+                setRole(profile.role || "User");
+                setIsVerified(profile.is_verified === true || profile.is_verified === "Approved");
+                setKycStep(profile.kyc_step || 0);
+                setBalance(profile.balance || 0);
+                const assets = Number(profile.balance || 0) + Number(profile.profit || 0);
+                setTotalEquity(assets);
+                setTotalAssets(assets);
+                setUser({ ...session.user, ...profile });
+            } else {
+                setUser(session.user);
+            }
+        } catch (err) {
+            console.error("[AUTH] Fetch failed:", err);
+        } finally {
+            setLoading(false);
+            isFetching.current = false;
+        }
+    };
+
     useEffect(() => {
-        const fetchProfile = async () => {
-            if (!session?.user) return;
-            if (isFetching.current) return; // Prevent concurrent loops
-            
-            isFetching.current = true;
-            const email = session.user.email;
-            const uid = session.user.id;
-
-            console.log(`[AUTH] Singleton Fetching for ${email}...`);
-
-            // Emergency Resolver for Master Admin
-            let emergencyTimer: NodeJS.Timeout | null = null;
-            if (email === MASTER_ADMIN_EMAIL) {
-                emergencyTimer = setTimeout(() => {
-                    if (isFetching.current) {
-                        console.warn("[AUTH] Emergency Bypass Triggered for Admin.");
-                        setUser(session.user);
-                        setRole("admin");
-                        setIsVerified(true);
-                        setKycStep(3);
-                        setLoading(false);
-                        isFetching.current = false;
-                    }
-                }, 3000); // 3-second strict resolution
-            }
-
-            try {
-                const { data: profile, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', uid)
-                    .maybeSingle();
-
-                if (emergencyTimer) clearTimeout(emergencyTimer);
-
-                if (profile) {
-                    setRole(profile.role || "User");
-                    setIsVerified(profile.is_verified === true || profile.is_verified === "Approved");
-                    setKycStep(profile.kyc_step || 0);
-                    setBalance(profile.balance || 0);
-                    setTotalEquity(Number(profile.balance || 0) + Number(profile.profit || 0));
-                    setTotalAssets(Number(profile.balance || 0) + Number(profile.profit || 0));
-                    setUser({ ...session.user, ...profile });
-                } else {
-                    setUser(session.user);
-                }
-            } catch (err) {
-                console.error("[AUTH] Fetch Stalled:", err);
-            } finally {
-                setLoading(false);
-                isFetching.current = false;
-            }
-        };
-
         if (session?.user) {
             fetchProfile();
         }
-    }, [session]); // Only fetch when session state is explicitly updated by stable listener
+    }, [session]);
 
     // 3. Real-time Profile Sync
     useEffect(() => {
@@ -154,19 +134,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 schema: 'public', 
                 table: 'profiles', 
                 filter: `id=eq.${uid}` 
-            }, (payload) => {
-                console.log("[AUTH] Profile Update Received via Realtime:", payload.new);
-                const updated = payload.new as any;
-                if (updated) {
-                    const totalAssetsCalc = Number(updated.balance || 0) + Number(updated.profit || 0);
-                    setBalance(updated.balance || 0);
-                    setTotalEquity(totalAssetsCalc);
-                    setTotalAssets(totalAssetsCalc);
-                    setIsVerified(updated.is_verified === true || updated.is_verified === "Approved");
-                    setKycStep(updated.kyc_step || 0);
-                    setRole(updated.role || "User");
-                    setUser((prev: any) => prev ? ({ ...prev, ...updated }) : updated);
-                }
+            }, () => {
+                console.log("[AUTH] Profile update detected, refreshing...");
+                fetchProfile();
             })
             .subscribe();
 

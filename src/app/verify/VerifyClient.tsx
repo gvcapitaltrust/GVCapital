@@ -272,7 +272,11 @@ export default function VerifyPage() {
                 .update({
                     kyc_step: step,
                     kyc_data: data,
-                    kyc_status: 'Draft' // Ensure dashboard knows it's a draft
+                    kyc_status: 'Draft', // Ensure dashboard knows it's a draft
+                    full_name: `${data.first_name} ${data.last_name}`.trim(),
+                    bank_name: data.bank_name,
+                    account_number: data.account_number,
+                    bank_account_holder: data.bank_account_holder
                 })
                 .eq('id', user.id);
         } catch (err) {

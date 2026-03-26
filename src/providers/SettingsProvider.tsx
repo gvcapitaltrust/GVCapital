@@ -82,17 +82,9 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 event: 'UPDATE', 
                 schema: 'public', 
                 table: 'platform_settings' 
-            }, (payload) => {
-                const updated = payload.new as any;
-                if (updated.key === 'usd_to_myr_rate') {
-                    setForexRate(parseFloat(updated.value));
-                } else if (updated.key === 'monthly_return_rate') {
-                    setMonthlyRate(parseFloat(updated.value));
-                } else if (updated.key === 'yearly_return_rate') {
-                    setYearlyRate(parseFloat(updated.value));
-                } else if (updated.key === 'maintenance_mode') {
-                    setMaintenanceMode(updated.value === 'true');
-                }
+            }, () => {
+                console.log("[SETTINGS] Change detected, refreshing...");
+                fetchSettings();
             })
             .subscribe();
 

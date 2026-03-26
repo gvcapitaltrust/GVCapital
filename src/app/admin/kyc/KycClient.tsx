@@ -50,17 +50,22 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
         setIsDetailModalOpen(true);
         setIsLoadingDocs(true);
         try {
-            const { data, error } = await supabase.storage.from('agreements').list(user.id);
-            if (error) throw error;
-            if (data) {
-                const docs = await Promise.all(
-                    data.map(async (file) => {
-                        const { data: urlData } = await supabase.storage.from('agreements').createSignedUrl(`${user.id}/${file.name}`, 3600);
-                        return { name: file.name, url: urlData?.signedUrl || "" };
-                    })
-                );
-                setUserDocs(docs.filter(d => d.url !== ""));
-            }
+            const docFields = [
+                { key: 'kyc_id_front', label: 'ID Front' },
+                { key: 'kyc_id_back', label: 'ID Back' },
+                { key: 'bank_statement_url', label: 'Bank Statement' }
+            ];
+
+            const docs = await Promise.all(
+                docFields.map(async (field) => {
+                    const path = user[field.key];
+                    if (!path) return null;
+                    const { data: urlData } = await supabase.storage.from('agreements').createSignedUrl(path, 3600);
+                    return { name: field.label, url: urlData?.signedUrl || "" };
+                })
+            );
+            
+            setUserDocs(docs.filter((d): d is {name: string, url: string} => d !== null && d.url !== ""));
         } catch (err) {
             console.error(err);
         } finally {
@@ -113,7 +118,13 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                     </td>
                                     <td className="px-8 py-6 text-zinc-500 font-mono text-xs">{new Date(user.created_at).toLocaleDateString()}</td>
                                     <td className="px-8 py-6">
-                                        <span className="px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-500">{user.kyc_status}</span>
+                                        <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${
+                                            user.kyc_status === 'Draft' 
+                                                ? 'bg-zinc-500/10 text-zinc-500 border border-zinc-500/20' 
+                                                : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                                        }`}>
+                                            {user.kyc_status}
+                                        </span>
                                     </td>
                                     <td className="px-8 py-6 text-right">
                                         <button onClick={() => openDetails(user)} className="bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all border border-white/5">{t.viewDocs}</button>
