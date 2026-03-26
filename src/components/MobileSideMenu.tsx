@@ -13,8 +13,11 @@ interface MobileSideMenuProps {
 }
 
 export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: MobileSideMenuProps) {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const router = useRouter();
+
+    // Stricter check to prevent showing dashboard items to stale sessions
+    const isReallyLoggedIn = !!(user && user.id && (user.email || user.fullName));
 
     const t = {
         en: {
@@ -43,7 +46,7 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
         { id: "contact", path: "/#contact", label: lang === "en" ? "Contact" : "联系", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> },
     ];
 
-    const menuItems = user ? [
+    const menuItems = isReallyLoggedIn ? [
         { id: "statements", path: "/dashboard/statements", label: t.statements, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> },
         { id: "referrals", path: "/dashboard/referrals", label: t.referrals, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg> },
     ] : guestItems;
@@ -102,14 +105,16 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                 </div>
 
                 <div className="space-y-6">
-                    {user ? (
+                    {isReallyLoggedIn ? (
                         <div className="p-6 bg-white/5 rounded-[32px] border border-white/5 space-y-4">
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-lg">
-                                    {user?.fullName?.[0] || user?.email?.[0] || "U"}
+                                    {(user?.fullName?.[0] || user?.email?.[0] || "U").toUpperCase()}
                                 </div>
                                 <div>
-                                    <p className="text-xs font-black text-white truncate w-32">{user?.fullName || "Member"}</p>
+                                    <p className="text-xs font-black text-white truncate w-32">
+                                        {(user && (user.fullName || user.full_name)) ? (user.fullName || user.full_name) : "Guest"}
+                                    </p>
                                     <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{user?.tier || "Standard"}</p>
                                 </div>
                             </div>
@@ -120,10 +125,11 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                         </div>
                     ) : (
                         <button 
+                            disabled={authLoading}
                             onClick={() => { router.push(`/login?lang=${lang}`); onClose(); }}
-                            className="w-full bg-gv-gold text-black py-5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:bg-gv-gold/90 shadow-[0_10px_20px_rgba(212,175,55,0.2)] active:scale-95"
+                            className="w-full bg-gv-gold text-black py-5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:bg-gv-gold/90 shadow-[0_10px_20px_rgba(212,175,55,0.2)] active:scale-95 disabled:opacity-50"
                         >
-                            {lang === "en" ? "Client Login" : "客户登录"}
+                            {authLoading ? "..." : (lang === "en" ? "Client Login" : "客户登录")}
                         </button>
                     )}
                 </div>

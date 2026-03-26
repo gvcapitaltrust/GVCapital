@@ -67,7 +67,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             deposit: "Deposit",
             withdraw: "Withdraw",
             noTier: "Standard",
-            activeStatus: "Active Member",
+            activeStatus: "Active Status",
             currentPackage: "Current Tier",
             depositTitle: "New Deposit",
             amountMYR: "Amount (RM)",

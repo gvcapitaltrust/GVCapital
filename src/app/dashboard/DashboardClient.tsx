@@ -15,6 +15,7 @@ import ProductSelection from "@/components/ProductSelection";
 import ComparisonTable from "@/components/ComparisonTable";
 import { TIERS, getTierByAmount, formatUSD } from "@/lib/tierUtils";
 import TierMedal from "@/components/TierMedal";
+import MobileSideMenu from "@/components/MobileSideMenu";
 import { MASTER_ADMIN_EMAIL } from "@/lib/supabaseClient";
 
 export default function DashboardClient() {
@@ -904,80 +905,12 @@ export default function DashboardClient() {
                 </div>
             </aside>
 
-            {/* Mobile Drawer (Settings & Secondary Links) */}
-            <div
-                className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
-                    isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
-                }`}
-                onClick={() => setIsSidebarOpen(false)}
+            <MobileSideMenu 
+                lang={lang}
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+                currentTab={activeTab}
             />
-            <aside
-                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#0a0a0a] border-r border-white/5 p-8 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden ${
-                    isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-                }`}
-            >
-                <div className="space-y-12">
-                    <div className="flex items-center justify-between">
-                        <img src="/logo.png" alt="GV Capital" className="h-[40px] w-auto object-contain mix-blend-screen" />
-                        <button
-                            onClick={() => setIsSidebarOpen(false)}
-                            className="h-10 w-10 flex items-center justify-center rounded-full border border-white/10 text-zinc-500 hover:text-white transition-colors"
-                        >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
-                    </div>
-
-                    <div className="space-y-8">
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-4 px-2">Settings & Tools</p>
-                            <nav className="space-y-1">
-                                {[
-                                    { id: "statements", label: t.statements, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> },
-                                    { id: "referrals", label: t.referrals, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg> },
-                                    { id: "security", label: t.securityTitle, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg> },
-                                ].map((item) => (
-                                    <button
-                                        key={item.id}
-                                        onClick={() => { setActiveTab(item.id as any); setIsSidebarOpen(false); }}
-                                        className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                                            activeTab === item.id ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white hover:bg-white/5"
-                                        }`}
-                                    >
-                                        {item.icon}
-                                        {item.label}
-                                    </button>
-                                ))}
-                            </nav>
-                        </div>
-
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-4 px-2">Support</p>
-                            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-white hover:bg-white/5 transition-all">
-                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
-                                Contact Support
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="space-y-6">
-                    <div className="p-6 bg-white/5 rounded-[32px] border border-white/5 space-y-4">
-                        <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-lg">
-                                {user?.fullName?.[0] || user?.email?.[0] || "U"}
-                            </div>
-                            <div>
-                                <p className="text-xs font-black text-white truncate w-32">{user?.fullName || "Member"}</p>
-                                <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{user?.tier || "Standard"}</p>
-                            </div>
-                        </div>
-                        <button onClick={handleLogout} className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
-                            {t.logout}
-                        </button>
-                    </div>
-                </div>
-            </aside>
 
             {/* Premium Bottom Navigation (Mobile Only) */}
             <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-[#0a0a0a]/80 backdrop-blur-2xl border-t border-white/5 flex items-center justify-around px-2 md:hidden">
@@ -1020,7 +953,11 @@ export default function DashboardClient() {
                     <div className="flex items-center gap-4">
                         {user && <NotificationBell userId={user.id} lang={lang} />}
                         <div className="h-10 w-10 rounded-xl bg-gv-gold flex items-center justify-center font-black text-black shadow-lg">
-                            {user?.fullName?.[0] || "U"}
+                            {user ? (user.fullName?.[0] || "U") : (
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -1032,7 +969,9 @@ export default function DashboardClient() {
                             <p className="text-zinc-500 text-[10px] sm:text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
                             <h1 className="text-3xl sm:text-4xl font-black flex flex-wrap items-center gap-2 sm:gap-4">
                                 <span>{t.welcome}</span>
-                                <span className="text-gv-gold tracking-tighter truncate max-w-[200px] sm:max-w-none">{user?.fullName || "Member"}</span>
+                                <span className="text-gv-gold tracking-tighter truncate max-w-[200px] sm:max-w-none">
+                                    {(user && (user.fullName || user.full_name)) ? (user.fullName || user.full_name) : (authLoading ? "..." : "Guest")}
+                                </span>
                                 {Number(user?.total_investment || 0) > 0 && (
                                     <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur-md hover:bg-white/10 transition-all cursor-default group/tier-badge ml-0 sm:ml-2">
                                         <TierMedal 
@@ -1050,7 +989,11 @@ export default function DashboardClient() {
                         <div className="flex items-center gap-6 hidden sm:flex">
                             {user && <NotificationBell userId={user.id} lang={lang} />}
                             <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-xl border border-gv-gold/30 shadow-lg capitalize">
-                                {user?.fullName?.[0] || user?.email?.[0] || "U"}
+                                {user ? (user.fullName?.[0] || user.email?.[0] || "U") : (
+                                    <svg className="h-8 w-8 text-black/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                )}
                             </div>
                         </div>
                     </header>

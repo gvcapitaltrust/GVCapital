@@ -44,7 +44,9 @@ export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNav
             <div>
                 <h1 className="text-lg sm:text-xl font-bold flex flex-wrap items-center gap-2">
                     <span className="text-zinc-300">{t.welcome}</span>
-                    <span className="text-gv-gold font-black tracking-tight truncate max-w-[200px] sm:max-w-none">{user?.fullName || "Member"}</span>
+                    <span className="text-gv-gold font-black tracking-tight truncate max-w-[200px] sm:max-w-none">
+                        {(user && (user.fullName || user.full_name)) ? (user.fullName || user.full_name) : (isCheckingAuth ? "..." : "Guest")}
+                    </span>
                     {Number(user?.total_investment || 0) > 0 && (
                         <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1 backdrop-blur-md hover:bg-white/10 transition-all cursor-default group/tier-badge">
                             <TierMedal 
@@ -62,7 +64,11 @@ export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNav
             <div className="flex items-center gap-4 hidden sm:flex">
                 {user && <NotificationBell userId={user.id} lang={lang} />}
                 <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-sm border border-gv-gold/30 shadow-lg capitalize">
-                    {user?.fullName?.[0] || user?.email?.[0] || "U"}
+                    {user ? (user.fullName?.[0] || user.email?.[0] || "U") : (
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    )}
                 </div>
             </div>
         </header>
