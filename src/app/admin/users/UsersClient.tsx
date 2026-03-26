@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useAdmin } from "@/providers/AdminProvider";
 import { useSettings } from "@/providers/SettingsProvider";
+import { getTierByAmount } from "@/lib/tierUtils";
 
 export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
     const { users, combinedAuditLogs, loading, handleAdjustBalance, handleUpdatePortfolio, handleResetUserPassword, handleSetAdminRole, handleDeleteUser, handleToggleUserStatus } = useAdmin();
@@ -193,28 +194,30 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                     {(user.full_name || user.username || "?")[0].toUpperCase()}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="font-black text-white uppercase tracking-tight">{user.full_name || user.username}</span>
-                                                    <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">{user.email}</span>
+                                                    <span className="font-extrabold text-white uppercase tracking-tight text-xs">{user.full_name || user.username}</span>
+                                                    <span className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest">{user.email}</span>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col">
-                                                <span className="font-black text-white tabular-nums">RM {totalEquity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                <span className="text-[10px] text-gv-gold/60 font-black tracking-tighter uppercase">B: RM {Number(user.balance || 0).toFixed(0)} | D: RM {Number(user.profit || 0).toFixed(0)}</span>
+                                                <span className="font-black text-white tabular-nums text-xs">RM {totalEquity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                <span className="text-[8px] text-gv-gold/60 font-black tracking-tighter uppercase whitespace-nowrap">B: RM {Number(user.balance || 0).toFixed(0)} | D: RM {Number(user.profit || 0).toFixed(0)}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest bg-zinc-800 border border-white/5 text-zinc-400">{user.tier || "Standard"}</span>
+                                            <span className="px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest bg-zinc-800 border border-white/5 text-zinc-400">
+                                                {(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(totalEquity / (forexRate || 4)).name}
+                                            </span>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                                            <span className={`px-2 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest ${
                                                 user.kyc_status === 'Verified' ? 'bg-emerald-500/10 text-emerald-500' :
                                                 'bg-zinc-800 text-zinc-500'
                                             }`}>{user.kyc_status}</span>
                                         </td>
                                         <td className="px-8 py-6 text-right">
-                                            <button onClick={() => openDetails(user)} className="bg-gv-gold/10 text-gv-gold hover:bg-gv-gold hover:text-black text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all border border-gv-gold/20">{t.tableActions}</button>
+                                            <button onClick={() => openDetails(user)} className="bg-gv-gold/10 text-gv-gold hover:bg-gv-gold hover:text-black text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg transition-all border border-gv-gold/20">{t.tableActions}</button>
                                         </td>
                                     </tr>
                                 );
@@ -237,7 +240,9 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                 <div>
                                     <h3 className="text-2xl font-black uppercase tracking-tighter text-white">{selectedUser?.full_name}</h3>
                                     <div className="flex items-center gap-3">
-                                        <span className="text-[10px] text-gv-gold font-black uppercase tracking-[0.2em]">{selectedUser?.tier || "Standard"} Class</span>
+                                        <span className="text-[9px] text-gv-gold font-black uppercase tracking-[0.2em]">
+                                            {(selectedUser?.tier && selectedUser?.tier !== "Standard") ? selectedUser?.tier : getTierByAmount((Number(selectedUser?.balance || 0) + Number(selectedUser?.profit || 0)) / (forexRate || 4)).name} Class
+                                        </span>
                                         <span className="h-1 w-1 rounded-full bg-zinc-700"></span>
                                         <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">@{selectedUser?.username}</span>
                                     </div>
