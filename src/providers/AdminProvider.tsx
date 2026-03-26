@@ -205,7 +205,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             // 1. Fetch current user balance/profit to calculate deduction
             const { data: profile, error: profileFetchError } = await supabase
                 .from('profiles')
-                .select('balance, profit')
+                .select('balance, profit, bank_name, account_number, bank_account_holder, kyc_data')
                 .eq('id', tx.user_id)
                 .single();
             
@@ -286,7 +286,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                             finalized_penalty: penalty,
                             finalized_payout: finalPayout,
                             penalty_applied: true,
-                            original_request_amount: withdrawAmount
+                            original_request_amount: withdrawAmount,
+                            approved_at: new Date().toISOString(),
+                            bank_name: profile.bank_name || profile.kyc_data?.bank_name,
+                            account_number: profile.account_number || profile.kyc_data?.account_number,
+                            bank_account_holder: profile.bank_account_holder || profile.kyc_data?.bank_account_holder
                         }
                     })
                     .eq('id', tx.id);
@@ -326,7 +330,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                             processed_by_email: authUser?.email,
                             finalized_penalty: 0,
                             finalized_payout: withdrawAmount,
-                            penalty_applied: false
+                            penalty_applied: false,
+                            approved_at: new Date().toISOString(),
+                            bank_name: profile.bank_name || profile.kyc_data?.bank_name,
+                            account_number: profile.account_number || profile.kyc_data?.account_number,
+                            bank_account_holder: profile.bank_account_holder || profile.kyc_data?.bank_account_holder
                         }
                     })
                     .eq('id', tx.id);
@@ -351,7 +359,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         ...tx.metadata,
                         released_by_name: authUser?.user_metadata?.full_name || "Admin",
                         released_by_id: authUser?.id,
-                        released_at: new Date().toISOString()
+                        released_at: new Date().toISOString(),
+                        completed_at: new Date().toISOString()
                     }
                 })
                 .eq('id', tx.id);

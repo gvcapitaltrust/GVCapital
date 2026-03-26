@@ -13,6 +13,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [activeFilter, setActiveFilter] = useState<'All' | 'Capital' | 'Dividends'>('All');
+    const [expandedId, setExpandedId] = useState<string | null>(null);
 
     const t = {
         en: {
@@ -146,8 +147,6 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-12 pb-20">
             <section className="space-y-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <h2 className="text-2xl font-black uppercase tracking-tighter">{t.history}</h2>
-                    
                     <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
                         {(['All', 'Capital', 'Dividends'] as const).map((f) => (
                             <button
@@ -184,30 +183,109 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                             </thead>
                             <tbody className="divide-y divide-white/[0.03]">
                                 {filteredTransactions.map((tx, idx) => (
-                                    <tr key={idx} className="text-sm font-medium group hover:bg-white/[0.03] transition-colors border-t border-white/[0.02]">
-                                        <td className="px-6 py-4 text-zinc-400 font-mono text-xs">{new Date(tx.created_at || tx.transfer_date).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 text-zinc-500 font-mono text-[11px] opacity-70">{tx.ref_id || "-"}</td>
-                                        <td className="px-6 py-4 uppercase tracking-widest text-[10px] font-bold text-white">{tx.metadata?.description || tx.type}</td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-3 py-1.5 rounded-lg text-[9px] uppercase font-bold tracking-widest ${
-                                                ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                                                tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
-                                                tx.status === 'Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
-                                                'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                                            }`}>{tx.status}</span>
-                                        </td>
-                                        {(() => {
-                                            const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease' || tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty');
-                                            const amountValue = Number(tx.amount);
-                                            const displayAmount = isWithdrawal ? -Math.abs(amountValue) : amountValue;
-                                            
-                                            return (
-                                                <td className={`px-6 py-4 text-right font-black tabular-nums ${displayAmount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                    {displayAmount >= 0 ? '+' : '-'}{Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                    <React.Fragment key={idx}>
+                                        <tr 
+                                            onClick={() => setExpandedId(expandedId === tx.id ? null : tx.id)}
+                                            className="text-sm font-medium group hover:bg-white/[0.03] transition-colors border-t border-white/[0.02] cursor-pointer"
+                                        >
+                                            <td className="px-6 py-4 text-zinc-400 font-mono text-xs">{new Date(tx.created_at || tx.transfer_date).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4 text-zinc-500 font-mono text-[11px] opacity-70">{tx.ref_id || "-"}</td>
+                                            <td className="px-6 py-4 uppercase tracking-widest text-[10px] font-bold text-white">
+                                                <div className="flex items-center gap-2">
+                                                    {tx.metadata?.description || tx.type}
+                                                    {(tx.type === 'Withdrawal' || tx.metadata?.is_adjustment) && (
+                                                        <svg className={`h-3 w-3 text-zinc-600 transition-transform ${expandedId === tx.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-3 py-1.5 rounded-lg text-[9px] uppercase font-bold tracking-widest ${
+                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                                    tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
+                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                                                    'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                                }`}>{tx.status}</span>
+                                            </td>
+                                            {(() => {
+                                                const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease' || tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty');
+                                                const amountValue = Number(tx.amount);
+                                                const displayAmount = isWithdrawal ? -Math.abs(amountValue) : amountValue;
+                                                
+                                                return (
+                                                    <td className={`px-6 py-4 text-right font-black tabular-nums ${displayAmount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                        {displayAmount >= 0 ? '+' : '-'}{Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                    </td>
+                                                );
+                                            })()}
+                                        </tr>
+                                        {expandedId === tx.id && (
+                                            <tr>
+                                                <td colSpan={5} className="px-6 py-6 bg-white/[0.01] animate-in slide-in-from-top-2 duration-300">
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                                        <div className="space-y-4">
+                                                            <h4 className="text-[10px] font-black uppercase text-zinc-500 tracking-widest">Financial Breakdown</h4>
+                                                            <div className="space-y-2">
+                                                                <div className="flex justify-between text-xs font-bold">
+                                                                    <span className="text-zinc-500 uppercase">Gross Amount</span>
+                                                                    <span className="text-white">RM {Math.abs(Number(tx.metadata?.original_request_amount || tx.amount)).toFixed(2)}</span>
+                                                                </div>
+                                                                {tx.metadata?.penalty_applied && (
+                                                                    <div className="flex justify-between text-xs font-bold">
+                                                                        <span className="text-red-500 uppercase italic">Early Withdrawal Penalty (40%)</span>
+                                                                        <span className="text-red-500">-RM {Number(tx.metadata?.finalized_penalty).toFixed(2)}</span>
+                                                                    </div>
+                                                                )}
+                                                                <div className="flex justify-between text-xs font-black border-t border-white/5 pt-2">
+                                                                    <span className="text-emerald-500 uppercase">Final Payout (Net)</span>
+                                                                    <span className="text-emerald-500 underline decoration-gv-gold">RM {Number(tx.metadata?.finalized_payout || tx.amount).toFixed(2)}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="space-y-4">
+                                                            <h4 className="text-[10px] font-black uppercase text-zinc-500 tracking-widest">Target Account</h4>
+                                                            <div className="bg-white/5 border border-white/5 p-4 rounded-2xl space-y-2">
+                                                                <p className="text-[10px] font-black text-gv-gold uppercase">{tx.metadata?.bank_name || user?.bank_name || "Institutional Account"}</p>
+                                                                <p className="text-sm font-mono text-white select-all">{tx.metadata?.account_number || user?.account_number || "Verified on File"}</p>
+                                                                <p className="text-[9px] font-bold text-zinc-500 uppercase">{tx.metadata?.bank_account_holder || user?.full_name}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="space-y-4">
+                                                            <h4 className="text-[10px] font-black uppercase text-zinc-500 tracking-widest">Processing Timeline</h4>
+                                                            <div className="space-y-3 relative before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[1px] before:bg-white/10">
+                                                                <div className="flex items-center gap-3 pl-6 relative">
+                                                                    <div className="h-2 w-2 rounded-full bg-zinc-500 absolute left-[3.5px]"></div>
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-[10px] font-black text-white uppercase">Submitted</span>
+                                                                        <span className="text-[9px] text-zinc-600 font-bold">{new Date(tx.created_at).toLocaleString()}</span>
+                                                                    </div>
+                                                                </div>
+                                                                {tx.metadata?.approved_at && (
+                                                                    <div className="flex items-center gap-3 pl-6 relative">
+                                                                        <div className="h-2 w-2 rounded-full bg-blue-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                                                        <div className="flex flex-col">
+                                                                            <span className="text-[10px] font-black text-blue-400 uppercase">Accepted by {tx.metadata?.processed_by_name || 'Admin'}</span>
+                                                                            <span className="text-[9px] text-zinc-600 font-bold">{new Date(tx.metadata.approved_at).toLocaleString()}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {tx.metadata?.released_at && (
+                                                                    <div className="flex items-center gap-3 pl-6 relative">
+                                                                        <div className="h-2 w-2 rounded-full bg-emerald-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                                                                        <div className="flex flex-col">
+                                                                            <span className="text-[10px] font-black text-emerald-400 uppercase">Released for Distribution</span>
+                                                                            <span className="text-[9px] text-zinc-600 font-bold">{new Date(tx.metadata.released_at).toLocaleString()}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </td>
-                                            );
-                                        })()}
-                                    </tr>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
                                 ))}
                                 {filteredTransactions.length === 0 && (
                                     <tr><td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
