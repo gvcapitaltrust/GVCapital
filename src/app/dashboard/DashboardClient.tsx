@@ -1521,7 +1521,7 @@ export default function DashboardClient() {
                                             </div>
                                             <div className="space-y-1">
                                                 <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.riskProfile}</p>
-                                                <p className="text-lg font-bold text-emerald-400 tracking-tight">{user?.risk_profile || "-"}</p>
+                                                <p className="text-lg font-bold text-emerald-400 tracking-tight">{user?.risk_profile === "Moderate" ? "40%" : (user?.risk_profile || "-")}</p>
                                             </div>
                                         </div>
                                     </div>

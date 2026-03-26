@@ -4,6 +4,8 @@ import React from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
+import { getTierByAmount } from "@/lib/tierUtils";
+import { useSettings } from "@/providers/SettingsProvider";
 
 interface MobileSideMenuProps {
     lang: "en" | "zh";
@@ -14,6 +16,7 @@ interface MobileSideMenuProps {
 
 export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: MobileSideMenuProps) {
     const { user, loading: authLoading } = useAuth();
+    const { forexRate } = useSettings();
     const router = useRouter();
 
     // Stricter check to prevent showing dashboard items to stale sessions
@@ -113,9 +116,11 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                                 </div>
                                 <div>
                                     <p className="text-xs font-black text-white truncate w-32">
-                                        {(user && (user.fullName || user.full_name)) ? (user.fullName || user.full_name) : "Guest"}
+                                        {user?.fullName || user?.full_name || user?.email?.split('@')[0] || "User"}
                                     </p>
-                                    <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{user?.tier || "Standard"}</p>
+                                    <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
+                                        {getTierByAmount(Number(user?.total_investment || 0) / forexRate).name}
+                                    </p>
                                 </div>
                             </div>
                             <button onClick={handleLogout} className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">

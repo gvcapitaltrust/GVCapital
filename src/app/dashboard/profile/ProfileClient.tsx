@@ -106,7 +106,7 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                                 { label: t.occupation, value: user?.occupation },
                                 { label: t.industry, value: user?.industry },
                                 { label: t.wealthSource, value: user?.source_of_wealth },
-                                { label: t.riskProfile, value: user?.risk_profile, className: "text-emerald-400" },
+                                { label: t.riskProfile, value: user?.risk_profile === "Moderate" ? "40%" : (user?.risk_profile || "-"), className: "text-emerald-400" },
                             ].map((item, i) => (
                                 <div key={i} className="space-y-1">
                                     <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{item.label}</p>
