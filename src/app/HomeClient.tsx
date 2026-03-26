@@ -7,8 +7,7 @@ import GlobalFooter from "@/components/GlobalFooter";
 import Navigation from "@/components/Navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/providers/AuthProvider";
-import { TIERS, formatUSD } from "@/lib/tierUtils";
-import { ShieldCheck, TrendingUp, BarChart3, Clock, Lock, ArrowRight, CheckCircle2, Globe, Briefcase, ChevronRight, Wallet, Activity } from "lucide-react";
+import { ShieldCheck, TrendingUp, BarChart3, Lock, ArrowRight, Globe, Briefcase, Activity } from "lucide-react";
 
 export default function HomeClient() {
     const { user, loading: authLoading } = useAuth();
@@ -54,7 +53,7 @@ export default function HomeClient() {
                 title: "Our Core Offerings",
                 items: [
                     { title: "Capital Management", desc: "Professional fund allocation in high-yield markets managed by expert managers." },
-                    { title: "Monthly Dividends", desc: "Automated monthly profit distribution based on your verifiable investment tier." },
+                    { title: "Monthly Dividends", desc: "Automated monthly profit distribution based on your investment performance." },
                     { title: "Market Strategies", desc: "Leveraging advanced proprietary fund management algorithms for reliable returns." },
                     { title: "Secure Trust Vault", desc: "Bank-grade security, end-to-end encryption, and strict KYC protocols." }
                 ]
@@ -64,16 +63,9 @@ export default function HomeClient() {
                 steps: [
                     { title: "Register & Verify", desc: "Create your account and complete our secure KYC verification process." },
                     { title: "Deposit Capital", desc: "Fund your account using our supported seamless payment gateways." },
-                    { title: "Select Allocation", desc: "Choose your investment tier and let our experts handle the fund management." },
+                    { title: "Select Allocation", desc: "Choose your investment strategy and let our experts handle the fund management." },
                     { title: "Earn Dividends", desc: "Profits are automatically credited to your wallet, available for you to withdraw anytime." }
                 ]
-            },
-            tiers: {
-                title: "Tiered Investment System",
-                subtitle: "Unlock higher monthly returns as you upgrade your portfolio tier.",
-                levels: ["Silver", "Gold", "Platinum", "Diamond"],
-                return: "Monthly Dividends",
-                upTo: "Up to"
             },
             cta: {
                 join: "Join GV Capital Trust Today",
@@ -100,7 +92,7 @@ export default function HomeClient() {
                 title: "核心服务",
                 items: [
                     { title: "资金管理", desc: "由具备丰富经验的管理专家在稳健市场进行专业的资金配置。" },
-                    { title: "每月分红", desc: "基于您所选择的投资等级，系统自动分配每月利润。" },
+                    { title: "每月分红", desc: "基于您的投资表现，系统自动分配每月利润。" },
                     { title: "市场策略", desc: "利用先进的市场策略和独家基金管理算法获取可靠的回报。" },
                     { title: "安全信托金库", desc: "银行级安全标准、端到端数据加密以及严格的 KYC 身份认证审核。" }
                 ]
@@ -110,16 +102,9 @@ export default function HomeClient() {
                 steps: [
                     { title: "注册与验证", desc: "创建您的账户并完成我们安全可靠的 KYC 验证流程。" },
                     { title: "存入资金", desc: "使用我们支持的无缝支付渠道为您的账户注入资金。" },
-                    { title: "选择配置", desc: "选择您的投资等级，让我们的专家团队负责接下来的基金管理。" },
+                    { title: "选择配置", desc: "选择您的投资策略，让我们的专家团队负责接下来的基金管理。" },
                     { title: "获取分红", desc: "利润将自动存入您的钱包，随时可供您自由提取。" }
                 ]
-            },
-            tiers: {
-                title: "阶梯式投资系统",
-                subtitle: "升级您的投资组合等级，解锁更高的每月回报率。",
-                levels: ["白银级", "黄金级", "铂金级", "钻石级"],
-                return: "每月分红",
-                upTo: "高达"
             },
             cta: {
                 join: "今天就加入 GV 资本信托",
@@ -277,41 +262,6 @@ export default function HomeClient() {
                 </div>
             </section>
 
-            {/* --- TIERS PREVIEW --- */}
-            <section className="py-24 relative z-10">
-                <div className="max-w-7xl mx-auto px-6 lg:px-12 text-center">
-                    <h2 className="text-2xl sm:text-3xl font-black mb-3">{t.tiers.title}</h2>
-                    <p className="text-zinc-400 text-base mb-12 max-w-2xl mx-auto">{t.tiers.subtitle}</p>
-
-                    <div className="flex flex-wrap justify-center gap-6">
-                        {TIERS.map((tierData, idx) => {
-                            const colors = ['border-zinc-400/50 text-zinc-300', 'border-slate-400/50 text-slate-300', 'border-yellow-500/50 text-yellow-500', 'border-amber-500/50 text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]'];
-                            const gradients = ['from-zinc-400/10', 'from-slate-400/10', 'from-yellow-500/10', 'from-amber-500/10'];
-                            const isFixed = tierData.minDividend === tierData.maxDividend;
-                            return (
-                                <div key={tierData.id} className={`w-full sm:w-[280px] rounded-3xl border border-white/5 bg-gradient-to-b ${gradients[idx]} to-transparent p-6 text-left relative overflow-hidden transition-all hover:scale-105 hover:border-white/20 hover:bg-[#1a1a1a]`}>
-                                    <div className="mb-8">
-                                        <span className={`inline-block px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${colors[idx]}`}>
-                                            {t.tiers.levels[idx]}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-end gap-1 mb-2">
-                                        <span className="text-sm font-bold text-zinc-400 mb-2 mr-1">{t.tiers.upTo as string}</span>
-                                        <span className="text-4xl font-black text-white">
-                                            {(tierData.maxDividend * 100).toFixed(0)}
-                                        </span>
-                                        <span className="text-gv-gold font-bold mb-1">%</span>
-                                    </div>
-                                    <div className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1">{t.tiers.return}</div>
-                                    <div className="text-zinc-500 text-[11px] font-bold">
-                                        {tierData.id === 'silver' ? 'Up to $999' : `${formatUSD(tierData.minAmount)} - ${formatUSD(tierData.maxAmount)}`}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
 
             {/* --- CTA BOTTOM --- */}
             <section className="py-32 relative z-10 border-t border-white/10 overflow-hidden">
