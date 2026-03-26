@@ -106,21 +106,29 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         ).reduce((acc, t) => acc + Number(t.amount), 0);
 
         const totalDeposits = periodTxs.filter(tx => tx.type === 'Deposit' && tx.status === 'Approved').reduce((acc, tx) => acc + Number(tx.amount), 0);
-        const totalWithdrawals = periodTxs.filter(tx => tx.type === 'Withdrawal' && tx.status === 'Approved').reduce((acc, tx) => acc + Math.abs(Number(tx.amount)), 0);
+        const totalWithdrawals = periodTxs.filter(tx => tx.type === 'Withdrawal' && !tx.metadata?.is_penalty && ['Approved', 'Completed', 'Pending Release'].includes(tx.status)).reduce((acc, tx) => acc + Math.abs(Number(tx.amount)), 0);
+        const totalPenalties = periodTxs.filter(tx => (tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty')) && ['Approved', 'Completed'].includes(tx.status)).reduce((acc, tx) => acc + Math.abs(Number(tx.amount)), 0);
         
         const closingBalance = (user.total_investment || 0) + (Number(user.profit || 0));
-        const openingBalance = closingBalance - totalDeposits + totalWithdrawals - periodProfit;
+        const openingBalance = closingBalance - totalDeposits + totalWithdrawals + totalPenalties - periodProfit;
+
+        const summaryBody = [
+            ['Opening Balance', openingBalance.toFixed(2)],
+            ['Total Deposits', totalDeposits.toFixed(2)],
+            ['Total Monthly Dividends', periodProfit.toFixed(2)],
+            ['Total Withdrawals (Net)', totalWithdrawals.toFixed(2)],
+        ];
+
+        if (totalPenalties > 0) {
+            summaryBody.push(['Early Withdrawal Penalties', `-${totalPenalties.toFixed(2)}`]);
+        }
+
+        summaryBody.push(['Closing Balance', closingBalance.toFixed(2)]);
 
         autoTable(doc, {
             startY: 70,
             head: [['Description', 'Amount (RM)']],
-            body: [
-                ['Opening Balance', openingBalance.toFixed(2)],
-                ['Total Deposits', totalDeposits.toFixed(2)],
-                ['Total Monthly Dividends', periodProfit.toFixed(2)],
-                ['Total Withdrawals', totalWithdrawals.toFixed(2)],
-                ['Closing Balance', closingBalance.toFixed(2)]
-            ],
+            body: summaryBody,
             theme: 'striped',
             headStyles: { fillColor: [51, 65, 85] }
         });
