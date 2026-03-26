@@ -61,11 +61,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 const withdrawableBalance = Math.max(0, (Number(profile.balance || 0) - lockedCapital) + Number(profile.profit || 0));
                 
                 const totalDeposited = txs.filter((t: any) => 
-                    (t.type === 'Deposit' && t.metadata?.adjustment_category !== 'Dividend') && t.status === 'Approved'
+                    (t.type === 'Deposit' && t.metadata?.adjustment_category !== 'Dividend') && ['Approved', 'Completed'].includes(t.status)
                 ).reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
                 
                 const totalWithdrawn = txs.filter((t: any) => 
-                    (t.type === 'Withdrawal' && t.metadata?.adjustment_category !== 'Dividend') && t.status === 'Approved'
+                    (t.type === 'Withdrawal' && t.metadata?.adjustment_category !== 'Dividend') && ['Approved', 'Completed', 'Pending Release'].includes(t.status)
                 ).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
 
                 const fullProfile = {

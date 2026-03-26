@@ -5,7 +5,7 @@ import { useAdmin } from "@/providers/AdminProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 
 export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
-    const { withdrawals, loading, handleApproveWithdrawal, handleRejectWithdrawal } = useAdmin();
+    const { withdrawals, loading, handleApproveWithdrawal, handleCompleteWithdrawal, handleRejectWithdrawal } = useAdmin();
     const { forexRate } = useSettings();
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
@@ -17,7 +17,9 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
             searchPlaceholder: "Search by name or email...",
             statusAll: "All Status",
             statusPending: "Pending",
-            statusApproved: "Approved",
+            statusPendingRelease: "Pending Release",
+            statusCompleted: "Completed",
+            statusApproved: "Approved (Legacy)",
             statusRejected: "Rejected",
             tableUser: "User",
             tableAmount: "Amount",
@@ -34,6 +36,8 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
             searchPlaceholder: "按姓名或邮箱搜索...",
             statusAll: "全部状态",
             statusPending: "待处理",
+            statusPendingRelease: "待释放",
+            statusCompleted: "已完成",
             statusApproved: "已批准",
             statusRejected: "已拒绝",
             tableUser: "用户",
@@ -78,7 +82,8 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                     >
                         <option value="All" className="bg-[#111]">{t.statusAll}</option>
                         <option value="Pending" className="bg-[#111]">{t.statusPending}</option>
-                        <option value="Approved" className="bg-[#111]">{t.statusApproved}</option>
+                        <option value="Pending Release" className="bg-[#111]">{t.statusPendingRelease}</option>
+                        <option value="Completed" className="bg-[#111]">{t.statusCompleted}</option>
                         <option value="Rejected" className="bg-[#111]">{t.statusRejected}</option>
                     </select>
                 </div>
@@ -92,6 +97,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                 <th className="px-4 py-3">{t.tableUser}</th>
                                 <th className="px-4 py-3">{t.tableAmount}</th>
                                 <th className="px-4 py-3">Penalty</th>
+                                <th className="px-4 py-3">Bank Details</th>
                                 <th className="px-4 py-3">Total Payout</th>
                                 <th className="px-4 py-3">{t.tableDate}</th>
                                 <th className="px-4 py-3">{t.tableStatus}</th>
@@ -123,12 +129,27 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                             <span className="text-zinc-700 font-bold uppercase text-[10px]">-</span>
                                         )}
                                     </td>
+                                    <td className="px-4 py-3">
+                                        <div className="flex flex-col max-w-[150px]">
+                                            <span className="text-[10px] font-black text-white truncate uppercase tracking-tighter">
+                                                {tx.profiles?.bank_name || tx.profiles?.kyc_data?.bank_name || "N/A"}
+                                            </span>
+                                            <span className="text-[10px] font-mono text-gv-gold font-bold">
+                                                {tx.profiles?.account_number || tx.profiles?.kyc_data?.account_number || "-"}
+                                            </span>
+                                            <span className="text-[9px] text-zinc-500 font-bold truncate uppercase tracking-widest">
+                                                {tx.profiles?.bank_account_holder || tx.profiles?.kyc_data?.bank_account_holder || "Unknown"}
+                                            </span>
+                                        </div>
+                                    </td>
                                     <td className="px-4 py-3 font-black text-emerald-500 tabular-nums">
                                         RM {Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </td>
                                     <td className="px-4 py-3 text-zinc-500 font-mono text-xs">{new Date(tx.created_at).toLocaleDateString()}</td>
                                     <td className="px-4 py-3">
                                         <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${
+                                            tx.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500' :
+                                            tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500' :
                                             tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
                                             tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
                                             'bg-amber-500/10 text-amber-500'
@@ -142,7 +163,12 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                     <button onClick={() => handleApproveWithdrawal(tx)} className="bg-emerald-500 text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">{t.approve}</button>
                                                 </>
                                             )}
-                                            {tx.status !== 'Pending' && <span className="text-[10px] text-zinc-700 font-black uppercase italic">Completed</span>}
+                                            {tx.status === 'Pending Release' && (
+                                                <button onClick={() => handleCompleteWithdrawal(tx)} className="bg-gv-gold text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-gv-gold/20 hover:-translate-y-0.5 transition-all">Complete Release</button>
+                                            )}
+                                            {tx.status === 'Completed' && <span className="text-[10px] text-zinc-700 font-black uppercase italic">Processed</span>}
+                                            {tx.status === 'Approved' && <span className="text-[10px] text-zinc-700 font-black uppercase italic">Legacy Success</span>}
+                                            {tx.status === 'Rejected' && <span className="text-[10px] text-zinc-700 font-black uppercase italic">Declined</span>}
                                         </div>
                                     </td>
                                 </tr>

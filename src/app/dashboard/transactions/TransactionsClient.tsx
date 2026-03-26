@@ -61,7 +61,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     });
 
     const filteredTotal = filteredTransactions
-        .filter(tx => tx.status === 'Approved')
+        .filter(tx => ['Approved', 'Completed', 'Pending Release'].includes(tx.status))
         .reduce((acc, tx) => {
             const amount = Number(tx.amount);
             if (tx.type === 'Withdrawal' && !tx.metadata?.adjustment_category) return acc - Math.abs(amount);
@@ -190,14 +190,23 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                         <td className="px-6 py-4 uppercase tracking-widest text-[10px] font-bold text-white">{tx.metadata?.description || tx.type}</td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1.5 rounded-lg text-[9px] uppercase font-bold tracking-widest ${
-                                                tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                                ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                                tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
                                                 tx.status === 'Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
                                                 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                                             }`}>{tx.status}</span>
                                         </td>
-                                        <td className={`px-6 py-4 text-right font-black tabular-nums ${Number(tx.amount) >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                            {Number(tx.amount) >= 0 ? '+' : ''}{Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                        </td>
+                                        {(() => {
+                                            const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease' || tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty');
+                                            const amountValue = Number(tx.amount);
+                                            const displayAmount = isWithdrawal ? -Math.abs(amountValue) : amountValue;
+                                            
+                                            return (
+                                                <td className={`px-6 py-4 text-right font-black tabular-nums ${displayAmount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                    {displayAmount >= 0 ? '+' : '-'}{Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                </td>
+                                            );
+                                        })()}
                                     </tr>
                                 ))}
                                 {filteredTransactions.length === 0 && (

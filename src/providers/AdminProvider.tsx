@@ -25,6 +25,7 @@ interface AdminContextType {
     handleApproveDeposit: (tx: any) => Promise<void>;
     handleRejectDeposit: (tx: any) => Promise<void>;
     handleApproveWithdrawal: (tx: any) => Promise<void>;
+    handleCompleteWithdrawal: (tx: any) => Promise<void>;
     handleRejectWithdrawal: (tx: any) => Promise<void>;
     handleAdjustBalance: (user: any, amount: number, type: "balance" | "profit", reason: string) => Promise<void>;
     handleApproveKyc: (userId: string) => Promise<void>;
@@ -109,7 +110,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             if (logs) setVerificationLogs(logs);
 
             // 4. Combine Audit Logs
-            const financialTxs = txList?.filter((t: any) => t.status === 'Approved') || [];
+            const financialTxs = txList?.filter((t: any) => ['Approved', 'Pending Release', 'Completed'].includes(t.status)) || [];
             const mergedLogs = [
                 ...(logs || []).map(l => ({ ...l, auditType: 'verification', action: l.action_taken })),
                 ...financialTxs.map(t => ({
@@ -118,10 +119,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     admin_username: t.metadata?.processed_by_name || 'System',
                     user_email: t.profiles?.email || 'Unknown',
                     action: t.type === 'Deposit' ? 'Deposit Approved' : 
-                            t.type === 'Withdrawal' ? 'Withdrawal Approved' : 
+                            t.type === 'Withdrawal' ? (t.status === 'Pending Release' ? 'Withdrawal Accepted' : 'Withdrawal Released') : 
                             t.type === 'Audit' ? t.metadata?.action : 'Adjustment',
                     processed_by_name: t.metadata?.processed_by_name,
-                    rejection_reason: t.metadata?.reason || t.metadata?.description || `${t.type} processed`,
+                    rejection_reason: t.metadata?.reason || t.metadata?.description || `${t.type} processed (${t.status})`,
                     auditType: 'transaction',
                     amount: t.amount,
                     txType: t.type
@@ -268,25 +269,95 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             
             if (profileUpdateError) throw profileUpdateError;
 
-            // 5. Mark transaction as Approved
+            // 5. Mark transaction as Pending Release (if penalty, split it)
+            if (penaltyApplied) {
+                // Update original to reflect final payout (Capital)
+                const { error: txUpdateError } = await supabase
+                    .from('transactions')
+                    .update({ 
+                        status: 'Pending Release',
+                        amount: finalPayout,
+                        metadata: {
+                            ...tx.metadata,
+                            description: "Capital Withdrawal (Net)",
+                            processed_by_name: authUser?.user_metadata?.full_name || "Admin",
+                            processed_by_id: authUser?.id,
+                            processed_by_email: authUser?.email,
+                            finalized_penalty: penalty,
+                            finalized_payout: finalPayout,
+                            penalty_applied: true,
+                            original_request_amount: withdrawAmount
+                        }
+                    })
+                    .eq('id', tx.id);
+                
+                if (txUpdateError) throw txUpdateError;
+
+                // Insert Penalty Transaction
+                const { error: penaltyTxError } = await supabase
+                    .from('transactions')
+                    .insert({
+                        user_id: tx.user_id,
+                        type: 'Withdrawal',
+                        amount: penalty,
+                        status: 'Completed', // Penalty is deducted immediately
+                        ref_id: `PEN-${tx.ref_id || Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+                        metadata: {
+                            description: "Early Withdrawal Penalty (40%)",
+                            is_penalty: true,
+                            parent_withdrawal_id: tx.id,
+                            processed_by_name: authUser?.user_metadata?.full_name || "Admin",
+                            processed_by_id: authUser?.id,
+                            processed_by_email: authUser?.email
+                        }
+                    });
+                
+                if (penaltyTxError) throw penaltyTxError;
+            } else {
+                const { error: txError } = await supabase
+                    .from('transactions')
+                    .update({ 
+                        status: 'Pending Release',
+                        metadata: {
+                            ...tx.metadata,
+                            description: "Capital Withdrawal",
+                            processed_by_name: authUser?.user_metadata?.full_name || "Admin",
+                            processed_by_id: authUser?.id,
+                            processed_by_email: authUser?.email,
+                            finalized_penalty: 0,
+                            finalized_payout: withdrawAmount,
+                            penalty_applied: false
+                        }
+                    })
+                    .eq('id', tx.id);
+                
+                if (txError) throw txError;
+            }
+            
+            showToast("Withdrawal accepted. Awaiting final release.");
+            fetchData();
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
+    const handleCompleteWithdrawal = async (tx: any) => {
+        try {
             const { error: txError } = await supabase
                 .from('transactions')
                 .update({ 
-                    status: 'Approved',
+                    status: 'Completed',
                     metadata: {
                         ...tx.metadata,
-                        processed_by_name: authUser?.user_metadata?.full_name || "Admin",
-                        processed_by_id: authUser?.id,
-                        processed_by_email: authUser?.email,
-                        finalized_penalty: penaltyApplied ? penalty : 0,
-                        finalized_payout: finalPayout,
-                        penalty_applied: penaltyApplied
+                        released_by_name: authUser?.user_metadata?.full_name || "Admin",
+                        released_by_id: authUser?.id,
+                        released_at: new Date().toISOString()
                     }
                 })
                 .eq('id', tx.id);
             
             if (txError) throw txError;
-            showToast("Withdrawal approved and balance deducted.");
+            showToast("Withdrawal released and marked as completed.");
             fetchData();
         } catch (error: any) {
             alert(error.message);
@@ -585,6 +656,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             handleApproveDeposit,
             handleRejectDeposit,
             handleApproveWithdrawal,
+            handleCompleteWithdrawal,
             handleRejectWithdrawal,
             handleAdjustBalance,
             handleApproveKyc,
