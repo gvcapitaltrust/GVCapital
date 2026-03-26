@@ -143,88 +143,174 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                             </button>
                         </div>
                         
-                        <div className="flex-1 p-8 grid grid-cols-1 lg:grid-cols-3 gap-8 overflow-hidden">
-                            {/* Documents List */}
-                            <div className="lg:col-span-2 space-y-6 overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-white/10">
-                                {isLoadingDocs ? (
-                                    <div className="h-64 flex items-center justify-center"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>
-                                ) : userDocs.length > 0 ? (
-                                    <div className="grid grid-cols-1 gap-6">
-                                        {userDocs.map((doc, i) => (
-                                            <div key={i} className="space-y-4">
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 px-2">{doc.name}</p>
-                                                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between hover:bg-white/10 transition-all group shadow-md gap-4 min-w-0">
-                                                    <div className="flex items-center gap-4 min-w-0">
-                                                        <div className="h-10 w-10 bg-gv-gold/20 text-gv-gold rounded-full flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                                        </div>
-                                                        <div className="min-w-0 truncate">
-                                                            <h4 className="text-sm font-bold text-white mb-0.5 truncate">Document Attachment</h4>
-                                                            <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest truncate">{doc.name}</p>
-                                                        </div>
-                                                    </div>
-                                                    <button onClick={() => setViewDocumentUrl(doc.url)} className="shrink-0 bg-white/10 text-white font-black uppercase tracking-widest text-[10px] px-4 py-2 rounded-xl shadow-lg hover:bg-white/20 transition-all hover:-translate-y-0.5">View</button>
-                                                </div>
+                        <div className="flex-1 p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 overflow-hidden">
+                            {/* Main Content Area: Detailed Data */}
+                            <div className="lg:col-span-8 space-y-8 overflow-y-auto pr-6 scrollbar-thin scrollbar-thumb-white/10">
+                                
+                                {/* Personal Information Section */}
+                                <div className="space-y-4">
+                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
+                                        <span className="h-1 w-4 bg-gv-gold rounded-full"></span>
+                                        Personal Information
+                                    </h4>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {[
+                                            { label: "Full Name", value: selectedUser?.full_name },
+                                            { label: "First Name", value: selectedUser?.kyc_data?.first_name },
+                                            { label: "Last Name", value: selectedUser?.kyc_data?.last_name },
+                                            { label: "Date of Birth", value: selectedUser?.kyc_data?.dob },
+                                            { label: "Gender", value: selectedUser?.kyc_data?.gender },
+                                            { label: "Phone", value: selectedUser?.phone || selectedUser?.kyc_data?.phone },
+                                            { label: "Tax ID / TIN", value: selectedUser?.kyc_data?.tax_id || "N/A" },
+                                            { label: "Country", value: selectedUser?.country || selectedUser?.kyc_data?.country },
+                                            { label: "City", value: selectedUser?.kyc_data?.city },
+                                        ].map((item, i) => (
+                                            <div key={i} className="bg-white/5 border border-white/5 p-3 rounded-2xl">
+                                                <p className="text-[8px] font-black text-zinc-600 uppercase mb-1">{item.label}</p>
+                                                <p className="text-xs font-bold text-white truncate">{item.value || "-"}</p>
                                             </div>
                                         ))}
+                                        <div className="bg-white/5 border border-white/5 p-3 rounded-2xl col-span-2">
+                                            <p className="text-[8px] font-black text-zinc-600 uppercase mb-1">Residential Address</p>
+                                            <p className="text-xs font-bold text-white">{selectedUser?.kyc_data?.address || "-"}</p>
+                                        </div>
                                     </div>
-                                ) : (
-                                    <div className="h-64 border-2 border-dashed border-white/5 rounded-3xl flex items-center justify-center text-zinc-700 font-black uppercase tracking-widest">No physical documents uploaded</div>
-                                )}
-                            </div>
+                                </div>
 
-                            {/* Actions & Info */}
-                            <div className="space-y-8 flex flex-col overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-white/10">
-                                <div className="space-y-6 flex-1">
-                                    <div className="bg-white/5 p-6 rounded-3xl border border-white/5 space-y-4">
-                                        <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-2">User Profile Summary</p>
-                                        <div className="space-y-4">
-                                            <div className="flex flex-col">
-                                                <span className="text-[8px] font-black uppercase text-zinc-600">Full Name</span>
-                                                <span className="text-lg font-black text-white">{selectedUser?.full_name}</span>
+                                {/* Investment Profile Section */}
+                                <div className="space-y-4">
+                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
+                                        <span className="h-1 w-4 bg-gv-gold rounded-full"></span>
+                                        Investment & Profile
+                                    </h4>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {[
+                                            { label: "Account Purpose", value: selectedUser?.kyc_data?.account_purpose },
+                                            { label: "Employment", value: selectedUser?.kyc_data?.employment_status },
+                                            { label: "Industry", value: selectedUser?.kyc_data?.industry },
+                                            { label: "Net Worth", value: selectedUser?.kyc_data?.total_wealth },
+                                            { label: "Annual Income", value: selectedUser?.kyc_data?.annual_income },
+                                            { label: "Expected Deposit", value: selectedUser?.kyc_data?.yearly_deposit },
+                                        ].map((item, i) => (
+                                            <div key={i} className="bg-white/5 border border-white/5 p-3 rounded-2xl">
+                                                <p className="text-[8px] font-black text-zinc-600 uppercase mb-1">{item.label}</p>
+                                                <p className="text-xs font-bold text-white">{item.value || "-"}</p>
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[8px] font-black uppercase text-zinc-600">Email</span>
-                                                <span className="text-sm font-bold text-zinc-400">{selectedUser?.email}</span>
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[8px] font-black uppercase text-zinc-600">Phone</span>
-                                                <span className="text-sm font-bold text-zinc-400">{selectedUser?.phone || "N/A"}</span>
+                                        ))}
+                                        <div className="bg-white/5 border border-white/5 p-3 rounded-2xl col-span-2">
+                                            <p className="text-[8px] font-black text-zinc-600 uppercase mb-1">Sources of Wealth</p>
+                                            <div className="flex flex-wrap gap-2 mt-1">
+                                                {selectedUser?.kyc_data?.source_of_wealth?.map((s: string, i: number) => (
+                                                    <span key={i} className="bg-gv-gold/10 text-gv-gold text-[9px] font-black px-2 py-1 rounded-lg uppercase">{s}</span>
+                                                )) || <span className="text-xs font-bold text-zinc-600">-</span>}
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div className="space-y-4">
-                                        <label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest px-1">Rejection Reason (Internal & External)</label>
+                                {/* Bank Information Section */}
+                                <div className="space-y-4">
+                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
+                                        <span className="h-1 w-4 bg-gv-gold rounded-full"></span>
+                                        Bank Information
+                                    </h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        {[
+                                            { label: "Bank Name", value: selectedUser?.bank_name || selectedUser?.kyc_data?.bank_name },
+                                            { label: "Account Number", value: selectedUser?.account_number || selectedUser?.kyc_data?.account_number },
+                                            { label: "Account Holder", value: selectedUser?.bank_account_holder || selectedUser?.kyc_data?.bank_account_holder },
+                                        ].map((item, i) => (
+                                            <div key={i} className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-2xl">
+                                                <p className="text-[8px] font-black text-emerald-500/50 uppercase mb-1">{item.label}</p>
+                                                <p className="text-sm font-black text-emerald-400">{item.value || "-"}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Compliance & Declarations */}
+                                <div className="space-y-4">
+                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
+                                        <span className="h-1 w-4 bg-gv-gold rounded-full"></span>
+                                        Compliance Declarations
+                                    </h4>
+                                    <div className="flex flex-wrap gap-3">
+                                        {[
+                                            { label: "Nationality Match", value: selectedUser?.kyc_data?.nationality_match },
+                                            { label: "Accuracy Confirmed", value: selectedUser?.kyc_data?.accuracy_confirmed },
+                                            { label: "Risk Acknowledged", value: selectedUser?.kyc_data?.risk_acknowledged },
+                                            { label: "Not a PEP", value: selectedUser?.kyc_data?.is_not_pep },
+                                        ].map((item, i) => (
+                                            <div key={i} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${item.value ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
+                                                <div className={`h-2 w-2 rounded-full ${item.value ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`}></div>
+                                                {item.label}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Sidebar Area: Documents & Actions */}
+                            <div className="lg:col-span-4 space-y-8 flex flex-col overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10 border-l border-white/5 pl-6">
+                                
+                                {/* Document List Section */}
+                                <div className="space-y-4">
+                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Submitted Documents</h4>
+                                    {isLoadingDocs ? (
+                                        <div className="h-32 flex items-center justify-center"><div className="h-8 w-8 border-3 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>
+                                    ) : userDocs.length > 0 ? (
+                                        <div className="space-y-3">
+                                            {userDocs.map((doc, i) => (
+                                                <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between hover:bg-white/10 transition-all group gap-4 min-w-0">
+                                                    <div className="flex items-center gap-3 min-w-0">
+                                                        <div className="h-8 w-8 bg-gv-gold/20 text-gv-gold rounded-full flex items-center justify-center shrink-0">
+                                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className="text-[10px] text-zinc-300 font-bold uppercase truncate">{doc.name}</p>
+                                                        </div>
+                                                    </div>
+                                                    <button onClick={() => setViewDocumentUrl(doc.url)} className="shrink-0 bg-white/10 text-white font-black uppercase tracking-widest text-[9px] px-3 py-1.5 rounded-lg hover:bg-gv-gold hover:text-black transition-all">View</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="p-10 border-2 border-dashed border-white/5 rounded-3xl text-center text-zinc-700 text-[10px] font-black uppercase tracking-widest">No Documents Found</div>
+                                    )}
+                                </div>
+
+                                {/* Decision Actions Section */}
+                                <div className="space-y-4 pt-4 border-t border-white/5 mt-auto">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest px-1">Rejection Reason</label>
                                         <textarea
                                             value={rejectReason}
                                             onChange={(e) => setRejectReason(e.target.value)}
                                             placeholder={t.rejectReasonPlaceholder}
-                                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-xs font-medium focus:outline-none focus:border-red-500/50 transition-all min-h-[120px] text-white"
+                                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-xs font-medium focus:outline-none focus:border-red-500/50 transition-all min-h-[100px] text-white"
                                         />
                                     </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 gap-4 pt-6 border-t border-white/5">
-                                    <button 
-                                        onClick={() => {
-                                            if (!rejectReason) { alert("Please provide a reason for rejection."); return; }
-                                            handleRejectKyc(selectedUser.id, rejectReason);
-                                            setIsDetailModalOpen(false);
-                                        }}
-                                        className="bg-red-500/10 border border-red-500/20 text-red-500 font-black py-4 rounded-2xl uppercase tracking-widest text-[10px] hover:bg-red-500 hover:text-white transition-all w-full"
-                                    >
-                                        {t.reject}
-                                    </button>
-                                    <button 
-                                        onClick={() => {
-                                            handleApproveKyc(selectedUser.id);
-                                            setIsDetailModalOpen(false);
-                                        }}
-                                        className="bg-gv-gold text-black font-black py-4 rounded-2xl uppercase tracking-widest text-[10px] hover:-translate-y-1 transition-all shadow-xl shadow-gv-gold/20 w-full"
-                                    >
-                                        {t.approve}
-                                    </button>
+                                    <div className="grid grid-cols-1 gap-3">
+                                        <button 
+                                            onClick={() => {
+                                                if (!rejectReason) { alert("Please provide a reason for rejection."); return; }
+                                                handleRejectKyc(selectedUser.id, rejectReason);
+                                                setIsDetailModalOpen(false);
+                                            }}
+                                            className="bg-red-500/10 border border-red-500/20 text-red-500 font-black py-4 rounded-xl uppercase tracking-widest text-[10px] hover:bg-red-500 hover:text-white transition-all w-full shadow-lg"
+                                        >
+                                            {t.reject}
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                handleApproveKyc(selectedUser.id);
+                                                setIsDetailModalOpen(false);
+                                            }}
+                                            className="bg-gv-gold text-black font-black py-4 rounded-xl uppercase tracking-widest text-[10px] hover:-translate-y-1 transition-all shadow-xl shadow-gv-gold/20 w-full"
+                                        >
+                                            {t.approve}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
