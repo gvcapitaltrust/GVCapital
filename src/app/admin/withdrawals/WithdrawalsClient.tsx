@@ -89,31 +89,31 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                     <table className="w-full text-left">
                         <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                             <tr>
-                                <th className="px-8 py-6">{t.tableUser}</th>
-                                <th className="px-8 py-6">{t.tableAmount}</th>
-                                <th className="px-8 py-6">Penalty</th>
-                                <th className="px-8 py-6">Total Payout</th>
-                                <th className="px-8 py-6">{t.tableDate}</th>
-                                <th className="px-8 py-6">{t.tableStatus}</th>
-                                <th className="px-8 py-6 text-right">{t.tableActions}</th>
+                                <th className="px-4 py-3">{t.tableUser}</th>
+                                <th className="px-4 py-3">{t.tableAmount}</th>
+                                <th className="px-4 py-3">Penalty</th>
+                                <th className="px-4 py-3">Total Payout</th>
+                                <th className="px-4 py-3">{t.tableDate}</th>
+                                <th className="px-4 py-3">{t.tableStatus}</th>
+                                <th className="px-4 py-3 text-right">{t.tableActions}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/[0.03]">
                             {filteredWithdrawals.map((tx, idx) => (
                                 <tr key={idx} className="text-sm group hover:bg-white/[0.02] transition-all">
-                                    <td className="px-8 py-6">
+                                    <td className="px-4 py-3">
                                         <div className="flex flex-col">
                                             <span className="font-black text-white uppercase tracking-tight">{tx.profiles?.full_name}</span>
                                             <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
+                                    <td className="px-4 py-3">
                                         <div className="flex flex-col">
                                             <span className="font-black text-red-500 tabular-nums">RM {Math.abs(Number(tx.amount)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(tx.amount)) / forexRate).toFixed(2)} USD)</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
+                                    <td className="px-4 py-3">
                                         {tx.metadata?.penalty_applied || tx.metadata?.penalty_amount ? (
                                             <div className="flex flex-col">
                                                 <span className="font-black text-red-400 tabular-nums">RM {Number(tx.metadata?.finalized_penalty || tx.metadata?.penalty_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
@@ -123,23 +123,23 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                             <span className="text-zinc-700 font-bold uppercase text-[10px]">-</span>
                                         )}
                                     </td>
-                                    <td className="px-8 py-6 font-black text-emerald-500 tabular-nums">
+                                    <td className="px-4 py-3 font-black text-emerald-500 tabular-nums">
                                         RM {Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </td>
-                                    <td className="px-8 py-6 text-zinc-500 font-mono text-xs">{new Date(tx.created_at).toLocaleDateString()}</td>
-                                    <td className="px-8 py-6">
+                                    <td className="px-4 py-3 text-zinc-500 font-mono text-xs">{new Date(tx.created_at).toLocaleDateString()}</td>
+                                    <td className="px-4 py-3">
                                         <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${
                                             tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
                                             tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
                                             'bg-amber-500/10 text-amber-500'
                                         }`}>{tx.status}</span>
                                     </td>
-                                    <td className="px-8 py-6 text-right">
+                                    <td className="px-4 py-3 text-right">
                                         <div className="flex items-center justify-end gap-3">
                                             {tx.status === 'Pending' && (
                                                 <>
                                                     <button onClick={() => handleRejectWithdrawal(tx)} className="text-red-500 hover:bg-red-500/10 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">{t.reject}</button>
-                                                    <button onClick={() => handleApproveWithdrawal(tx)} className="bg-emerald-500 text-black px-6 py-2 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">{t.approve}</button>
+                                                    <button onClick={() => handleApproveWithdrawal(tx)} className="bg-emerald-500 text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">{t.approve}</button>
                                                 </>
                                             )}
                                             {tx.status !== 'Pending' && <span className="text-[10px] text-zinc-700 font-black uppercase italic">Completed</span>}

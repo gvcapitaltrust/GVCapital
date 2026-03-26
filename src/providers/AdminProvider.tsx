@@ -116,7 +116,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     admin_username: t.metadata?.processed_by_name || 'System',
                     user_email: t.profiles?.email || 'Unknown',
                     action: t.type === 'Deposit' ? 'Deposit Approved' : 
-                            t.type === 'Withdrawal' ? 'Withdrawal Approved' : 'Adjustment',
+                            t.type === 'Withdrawal' ? 'Withdrawal Approved' : 
+                            t.type === 'Audit' ? t.metadata?.action : 'Adjustment',
                     processed_by_name: t.metadata?.processed_by_name,
                     rejection_reason: t.metadata?.reason || t.metadata?.description || `${t.type} processed`,
                     auditType: 'transaction',
@@ -365,13 +366,21 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
             const user = users.find(u => u.id === userId);
             await supabase
-                .from('verification_logs')
+                .from('transactions')
                 .insert({
-                    admin_id: authUser?.id,
-                    user_email: user?.email || 'Unknown',
-                    admin_username: authUser?.user_metadata?.full_name || "Admin",
-                    action: 'Verified',
-                    created_at: new Date().toISOString()
+                    user_id: userId,
+                    type: 'Audit',
+                    amount: 0,
+                    status: 'Approved',
+                    ref_id: `KYC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+                    metadata: {
+                        is_audit: true,
+                        action: 'KYC Verified',
+                        description: `User identity verified`,
+                        processed_by_name: authUser?.user_metadata?.full_name || "Admin",
+                        processed_by_id: authUser?.id,
+                        processed_by_email: authUser?.email
+                    }
                 });
 
             showToast(`User successfully verified.`);
@@ -396,14 +405,22 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
             const user = users.find(u => u.id === userId);
             await supabase
-                .from('verification_logs')
+                .from('transactions')
                 .insert({
-                    admin_id: authUser?.id,
-                    user_email: user?.email || 'Unknown',
-                    admin_username: authUser?.user_metadata?.full_name || "Admin",
-                    action: 'Rejected',
-                    rejection_reason: reason,
-                    created_at: new Date().toISOString()
+                    user_id: userId,
+                    type: 'Audit',
+                    amount: 0,
+                    status: 'Approved',
+                    ref_id: `KYC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+                    metadata: {
+                        is_audit: true,
+                        action: 'KYC Rejected',
+                        reason: reason,
+                        description: `User identity rejected: ${reason}`,
+                        processed_by_name: authUser?.user_metadata?.full_name || "Admin",
+                        processed_by_id: authUser?.id,
+                        processed_by_email: authUser?.email
+                    }
                 });
 
             showToast(`User successfully rejected.`);
