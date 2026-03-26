@@ -53,8 +53,8 @@ export default function DepositClient() {
 
             // 2. Insert into transactions table
             const refId = `DEP-${Math.floor(100000 + Math.random() * 900000)}`;
-            const currentAmountRm = parseFloat(amount);
-            const depositUSD = currentAmountRm / forexRate;
+            const depositUSD = parseFloat(amount);
+            const currentAmountRm = depositUSD * forexRate;
             const currentCapitalUSD = Number(user.balance || 0) / forexRate;
 
             if (currentCapitalUSD + depositUSD > 10000) {
@@ -71,9 +71,9 @@ export default function DepositClient() {
                     user_id: user.id,
                     type: 'Deposit',
                     amount: currentAmountRm,
-                    metadata: { original_rm_amount: amount },
-                    original_currency_amount: currentAmountRm,
-                    original_currency: 'RM',
+                    metadata: { original_usd_amount: amount, forex_rate: forexRate },
+                    original_currency_amount: depositUSD,
+                    original_currency: 'USD',
                     transfer_date: new Date().toISOString(),
                     status: 'Pending',
                     receipt_url: uploadData.path,
@@ -99,27 +99,27 @@ export default function DepositClient() {
         en: {
             title: "Deposit Funds",
             subtitle: "Top up your GV Capital investment account",
-            amount: "Amount (RM)",
+            amount: "Amount (USD)",
             receipt: "Upload Bank Receipt (Image/PDF)",
             button: "Confirm Deposit",
             back: "Back to Dashboard",
             note: "Your deposit is being verified by the GV Capital admin team. This usually takes 1-2 hours.",
             successTitle: "Deposit Submitted",
             successDesc: "Redirecting you to dashboard...",
-            estimatedCredit: "Estimated Credit",
+            estimatedCredit: "Equivalent RM Amount",
             maxLimit: "Maximum investment allowed: $10,000 USD. Only input amounts within your limit.",
         },
         zh: {
             title: "资金充值",
             subtitle: "充值您的 GV 资本投资账户",
-            amount: "金额 (RM)",
+            amount: "金额 (USD)",
             receipt: "上传银行收据 (图片/PDF)",
             button: "确认存款",
             back: "返回控制台",
             note: "您的存款正在由 GV 资本管理员团队验证。 这通常需要 1-2 小时。",
             successTitle: "存款已提交",
             successDesc: "正在为您跳转到控制台...",
-            estimatedCredit: "预计信用额度",
+            estimatedCredit: "等值马币金额",
             maxLimit: "最高允许投资: $10,000 USD。请仅输入限制内的金额。",
         }
     };
@@ -169,7 +169,7 @@ export default function DepositClient() {
                                     <div className="mt-3 flex items-center gap-2 px-1 animate-in fade-in slide-in-from-left-2 duration-300">
                                         <div className="h-2 w-2 rounded-full bg-gv-gold animate-pulse"></div>
                                         <p className="text-gv-gold font-black text-sm uppercase tracking-tighter">
-                                            {t.estimatedCredit}: ≈ ${(parseFloat(amount) / forexRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                                            {t.estimatedCredit}: ≈ RM {(parseFloat(amount) * forexRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </p>
                                     </div>
                                 )}

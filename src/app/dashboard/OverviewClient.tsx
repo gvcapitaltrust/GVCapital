@@ -70,7 +70,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             activeStatus: "Active Status",
             currentPackage: "Current Tier",
             depositTitle: "New Deposit",
-            amountMYR: "Amount (RM)",
+            amountMYR: "Amount (USD)",
             transferDate: "Transfer Date",
             bankReceipt: "Bank Receipt / Proof of Transfer",
             selectDocument: "Select Document",
@@ -116,7 +116,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             activeStatus: "活跃会员",
             currentPackage: "当前等级",
             depositTitle: "新存款",
-            amountMYR: "金额 (RM)",
+            amountMYR: "金额 (USD)",
             transferDate: "转账日期",
             bankReceipt: "银行收据 / 转账凭证",
             selectDocument: "选择文件",
@@ -189,10 +189,12 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
     };
 
     const handleWithdrawInitiate = () => {
-        const amount = parseFloat(withdrawAmount);
-        if (!amount || amount <= 0) return;
+        const amountUSD = parseFloat(withdrawAmount);
+        if (!amountUSD || amountUSD <= 0) return;
         
-        if (amount > (user?.total_assets || 0)) {
+        const amountRM = amountUSD * forexRate;
+
+        if (amountRM > (user?.total_assets || 0)) {
             alert("Requested amount exceeds total assets.");
             return;
         }
@@ -203,15 +205,15 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
         const userWithdrawable = profit + maturedCapital;
         
         let lockedPortion = 0;
-        if (amount > userWithdrawable) {
-            lockedPortion = amount - userWithdrawable;
+        if (amountRM > userWithdrawable) {
+            lockedPortion = amountRM - userWithdrawable;
         }
 
         if (lockedPortion > 0) {
             const penalty = lockedPortion * 0.4;
             setPenaltyInfo({
                 penalty,
-                payout: amount - penalty,
+                payout: amountRM - penalty,
                 lockedPortion,
                 isApplied: true
             });
@@ -220,7 +222,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
         } else {
             setPenaltyInfo({
                 penalty: 0,
-                payout: amount,
+                payout: amountRM,
                 lockedPortion: 0,
                 isApplied: false
             });
@@ -254,19 +256,28 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
             // 2. Insert Transaction
             const refId = `WDL-${Math.floor(1000 + Math.random() * 9000)}`;
+            const amountUSD = parseFloat(withdrawAmount);
+            const amountRM = amountUSD * forexRate;
+            
             const { error } = await supabase.from('transactions').insert([{
                 user_id: user.id,
                 type: 'Withdrawal',
-                amount: Math.abs(parseFloat(withdrawAmount)),
+                amount: Math.abs(amountRM),
                 status: 'Pending',
                 ref_id: refId,
-                metadata: penaltyInfo?.isApplied ? {
-                    penalty_applied: true,
-                    penalty_amount: penaltyInfo.penalty,
-                    expected_payout: penaltyInfo.payout,
-                    locked_portion: penaltyInfo.lockedPortion,
-                    penalty_rate: "40%"
-                } : null
+                original_currency_amount: amountUSD,
+                original_currency: 'USD',
+                metadata: {
+                    original_usd_amount: withdrawAmount,
+                    forex_rate: forexRate,
+                    ...(penaltyInfo?.isApplied ? {
+                        penalty_applied: true,
+                        penalty_amount: penaltyInfo.penalty,
+                        expected_payout: penaltyInfo.payout,
+                        locked_portion: penaltyInfo.lockedPortion,
+                        penalty_rate: "40%"
+                    } : {})
+                }
             }]);
             
             if (error) throw error;
@@ -356,7 +367,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10 w-full">
                                         <div>
                                             <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest">{t.totalEquity}</p>
-                                            <h2 className="text-3xl font-black tracking-tighter text-gv-gold tabular-nums whitespace-nowrap">$ {(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                            <h2 className="text-4xl font-black tracking-tighter text-gv-gold tabular-nums whitespace-nowrap">$ {(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                                             <p className="text-[10px] font-bold text-zinc-500 mt-2">≈ RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                         </div>
                                         <div className="sm:border-l border-white/5 sm:pl-8 flex flex-col justify-center">
@@ -369,8 +380,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                                 </div>
                                                 <TierMedal 
                                                     tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
-                                                    size="md" 
-                                                    className="shrink-0" 
+                                                    size="sm" 
+                                                    className="shrink-0 md:scale-90 origin-right" 
                                                 />
                                             </div>
                                         </div>
@@ -423,11 +434,12 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         </div>
                     </section>
 
-                    <section className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                        <div className="xl:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8 overflow-hidden">
+                    {/* Temporary hide Dividend Trends
+                    <section className="grid grid-cols-1 gap-8">
+                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8 overflow-hidden">
                             <h3 className="text-xl font-black uppercase tracking-tighter">{t.dividendTrends}</h3>
                             <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 px-2 sm:px-4">
-                                {dividendHistory && dividendHistory.length > 0 ? dividendHistory.slice(-6).map((div: any, i: number) => (
+                                {dividendHistory && dividendHistory.length > 0 ? dividendHistory.slice(-12).map((div: any, i: number) => (
                                     <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
                                         <div
                                             className="w-full bg-gv-gold rounded-t-xl transition-all duration-500 group-hover:brightness-125"
@@ -440,41 +452,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                 )}
                             </div>
                         </div>
-                        <div className="bg-[#1a1a1a] border border-white/5 p-8 sm:p-10 rounded-[40px] flex flex-col justify-center items-center text-center space-y-6 overflow-hidden">
-                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{t.latestActivity || "Latest Activity"}</p>
-                            {transactions && transactions.length > 0 ? (
-                                <>
-                                    <div className={`h-24 w-24 rounded-full flex items-center justify-center border-2 shrink-0 ${
-                                        (transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'border-gv-gold/20 text-gv-gold' :
-                                        transactions[0].status === 'Approved' ? 'border-emerald-500/20 text-emerald-500' : 
-                                        transactions[0].status === 'Rejected' ? 'border-red-500/20 text-red-500' : 
-                                        'border-amber-500/20 text-amber-500'
-                                    }`}>
-                                        {(transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? (
-                                            <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                        ) : (
-                                            <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                        )}
-                                    </div>
-                                    <div className="w-full truncate">
-                                        <h4 className={`text-2xl font-black uppercase tracking-tighter truncate ${
-                                            (transactions[0].metadata?.adjustment_category === 'Dividend' || transactions[0].metadata?.adjustment_category === 'Bonus') ? 'text-gv-gold' :
-                                            transactions[0].status === 'Approved' ? 'text-emerald-500' : 
-                                            transactions[0].status === 'Rejected' ? 'text-red-500' : 
-                                            'text-amber-500'
-                                        }`}>
-                                            {transactions[0].metadata?.adjustment_category || transactions[0].status}
-                                        </h4>
-                                        <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1 truncate px-2">
-                                            {transactions[0].metadata?.description || transactions[0].type}: RM {Number(transactions[0].amount).toFixed(2)}
-                                        </p>
-                                    </div>
-                                </>
-                            ) : (
-                                <p className="text-zinc-700 font-black uppercase tracking-widest text-xs">{t.noTxFound}</p>
-                            )}
-                        </div>
                     </section>
+                    */}
 
                     <section className="flex flex-col sm:flex-row gap-6">
                         <Link
@@ -542,9 +521,14 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             <div className="space-y-2">
                                 <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
                                 <input type="number" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
-                                <div className="flex justify-between px-1 text-[10px] font-black uppercase tracking-widest text-zinc-500 mt-2">
+                                {withdrawAmount && (
+                                    <p className="mt-2 text-[10px] text-gv-gold font-bold px-1 uppercase tracking-tighter">
+                                        ≈ RM {(parseFloat(withdrawAmount) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                    </p>
+                                )}
+                                <div className="flex justify-between px-1 text-[10px] font-black uppercase tracking-widest text-zinc-500 mt-4">
                                     <span>Withdrawable</span>
-                                    <span className="text-emerald-500">RM {user?.withdrawable_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    <span className="text-emerald-500 whitespace-nowrap">$ {(Number(user?.withdrawable_balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-zinc-600 ml-1">(≈ RM {user?.withdrawable_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
                                 </div>
                             </div>
                             <button onClick={handleWithdrawInitiate} disabled={!withdrawAmount} className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:bg-gv-gold">
@@ -564,22 +548,22 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         </div>
                         <div className="text-center space-y-4">
                             <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Penalty Confirmation</h3>
-                            <p className="text-zinc-500 font-bold text-sm leading-relaxed">
-                                Your withdrawal of RM {parseFloat(withdrawAmount).toLocaleString()} includes capital protected by our 6-month lock-in period.
+                            <p className="text-zinc-500 font-bold text-sm leading-relaxed px-4">
+                                Your withdrawal of <span className="text-white">$ {parseFloat(withdrawAmount).toLocaleString()}</span> includes capital protected by our 6-month lock-in period.
                             </p>
                             <div className="bg-white/5 rounded-3xl p-6 border border-white/5 space-y-4">
                                 <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-zinc-500">
                                     <span>Locked Portion</span>
-                                    <span>RM {penaltyInfo.lockedPortion.toLocaleString()}</span>
+                                    <span>$ {(penaltyInfo.lockedPortion / forexRate).toLocaleString()} <span className="text-zinc-600 ml-1">(≈ RM {penaltyInfo.lockedPortion.toLocaleString()})</span></span>
                                 </div>
                                 <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-red-500">
                                     <span>Penalty (40%)</span>
-                                    <span>- RM {penaltyInfo.penalty.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    <span>- $ {(penaltyInfo.penalty / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="opacity-50 ml-1">(≈ -RM {penaltyInfo.penalty.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
                                 </div>
                                 <div className="h-px bg-white/5"></div>
                                 <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-emerald-500">
                                     <span>Estimated Payout</span>
-                                    <span>RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    <span>$ {(penaltyInfo.payout / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-zinc-600 ml-1 text-[10px] font-bold">(≈ RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
                                 </div>
                             </div>
                         </div>

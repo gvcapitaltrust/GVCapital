@@ -14,7 +14,7 @@ export default function GlobalFooter() {
             terms: "Terms of Service",
             risk: "Risk Disclosure",
             disclaimer: "GV Capital Trust is not a licensed bank. We operate as a private investment vehicle. Investing involves risk of loss. Please read our Disclosure before participating.",
-            location: "Kuala Lumpur, Malaysia"
+            location: ""
         },
         zh: {
             copyright: "© 2026 GV Capital Trust. 版权所有。",

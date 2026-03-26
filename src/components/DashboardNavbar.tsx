@@ -63,12 +63,27 @@ export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNav
             </div>
             <div className="flex items-center gap-4 hidden sm:flex">
                 {user && <NotificationBell userId={user.id} lang={lang} />}
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-sm border border-gv-gold/30 shadow-lg capitalize">
-                    {user ? (user.fullName?.[0] || user.email?.[0] || "U") : (
-                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-1.5 backdrop-blur-md">
+                    <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-xs border border-gv-gold/30 shadow-lg capitalize">
+                        {user ? (user.fullName?.[0] || user.email?.[0] || "U") : (
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        )}
+                    </div>
+                    <button 
+                        onClick={async () => {
+                            const { supabase } = await import("@/lib/supabaseClient");
+                            await supabase.auth.signOut();
+                            window.location.href = "/login";
+                        }}
+                        className="h-9 w-9 flex items-center justify-center rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all border border-red-500/20 group"
+                        title={lang === 'en' ? 'Logout' : '退出登录'}
+                    >
+                        <svg className="h-4 w-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7" />
                         </svg>
-                    )}
+                    </button>
                 </div>
             </div>
         </header>

@@ -20,6 +20,7 @@ interface AdminContextType {
     verificationLogs: any[];
     combinedAuditLogs: any[];
     loading: boolean;
+    forexRate: number;
     showToast: (msg: string) => void;
     refreshData: () => Promise<void>;
     handleApproveDeposit: (tx: any) => Promise<void>;
@@ -52,6 +53,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const [forexHistory, setForexHistory] = useState<any[]>([]);
     const [verificationLogs, setVerificationLogs] = useState<any[]>([]);
     const [combinedAuditLogs, setCombinedAuditLogs] = useState<any[]>([]);
+    const [forexRate, setForexRate] = useState(4.4); // Default fallback
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: "", visible: false });
 
@@ -63,25 +65,67 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const fetchData = useCallback(async (isSilent = false) => {
         if (!isSilent) setLoading(true);
         try {
-            // 1. Fetch Profiles (Latest 1,000 for general management)
+            // 1. Fetch Transactions
+            const { data: txList } = await supabase
+                .from('transactions')
+                .select('*, profiles(*)')
+                .order('created_at', { ascending: false });
+
+            // 2. Fetch Profiles (Latest 1,000 for general management)
             const { data: profileList } = await supabase
                 .from('profiles')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(1000);
 
-            // 2. Fetch KYC Queue (Specifically all users with 'Pending' status)
+            // 3. Fetch KYC Queue (Specifically all users with 'Pending' status)
             const { data: kycPendingList } = await supabase
                 .from('profiles')
                 .select('*')
                 .in('kyc_status', ['Pending', 'Draft'])
                 .order('created_at', { ascending: false });
 
-            if (profileList) {
-                setUsers(profileList);
+            if (profileList && txList) {
+                const now = new Date();
+                const enrichedUsers = profileList.map((p: any) => {
+                    const userTxs = txList.filter((t: any) => t.user_id === p.id && ['Approved', 'Completed'].includes(t.status));
+                    
+                    // Locked Capital Logic (same as UserProvider)
+                    const lockedCapital = userTxs.filter((t: any) => t.type === 'Deposit').reduce((acc, tx) => {
+                        const rawDate = tx.transfer_date || tx.created_at;
+                        const txDate = new Date(rawDate);
+                        if (isNaN(txDate.getTime())) return acc;
+                        const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
+                        return diffDays < 180 ? acc + Number(tx.amount) : acc;
+                    }, 0);
+
+                    // Total Investment Logic (Capital only)
+                    const totalDeposited = userTxs.filter((t: any) => {
+                        const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                        return t.type === 'Deposit' && category !== 'dividend' && category !== 'bonus';
+                    }).reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
+
+                    const totalWithdrawn = txList.filter((t: any) => {
+                        const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                        const isCapitalWithdrawal = t.type === 'Withdrawal' && category !== 'dividend' && category !== 'bonus';
+                        return t.user_id === p.id && isCapitalWithdrawal && ['Approved', 'Completed', 'Pending Release'].includes(t.status);
+                    }).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
+
+                    const totalInvestment = totalDeposited - totalWithdrawn;
+                    const withdrawableBalance = Math.max(0, (Number(p.balance || 0) - lockedCapital) + Number(p.profit || 0));
+
+                    return {
+                        ...p,
+                        total_investment: totalInvestment,
+                        withdrawable_balance: withdrawableBalance,
+                        locked_capital: lockedCapital
+                    };
+                });
+
+                setUsers(enrichedUsers);
                 setKycQueue(kycPendingList || []);
 
-                const stats = profileList.reduce((acc, p) => ({
+                const stats = enrichedUsers.reduce((acc, p) => ({
                     totalBalance: acc.totalBalance + Number(p.balance || 0),
                     totalProfit: acc.totalProfit + Number(p.profit || 0),
                     totalAssets: acc.totalAssets + (Number(p.balance || 0) + Number(p.profit || 0)),
@@ -90,18 +134,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 setPlatformStats(stats);
             }
 
-            // 2. Fetch Transactions
-            const { data: txList } = await supabase
-                .from('transactions')
-                .select('*, profiles(*)')
-                .order('created_at', { ascending: false });
-            
             if (txList) {
                 setDeposits(txList.filter((t: any) => t.type?.toLowerCase() === 'deposit'));
                 setWithdrawals(txList.filter((t: any) => t.type?.toLowerCase() === 'withdrawal'));
             }
 
-            // 3. Fetch Verification Logs
+            // 4. Fetch Verification Logs
             const { data: logs } = await supabase
                 .from('verification_logs')
                 .select('*')
@@ -109,7 +147,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             
             if (logs) setVerificationLogs(logs);
 
-            // 4. Combine Audit Logs
+            // 5. Combine Audit Logs
             const financialTxs = txList?.filter((t: any) => ['Approved', 'Pending Release', 'Completed'].includes(t.status)) || [];
             const mergedLogs = [
                 ...(logs || []).map(l => ({ ...l, auditType: 'verification', action: l.action_taken })),
@@ -130,20 +168,28 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
             setCombinedAuditLogs(mergedLogs);
 
-            // 5. Fetch Sales Data
+            // 6. Fetch Sales Data
             const { data: sales } = await supabase
                 .from('sales_leaderboard')
                 .select('*')
                 .order('total_referred_capital', { ascending: false });
             if (sales) setSalesData(sales);
 
-            // 6. Fetch Forex History
+            // 7. Fetch Forex History
             const { data: fHistory } = await supabase
                 .from('forex_history')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(10);
             if (fHistory) setForexHistory(fHistory);
+
+            // 8. Fetch Current Forex Rate
+            const { data: fRate } = await supabase
+                .from('platform_settings')
+                .select('value')
+                .eq('key', 'usd_to_myr_rate')
+                .single();
+            if (fRate) setForexRate(Number(fRate.value || 4.4));
 
         } catch (error) {
             console.error("Error fetching admin data:", error);
@@ -418,32 +464,38 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const handleAdjustBalance = async (user: any, amount: number, type: "balance" | "profit", reason: string) => {
+    const handleAdjustBalance = async (user: any, amountUSD: number, type: "balance" | "profit", reason: string) => {
         try {
             const isDividendOrBonus = type === 'profit' || reason?.toLowerCase().includes('dividend') || reason?.toLowerCase().includes('bonus');
             const targetField = isDividendOrBonus ? 'profit' : 'balance';
 
+            const amountRM = amountUSD * forexRate;
+
             const { error: profileError } = await supabase
                 .from('profiles')
-                .update({ [targetField]: Number(user[targetField] || 0) + amount })
+                .update({ [targetField]: Number(user[targetField] || 0) + amountRM })
                 .eq('id', user.id);
             if (profileError) throw profileError;
 
-            const txBaseType = amount >= 0 ? 'Deposit' : 'Withdrawal';
+            const txBaseType = amountUSD >= 0 ? 'Deposit' : 'Withdrawal';
             const { error: txError } = await supabase
                 .from('transactions')
                 .insert({
                     user_id: user.id,
                     type: txBaseType,
-                    amount: Math.abs(amount),
+                    amount: Math.abs(amountRM),
                     status: 'Approved',
+                    original_currency: 'USD',
+                    original_currency_amount: amountUSD,
                     ref_id: `ADJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
                     metadata: { 
                         is_adjustment: true,
                         reason: reason,
                         adjustment_category: isDividendOrBonus ? 'Dividend' : 'Capital',
-                        adjustment_type: amount >= 0 ? 'Increase' : 'Decrease',
-                        description: reason || `${txBaseType} ${amount >= 0 ? 'Increase' : 'Decrease'} Adjustment`,
+                        adjustment_type: amountUSD >= 0 ? 'Increase' : 'Decrease',
+                        original_usd_amount: amountUSD,
+                        forex_rate: forexRate,
+                        description: reason || `${txBaseType} ${amountUSD >= 0 ? 'Increase' : 'Decrease'} Adjustment`,
                         processed_by_name: authUser?.user_metadata?.full_name || "Admin",
                         processed_by_id: authUser?.id,
                         processed_by_email: authUser?.email
@@ -451,7 +503,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 });
             if (txError) throw txError;
 
-            showToast(`Successfully adjusted ${targetField} by RM ${amount.toFixed(2)}`);
+            showToast(`Successfully adjusted ${targetField} by $${amountUSD.toFixed(2)} (≈ RM ${amountRM.toFixed(2)})`);
             fetchData();
         } catch (err: any) {
             alert(err.message);
@@ -558,7 +610,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             const { data: currentSettings } = await supabase
                 .from('platform_settings')
                 .select('value')
-                .eq('key', 'forex_rate')
+                .eq('key', 'usd_to_myr_rate')
                 .single();
             const oldRate = Number(currentSettings?.value || 4.2);
 
@@ -687,6 +739,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             verificationLogs, 
             combinedAuditLogs,
             loading, 
+            forexRate,
             showToast,
             refreshData: fetchData,
             handleApproveDeposit,

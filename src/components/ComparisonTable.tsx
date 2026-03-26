@@ -80,7 +80,8 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                 <td className="py-6 px-4 text-zinc-400">{t.dividend}</td>
                 {TIERS.map((tier) => (
                   <td key={tier.id} className="py-6 px-4 text-center text-emerald-500 font-black">
-                    {(tier.minDividend * 100).toFixed(0)} - {(tier.maxDividend * 100).toFixed(0)}%
+                    <span className="text-[10px] font-normal opacity-60 mr-1 italic">up to</span>
+                    {(tier.maxDividend * 100).toFixed(0)}%
                   </td>
                 ))}
               </tr>

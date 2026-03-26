@@ -136,8 +136,8 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                                     </p>
                                 </div>
                             </div>
-                            <button onClick={handleLogout} className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
+                            <button onClick={handleLogout} className="w-full bg-red-600 hover:bg-red-700 text-white py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-red-900/20 active:scale-[0.98]">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
                                 {t.logout}
                             </button>
                         </div>

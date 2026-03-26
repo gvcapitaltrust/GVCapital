@@ -34,13 +34,15 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             subtitle: "Manage institutional client profiles, internal capital allocations, and portfolio mapping.",
             searchPlaceholder: "Search by name, email, or username...",
             tableUser: "User",
-            tableEquity: "Equity",
+            tableAssets: "Total Assets",
+            tableInvestment: "Investment",
+            tableWithdrawable: "Withdrawable",
             tableTier: "Tier",
             tableStatus: "Status",
             tableActions: "Manage",
             noUsers: "No clients found in directory.",
             adjustHeader: "Capital Allocation",
-            adjustAmount: "Adjustment Amount (RM)",
+            adjustAmount: "Adjustment Amount (USD)",
             adjustType: "Allocation Type",
             adjustReason: "Reference / Reasoning",
             adjustSubmit: "Execute Adjustment",
@@ -62,13 +64,15 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             subtitle: "管理机构客户资料、内部资本分配和投资组合映射。",
             searchPlaceholder: "按姓名、邮箱或用户名搜索...",
             tableUser: "用户",
-            tableEquity: "权益",
+            tableAssets: "总资产",
+            tableInvestment: "投资额",
+            tableWithdrawable: "可提现额",
             tableTier: "等级",
             tableStatus: "状态",
             tableActions: "管理",
             noUsers: "目录中未发现客户。",
             adjustHeader: "资本分配",
-            adjustAmount: "计入金额 (RM)",
+            adjustAmount: "计入金额 (USD)",
             adjustType: "分配类型",
             adjustReason: "参考 / 理由",
             adjustSubmit: "执行分配",
@@ -177,7 +181,9 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                         <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
                             <tr>
                                 <th className="px-8 py-6">{t.tableUser}</th>
-                                <th className="px-8 py-6">{t.tableEquity}</th>
+                                <th className="px-8 py-6">{t.tableAssets}</th>
+                                <th className="px-8 py-6">{t.tableInvestment}</th>
+                                <th className="px-8 py-6">{t.tableWithdrawable}</th>
                                 <th className="px-8 py-6">{t.tableTier}</th>
                                 <th className="px-8 py-6">{t.tableStatus}</th>
                                 <th className="px-8 py-6 text-right">{t.tableActions}</th>
@@ -206,8 +212,20 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
+                                            <div className="flex flex-col">
+                                                <span className="font-black text-white tabular-nums text-[10px] text-emerald-500">$ {(Number(user.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                <span className="text-[8px] text-zinc-500 font-bold uppercase whitespace-nowrap">RM {Number(user.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex flex-col">
+                                                <span className="font-black text-white tabular-nums text-[10px] text-gv-gold">$ {(Number(user.withdrawable_balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                <span className="text-[8px] text-zinc-500 font-bold uppercase whitespace-nowrap">RM {Number(user.withdrawable_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6">
                                             <span className="px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest bg-zinc-800 border border-white/5 text-gv-gold">
-                                                {(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(totalEquity / forexRate).name}
+                                                {(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(Number(user.total_investment || 0) / forexRate).name}
                                             </span>
                                         </td>
                                         <td className="px-8 py-6">
@@ -305,6 +323,11 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                     className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-white font-black text-xl focus:outline-none focus:border-gv-gold transition-all"
                                                     placeholder="0.00"
                                                 />
+                                                {adjustmentAmount && (
+                                                    <p className="mt-1 text-[9px] text-gv-gold font-bold px-1 uppercase tracking-tighter">
+                                                        ≈ RM {(parseFloat(adjustmentAmount) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                    </p>
+                                                )}
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[9px] font-black uppercase text-zinc-500 px-1">{t.adjustType}</label>

@@ -1119,7 +1119,7 @@ export default function DashboardClient() {
                                                 <div>
                                                     <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest transition-colors">{t.totalEquity}</p>
                                                     <div className="flex flex-col gap-2">
-                                                        <h2 className="text-3xl font-black tracking-tighter text-gv-gold tabular-nums whitespace-nowrap">
+                                                        <h2 className="text-4xl font-black tracking-tighter text-gv-gold tabular-nums whitespace-nowrap">
                                                             {isCheckingAuth ? "..." : `$ ${(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                         </h2>
                                                         {!isCheckingAuth && (
@@ -1132,29 +1132,31 @@ export default function DashboardClient() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="sm:border-l border-t sm:border-t-0 border-white/5 pt-6 sm:pt-0 sm:pl-8">
+                                                <div className="sm:border-l border-t sm:border-t-0 border-white/5 pt-6 sm:pt-0 sm:pl-8 flex flex-col justify-center">
                                                     <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
-                                                    <div className="flex justify-between items-center gap-4 group/tier">
-                                                        <div className="flex flex-col gap-1 min-w-0 flex-1">
-                                                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter truncate">
+                                                    <div className="flex items-center gap-6 group/tier">
+                                                        <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+                                                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter truncate leading-none">
                                                                 {Number(user?.total_investment_usd || 0) > 0 
                                                                     ? ((user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name)
                                                                     : t.noInvestment}
                                                             </h2>
-                                                            <div className="flex items-center gap-2 mt-2">
-                                                                <div className={`h-2 w-2 rounded-full border border-black/20 ${Number(user?.total_investment || 0) > 0 ? 'bg-gv-gold animate-pulse' : 'bg-red-500'}`}></div>
-                                                                <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest whitespace-nowrap">
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <div className={`h-1.5 w-1.5 rounded-full ${Number(user?.total_investment || 0) > 0 ? 'bg-gv-gold shadow-[0_0_8px_rgba(212,175,55,0.6)] animate-pulse' : 'bg-red-500'}`}></div>
+                                                                <span className="text-[9px] font-black text-gv-gold/60 uppercase tracking-widest whitespace-nowrap">
                                                                     {Number(user?.total_investment || 0) > 0 ? "" : t.noTier}
                                                                 </span>
                                                             </div>
                                                         </div>
-                                                        <TierMedal 
-                                                            tierId={Number(user?.total_investment_usd || 0) > 0 
-                                                                ? ((user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id)
-                                                                : "none"} 
-                                                            size="md" 
-                                                            className="shrink-0 group-hover/tier:scale-110 transition-transform duration-500" 
-                                                        />
+                                                        <div className="shrink-0 md:scale-90 origin-right pr-2">
+                                                            <TierMedal 
+                                                                tierId={Number(user?.total_investment_usd || 0) > 0 
+                                                                    ? ((user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id)
+                                                                    : "none"} 
+                                                                size="sm" 
+                                                                className="group-hover/tier:scale-105 transition-transform duration-500" 
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1212,11 +1214,12 @@ export default function DashboardClient() {
                                         </section>
                                     )}
 
-                                    <section className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                                        <div className="xl:col-span-2 bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8 overflow-hidden">
+                                    {/* Temporary hide Dividend Trends
+                                    <section className="grid grid-cols-1 gap-8">
+                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8 overflow-hidden">
                                             <h3 className="text-lg font-black uppercase tracking-tight">{t.dividendTrends}</h3>
                                             <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 px-2 sm:px-4">
-                                                {dividendHistory.length > 0 ? dividendHistory.map((div: any, i: number) => (
+                                                {dividendHistory.length > 0 ? dividendHistory.slice(-12).map((div: any, i: number) => (
                                                     <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
                                                         <div
                                                             className="w-full bg-gv-gold rounded-t-xl transition-all duration-500 group-hover:brightness-125"
@@ -1229,42 +1232,8 @@ export default function DashboardClient() {
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-8 sm:p-10 rounded-[40px] flex flex-col justify-center items-center text-center space-y-6 overflow-hidden">
-                                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{t.latestActivity || "Latest Activity"}</p>
-                                            {transactions.length > 0 ? (
-                                                <>
-                                                    <div className={`h-24 w-24 rounded-full flex items-center justify-center border-2 shrink-0 ${
-                                                        (transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'border-gv-gold/20 text-gv-gold' :
-                                                        transactions[0].status === 'Approved' ? 'border-emerald-500/20 text-emerald-500' : 
-                                                        transactions[0].status === 'Rejected' ? 'border-red-500/20 text-red-500' : 
-                                                        'border-amber-500/20 text-amber-500'
-                                                    }`}>
-                                                        {(transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? (
-                                                            <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                        ) : (
-                                                            <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                        )}
-                                                    </div>
-                                                    <div className="w-full truncate">
-                                                        <h4 className={`text-xl font-black uppercase tracking-tight truncate ${
-                                                            (transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'text-gv-gold' :
-                                                            transactions[0].status === 'Approved' ? 'text-emerald-500' : 
-                                                            transactions[0].status === 'Rejected' ? 'text-red-500' : 
-                                                            'text-amber-500'
-                                                        }`}>
-                                                            {(transactions[0].type?.toLowerCase().includes('bonus') || transactions[0].type?.toLowerCase().includes('dividend')) ? 'Adjustment' : transactions[0].status}
-                                                        </h4>
-                                                        <p className="text-zinc-600 text-[10px] font-bold uppercase mt-1 truncate px-2">
-                                                            {transactions[0].type}: RM {Number(transactions[0].amount).toFixed(2)}
-                                                            {transactions[0].ref_id && ` Ref: ${transactions[0].ref_id}`}
-                                                        </p>
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <p className="text-zinc-700 font-black uppercase tracking-widest text-xs">{t.noTxFound}</p>
-                                            )}
-                                        </div>
                                     </section>
+                                    */}
 
                             <section className="flex flex-col sm:flex-row gap-6">
                                 <Link

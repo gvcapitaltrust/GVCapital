@@ -115,10 +115,11 @@ export default function ProductSelection({
                 <p className="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-0.5">{t.monthlyReturn}</p>
                 <div className="flex flex-col">
                   <p className="text-lg font-black text-emerald-500 tracking-tight">
-                    {formatUSD(dividendRange.min)} - {formatUSD(dividendRange.max)}
+                    <span className="text-xs font-normal opacity-60 mr-1">up to</span>
+                    {formatUSD(dividendRange.max)}
                   </p>
                   <p className="text-[9px] font-bold text-emerald-500/60 uppercase">
-                    ≈ RM {(dividendRange.min * forexRate).toLocaleString()} - RM {(dividendRange.max * forexRate).toLocaleString()}
+                    ≈ up to RM {(dividendRange.max * forexRate).toLocaleString()}
                   </p>
                 </div>
               </div>
