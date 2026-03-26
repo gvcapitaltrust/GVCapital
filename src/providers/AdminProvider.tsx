@@ -111,7 +111,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             // 4. Combine Audit Logs
             const financialTxs = txList?.filter((t: any) => t.status === 'Approved') || [];
             const mergedLogs = [
-                ...(logs || []).map(l => ({ ...l, auditType: 'verification' })),
+                ...(logs || []).map(l => ({ ...l, auditType: 'verification', action: l.action_taken })),
                 ...financialTxs.map(t => ({
                     id: t.id,
                     created_at: t.created_at,
@@ -368,21 +368,13 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
             const user = users.find(u => u.id === userId);
             await supabase
-                .from('transactions')
+                .from('verification_logs')
                 .insert({
                     user_id: userId,
-                    type: 'Audit',
-                    amount: 0,
-                    status: 'Approved',
-                    ref_id: `KYC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-                    metadata: {
-                        is_audit: true,
-                        action: 'KYC Verified',
-                        description: `User identity verified`,
-                        processed_by_name: authUser?.user_metadata?.full_name || "Admin",
-                        processed_by_id: authUser?.id,
-                        processed_by_email: authUser?.email
-                    }
+                    user_email: user?.email,
+                    admin_id: authUser?.id,
+                    admin_username: authUser?.user_metadata?.full_name || "Admin",
+                    action_taken: 'KYC Verified'
                 });
 
             showToast(`User successfully verified.`);
@@ -407,22 +399,14 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
             const user = users.find(u => u.id === userId);
             await supabase
-                .from('transactions')
+                .from('verification_logs')
                 .insert({
                     user_id: userId,
-                    type: 'Audit',
-                    amount: 0,
-                    status: 'Approved',
-                    ref_id: `KYC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-                    metadata: {
-                        is_audit: true,
-                        action: 'KYC Rejected',
-                        reason: reason,
-                        description: `User identity rejected: ${reason}`,
-                        processed_by_name: authUser?.user_metadata?.full_name || "Admin",
-                        processed_by_id: authUser?.id,
-                        processed_by_email: authUser?.email
-                    }
+                    user_email: user?.email,
+                    admin_id: authUser?.id,
+                    admin_username: authUser?.user_metadata?.full_name || "Admin",
+                    action_taken: 'KYC Rejected',
+                    rejection_reason: reason
                 });
 
             showToast(`User successfully rejected.`);
