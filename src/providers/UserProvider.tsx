@@ -91,7 +91,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     total_deposited: totalDeposited,
                     total_withdrawn: totalWithdrawn,
                     total_investment: totalDeposited - totalWithdrawn,
+                    total_investment_usd: (totalDeposited - totalWithdrawn) / forexRate,
                     totalEquity: totalAssetsRM,
+                    total_assets_usd: totalAssetsRM / forexRate,
                     balanceUSD: Number(profile.balance || 0) / forexRate
                 };
 
@@ -109,7 +111,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             // 4. Fetch Referrals
             const { data: refs, count } = await supabase
                 .from('profiles')
-                .select('id, full_name, username, balance, is_verified, created_at', { count: 'exact' })
+                .select('id, full_name, username, balance, is_verified, created_at, tier', { count: 'exact' })
                 .eq('referred_by', user.id);
             
             if (refs) setReferredUsers(refs);

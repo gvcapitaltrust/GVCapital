@@ -17,7 +17,7 @@ interface DashboardSidebarProps {
 export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, onOpenMobileMenu }: DashboardSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const { user, totalAssets, balance } = useAuth();
+    const { user, totalAssets, balance, balanceUSD } = useAuth();
     const { forexRate } = useSettings();
 
     const t = {
@@ -106,7 +106,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                         {user.fullName || user.full_name || user.email?.split('@')[0] || "User"}
                                     </p>
                                     <p className="text-[8px] font-bold text-gv-gold uppercase tracking-[0.2em] mt-0.5">
-                                        {getTierByAmount(Number(balance || 0)).name}
+                                        {(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(Number(balanceUSD || 0)).name}
                                     </p>
                                 </div>
                             </div>

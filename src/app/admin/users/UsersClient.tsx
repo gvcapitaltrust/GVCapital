@@ -201,13 +201,13 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col">
-                                                <span className="font-black text-white tabular-nums text-xs">RM {totalEquity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                <span className="text-[8px] text-gv-gold/60 font-black tracking-tighter uppercase whitespace-nowrap">B: RM {Number(user.balance || 0).toFixed(0)} | D: RM {Number(user.profit || 0).toFixed(0)}</span>
+                                                <span className="font-black text-white tabular-nums text-[10px]">$ {(totalEquity / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                <span className="text-[8px] text-zinc-500 font-bold uppercase whitespace-nowrap">RM {totalEquity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className="px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest bg-zinc-800 border border-white/5 text-zinc-400">
-                                                {(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(totalEquity).name}
+                                            <span className="px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest bg-zinc-800 border border-white/5 text-gv-gold">
+                                                {(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(totalEquity / forexRate).name}
                                             </span>
                                         </td>
                                         <td className="px-8 py-6">
@@ -241,7 +241,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                     <h3 className="text-2xl font-black uppercase tracking-tighter text-white">{selectedUser?.full_name}</h3>
                                     <div className="flex items-center gap-3">
                                         <span className="text-[9px] text-gv-gold font-black uppercase tracking-[0.2em]">
-                                            {(selectedUser?.tier && selectedUser?.tier !== "Standard") ? selectedUser?.tier : getTierByAmount(Number(selectedUser?.balance || 0) + Number(selectedUser?.profit || 0)).name} Class
+                                            {(selectedUser?.tier && selectedUser?.tier !== "Standard") ? selectedUser?.tier : getTierByAmount((Number(selectedUser?.balance || 0) + Number(selectedUser?.profit || 0)) / forexRate).name} Class
                                         </span>
                                         <span className="h-1 w-1 rounded-full bg-zinc-700"></span>
                                         <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">@{selectedUser?.username}</span>

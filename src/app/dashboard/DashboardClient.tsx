@@ -975,12 +975,12 @@ export default function DashboardClient() {
                                 {Number(user?.total_investment || 0) > 0 && (
                                     <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur-md hover:bg-white/10 transition-all cursor-default group/tier-badge ml-0 sm:ml-2">
                                         <TierMedal 
-                                            tierId={getTierByAmount(Number(user?.total_investment || 0)).id} 
+                                            tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
                                             size="sm" 
                                             className="group-hover/tier-badge:scale-110 transition-transform"
                                         />
                                         <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold/80 group-hover/tier-badge:text-gv-gold transition-colors">
-                                            {getTierByAmount(Number(user?.total_investment || 0)).name}
+                                            {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
                                         </span>
                                     </div>
                                 )}
@@ -1055,16 +1055,22 @@ export default function DashboardClient() {
                                         </div>
                                         <div>
                                             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{t.totalEquity}</p>
-                                            <div className="flex items-baseline gap-2">
-                                                <h3 className="text-4xl font-black text-[#e0c872] tracking-tighter">
-                                                    RM {user?.total_assets?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                            <div className="flex flex-col items-center">
+                                                <h3 className="text-4xl font-black text-[#e0c872] tracking-tighter tabular-nums">
+                                                    $ {(user?.total_assets / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </h3>
+                                                <p className="text-[10px] font-bold text-zinc-500 mt-2">
+                                                    RM {user?.total_assets?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                </p>
                                             </div>
                                             <p className="text-zinc-600 text-[10px] font-bold mt-1 lowercase opacity-50">{t.investmentNote}</p>
                                             {user?.locked_capital > 0 && (
-                                                <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
-                                                    <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></div>
-                                                    <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">RM {user.locked_capital.toLocaleString()} Locked</span>
+                                                <div className="mt-4 flex flex-col items-center gap-1">
+                                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></div>
+                                                        <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">$ {(user.locked_capital / forexRate).toLocaleString()} USD Locked</span>
+                                                    </div>
+                                                    <p className="text-[8px] text-zinc-600 font-bold uppercase">(RM {user.locked_capital.toLocaleString()} RM)</p>
                                                 </div>
                                             )}
                                         </div>
@@ -1088,13 +1094,13 @@ export default function DashboardClient() {
                                                 <div>
                                                     <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors">{t.totalProfit}</p>
                                                     <div className="flex flex-col gap-2">
-                                                        <h2 className="text-4xl font-black tracking-tighter text-emerald-500">
-                                                            {isCheckingAuth ? "..." : `RM ${Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                        <h2 className="text-4xl font-black tracking-tighter text-emerald-500 tabular-nums whitespace-nowrap">
+                                                            {isCheckingAuth ? "..." : `$ ${(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                         </h2>
                                                         {!isCheckingAuth && (
                                                             <div className="flex flex-col gap-1">
                                                                 <p className="text-[10px] font-bold text-zinc-500">
-                                                                    (${(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                                                                    ≈ RM {Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                                 </p>
                                                                 <span className="text-[10px] font-black text-emerald-500/60 uppercase tracking-widest">{t.dividendNote}</span>
                                                             </div>
@@ -1113,13 +1119,13 @@ export default function DashboardClient() {
                                                 <div>
                                                     <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest transition-colors">{t.totalEquity}</p>
                                                     <div className="flex flex-col gap-2">
-                                                        <h2 className="text-3xl font-black tracking-tighter text-gv-gold">
-                                                            {isCheckingAuth ? "..." : `RM ${Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                        <h2 className="text-3xl font-black tracking-tighter text-gv-gold tabular-nums whitespace-nowrap">
+                                                            {isCheckingAuth ? "..." : `$ ${(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                         </h2>
                                                         {!isCheckingAuth && (
                                                             <div className="flex flex-col gap-1">
                                                                 <p className="text-[10px] font-bold text-zinc-500">
-                                                                    (${(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD)
+                                                                    ≈ RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                                 </p>
                                                                 <span className="text-[10px] font-black text-gv-gold/60 uppercase tracking-widest">{t.investmentNote}</span>
                                                             </div>
@@ -1131,20 +1137,20 @@ export default function DashboardClient() {
                                                     <div className="flex justify-between items-center gap-4 group/tier">
                                                         <div className="flex flex-col gap-1 min-w-0 flex-1">
                                                             <h2 className="text-2xl font-black text-white uppercase tracking-tighter truncate">
-                                                                {Number(user?.total_investment || 0) > 0 
-                                                                    ? getTierByAmount(Number(user?.total_investment || 0)).name 
-                                                                    : t.noTier}
+                                                                {Number(user?.total_investment_usd || 0) > 0 
+                                                                    ? ((user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name)
+                                                                    : t.noInvestment}
                                                             </h2>
                                                             <div className="flex items-center gap-2 mt-2">
                                                                 <div className={`h-2 w-2 rounded-full border border-black/20 ${Number(user?.total_investment || 0) > 0 ? 'bg-gv-gold animate-pulse' : 'bg-red-500'}`}></div>
                                                                 <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest whitespace-nowrap">
-                                                                    {Number(user?.total_investment || 0) > 0 ? t.activeStatus : t.noTier}
+                                                                    {Number(user?.total_investment || 0) > 0 ? "" : t.noTier}
                                                                 </span>
                                                             </div>
                                                         </div>
                                                         <TierMedal 
-                                                            tierId={Number(user?.total_investment || 0) > 0 
-                                                                ? getTierByAmount(Number(user?.total_investment || 0)).id 
+                                                            tierId={Number(user?.total_investment_usd || 0) > 0 
+                                                                ? ((user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id)
                                                                 : "none"} 
                                                             size="md" 
                                                             className="shrink-0 group-hover/tier:scale-110 transition-transform duration-500" 
@@ -1163,14 +1169,17 @@ export default function DashboardClient() {
                                                 </div>
                                                 <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
                                                 {(() => {
-                                                    const currentTier = getTierByAmount(Number(user?.total_investment || 0));
-                                                    const monthlyMax = Number(user?.total_investment || 0) * currentTier.maxDividend;
+                                                    const currentTier = (user?.tier && user?.tier !== "Standard") 
+                                                        ? TIERS.find(t => t.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
+                                                        : getTierByAmount(Number(user?.total_investment_usd || 0));
+                                                    const monthlyMaxUSD = Number(user?.total_investment_usd || 0) * currentTier.maxDividend;
                                                     return (
                                                         <>
-                                                            <h3 className="text-3xl font-black text-white">
+                                                            <h3 className="text-3xl font-black text-white tabular-nums whitespace-nowrap">
                                                                 <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
-                                                                RM {monthlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                                $ {monthlyMaxUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                                             </h3>
+                                                            <p className="text-[10px] text-zinc-500 font-bold mt-1">≈ RM {(monthlyMaxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
                                                             <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">
                                                                 {t.dividendRateDesc} ({t.basedOn} {currentTier.name})
                                                             </p>
@@ -1184,14 +1193,17 @@ export default function DashboardClient() {
                                                 </div>
                                                 <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
                                                 {(() => {
-                                                    const currentTier = getTierByAmount(Number(user?.total_investment || 0));
-                                                    const yearlyMax = Number(user?.total_investment || 0) * currentTier.maxDividend * 12;
+                                                    const currentTier = (user?.tier && user?.tier !== "Standard") 
+                                                        ? TIERS.find(t => t.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
+                                                        : getTierByAmount(Number(user?.total_investment_usd || 0));
+                                                    const yearlyMaxUSD = Number(user?.total_investment_usd || 0) * currentTier.maxDividend * 12;
                                                     return (
                                                         <>
-                                                            <h3 className="text-3xl font-black text-emerald-500">
+                                                            <h3 className="text-3xl font-black text-emerald-500 tabular-nums whitespace-nowrap">
                                                                 <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
-                                                                RM {yearlyMax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                                                $ {yearlyMaxUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                                             </h3>
+                                                            <p className="text-[10px] text-zinc-500 font-bold mt-1">≈ RM {(yearlyMaxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
                                                             <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">{t.dividendRateDesc} ({t.basedOn} {currentTier.name})</p>
                                                         </>
                                                     );

@@ -7,7 +7,7 @@ import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { supabase } from "@/lib/supabaseClient";
 import TierMedal from "@/components/TierMedal";
-import { getTierByAmount } from "@/lib/tierUtils";
+import { getTierByAmount, TIERS } from "@/lib/tierUtils";
 import ComparisonTable from "@/components/ComparisonTable";
 import ProductSelection from "@/components/ProductSelection";
 import { X } from "lucide-react";
@@ -342,9 +342,9 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
                             <div className="relative z-10">
-                                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4">{t.totalProfit}</p>
-                                <h2 className="text-4xl font-black tracking-tighter text-emerald-500">RM {Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</h2>
-                                <p className="text-[10px] font-bold text-zinc-500 mt-2">(${(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD)</p>
+                                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors">{t.totalProfit}</p>
+                                <h2 className="text-4xl font-black tracking-tighter text-emerald-500 tabular-nums whitespace-nowrap">$ {(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                <p className="text-[10px] font-bold text-zinc-500 mt-2">≈ RM {Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                             </div>
                         </div>
 
@@ -356,19 +356,22 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10 w-full">
                                         <div>
                                             <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest">{t.totalEquity}</p>
-                                            <h2 className="text-3xl font-black tracking-tighter text-gv-gold">RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</h2>
-                                            <p className="text-[10px] font-bold text-zinc-500 mt-2">(${(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD)</p>
+                                            <h2 className="text-3xl font-black tracking-tighter text-gv-gold tabular-nums whitespace-nowrap">$ {(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                            <p className="text-[10px] font-bold text-zinc-500 mt-2">≈ RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                         </div>
                                         <div className="sm:border-l border-white/5 sm:pl-8 flex flex-col justify-center">
                                             <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
                                             <div className="flex justify-between items-center group/tier">
                                                 <div className="flex flex-col gap-1">
                                                     <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-                                                        {getTierByAmount(Number(user?.total_investment || 0)).name}
+                                                        {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
                                                     </h2>
-                                                    <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">{t.activeStatus}</span>
                                                 </div>
-                                                <TierMedal tierId={getTierByAmount(Number(user?.total_investment || 0)).id} size="md" className="shrink-0" />
+                                                <TierMedal 
+                                                    tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
+                                                    size="md" 
+                                                    className="shrink-0" 
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -389,11 +392,14 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
                            {(() => {
-                               const tier = getTierByAmount(Number(user?.total_investment || 0));
-                               const max = Number(user?.total_investment || 0) * tier.maxDividend;
+                               const tier = (user?.tier && user?.tier !== "Standard") 
+                                   ? TIERS.find(t => t.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
+                                   : getTierByAmount(Number(user?.total_investment_usd || 0));
+                               const maxUSD = Number(user?.total_investment_usd || 0) * tier.maxDividend;
                                return (
                                    <>
-                                       <h3 className="text-3xl font-black text-white"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>RM {max.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+                                       <h3 className="text-3xl font-black text-white tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+                                       <p className="text-[10px] text-zinc-500 font-bold mt-1">≈ RM {(maxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
                                        <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                    </>
                                );
@@ -402,11 +408,14 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
                            {(() => {
-                               const tier = getTierByAmount(Number(user?.total_investment || 0));
-                               const max = Number(user?.total_investment || 0) * tier.maxDividend * 12;
+                               const tier = (user?.tier && user?.tier !== "Standard") 
+                                   ? TIERS.find(t => t.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
+                                   : getTierByAmount(Number(user?.total_investment_usd || 0));
+                               const maxUSD = Number(user?.total_investment_usd || 0) * tier.maxDividend * 12;
                                return (
                                    <>
-                                       <h3 className="text-3xl font-black text-emerald-500"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>RM {max.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+                                       <h3 className="text-3xl font-black text-emerald-500 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+                                       <p className="text-[10px] text-zinc-500 font-bold mt-1">≈ RM {(maxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
                                        <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                    </>
                                );

@@ -10,8 +10,10 @@ interface AuthContextType {
     isVerified: boolean;
     kycStep: number;
     balance: number;
+    balanceUSD: number;
     totalEquity: number;
     totalAssets: number;
+    totalAssetsUSD: number;
     loading: boolean;
     refresh: () => Promise<void>;
 }
@@ -24,8 +26,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isVerified, setIsVerified] = useState(false);
     const [kycStep, setKycStep] = useState(0);
     const [balance, setBalance] = useState(0);
+    const [balanceUSD, setBalanceUSD] = useState(0);
     const [totalEquity, setTotalEquity] = useState(0);
     const [totalAssets, setTotalAssets] = useState(0);
+    const [totalAssetsUSD, setTotalAssetsUSD] = useState(0);
     const [loading, setLoading] = useState(true);
     
     const [session, setSession] = useState<any>(null);
@@ -59,8 +63,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setIsVerified(false);
                 setKycStep(0);
                 setBalance(0);
+                setBalanceUSD(0);
                 setTotalEquity(0);
                 setTotalAssets(0);
+                setTotalAssetsUSD(0);
                 currentUserId.current = null;
                 setSession(null);
                 setLoading(false);
@@ -101,9 +107,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setIsVerified(profile.is_verified === true || profile.is_verified === "Approved");
                 setKycStep(profile.kyc_step || 0);
                 setBalance(profile.balance || 0);
+                
+                // Fetch forex rate for conversion
+                const { data: settings } = await supabase.from('platform_settings').select('forex_rate').single();
+                const rate = settings?.forex_rate || 4.4;
+                
+                setBalanceUSD(Number(profile.balance || 0) / rate);
                 const assets = Number(profile.balance || 0) + Number(profile.profit || 0);
                 setTotalEquity(assets);
                 setTotalAssets(assets);
+                setTotalAssetsUSD(assets / rate);
                 setUser({ ...session.user, ...profile });
             } else {
                 setUser(session.user);
@@ -153,7 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, role, isVerified, kycStep, balance, totalEquity, totalAssets, loading, refresh: refreshProfile }}>
+        <AuthContext.Provider value={{ user, role, isVerified, kycStep, balance, balanceUSD, totalEquity, totalAssets, totalAssetsUSD, loading, refresh: refreshProfile }}>
             {children}
         </AuthContext.Provider>
     );

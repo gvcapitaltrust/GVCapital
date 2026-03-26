@@ -13,7 +13,7 @@ interface DashboardNavbarProps {
 }
 
 export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNavbarProps) {
-    const { user, totalAssets, balance, loading: isCheckingAuth } = useAuth();
+    const { user, totalAssets, balance, balanceUSD, loading: isCheckingAuth } = useAuth();
     const { forexRate } = useSettings();
 
     const t = {
@@ -50,12 +50,12 @@ export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNav
                     {Number(user?.total_investment || 0) > 0 && (
                         <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1 backdrop-blur-md hover:bg-white/10 transition-all cursor-default group/tier-badge">
                             <TierMedal 
-                                tierId={getTierByAmount(Number(balance || 0)).id} 
+                                tierId={(user.tier && user.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(balanceUSD || 0)).id} 
                                 size="sm" 
                                 className="group-hover/tier-badge:scale-110 transition-transform"
                             />
                             <span className="text-[9px] font-black uppercase tracking-widest text-gv-gold/80 group-hover/tier-badge:text-gv-gold transition-colors">
-                                {getTierByAmount(Number(balance || 0)).name}
+                                {(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(Number(balanceUSD || 0)).name}
                             </span>
                         </div>
                     )}
