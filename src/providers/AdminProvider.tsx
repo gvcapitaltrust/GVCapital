@@ -53,7 +53,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const [forexHistory, setForexHistory] = useState<any[]>([]);
     const [verificationLogs, setVerificationLogs] = useState<any[]>([]);
     const [combinedAuditLogs, setCombinedAuditLogs] = useState<any[]>([]);
-    const [forexRate, setForexRate] = useState(4.4); // Default fallback
+    const [forexRate, setForexRate] = useState(4.0); // Default fallback
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: "", visible: false });
 
@@ -193,7 +193,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .select('value')
                 .eq('key', 'usd_to_myr_rate')
                 .single();
-            if (fRate) setForexRate(Number(fRate.value || 4.4));
+            if (fRate) setForexRate(Number(fRate.value || 4.0));
 
         } catch (error) {
             console.error("Error fetching admin data:", error);
@@ -616,7 +616,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .select('value')
                 .eq('key', 'usd_to_myr_rate')
                 .single();
-            const oldRate = Number(currentSettings?.value || 4.2);
+            const oldRate = Number(currentSettings?.value || 4.0);
 
             // 1. Update Platform Settings
             const { error: settingsError } = await supabase
