@@ -52,7 +52,7 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
         <TierMedal tierId={tier.id} size="sm" className="shrink-0" />
       </div>
 
-      <div className="mb-4 flex flex-wrap items-baseline gap-2">
+      <div className="mb-4 flex flex-col gap-1">
         <div className="flex items-baseline gap-1">
           <span className="text-xl font-black text-white shrink-0 flex items-baseline">
             <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mr-1 whitespace-nowrap">
@@ -62,11 +62,17 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
               ? `${(tier.minDividend * 100).toFixed(0)}%` 
               : `${(tier.maxDividend * 100).toFixed(0)}%`}
           </span>
-          <span className="text-[9px] font-bold text-zinc-500 ml-0.5 uppercase tracking-tighter">Monthly</span>
+          <span className="text-[9px] font-bold text-zinc-500 ml-0.5 uppercase tracking-tighter">Monthly Dividend</span>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <span className="text-[8px] font-black text-amber-500/80 uppercase tracking-[0.2em] bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/10">
+            {tier.lockInDays === 365 ? '12-Month' : '6-Month'} Lock-in
+          </span>
         </div>
         
         {tier.yearlyBonus && (
-          <div className="flex flex-col gap-1 items-start">
+          <div className="flex flex-col gap-1 items-start mt-1">
             <div className="bg-gv-gold/10 border border-gv-gold/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
               <span className="text-gv-gold text-[10px] font-black">
                 +{ (tier.yearlyBonus * 100).toFixed(0) }% 
@@ -79,14 +85,6 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
       </div>
 
       <ul className="space-y-2 flex-1">
-        <li className="flex items-start gap-1.5 pb-2 border-b border-white/5 mb-2">
-          <div className="h-4 w-4 rounded-md bg-amber-500/10 flex items-center justify-center shrink-0">
-            <Check className="h-2.5 w-2.5 text-amber-500" />
-          </div>
-          <span className="text-[10px] text-amber-500 font-black uppercase tracking-widest">
-            {tier.lockInDays === 365 ? '12-Month' : '6-Month'} Capital Lock-in
-          </span>
-        </li>
         {tier.id === 'platinum' && (
           <li className="flex items-start gap-1.5 pb-2 border-b border-white/5 mb-2">
             <div className="h-4 w-4 rounded-md bg-gv-gold/10 flex items-center justify-center shrink-0">
