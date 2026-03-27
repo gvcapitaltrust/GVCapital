@@ -22,7 +22,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             refId: "Reference ID",
             type: "Type",
             status: "Status",
-            amount: "Amount",
+            amount: "Amount (USD)",
             noTxFound: "No transactions found",
             statementCenter: "Statement Center",
             statementCenterDesc: "Generate and download official PDF statements for your account activity and investment performance.",
@@ -37,7 +37,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             refId: "参考编号",
             type: "类型",
             status: "状态",
-            amount: "金额",
+            amount: "金额 (USD)",
             noTxFound: "未找到交易记录",
             statementCenter: "对账单中心",
             statementCenterDesc: "生成并下载您的账户活动和投资表现的官方 PDF 对账单。",
@@ -61,13 +61,14 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         return true;
     });
 
-    const filteredTotal = filteredTransactions
+    const filteredTotalUSD = filteredTransactions
         .filter(tx => ['Approved', 'Completed', 'Pending Release'].includes(tx.status))
         .reduce((acc, tx) => {
-            const amount = Number(tx.amount);
-            if (tx.type === 'Withdrawal' && !tx.metadata?.adjustment_category) return acc - Math.abs(amount);
-            if (tx.metadata?.adjustment_type === 'Decrease') return acc - Math.abs(amount);
-            return acc + amount;
+            const amountRM = Number(tx.amount);
+            const amountUSD = amountRM / forexRate;
+            if (tx.type === 'Withdrawal' && !tx.metadata?.adjustment_category) return acc - Math.abs(amountUSD);
+            if (tx.metadata?.adjustment_type === 'Decrease') return acc - Math.abs(amountUSD);
+            return acc + amountUSD;
         }, 0);
 
     const generateStatement = () => {
@@ -127,21 +128,21 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
 
         autoTable(doc, {
             startY: 70,
-            head: [['Description', 'Amount (RM)']],
-            body: summaryBody,
+            head: [['Description', 'Amount (USD)']],
+            body: summaryBody.map(([desc, amt]) => [desc, (Number(amt) / forexRate).toFixed(2)]),
             theme: 'striped',
             headStyles: { fillColor: [51, 65, 85] }
         });
 
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 15,
-            head: [['Date', 'Ref ID', 'Type', 'Status', 'Amount (RM)']],
+            head: [['Date', 'Ref ID', 'Type', 'Status', 'Amount (USD)']],
             body: periodTxs.map(tx => [
                 new Date(tx.created_at || tx.transfer_date).toLocaleDateString(),
                 tx.ref_id || "-",
                 tx.metadata?.description || tx.type,
                 tx.status,
-                Number(tx.amount).toFixed(2)
+                (Number(tx.amount) / forexRate).toFixed(2)
             ]),
             headStyles: { fillColor: [71, 85, 105] }
         });
@@ -172,8 +173,11 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
 
                 <div className="flex items-center gap-4 px-2">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.totalInView}:</span>
-                    <span className={`text-sm font-black tabular-nums ${filteredTotal >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                        RM {filteredTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    <span className={`text-sm font-black tabular-nums ${filteredTotalUSD >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                        $ {filteredTotalUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-[10px] font-bold text-gray-400">
+                        ≈ RM {(filteredTotalUSD * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </span>
                 </div>
 
@@ -216,12 +220,13 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                             </td>
                                             {(() => {
                                                 const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease' || tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty');
-                                                const amountValue = Number(tx.amount);
-                                                const displayAmount = isWithdrawal ? -Math.abs(amountValue) : amountValue;
+                                                const amountRM = Number(tx.amount);
+                                                const amountUSD = amountRM / forexRate;
+                                                const displayAmount = isWithdrawal ? -Math.abs(amountUSD) : amountUSD;
                                                 
                                                 return (
                                                     <td className={`px-6 py-4 text-right font-black tabular-nums ${displayAmount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                        {displayAmount >= 0 ? '+' : '-'}{Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                        {displayAmount >= 0 ? '+' : '-'}{Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                     </td>
                                                 );
                                             })()}
@@ -235,18 +240,19 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                             <div className="space-y-2">
                                                                 <div className="flex justify-between text-xs font-bold">
                                                                     <span className="text-gray-400 uppercase">Gross Amount</span>
-                                                                    <span className="text-gray-900">RM {Math.abs(Number(tx.metadata?.original_request_amount || tx.amount)).toFixed(2)}</span>
+                                                                    <span className="text-gray-900">$ {Math.abs(Number(tx.metadata?.original_request_amount || tx.amount) / forexRate).toFixed(2)}</span>
                                                                 </div>
                                                                 {tx.metadata?.penalty_applied && (
                                                                     <div className="flex justify-between text-xs font-bold">
                                                                         <span className="text-red-500 uppercase italic">Early Withdrawal Penalty (40%)</span>
-                                                                        <span className="text-red-500">-RM {Number(tx.metadata?.finalized_penalty).toFixed(2)}</span>
+                                                                        <span className="text-red-500">-$ {(Number(tx.metadata?.finalized_penalty) / forexRate).toFixed(2)}</span>
                                                                     </div>
                                                                 )}
                                                                 <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2">
                                                                     <span className="text-emerald-500 uppercase">Final Payout (Net)</span>
-                                                                    <span className="text-emerald-500 underline decoration-gv-gold">RM {Number(tx.metadata?.finalized_payout || tx.amount).toFixed(2)}</span>
+                                                                    <span className="text-emerald-500 underline decoration-gv-gold">$ {(Number(tx.metadata?.finalized_payout || tx.amount) / forexRate).toFixed(2)}</span>
                                                                 </div>
+                                                                <p className="text-[9px] text-gray-400 text-right font-medium">≈ RM {Number(tx.metadata?.finalized_payout || tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                                             </div>
                                                         </div>
 

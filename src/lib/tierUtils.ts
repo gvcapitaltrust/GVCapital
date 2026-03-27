@@ -44,7 +44,7 @@ export const TIERS: Tier[] = [
     yearlyBonus: 0.03,
     lockInDays: 180,
     color: "gv-gold",
-    benefits: ["Dedicated Account Manager"],
+    benefits: [],
   },
   {
     id: "vvip",
@@ -56,9 +56,7 @@ export const TIERS: Tier[] = [
     yearlyBonus: 0.04,
     lockInDays: 365,
     color: "amber",
-    benefits: [
-      "Legacy Wealth Planning",
-    ],
+    benefits: [],
   },
 ];
 

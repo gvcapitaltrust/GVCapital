@@ -191,7 +191,7 @@ export default function HomeClient() {
                     </div>
                     
                     <div className="relative">
-                        <div className="aspect-square rounded-[3rem] bg-gradient-to-br from-zinc-900 to-[#121212] border border-gray-200 p-2 relative overflow-hidden flex items-center justify-center">
+                        <div className="aspect-square rounded-[3rem] bg-gray-50 border border-gray-200 p-2 relative overflow-hidden flex items-center justify-center shadow-xl">
                             {/* Decorative Central Element */}
                             <div className="relative h-64 w-64 rounded-full border border-gv-gold/30 flex items-center justify-center animate-[spin_60s_linear_infinite]">
                                 <div className="absolute h-full w-full rounded-full border-t-2 border-gv-gold/80 animate-[spin_10s_linear_infinite]"></div>
@@ -201,11 +201,11 @@ export default function HomeClient() {
                             </div>
                             
                             {/* Floating cards */}
-                            <div className="absolute top-10 left-10 bg-gray-50/80 backdrop-blur-md border border-gray-200 p-4 rounded-2xl flex items-center gap-4 animate-[bounce_4s_infinite]">
+                            <div className="absolute top-10 left-10 bg-white backdrop-blur-md border border-gray-200 p-4 rounded-2xl flex items-center gap-4 animate-[bounce_4s_infinite] shadow-lg">
                                 <div className="bg-green-500/20 p-2 rounded-lg text-green-400"><TrendingUp size={24} /></div>
                                 <div><div className="text-sm font-bold text-gray-900">Consistent</div><div className="text-xs text-gray-400">Growth</div></div>
                             </div>
-                            <div className="absolute bottom-10 right-10 bg-gray-50/80 backdrop-blur-md border border-gray-200 p-4 rounded-2xl flex items-center gap-4 animate-[bounce_5s_infinite_reverse]">
+                            <div className="absolute bottom-10 right-10 bg-white backdrop-blur-md border border-gray-200 p-4 rounded-2xl flex items-center gap-4 animate-[bounce_5s_infinite_reverse] shadow-lg">
                                 <div className="bg-gv-gold/20 p-2 rounded-lg text-gv-gold"><ShieldCheck size={24} /></div>
                                 <div><div className="text-sm font-bold text-gray-900">Secured</div><div className="text-xs text-gray-400">Bank-Grade</div></div>
                             </div>

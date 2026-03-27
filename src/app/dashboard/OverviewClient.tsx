@@ -477,7 +477,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         </Link>
                         <button
                             onClick={(e) => handleProtectedAction(e, () => setIsWithdrawModalOpen(true))}
-                            className="flex-1 bg-[#222] text-gray-900 font-black text-xl py-6 rounded-[28px] hover:bg-[#333] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 border border-gray-200"
+                            className="flex-1 bg-[#222] text-white font-black text-xl py-6 rounded-[28px] hover:bg-[#333] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 border border-gray-200"
                         >
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                             {t.withdraw}

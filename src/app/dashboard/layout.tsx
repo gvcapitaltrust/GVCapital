@@ -35,7 +35,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                         currentTab=""
                     />
 
-                    <main className={`flex-1 min-h-screen transition-all duration-500 ease-in-out ${isSidebarCollapsed ? "md:ml-20" : "md:ml-80"}`}>
+                    <main className={`flex-1 min-h-screen transition-all duration-500 ease-in-out ${isSidebarCollapsed ? "md:ml-20" : "md:ml-64"}`}>
                         <div className="max-w-[1600px] mx-auto p-4 sm:p-10 space-y-10 pb-32 md:pb-10">
                             <DashboardNavbar 
                                 lang={lang} 
