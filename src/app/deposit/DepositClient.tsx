@@ -57,13 +57,6 @@ export default function DepositClient() {
             const currentAmountRm = depositUSD * forexRate;
             const currentCapitalUSD = Number(user.balance || 0) / forexRate;
 
-            if (currentCapitalUSD + depositUSD > 10000) {
-                alert(lang === "en" 
-                    ? "Maximum allowed investment capital is $10,000 USD. Your deposit exceeds this limit." 
-                    : "最高允许的投资本金为 $10,000 USD。您的存款已超过此限制。");
-                setIsSubmitting(false);
-                return;
-            }
             
             const { error: insertError } = await supabase
                 .from('transactions')
@@ -107,7 +100,7 @@ export default function DepositClient() {
             successTitle: "Deposit Submitted",
             successDesc: "Redirecting you to dashboard...",
             estimatedCredit: "Equivalent RM Amount",
-            maxLimit: "Maximum investment allowed: $10,000 USD. Only input amounts within your limit.",
+            maxLimit: "GV Capital VVIP accounts have no investment limit. Enjoy uncapped growth.",
         },
         zh: {
             title: "资金充值",
@@ -120,7 +113,7 @@ export default function DepositClient() {
             successTitle: "存款已提交",
             successDesc: "正在为您跳转到控制台...",
             estimatedCredit: "等值马币金额",
-            maxLimit: "最高允许投资: $10,000 USD。请仅输入限制内的金额。",
+            maxLimit: "GV 资本 VVIP 账户没有投资限制。享受无上限的增长。",
         }
     };
 

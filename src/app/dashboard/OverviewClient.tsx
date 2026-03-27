@@ -425,7 +425,14 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                const maxUSD = Number(user?.total_investment_usd || 0) * ((tier.maxDividend * 12) + (tier.yearlyBonus || 0));
                                return (
                                    <>
-                                       <h3 className="text-3xl font-black text-emerald-500 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+                                       <div className="flex items-center gap-3">
+                                           <h3 className="text-3xl font-black text-emerald-500 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+                                           {tier.yearlyBonus && (
+                                               <div className="bg-gv-gold/10 border border-gv-gold/30 px-2 py-0.5 rounded-full animate-pulse shrink-0">
+                                                   <span className="text-gv-gold text-[8px] font-black uppercase tracking-widest">+{ (tier.yearlyBonus * 100).toFixed(0) }% Bonus Included</span>
+                                               </div>
+                                           )}
+                                       </div>
                                        <p className="text-[10px] text-zinc-500 font-bold mt-1">≈ RM {(maxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
                                        <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                    </>

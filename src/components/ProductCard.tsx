@@ -44,22 +44,33 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
         <div className="min-w-0 flex-1">
           <h3 className="text-sm xl:text-base font-black mb-0.5 uppercase tracking-tight break-words">{tier.name}</h3>
           <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
-            {`${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
+            {tier.id === 'vvip' 
+              ? `> ${formatUSD(tier.minAmount)}` 
+              : `${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
           </p>
         </div>
         <TierMedal tierId={tier.id} size="sm" className="shrink-0" />
       </div>
 
-      <div className="mb-4 flex items-baseline gap-1">
-        <span className="text-xl font-black text-white shrink-0 flex items-baseline">
-          <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mr-1 whitespace-nowrap">
-            {tier.id === "silver" ? "min" : "up to"}
+      <div className="mb-4 flex flex-wrap items-baseline gap-2">
+        <div className="flex items-baseline gap-1">
+          <span className="text-xl font-black text-white shrink-0 flex items-baseline">
+            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mr-1 whitespace-nowrap">
+              {tier.id === "silver" ? "min" : "up to"}
+            </span>
+            {tier.id === "silver" 
+              ? `${(tier.minDividend * 100).toFixed(0)}%` 
+              : `${(tier.maxDividend * 100).toFixed(0)}%`}
           </span>
-          {tier.id === "silver" 
-            ? `${(tier.minDividend * 100).toFixed(0)}%` 
-            : `${(tier.maxDividend * 100).toFixed(0)}%`}
-        </span>
-        <span className="text-[9px] font-bold text-zinc-500 ml-0.5 uppercase">Monthly</span>
+          <span className="text-[9px] font-bold text-zinc-500 ml-0.5 uppercase">Monthly</span>
+        </div>
+        
+        {tier.yearlyBonus && (
+          <div className="bg-gv-gold/10 border border-gv-gold/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+            <span className="text-gv-gold text-[10px] font-black">+{ (tier.yearlyBonus * 100).toFixed(0) }%</span>
+            <span className="text-gv-gold/60 text-[7px] font-black uppercase tracking-widest">Yearly</span>
+          </div>
+        )}
       </div>
 
       <ul className="space-y-2 flex-1">

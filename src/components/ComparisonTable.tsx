@@ -24,6 +24,9 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
       reduced: "Reduced",
       zero: "Zero",
       yearlyBonus: "Yearly Bonus",
+      lockIn: "Capital Lock-in",
+      months: "Months",
+      days: "Days",
       footnote: "* All dividends are calculated monthly based on your investment capital. Higher tiers enjoy lower withdrawal fees and priority liquidation."
     },
     zh: {
@@ -39,6 +42,9 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
       reduced: "降低",
       zero: "零",
       yearlyBonus: "年度奖金",
+      lockIn: "资金锁定内",
+      months: "个月",
+      days: "天",
       footnote: "* 所有分红均根据您的投资本金按月计算。更高级别享受更低的提款费和优先清算权。"
     }
   }[lang];
@@ -73,9 +79,9 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
               <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
                 <td className="py-6 px-4 text-zinc-400">{t.range}</td>
                 {TIERS.map((tier) => (
-                  <td key={tier.id} className="py-6 px-4 text-center text-white font-bold">
-                    {tier.maxAmount > 10000000 
-                      ? `${formatUSD(tier.minAmount)}+` 
+                  <td key={tier.id} className="py-6 px-4 text-center text-white font-bold whitespace-nowrap">
+                    {tier.id === 'vvip' 
+                      ? `> ${formatUSD(tier.minAmount)}` 
                       : `${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
                   </td>
                 ))}
@@ -92,8 +98,24 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
               <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
                 <td className="py-6 px-4 text-zinc-400">{t.yearlyBonus}</td>
                 {TIERS.map((tier) => (
-                  <td key={tier.id} className="py-6 px-4 text-center text-gv-gold font-bold">
-                    {tier.yearlyBonus ? `+${(tier.yearlyBonus * 100).toFixed(0)}%` : <Minus className="h-4 w-4 mx-auto text-zinc-600" />}
+                  <td key={tier.id} className="py-6 px-4 text-center">
+                    {tier.yearlyBonus ? (
+                      <div className="relative inline-block py-1.5 px-3 rounded-full bg-gv-gold/10 border border-gv-gold/20 shadow-[0_0_15px_rgba(201,168,76,0.1)] animate-pulse">
+                        <span className="text-gv-gold font-black">
+                          +{ (tier.yearlyBonus * 100).toFixed(0) }%
+                        </span>
+                      </div>
+                    ) : (
+                      <Minus className="h-4 w-4 mx-auto text-zinc-600" />
+                    )}
+                  </td>
+                ))}
+              </tr>
+              <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                <td className="py-6 px-4 text-zinc-400">{t.lockIn}</td>
+                {TIERS.map((tier) => (
+                  <td key={tier.id} className="py-6 px-4 text-center text-white font-bold">
+                    {tier.lockInDays === 365 ? `12 ${t.months}` : `6 ${t.months}`}
                   </td>
                 ))}
               </tr>

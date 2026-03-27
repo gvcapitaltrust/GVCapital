@@ -134,11 +134,18 @@ export default function ProductSelection({
               </div>
               <div className="space-y-1">
                 <p className="text-zinc-400 text-[9px] font-medium uppercase tracking-widest">{t.currentTier}</p>
-                <div className="flex items-center justify-center gap-2">
-                  <TierMedal tierId={currentInvestment > 0 ? qualifiedTier.id : "none"} size="sm" />
-                  <span className="text-white text-xs font-black uppercase tracking-tight">
-                    {currentInvestment > 0 ? qualifiedTier.name.replace(/ package/gi, '') : t.noTier}
-                  </span>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center justify-center gap-2">
+                    <TierMedal tierId={currentInvestment > 0 ? qualifiedTier.id : "none"} size="sm" />
+                    <span className="text-white text-xs font-black uppercase tracking-tight">
+                      {currentInvestment > 0 ? qualifiedTier.name.replace(/ package/gi, '') : t.noTier}
+                    </span>
+                  </div>
+                  {currentInvestment > 0 && qualifiedTier.yearlyBonus && (
+                    <div className="bg-gv-gold/10 border border-gv-gold/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+                      <span className="text-gv-gold text-[8px] font-black">+{ (qualifiedTier.yearlyBonus * 100).toFixed(0) }% Yearly Bonus</span>
+                    </div>
+                  )}
                 </div>
               </div>
               {amount > currentInvestment && (

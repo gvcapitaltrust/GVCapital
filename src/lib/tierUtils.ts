@@ -6,6 +6,7 @@ export interface Tier {
   minDividend: number;
   maxDividend: number;
   yearlyBonus?: number;
+  lockInDays: number;
   color: string;
   benefits: string[];
 }
@@ -18,6 +19,7 @@ export const TIERS: Tier[] = [
     maxAmount: 3000,
     minDividend: 0.03,
     maxDividend: 0.03,
+    lockInDays: 180,
     color: "zinc",
     benefits: ["Entry-level Access", "Standard Support", "Monthly Statements"],
   },
@@ -28,6 +30,7 @@ export const TIERS: Tier[] = [
     maxAmount: 5000,
     minDividend: 0.03,
     maxDividend: 0.05,
+    lockInDays: 180,
     color: "slate",
     benefits: ["Priority Support", "Quarterly Strategy Review", "Enhanced Yield"],
   },
@@ -39,6 +42,7 @@ export const TIERS: Tier[] = [
     minDividend: 0.05,
     maxDividend: 0.05,
     yearlyBonus: 0.03,
+    lockInDays: 180,
     color: "gv-gold",
     benefits: ["Dedicated Account Manager", "Custom Portfolio Alerts", "VIP Events Access", "Extra 3% Yearly Bonus"],
   },
@@ -49,11 +53,13 @@ export const TIERS: Tier[] = [
     maxAmount: Number.MAX_SAFE_INTEGER,
     minDividend: 0.08,
     maxDividend: 0.08,
-    yearlyBonus: 0.05,
+    yearlyBonus: 0.04,
+    lockInDays: 365,
     color: "amber",
     benefits: [
       "Premium Fixed Returns",
-      "Extra 5% Yearly Bonus",
+      "Extra 4% Yearly Bonus",
+      "12-Month Lock-in Period",
       "Zero Withdrawal Fees",
       "Insurance Coverage",
       "Legacy Wealth Planning",

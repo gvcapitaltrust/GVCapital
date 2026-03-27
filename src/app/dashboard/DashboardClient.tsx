@@ -67,7 +67,9 @@ export default function DashboardClient() {
         if (!isMounted || !user) return { lockedCapital: 0, withdrawable: 0 };
         const approvedDeposits = transactions.filter(tx => tx.type === 'Deposit' && tx.status === 'Approved');
         const now = new Date();
-        const lockPeriodDays = 180;
+        const currentTier = getTierByAmount(Number(user.total_investment_usd || 0));
+        const lockPeriodDays = currentTier.lockInDays || 180;
+        
         const lockedCapital = approvedDeposits.reduce((acc, tx) => {
             const txDate = new Date(tx.created_at || tx.transfer_date);
             const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
@@ -321,8 +323,9 @@ export default function DashboardClient() {
             return;
         }
 
+        const currentTier = getTierByAmount(Number(user.total_investment_usd || 0));
+        const lockPeriodDays = currentTier.lockInDays || 180;
         const now = new Date();
-        const lockPeriodDays = 180;
         const lockedCapital = approvedDeposits.reduce((acc, tx) => {
             const txDate = new Date(tx.created_at || tx.transfer_date);
             const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);

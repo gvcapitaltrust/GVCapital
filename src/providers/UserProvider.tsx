@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsProvider";
+import { getTierByAmount } from "@/lib/tierUtils";
 
 interface UserContextType {
     userProfile: any;
@@ -53,13 +54,32 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 const approvedDeposits = txs.filter((tx: any) => 
                     tx.type === 'Deposit' && ['Approved', 'Completed'].includes(tx.status)
                 );
+                const totalDepositedRaw = txs.filter((t: any) => {
+                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                    const isCapital = t.type === 'Deposit' && 
+                                     category !== 'dividend' && 
+                                     category !== 'bonus';
+                    return isCapital && ['Approved', 'Completed'].includes(t.status);
+                }).reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
+
+                const totalWithdrawnRaw = txs.filter((t: any) => {
+                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                    const isCapitalWithdrawal = t.type === 'Withdrawal' && 
+                                               category !== 'dividend' && 
+                                               category !== 'bonus';
+                    return isCapitalWithdrawal && ['Approved', 'Completed', 'Pending Release'].includes(t.status);
+                }).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
+
+                const currentTier = getTierByAmount((totalDepositedRaw - totalWithdrawnRaw) / forexRate);
+                const lockPeriodDays = currentTier.lockInDays || 180;
+
                 const lockedCapital = approvedDeposits.reduce((acc, tx) => {
                     const rawDate = tx.transfer_date || tx.created_at;
                     const txDate = new Date(rawDate);
                     if (isNaN(txDate.getTime())) return acc;
                     
                     const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
-                    return diffDays < 180 ? acc + Number(tx.amount) : acc;
+                    return diffDays < lockPeriodDays ? acc + Number(tx.amount) : acc;
                 }, 0);
 
                 const totalAssetsRM = Number(profile.balance || 0) + Number(profile.profit || 0);
