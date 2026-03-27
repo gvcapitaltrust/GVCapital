@@ -112,10 +112,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     total_deposited: totalDeposited,
                     total_withdrawn: totalWithdrawn,
                     total_investment: totalInvestmentRM,
-                    total_investment_usd: totalInvestmentRM / forexRate,
+                    total_investment_usd: profile.balance_usd ?? (totalInvestmentRM / forexRate),
                     totalEquity: totalAssetsRM,
-                    total_assets_usd: totalAssetsRM / forexRate,
-                    balanceUSD: totalInvestmentRM / forexRate
+                    total_assets_usd: (profile.balance_usd ?? (totalInvestmentRM / forexRate)) + (Number(profile.profit || 0) / forexRate),
+                    balanceUSD: profile.balance_usd ?? (totalInvestmentRM / forexRate)
                 };
 
                 setUserProfile(fullProfile);

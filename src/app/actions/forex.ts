@@ -55,7 +55,7 @@ export async function updateGlobalForexRate(newRate: number) {
             .insert([{
                 old_rate: oldRateValue,
                 new_rate: newRate,
-                changed_by: user.email || user.id
+                changed_by: user.id
             }]);
 
         if (historyError) {

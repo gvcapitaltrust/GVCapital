@@ -201,6 +201,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             });
             if (rpcError) throw rpcError;
 
+            await supabase.from('profiles').update({
+                balance_usd: (tx.profiles?.balance_usd || (Number(tx.profiles?.balance || 0) / forexRate)) + Number(tx.original_currency_amount || 0)
+            }).eq('id', tx.user_id);
+
             await supabase.from('transactions').update({
                 metadata: {
                     ...tx.metadata,
@@ -245,7 +249,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             // 1. Fetch current user balance/profit to calculate deduction
             const { data: profile, error: profileFetchError } = await supabase
                 .from('profiles')
-                .select('balance, profit, bank_name, account_number, bank_account_holder, kyc_data')
+                .select('balance, balance_usd, profit, bank_name, account_number, bank_account_holder, kyc_data')
                 .eq('id', tx.user_id)
                 .single();
             
@@ -305,9 +309,19 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             }
 
             // 4. Update profile with new balance/profit
+            // Calculate USD deduction for balance_usd sync
+            const withdrawalRate = forexRate - 0.4;
+            const rmDeductedFromBalance = currentBalance - newBalance;
+            const usdDeducted = rmDeductedFromBalance / withdrawalRate;
+            const currentBalanceUSD = profile?.balance_usd || (currentBalance / forexRate);
+
             const { error: profileUpdateError } = await supabase
                 .from('profiles')
-                .update({ balance: newBalance, profit: newProfit })
+                .update({ 
+                    balance: newBalance, 
+                    profit: newProfit,
+                    balance_usd: Math.max(0, currentBalanceUSD - usdDeducted)
+                })
                 .eq('id', tx.user_id);
             
             if (profileUpdateError) throw profileUpdateError;
@@ -465,9 +479,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
             const amountRM = amountUSD * forexRate;
 
+            const updatePayload: any = { [targetField]: Number(user[targetField] || 0) + amountRM };
+            if (targetField === 'balance') {
+                const currentBalanceUSD = user.balance_usd || (Number(user.balance || 0) / forexRate);
+                updatePayload.balance_usd = currentBalanceUSD + amountUSD;
+            }
+
             const { error: profileError } = await supabase
                 .from('profiles')
-                .update({ [targetField]: Number(user[targetField] || 0) + amountRM })
+                .update(updatePayload)
                 .eq('id', user.id);
             if (profileError) throw profileError;
 
@@ -620,8 +640,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .insert({
                     old_rate: oldRate,
                     new_rate: newRate,
-                    admin_id: authUser?.id,
-                    admin_username: authUser?.user_metadata?.full_name || "Admin"
+                    changed_by: authUser?.id
                 });
             if (historyError) throw historyError;
 

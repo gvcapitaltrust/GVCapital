@@ -112,11 +112,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const { data: settings } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
                 const rate = Number(settings?.value || 4.4);
                 
-                setBalanceUSD(Number(profile.balance || 0) / rate);
-                const assets = Number(profile.balance || 0) + Number(profile.profit || 0);
-                setTotalEquity(assets);
-                setTotalAssets(assets);
-                setTotalAssetsUSD(assets / rate);
+                // Use stable USD balance if exists, else fallback to conversion
+                const currentBalanceUSD = profile.balance_usd ?? (Number(profile.balance || 0) / rate);
+                setBalanceUSD(currentBalanceUSD);
+                
+                const assetsRM = Number(profile.balance || 0) + Number(profile.profit || 0);
+                const profitUSD = Number(profile.profit || 0) / rate;
+                
+                setTotalEquity(assetsRM);
+                setTotalAssets(assetsRM);
+                setTotalAssetsUSD(currentBalanceUSD + profitUSD);
                 setUser({ ...session.user, ...profile });
             } else if (session?.user && !isFetching.current) {
                 // Profile missing but auth session exists -> User was likely deleted by admin
