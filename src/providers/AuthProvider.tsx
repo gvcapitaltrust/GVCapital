@@ -109,8 +109,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setBalance(profile.balance || 0);
                 
                 // Fetch forex rate for conversion
-                const { data: settings } = await supabase.from('platform_settings').select('forex_rate').single();
-                const rate = settings?.forex_rate || 4.4;
+                const { data: settings } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
+                const rate = Number(settings?.value || 4.4);
                 
                 setBalanceUSD(Number(profile.balance || 0) / rate);
                 const assets = Number(profile.balance || 0) + Number(profile.profit || 0);
@@ -118,8 +118,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setTotalAssets(assets);
                 setTotalAssetsUSD(assets / rate);
                 setUser({ ...session.user, ...profile });
-            } else {
-                setUser(session.user);
+            } else if (session?.user && !isFetching.current) {
+                // Profile missing but auth session exists -> User was likely deleted by admin
+                console.warn("[AUTH] Profile missing for active session. Signing out...");
+                document.cookie = `gv-auth-v1=; path=/; max-age=0;`;
+                await supabase.auth.signOut();
+                router.push("/login?error=account_deleted");
             }
         } catch (err) {
             console.error("[AUTH] Fetch failed:", err);

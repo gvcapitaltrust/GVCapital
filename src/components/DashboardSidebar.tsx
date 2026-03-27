@@ -17,7 +17,7 @@ interface DashboardSidebarProps {
 export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, onOpenMobileMenu }: DashboardSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const { user, totalAssets, balance, balanceUSD } = useAuth();
+    const { user, isVerified, totalAssets, balance, balanceUSD } = useAuth();
     const { forexRate } = useSettings();
 
     const t = {
@@ -30,7 +30,8 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
             profile: "Profile",
             securityTitle: "Security",
             logout: "Logout",
-            nav: "Navigation"
+            nav: "Navigation",
+            verifiedRequired: "Verification Required"
         },
         zh: {
             overview: "总览",
@@ -41,7 +42,8 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
             profile: "个人资料",
             securityTitle: "安全设置",
             logout: "退出登录",
-            nav: "导航"
+            nav: "导航",
+            verifiedRequired: "需完成实名验证"
         }
     }[lang];
 
@@ -50,7 +52,13 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
         { id: "products", path: "/dashboard/products", label: t.products, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> },
         { id: "transactions", path: "/dashboard/transactions", label: t.transactions, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> },
         { id: "referrals", path: "/dashboard/referrals", label: t.referrals, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg> },
-        { id: "profile", path: "/dashboard/profile", label: t.profile, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
+        { 
+            id: "profile", 
+            path: "/dashboard/profile", 
+            label: t.profile, 
+            icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
+            isRestricted: !isVerified
+        },
         { id: "security", path: "/dashboard/security", label: t.securityTitle, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg> },
     ];
 
@@ -77,8 +85,26 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                         <p className={`text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-6 px-4 transition-opacity duration-300 ${isCollapsed ? "opacity-0 invisible h-0" : "opacity-100"}`}>
                             {t.nav}
                         </p>
-                        {menuItems.map((item) => {
+                        {menuItems.map((item: any) => {
                             const isActive = pathname === item.path;
+                            const isDisabled = item.isRestricted;
+                            
+                            if (isDisabled) {
+                                return (
+                                    <div
+                                        key={item.id}
+                                        className={`w-full flex items-center justify-between gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 opacity-40 cursor-not-allowed text-zinc-700`}
+                                        title={t.verifiedRequired}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <span className={`shrink-0 ${isCollapsed ? "mx-auto" : ""}`}>{item.icon}</span>
+                                            {!isCollapsed && <span className="truncate">{item.label}</span>}
+                                        </div>
+                                        {!isCollapsed && <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>}
+                                    </div>
+                                );
+                            }
+
                             return (
                                 <Link
                                     key={item.id}
@@ -99,14 +125,14 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                         <div className="mx-2 p-4 bg-white/5 rounded-2xl border border-white/5 animate-in fade-in duration-500">
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-sm shrink-0 border border-gv-gold/30">
-                                    {(user.fullName?.[0] || user.full_name?.[0] || user.email?.[0] || "U").toUpperCase()}
+                                    {(user.full_name?.[0] || user.fullName?.[0] || user.email?.[0] || "U").toUpperCase()}
                                 </div>
-                                <div className="min-w-0">
+                                <div className="min-w-0 flex-1">
                                     <p className="text-[10px] font-black text-white uppercase tracking-tight truncate">
-                                        {user.fullName || user.full_name || user.email?.split('@')[0] || "User"}
+                                        {user.full_name || user.fullName || user.email?.split('@')[0] || "User"}
                                     </p>
-                                    <p className="text-[8px] font-bold text-gv-gold uppercase tracking-[0.2em] mt-0.5">
-                                        {(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(Number(balanceUSD || 0)).name}
+                                    <p className="text-[8px] font-bold text-gv-gold uppercase tracking-[0.2em] mt-0.5 whitespace-nowrap">
+                                        {getTierByAmount(Number(balanceUSD || 0)).name}
                                     </p>
                                 </div>
                             </div>
@@ -135,9 +161,30 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                     { id: "products", path: "/dashboard/products", label: "Trade", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> },
                     { id: "transactions", path: "/dashboard/transactions", label: "Activity", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> },
                     { id: "referrals", path: "/dashboard/referrals", label: "Refer", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg> },
-                    { id: "profile", path: "/dashboard/profile", label: "Profile", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
-                ].map((item) => {
+                    { 
+                        id: "profile", 
+                        path: "/dashboard/profile", 
+                        label: "Profile", 
+                        icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
+                        isRestricted: !isVerified
+                    },
+                ].map((item: any) => {
                     const isActive = pathname === item.path;
+                    const isDisabled = item.isRestricted;
+
+                    if (isDisabled) {
+                        return (
+                            <div
+                                key={item.id}
+                                className={`group relative flex flex-col items-center justify-center w-16 h-16 opacity-30 cursor-not-allowed`}
+                            >
+                                <span className="text-zinc-600">
+                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                </span>
+                            </div>
+                        );
+                    }
+
                     return (
                         <Link
                             key={item.id}

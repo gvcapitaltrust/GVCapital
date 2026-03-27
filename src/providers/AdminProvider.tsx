@@ -15,6 +15,7 @@ interface AdminContextType {
         totalProfit: number;
         totalAssets: number;
         userCount: number;
+        verifiedCount: number;
     };
     forexHistory: any[];
     verificationLogs: any[];
@@ -49,7 +50,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const [deposits, setDeposits] = useState<any[]>([]);
     const [withdrawals, setWithdrawals] = useState<any[]>([]);
     const [salesData, setSalesData] = useState<any[]>([]);
-    const [platformStats, setPlatformStats] = useState({ totalBalance: 0, totalProfit: 0, totalAssets: 0, userCount: 0 });
+    const [platformStats, setPlatformStats] = useState({ totalBalance: 0, totalProfit: 0, totalAssets: 0, userCount: 0, verifiedCount: 0 });
     const [forexHistory, setForexHistory] = useState<any[]>([]);
     const [verificationLogs, setVerificationLogs] = useState<any[]>([]);
     const [combinedAuditLogs, setCombinedAuditLogs] = useState<any[]>([]);
@@ -71,12 +72,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .select('*, profiles(*)')
                 .order('created_at', { ascending: false });
 
-            // 2. Fetch Profiles (Latest 1,000 for general management)
+            // 2. Fetch Profiles (All for global management)
             const { data: profileList } = await supabase
                 .from('profiles')
                 .select('*')
-                .order('created_at', { ascending: false })
-                .limit(1000);
+                .order('created_at', { ascending: false });
 
             // 3. Fetch KYC Queue (Specifically all users with 'Pending' status)
             const { data: kycPendingList } = await supabase
@@ -99,18 +99,6 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         return diffDays < 180 ? acc + Number(tx.amount) : acc;
                     }, 0);
 
-                    // Total Investment Logic (Capital only)
-                    const totalDeposited = userTxs.filter((t: any) => {
-                        const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                        return t.type === 'Deposit' && category !== 'dividend' && category !== 'bonus';
-                    }).reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
-
-                    const totalWithdrawn = txList.filter((t: any) => {
-                        const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                        const isCapitalWithdrawal = t.type === 'Withdrawal' && category !== 'dividend' && category !== 'bonus';
-                        return t.user_id === p.id && isCapitalWithdrawal && ['Approved', 'Completed', 'Pending Release'].includes(t.status);
-                    }).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
-
                     const totalInvestment = Number(p.balance || 0);
                     const withdrawableBalance = Math.max(0, (Number(p.balance || 0) - lockedCapital) + Number(p.profit || 0));
 
@@ -125,12 +113,14 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 setUsers(enrichedUsers);
                 setKycQueue(kycPendingList || []);
 
-                const stats = enrichedUsers.reduce((acc, p) => ({
+                // Calculate Global Platform Stats (Always RM)
+                const stats = profileList.reduce((acc, p) => ({
                     totalBalance: acc.totalBalance + Number(p.balance || 0),
                     totalProfit: acc.totalProfit + Number(p.profit || 0),
                     totalAssets: acc.totalAssets + (Number(p.balance || 0) + Number(p.profit || 0)),
-                    userCount: acc.userCount + 1
-                }), { totalBalance: 0, totalProfit: 0, totalAssets: 0, userCount: 0 });
+                    userCount: acc.userCount + 1,
+                    verifiedCount: acc.verifiedCount + (p.kyc_status === 'Verified' ? 1 : 0)
+                }), { totalBalance: 0, totalProfit: 0, totalAssets: 0, userCount: 0, verifiedCount: 0 });
                 setPlatformStats(stats);
             }
 

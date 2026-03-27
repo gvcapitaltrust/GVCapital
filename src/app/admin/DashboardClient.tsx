@@ -6,14 +6,14 @@ import { useSettings } from "@/providers/SettingsProvider";
 import Link from "next/link";
 
 export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
-    const { users, kycQueue, deposits, withdrawals, loading } = useAdmin();
-    const { forexRate } = useSettings();
+    const { platformStats, users, kycQueue, deposits, withdrawals, loading, forexRate } = useAdmin();
+    const { totalAssets, totalBalance, totalProfit, userCount, verifiedCount } = platformStats;
 
     const t = {
         en: {
             title: "Executive Overview",
             subtitle: "Global platform liquidity, compliance status, and operational throughput.",
-            cardTotal: "Total Managed Capital",
+            cardTotal: "Total Platform Assets",
             cardDeposits: "Pending Deposits",
             cardKyc: "KYC Queue",
             cardWithdrawals: "Withdrawal Requests",
@@ -26,7 +26,7 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
         zh: {
             title: "执行概览",
             subtitle: "全球平台流动性、合规状态和运营吞吐量。",
-            cardTotal: "总管理资本",
+            cardTotal: "总管理资产 (包含红利)",
             cardDeposits: "待处理存款",
             cardKyc: "KYC 队列",
             cardWithdrawals: "提款请求",
@@ -38,11 +38,9 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
         }
     }[lang];
 
-    const totalCapital = users.reduce((sum, u) => sum + (Number(u.balance) || 0), 0);
     const pendingDeposits = deposits.filter(d => d.status === 'Pending').length;
     const pendingWithdrawals = withdrawals.filter(w => w.status === 'Pending').length;
     const pendingKyc = kycQueue.length;
-    const verifiedUsers = users.filter(u => u.kyc_status === 'Verified').length;
 
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
 
@@ -59,8 +57,8 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
                         <svg className="h-20 w-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <div className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.cardTotal}</div>
-                    <div className="text-2xl font-black text-white tracking-tight tabular-nums drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]">RM {totalCapital.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
-                    <div className="text-[10px] text-gv-gold/60 font-bold uppercase tracking-[0.2em]">≈ ${(totalCapital / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
+                    <div className="text-2xl font-black text-white tracking-tight tabular-nums drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]">RM {totalAssets.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                    <div className="text-[10px] text-gv-gold/60 font-bold uppercase tracking-[0.2em]">≈ ${(totalAssets / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
                 </div>
 
                 <Link href="/admin/deposits" className="bg-[#1a1a1a]/40 border border-white/5 rounded-[40px] p-8 space-y-4 backdrop-blur-md shadow-2xl relative overflow-hidden group transition-all hover:bg-white/[0.02] hover:-translate-y-1">
@@ -97,11 +95,11 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                         <div className="space-y-1">
                             <p className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">{t.activeInvestors}</p>
-                            <p className="text-2xl font-black text-white">{users.length}</p>
+                            <p className="text-2xl font-black text-white">{userCount}</p>
                         </div>
                         <div className="space-y-1">
                             <p className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">{t.verifiedRatio}</p>
-                            <p className="text-2xl font-black text-emerald-500">{users.length > 0 ? ((verifiedUsers / users.length) * 100).toFixed(0) : 0}%</p>
+                            <p className="text-2xl font-black text-emerald-500">{userCount > 0 ? ((verifiedCount / userCount) * 100).toFixed(0) : 0}%</p>
                         </div>
                     </div>
                 </div>

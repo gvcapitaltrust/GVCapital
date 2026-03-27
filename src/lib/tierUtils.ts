@@ -63,6 +63,19 @@ export const TIERS: Tier[] = [
 ];
 
 export const getTierByAmount = (amountUSD: number): Tier => {
+  if (amountUSD < 1) {
+    return {
+      id: "none",
+      name: "No Tier",
+      minAmount: 0,
+      maxAmount: 0,
+      minDividend: 0,
+      maxDividend: 0,
+      lockInDays: 0,
+      color: "zinc",
+      benefits: [],
+    };
+  }
   // Find highest tier where amount is greater than or equal to minAmount (USD)
   const matchingTiers = TIERS.filter((t) => amountUSD >= t.minAmount);
   if (matchingTiers.length === 0) return TIERS[0];
