@@ -68,7 +68,10 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
         {tier.yearlyBonus && (
           <div className="flex flex-col gap-1 items-start">
             <div className="bg-gv-gold/10 border border-gv-gold/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
-              <span className="text-gv-gold text-[10px] font-black">+{ (tier.yearlyBonus * 100).toFixed(0) }%</span>
+              <span className="text-gv-gold text-[10px] font-black">
+                +{ (tier.yearlyBonus * 100).toFixed(0) }% 
+                {tier.id === 'platinum' && '*'}
+              </span>
               <span className="text-gv-gold/60 text-[7px] font-black uppercase tracking-widest">Yearly</span>
             </div>
           </div>

@@ -57,7 +57,6 @@ export const TIERS: Tier[] = [
     lockInDays: 365,
     color: "amber",
     benefits: [
-      "12-Month Lock-in Period",
       "Legacy Wealth Planning",
     ],
   },

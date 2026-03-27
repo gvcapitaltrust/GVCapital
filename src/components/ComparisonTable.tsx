@@ -104,6 +104,7 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                         <div className="relative inline-block py-1.5 px-3 rounded-full bg-gv-gold/10 border border-gv-gold/20 shadow-[0_0_15px_rgba(201,168,76,0.1)] animate-pulse">
                           <span className="text-gv-gold font-black">
                             +{ (tier.yearlyBonus * 100).toFixed(0) }%
+                            {tier.id === 'platinum' && '*'}
                           </span>
                         </div>
                         {tier.id === 'platinum' && (
