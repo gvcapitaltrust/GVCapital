@@ -20,7 +20,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     return (
         <AuthGuard>
             <UserProvider>
-                <div className="min-h-screen bg-[#0a0a0a] text-white font-body selection:bg-gv-gold selection:text-black">
+                <div className="min-h-screen bg-gray-50 text-gray-900 font-body selection:bg-gv-gold selection:text-white">
                     <DashboardSidebar 
                         lang={lang} 
                         isCollapsed={isSidebarCollapsed} 
@@ -58,7 +58,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div>
             </div>
         }>

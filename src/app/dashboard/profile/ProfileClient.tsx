@@ -61,7 +61,7 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Personal Information */}
-                <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
+                <div className="bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2"></div>
                     <div className="relative z-10 space-y-8">
                         <h3 className="text-lg font-bold uppercase tracking-tight text-gv-gold flex items-center gap-3">
@@ -75,18 +75,18 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                                 { label: t.email, value: user?.email },
                             ].map((item, i) => (
                                 <div key={i} className="space-y-1">
-                                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{item.label}</p>
-                                    <p className="text-base font-semibold text-white tracking-tight">{item.value || "-"}</p>
+                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{item.label}</p>
+                                    <p className="text-base font-semibold text-gray-900 tracking-tight">{item.value || "-"}</p>
                                 </div>
                             ))}
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-1">
-                                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.phone}</p>
-                                    <p className="text-base font-semibold text-white tracking-tight">{user?.phone || "-"}</p>
+                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.phone}</p>
+                                    <p className="text-base font-semibold text-gray-900 tracking-tight">{user?.phone || "-"}</p>
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.country}</p>
-                                    <p className="text-base font-semibold text-white tracking-tight">{user?.country || "-"}</p>
+                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.country}</p>
+                                    <p className="text-base font-semibold text-gray-900 tracking-tight">{user?.country || "-"}</p>
                                 </div>
                             </div>
                         </div>
@@ -94,7 +94,7 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
 
                 {/* Compliance */}
-                <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
+                <div className="bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2"></div>
                     <div className="relative z-10 space-y-8">
                         <h3 className="text-lg font-bold uppercase tracking-tight text-gv-gold flex items-center gap-3">
@@ -109,8 +109,8 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                                 { label: t.riskProfile, value: user?.risk_profile === "Moderate" ? "40%" : (user?.risk_profile || "-"), className: "text-emerald-400" },
                             ].map((item, i) => (
                                 <div key={i} className="space-y-1">
-                                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{item.label}</p>
-                                    <p className={`text-base font-semibold tracking-tight ${item.className || "text-white"}`}>{item.value || "-"}</p>
+                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{item.label}</p>
+                                    <p className={`text-base font-semibold tracking-tight ${item.className || "text-gray-900"}`}>{item.value || "-"}</p>
                                 </div>
                             ))}
                         </div>
@@ -128,28 +128,28 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                     </h3>
                     <div className="flex flex-col md:flex-row gap-12">
                         <div className="space-y-1 flex-1">
-                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.bankName}</p>
-                            <p className="text-lg font-bold text-white tracking-widest uppercase">{user?.bank_name || "-"}</p>
+                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.bankName}</p>
+                            <p className="text-lg font-bold text-gray-900 tracking-widest uppercase">{user?.bank_name || "-"}</p>
                         </div>
                         <div className="space-y-1 flex-1">
-                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.accNumber}</p>
-                            <p className="text-lg font-bold text-white tracking-widest font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
+                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.accNumber}</p>
+                            <p className="text-lg font-bold text-gray-900 tracking-widest font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
                         </div>
                     </div>
-                    <div className="flex flex-col md:flex-row gap-12 pt-8 border-t border-white/5">
+                    <div className="flex flex-col md:flex-row gap-12 pt-8 border-t border-gray-200">
                         <div className="space-y-1 flex-1">
-                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.accHolder}</p>
-                            <p className="text-lg font-bold text-white tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
+                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.accHolder}</p>
+                            <p className="text-lg font-bold text-gray-900 tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
                         </div>
                         <div className="space-y-1 flex-1">
-                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.bankStatement}</p>
+                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.bankStatement}</p>
                             {user?.bank_statement_url ? (
-                                <button onClick={viewStatement} className="inline-flex items-center gap-2 bg-white/5 hover:bg-gv-gold hover:text-black border border-white/10 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all mt-2">
+                                <button onClick={viewStatement} className="inline-flex items-center gap-2 bg-white hover:bg-gv-gold hover:text-black border border-gray-200 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all mt-2">
                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                     {t.viewStatement}
                                 </button>
                             ) : (
-                                <p className="text-zinc-600 font-bold uppercase text-[10px] mt-2 italic">Not Provided</p>
+                                <p className="text-gray-500 font-bold uppercase text-[10px] mt-2 italic">Not Provided</p>
                             )}
                         </div>
                     </div>

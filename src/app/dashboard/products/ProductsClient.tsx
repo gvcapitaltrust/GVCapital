@@ -19,10 +19,10 @@ export default function ProductsPageContent({ lang }: { lang: "en" | "zh" }) {
                         <div className="h-0.5 w-6 bg-gv-gold rounded-full"></div>
                         <span className="text-gv-gold text-[9px] font-black uppercase tracking-[0.25em]">Investment Tiers</span>
                     </div>
-                    <h1 className="text-xl md:text-2xl font-bold uppercase tracking-tight leading-none text-white">
+                    <h1 className="text-xl md:text-2xl font-bold uppercase tracking-tight leading-none text-gray-900">
                         {lang === "en" ? "Products & Portfolios" : "理财产品与组合"}
                     </h1>
-                    <p className="text-zinc-500 text-xs max-w-lg mt-2">
+                    <p className="text-gray-400 text-xs max-w-lg mt-2">
                         {lang === "en" ? "Explore our fund management tiers with fixed dividends and priority capital processing." : "探索我们专业的基金管理等级，享受固定分红和优先资金处理。"}
                     </p>
                 </div>

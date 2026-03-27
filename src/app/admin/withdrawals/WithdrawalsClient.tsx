@@ -64,8 +64,8 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter text-white">{t.title}</h2>
-                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{t.subtitle}</p>
+                    <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h2>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
                 </div>
                 <div className="flex flex-col md:flex-row gap-4">
                     <input
@@ -73,26 +73,26 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                         placeholder={t.searchPlaceholder}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs w-full md:w-64 focus:outline-none focus:border-gv-gold transition-all"
+                        className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs w-full md:w-64 focus:outline-none focus:border-gv-gold transition-all"
                     />
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-gv-gold transition-all text-white"
+                        className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-gv-gold transition-all text-gray-900"
                     >
-                        <option value="All" className="bg-[#111]">{t.statusAll}</option>
-                        <option value="Pending" className="bg-[#111]">{t.statusPending}</option>
-                        <option value="Pending Release" className="bg-[#111]">{t.statusPendingRelease}</option>
-                        <option value="Completed" className="bg-[#111]">{t.statusCompleted}</option>
-                        <option value="Rejected" className="bg-[#111]">{t.statusRejected}</option>
+                        <option value="All" className="bg-white">{t.statusAll}</option>
+                        <option value="Pending" className="bg-white">{t.statusPending}</option>
+                        <option value="Pending Release" className="bg-white">{t.statusPendingRelease}</option>
+                        <option value="Completed" className="bg-white">{t.statusCompleted}</option>
+                        <option value="Rejected" className="bg-white">{t.statusRejected}</option>
                     </select>
                 </div>
             </div>
 
-            <div className="bg-[#1a1a1a]/50 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+            <div className="bg-white backdrop-blur-md rounded-3xl border border-gray-200 overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                        <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400">
                             <tr>
                                 <th className="px-4 py-3">{t.tableUser}</th>
                                 <th className="px-4 py-3">{t.tableAmount}</th>
@@ -104,40 +104,40 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                 <th className="px-4 py-3 text-right">{t.tableActions}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/[0.03]">
+                        <tbody className="divide-y divide-gray-100">
                             {filteredWithdrawals.map((tx, idx) => (
-                                <tr key={idx} className="text-sm group hover:bg-white/[0.02] transition-all">
+                                <tr key={idx} className="text-sm group hover:bg-gray-50 transition-all">
                                     <td className="px-4 py-3">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-white uppercase tracking-tight">{tx.profiles?.full_name}</span>
-                                            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
+                                            <span className="font-black text-gray-900 uppercase tracking-tight">{tx.profiles?.full_name}</span>
+                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3">
                                         <div className="flex flex-col">
                                             <span className="font-black text-red-500 tabular-nums">RM {Math.abs(Number(tx.amount)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Math.abs(Number(tx.amount)) / forexRate).toFixed(2)} USD)</span>
+                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">(${(Math.abs(Number(tx.amount)) / forexRate).toFixed(2)} USD)</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3">
                                         {tx.metadata?.penalty_applied || tx.metadata?.penalty_amount ? (
                                             <div className="flex flex-col">
                                                 <span className="font-black text-red-400 tabular-nums">RM {Number(tx.metadata?.finalized_penalty || tx.metadata?.penalty_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">40% Early</span>
+                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">40% Early</span>
                                             </div>
                                         ) : (
-                                            <span className="text-zinc-700 font-bold uppercase text-[10px]">-</span>
+                                            <span className="text-gray-400 font-bold uppercase text-[10px]">-</span>
                                         )}
                                     </td>
                                     <td className="px-4 py-3">
                                         <div className="flex flex-col max-w-[150px]">
-                                            <span className="text-[10px] font-black text-white truncate uppercase tracking-tighter">
+                                            <span className="text-[10px] font-black text-gray-900 truncate uppercase tracking-tighter">
                                                 {tx.profiles?.bank_name || tx.profiles?.kyc_data?.bank_name || "N/A"}
                                             </span>
                                             <span className="text-[10px] font-mono text-gv-gold font-bold">
                                                 {tx.profiles?.account_number || tx.profiles?.kyc_data?.account_number || "-"}
                                             </span>
-                                            <span className="text-[9px] text-zinc-500 font-bold truncate uppercase tracking-widest">
+                                            <span className="text-[9px] text-gray-400 font-bold truncate uppercase tracking-widest">
                                                 {tx.profiles?.bank_account_holder || tx.profiles?.kyc_data?.bank_account_holder || "Unknown"}
                                             </span>
                                         </div>
@@ -145,7 +145,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                     <td className="px-4 py-3 font-black text-emerald-500 tabular-nums">
                                         RM {Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </td>
-                                    <td className="px-4 py-3 text-zinc-500 font-mono text-xs">{new Date(tx.created_at).toLocaleDateString()}</td>
+                                    <td className="px-4 py-3 text-gray-400 font-mono text-xs">{new Date(tx.created_at).toLocaleDateString()}</td>
                                     <td className="px-4 py-3">
                                         <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${
                                             tx.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500' :
@@ -166,9 +166,9 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                             {tx.status === 'Pending Release' && (
                                                 <button onClick={() => handleCompleteWithdrawal(tx)} className="bg-gv-gold text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-gv-gold/20 hover:-translate-y-0.5 transition-all">Complete Release</button>
                                             )}
-                                            {tx.status === 'Completed' && <span className="text-[10px] text-zinc-700 font-black uppercase italic">Processed</span>}
-                                            {tx.status === 'Approved' && <span className="text-[10px] text-zinc-700 font-black uppercase italic">Legacy Success</span>}
-                                            {tx.status === 'Rejected' && <span className="text-[10px] text-zinc-700 font-black uppercase italic">Declined</span>}
+                                            {tx.status === 'Completed' && <span className="text-[10px] text-gray-400 font-black uppercase italic">Processed</span>}
+                                            {tx.status === 'Approved' && <span className="text-[10px] text-gray-400 font-black uppercase italic">Legacy Success</span>}
+                                            {tx.status === 'Rejected' && <span className="text-[10px] text-gray-400 font-black uppercase italic">Declined</span>}
                                         </div>
                                     </td>
                                 </tr>
@@ -176,7 +176,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                         </tbody>
                     </table>
                     {filteredWithdrawals.length === 0 && (
-                        <div className="p-20 text-center text-zinc-600 font-black uppercase tracking-[0.2em]">{t.noWithdrawals}</div>
+                        <div className="p-20 text-center text-gray-500 font-black uppercase tracking-[0.2em]">{t.noWithdrawals}</div>
                     )}
                 </div>
             </div>

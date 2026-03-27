@@ -50,22 +50,22 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
   }[lang];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-[#121212] border border-white/10 rounded-[2.5rem] p-6 sm:p-10 max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-gray-900/40 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="bg-white border border-gray-200 rounded-[2.5rem] p-6 sm:p-10 max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full border border-white/10 hover:bg-white/5 transition-all text-white"
+          className="absolute top-6 right-6 p-2 rounded-full border border-gray-200 hover:bg-white transition-all text-gray-900"
         >
           <X className="h-6 w-6" />
         </button>
 
-        <h2 className="text-3xl font-black text-white mb-8 uppercase tracking-tighter">{t.title}</h2>
+        <h2 className="text-3xl font-black text-gray-900 mb-8 uppercase tracking-tighter">{t.title}</h2>
 
         <div className="overflow-x-auto pb-4">
           <table className="w-full text-left border-collapse min-w-[700px]">
             <thead>
-              <tr className="border-b border-white/5">
-                <th className="py-6 px-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.feature}</th>
+              <tr className="border-b border-gray-200">
+                <th className="py-6 px-4 text-[10px] font-black uppercase tracking-widest text-gray-400">{t.feature}</th>
                 {TIERS.map((tier) => (
                   <th key={tier.id} className="py-6 px-4 text-center">
                     <span className={`text-xs font-black uppercase tracking-widest ${tier.id === 'gold' ? 'text-gv-gold' : tier.id === 'platinum' ? 'text-zinc-200' : tier.id === 'vvip' ? 'text-cyan-400' : 'text-slate-300'}`}>
@@ -76,18 +76,18 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
               </tr>
             </thead>
             <tbody className="text-sm font-medium">
-              <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td className="py-6 px-4 text-zinc-400">{t.range}</td>
+              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
+                <td className="py-6 px-4 text-gray-500">{t.range}</td>
                 {TIERS.map((tier) => (
-                  <td key={tier.id} className="py-6 px-4 text-center text-white font-bold whitespace-nowrap">
+                  <td key={tier.id} className="py-6 px-4 text-center text-gray-900 font-bold whitespace-nowrap">
                     {tier.id === 'vvip' 
                       ? `> ${formatUSD(tier.minAmount)}` 
                       : `${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
                   </td>
                 ))}
               </tr>
-              <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td className="py-6 px-4 text-zinc-400">{t.dividend}</td>
+              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
+                <td className="py-6 px-4 text-gray-500">{t.dividend}</td>
                 {TIERS.map((tier) => (
                   <td key={tier.id} className="py-6 px-4 text-center text-emerald-500 font-black">
                     <span className="text-[10px] font-normal opacity-60 mr-1 italic">up to</span>
@@ -95,8 +95,8 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                   </td>
                 ))}
               </tr>
-              <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td className="py-6 px-4 text-zinc-400">{t.yearlyBonus}</td>
+              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
+                <td className="py-6 px-4 text-gray-500">{t.yearlyBonus}</td>
                 {TIERS.map((tier) => (
                   <td key={tier.id} className="py-6 px-4 text-center">
                     {tier.yearlyBonus ? (
@@ -114,15 +114,15 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                       )}
                       </div>
                     ) : (
-                      <Minus className="h-4 w-4 mx-auto text-zinc-600" />
+                      <Minus className="h-4 w-4 mx-auto text-gray-500" />
                     )}
                   </td>
                 ))}
               </tr>
-              <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td className="py-6 px-4 text-zinc-400">{t.lockIn}</td>
+              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
+                <td className="py-6 px-4 text-gray-500">{t.lockIn}</td>
                 {TIERS.map((tier) => (
-                  <td key={tier.id} className="py-6 px-4 text-center text-white font-bold">
+                  <td key={tier.id} className="py-6 px-4 text-center text-gray-900 font-bold">
                     {tier.id === 'vvip' 
                       ? `12 ${t.months}` 
                       : tier.id === 'platinum'
@@ -131,40 +131,40 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                   </td>
                 ))}
               </tr>
-              <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td className="py-6 px-4 text-zinc-400">{t.priority}</td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-zinc-600" /></td>
+              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
+                <td className="py-6 px-4 text-gray-500">{t.priority}</td>
+                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
                 <td className="py-6 px-4 text-center"><Check className="h-4 w-4 mx-auto text-gv-gold" /></td>
                 <td className="py-6 px-4 text-center"><Check className="h-4 w-4 mx-auto text-gv-gold" /></td>
                 <td className="py-6 px-4 text-center"><Check className="h-4 w-4 mx-auto text-gv-gold" /></td>
               </tr>
-              <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td className="py-6 px-4 text-zinc-400">{t.accountManager}</td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-zinc-600" /></td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-zinc-600" /></td>
+              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
+                <td className="py-6 px-4 text-gray-500">{t.accountManager}</td>
+                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
+                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
                 <td className="py-6 px-4 text-center"><Check className="h-4 w-4 mx-auto text-gv-gold" /></td>
                 <td className="py-6 px-4 text-center"><Check className="h-4 w-4 mx-auto text-gv-gold" /></td>
               </tr>
-              <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td className="py-6 px-4 text-zinc-400">{t.insurance}</td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-zinc-600" /></td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-zinc-600" /></td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-zinc-600" /></td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-zinc-600" /></td>
+              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
+                <td className="py-6 px-4 text-gray-500">{t.insurance}</td>
+                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
+                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
+                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
+                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
               </tr>
-              <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td className="py-6 px-4 text-zinc-400">{t.fees}</td>
-                <td className="py-6 px-4 text-center text-zinc-500">{t.standard}</td>
-                <td className="py-6 px-4 text-center text-zinc-500">{t.standard}</td>
-                <td className="py-6 px-4 text-center text-zinc-500">{t.standard}</td>
-                <td className="py-6 px-4 text-center text-zinc-500">{t.standard}</td>
+              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
+                <td className="py-6 px-4 text-gray-500">{t.fees}</td>
+                <td className="py-6 px-4 text-center text-gray-400">{t.standard}</td>
+                <td className="py-6 px-4 text-center text-gray-400">{t.standard}</td>
+                <td className="py-6 px-4 text-center text-gray-400">{t.standard}</td>
+                <td className="py-6 px-4 text-center text-gray-400">{t.standard}</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div className="mt-10 p-6 bg-white/5 rounded-2xl border border-white/5">
-          <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-widest text-center leading-relaxed">
+        <div className="mt-10 p-6 bg-white rounded-2xl border border-gray-200">
+          <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest text-center leading-relaxed">
             {t.footnote}
             <br />
             {lang === 'en' 

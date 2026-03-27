@@ -71,18 +71,18 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className={`fixed inset-y-0 left-0 z-50 bg-[#0a0a0a] border-r border-white/5 p-6 flex flex-col justify-between transition-all duration-500 ease-in-out hidden md:flex ${isCollapsed ? "w-20" : "w-80"}`}>
+            <aside className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 p-6 flex flex-col justify-between transition-all duration-500 ease-in-out hidden md:flex ${isCollapsed ? "w-20" : "w-80"}`}>
                 <div className="space-y-12">
                     <div className={`flex items-center gap-4 px-2 transition-all duration-500 ${isCollapsed ? "justify-center" : ""}`}>
                         {isCollapsed ? (
-                            <img src="/logo.png" alt="GV Capital" className="h-8 w-auto object-contain mix-blend-screen" />
+                            <img src="/logo.png" alt="GV Capital" className="h-8 w-auto object-contain" />
                         ) : (
-                            <img src="/logo.png" alt="GV Capital" className="h-[21px] w-[170px] object-contain mix-blend-screen" />
+                            <img src="/logo.png" alt="GV Capital" className="h-[21px] w-[170px] object-contain" />
                         )}
                     </div>
 
                     <nav className="space-y-2">
-                        <p className={`text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-6 px-4 transition-opacity duration-300 ${isCollapsed ? "opacity-0 invisible h-0" : "opacity-100"}`}>
+                        <p className={`text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 mb-6 px-4 transition-opacity duration-300 ${isCollapsed ? "opacity-0 invisible h-0" : "opacity-100"}`}>
                             {t.nav}
                         </p>
                         {menuItems.map((item: any) => {
@@ -93,7 +93,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                 return (
                                     <div
                                         key={item.id}
-                                        className={`w-full flex items-center justify-between gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 opacity-40 cursor-not-allowed text-zinc-700`}
+                                        className={`w-full flex items-center justify-between gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 opacity-40 cursor-not-allowed text-gray-400`}
                                         title={t.verifiedRequired}
                                     >
                                         <div className="flex items-center gap-4">
@@ -109,7 +109,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                 <Link
                                     key={item.id}
                                     href={`${item.path}?lang=${lang}`}
-                                    className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isActive ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                                    className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isActive ? "bg-gv-gold text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"}`}
                                     title={isCollapsed ? item.label : ""}
                                 >
                                     <span className={`shrink-0 ${isCollapsed ? "mx-auto" : ""}`}>{item.icon}</span>
@@ -122,13 +122,13 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
 
                 <div className="space-y-4">
                     {user && !isCollapsed && (
-                        <div className="mx-2 p-4 bg-white/5 rounded-2xl border border-white/5 animate-in fade-in duration-500">
+                        <div className="mx-2 p-4 bg-gray-50 rounded-2xl border border-gray-200 animate-in fade-in duration-500">
                             <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-sm shrink-0 border border-gv-gold/30">
+                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-white text-sm shrink-0 border border-gv-gold/30">
                                     {(user.full_name?.[0] || user.fullName?.[0] || user.email?.[0] || "U").toUpperCase()}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-[10px] font-black text-white uppercase tracking-tight truncate">
+                                    <p className="text-[10px] font-black text-gray-900 uppercase tracking-tight truncate">
                                         {user.full_name || user.fullName || user.email?.split('@')[0] || "User"}
                                     </p>
                                     <p className="text-[8px] font-bold text-gv-gold uppercase tracking-[0.2em] mt-0.5 whitespace-nowrap">
@@ -142,11 +142,11 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                     <div className="flex flex-col gap-2">
                         <button 
                             onClick={onToggleCollapse} 
-                            className={`w-full text-zinc-600 hover:text-gv-gold transition-colors p-2 flex items-center ${isCollapsed ? "justify-center" : "justify-end"}`}
+                            className={`w-full text-gray-400 hover:text-gv-gold transition-colors p-2 flex items-center ${isCollapsed ? "justify-center" : "justify-end"}`}
                         >
                             <svg className={`h-5 w-5 transition-transform duration-500 ${isCollapsed ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
                         </button>
-                        <button onClick={handleLogout} className={`w-full text-zinc-500 hover:text-red-400 transition-colors text-[10px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-3 rounded-2xl ${isCollapsed ? "justify-center" : "hover:bg-red-500/5"}`}>
+                        <button onClick={handleLogout} className={`w-full text-gray-400 hover:text-red-500 transition-colors text-[10px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-3 rounded-2xl ${isCollapsed ? "justify-center" : "hover:bg-red-50"}`}>
                             <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
                             {!isCollapsed && <span>{t.logout}</span>}
                         </button>
@@ -155,7 +155,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
             </aside>
 
             {/* Premium Bottom Navigation (Mobile Only) */}
-            <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-[#0a0a0a]/80 backdrop-blur-2xl border-t border-white/5 flex items-center justify-around px-2 md:hidden">
+            <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-white/90 backdrop-blur-2xl border-t border-gray-200 flex items-center justify-around px-2 md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
                 {[
                     { id: "overview", path: "/dashboard", label: "Home", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> },
                     { id: "products", path: "/dashboard/products", label: "Trade", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> },
@@ -178,7 +178,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                 key={item.id}
                                 className={`group relative flex flex-col items-center justify-center w-16 h-16 opacity-30 cursor-not-allowed`}
                             >
-                                <span className="text-zinc-600">
+                                <span className="text-gray-400">
                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                 </span>
                             </div>
@@ -190,11 +190,11 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                             key={item.id}
                             href={`${item.path}?lang=${lang}`}
                             className={`group relative flex flex-col items-center justify-center w-16 h-16 transition-all duration-300 ${
-                                isActive ? "text-gv-gold" : "text-zinc-500"
+                                isActive ? "text-gv-gold" : "text-gray-400"
                             }`}
                         >
                             {isActive && (
-                                <div className="absolute -top-px left-1/2 -translate-x-1/2 w-8 h-0.5 bg-gv-gold shadow-[0_0_15px_rgba(201,168,76,0.8)] rounded-full"></div>
+                                <div className="absolute -top-px left-1/2 -translate-x-1/2 w-8 h-0.5 bg-gv-gold shadow-[0_0_15px_rgba(184,134,11,0.5)] rounded-full"></div>
                             )}
                             <span className={`transition-transform duration-300 ${isActive ? "scale-110 -translate-y-1" : "group-hover:scale-110"}`}>
                                 {item.icon}
@@ -207,7 +207,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                 })}
                 <button
                     onClick={onOpenMobileMenu}
-                    className={`flex flex-col items-center justify-center w-16 h-16 text-zinc-500`}
+                    className={`flex flex-col items-center justify-center w-16 h-16 text-gray-400`}
                 >
                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>

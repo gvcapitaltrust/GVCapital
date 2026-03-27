@@ -55,41 +55,41 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                 <div className="h-20 w-20 bg-gv-gold/10 border border-gv-gold/20 rounded-[30px] flex items-center justify-center mx-auto shadow-2xl">
                     <svg className="h-10 w-10 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                 </div>
-                <h2 className="text-3xl font-black uppercase tracking-tighter text-white">{t.title}</h2>
-                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{t.subtitle}</p>
+                <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h2>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-[#1a1a1a]/40 border border-white/5 rounded-[40px] p-10 space-y-8 backdrop-blur-md shadow-2xl">
+            <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-[40px] p-10 space-y-8 backdrop-blur-md shadow-2xl">
                 <div className="space-y-2 opacity-50">
-                    <label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest px-1">{t.emailLabel}</label>
+                    <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">{t.emailLabel}</label>
                     <input
                         type="email"
                         readOnly
                         value={authUser?.email || ""}
-                        className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-xs font-bold text-zinc-500 outline-none cursor-not-allowed"
+                        className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 text-xs font-bold text-gray-400 outline-none cursor-not-allowed"
                     />
                 </div>
 
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest px-1">{t.passwordLabel}</label>
+                        <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">{t.passwordLabel}</label>
                         <input
                             type="password"
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 text-xl font-bold text-white focus:outline-none focus:border-gv-gold transition-all"
+                            className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-5 text-xl font-bold text-gray-900 focus:outline-none focus:border-gv-gold transition-all"
                             placeholder="••••••••"
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] text-zinc-500 font-black uppercase tracking-widest px-1">{t.confirmLabel}</label>
+                        <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">{t.confirmLabel}</label>
                         <input
                             type="password"
                             required
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 text-xl font-bold text-white focus:outline-none focus:border-gv-gold transition-all"
+                            className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-5 text-xl font-bold text-gray-900 focus:outline-none focus:border-gv-gold transition-all"
                             placeholder="••••••••"
                         />
                     </div>

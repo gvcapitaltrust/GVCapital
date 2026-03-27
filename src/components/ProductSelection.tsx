@@ -59,12 +59,12 @@ export default function ProductSelection({
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="space-y-0.5">
-          <h2 className="text-base md:text-lg font-bold uppercase tracking-tight text-white">{t.title}</h2>
-          <p className="text-zinc-500 text-xs">{t.subtitle}</p>
+          <h2 className="text-base md:text-lg font-bold uppercase tracking-tight text-gray-900">{t.title}</h2>
+          <p className="text-gray-400 text-xs">{t.subtitle}</p>
         </div>
         <button 
           onClick={onOpenComparison}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white hover:bg-white/10 transition-all"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all"
         >
           <Info className="h-3.5 w-3.5" />
           {t.compare}
@@ -72,7 +72,7 @@ export default function ProductSelection({
       </div>
 
       {/* Slider Section */}
-      <div className="bg-[#1a1a1a] border border-white/5 p-6 sm:p-8 rounded-2xl shadow-xl relative overflow-hidden group">
+      <div className="bg-gray-50 border border-gray-200 p-6 sm:p-8 rounded-2xl shadow-xl relative overflow-hidden group">
         <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
           <TrendingUp className="h-40 w-40 text-gv-gold" />
         </div>
@@ -81,12 +81,12 @@ export default function ProductSelection({
           <div className="space-y-5">
             <div className="space-y-3">
               <div className="flex justify-between items-end">
-                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600">{t.sliderLabel}</label>
+                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500">{t.sliderLabel}</label>
                 <div className="flex flex-col items-end">
                   <span className="text-2xl font-black text-gv-gold tracking-tighter">
                     {formatUSD(amount)}
                   </span>
-                  <span className="text-[10px] font-bold text-zinc-500">
+                  <span className="text-[10px] font-bold text-gray-400">
                     ≈ RM {(amount * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -98,21 +98,21 @@ export default function ProductSelection({
                 step="100"
                 value={amount}
                 onChange={(e) => setAmount(parseInt(e.target.value))}
-                className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-gv-gold hover:accent-gv-gold/80 transition-all"
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gv-gold hover:accent-gv-gold/80 transition-all"
               />
-              <div className="flex justify-between text-[8px] font-black text-zinc-700 uppercase tracking-widest pt-1">
+              <div className="flex justify-between text-[8px] font-black text-gray-400 uppercase tracking-widest pt-1">
                 <span>$0</span>
                 <span>$7,500</span>
                 <span>$15,000+</span>
               </div>
             </div>
 
-            <div className="bg-white/5 border border-white/5 p-4 rounded-xl flex items-center gap-4">
+            <div className="bg-white border border-gray-200 p-4 rounded-xl flex items-center gap-4">
               <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
                 <TrendingUp className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-0.5">{t.monthlyReturn}</p>
+                <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-0.5">{t.monthlyReturn}</p>
                 <div className="flex flex-col">
                   <p className="text-lg font-black text-emerald-500 tracking-tight">
                     <span className="text-xs font-normal opacity-60 mr-1">up to</span>
@@ -133,11 +133,11 @@ export default function ProductSelection({
                 <span className="text-[10px] font-black uppercase tracking-widest">Investment Summary</span>
               </div>
               <div className="space-y-1">
-                <p className="text-zinc-400 text-[9px] font-medium uppercase tracking-widest">{t.currentTier}</p>
+                <p className="text-gray-500 text-[9px] font-medium uppercase tracking-widest">{t.currentTier}</p>
                 <div className="flex flex-col items-center gap-1">
                   <div className="flex items-center justify-center gap-2">
                     <TierMedal tierId={currentInvestment > 0 ? qualifiedTier.id : "none"} size="sm" />
-                    <span className="text-white text-xs font-black uppercase tracking-tight">
+                    <span className="text-gray-900 text-xs font-black uppercase tracking-tight">
                       {currentInvestment > 0 ? qualifiedTier.name.replace(/ package/gi, '') : t.noTier}
                     </span>
                   </div>
@@ -158,7 +158,7 @@ export default function ProductSelection({
               {amount > currentInvestment && (
                 <div className="pt-2 border-t border-gv-gold/10 w-full">
                   <p className="text-[9px] text-gv-gold/60 font-black uppercase">{t.potentialUpgrade}</p>
-                  <p className="text-white text-xs font-bold italic">
+                  <p className="text-gray-900 text-xs font-bold italic">
                     {t.increaseBy} {formatUSD(amount - currentInvestment)} (≈ RM {((amount - currentInvestment) * forexRate).toLocaleString()}) {t.toReach} {activeTier.name.replace(/ package/gi, '')}
                   </p>
                 </div>

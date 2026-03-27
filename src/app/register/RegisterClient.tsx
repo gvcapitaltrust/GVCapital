@@ -293,13 +293,13 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#121212] flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
+        <div className="min-h-screen bg-white flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
             <title>{`Register | GV Capital Trust`}</title>
 
             <div className="absolute top-8 right-8">
                 <button
                     onClick={() => setLang(lang === "en" ? "zh" : "en")}
-                    className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/50 hover:bg-white/10 transition-all uppercase tracking-widest"
+                    className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-gray-900/50 hover:bg-gray-100 transition-all uppercase tracking-widest"
                 >
                     {lang === "en" ? "简体中文" : "English"}
                 </button>
@@ -311,18 +311,18 @@ export default function RegisterPage() {
                         <img
                             src="/logo.png"
                             alt="GV Capital Trust Logo"
-                            className="h-[80px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
+                            className="h-[80px] w-auto object-contain  drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
                         />
                     </Link>
-                    <h1 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">{t.title}</h1>
-                    <p className="text-zinc-500 font-medium tracking-wide">{t.subtitle}</p>
+                    <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tighter mb-2">{t.title}</h1>
+                    <p className="text-gray-400 font-medium tracking-wide">{t.subtitle}</p>
                 </div>
 
                 {errorMsg && <div className="w-full bg-red-500/20 border border-red-500/50 p-4 rounded-xl text-red-500 text-sm mb-6">{errorMsg}</div>}
 
                 <form onSubmit={handleSubmit} className="w-full space-y-6">
                     <div className="space-y-2">
-                        <label htmlFor="full_name" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.name}</label>
+                        <label htmlFor="full_name" className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.name}</label>
                         <input
                             id="full_name"
                             name="full_name"
@@ -330,13 +330,13 @@ export default function RegisterPage() {
                             required
                             value={fullName}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
-                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_name}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label htmlFor="email" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.emailLabel}</label>
+                        <label htmlFor="email" className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.emailLabel}</label>
                         <input
                             id="email"
                             name="email"
@@ -344,13 +344,13 @@ export default function RegisterPage() {
                             required
                             value={email}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_email}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label htmlFor="password" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.passwordLabel}</label>
+                        <label htmlFor="password" className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.passwordLabel}</label>
                         <input
                             id="password"
                             name="password"
@@ -358,13 +358,13 @@ export default function RegisterPage() {
                             required
                             value={password}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_pass}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label htmlFor="username" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.usernameLabel}</label>
+                        <label htmlFor="username" className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.usernameLabel}</label>
                         <input
                             id="username"
                             name="username"
@@ -372,14 +372,14 @@ export default function RegisterPage() {
                             required
                             value={ownUsername}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOwnUsername(e.target.value.replace(/\s+/g, '').toLowerCase())}
-                            className={`w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all font-medium ${!isUsernameValid ? 'border-red-500/50 ring-red-500/20' : 'focus:ring-gv-gold/50'}`}
+                            className={`w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 transition-all font-medium ${!isUsernameValid ? 'border-red-500/50 ring-red-500/20' : 'focus:ring-gv-gold/50'}`}
                             placeholder={t.usernamePlaceholder}
                         />
                         {usernameCheckMsg && <p className="text-[10px] text-red-500 font-bold px-1 uppercase tracking-widest">{usernameCheckMsg}</p>}
                     </div>
 
                     <div className="space-y-2">
-                        <label htmlFor="security_pin" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.securityPinLabel}</label>
+                        <label htmlFor="security_pin" className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.securityPinLabel}</label>
                         <input
                             id="security_pin"
                             name="security_pin"
@@ -388,13 +388,13 @@ export default function RegisterPage() {
                             maxLength={6}
                             value={securityPin}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSecurityPin(e.target.value.replace(/\D/g, ''))}
-                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.securityPinPlaceholder}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label htmlFor="referral_code" className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.referralLabel}</label>
+                        <label htmlFor="referral_code" className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.referralLabel}</label>
                         <input
                             id="referral_code"
                             name="referral_code"
@@ -403,10 +403,10 @@ export default function RegisterPage() {
                             value={referralCode}
                             readOnly={isRefReadOnly}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setReferralCode(e.target.value)}
-                            className={`w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 transition-all font-medium ${isRefReadOnly ? 'opacity-50 cursor-not-allowed border-gv-gold/30 ring-1 ring-gv-gold/20' : (isReferralValid ? 'focus:ring-emerald-500/50' : 'focus:ring-red-500/50')}`}
+                            className={`w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 transition-all font-medium ${isRefReadOnly ? 'opacity-50 cursor-not-allowed border-gv-gold/30 ring-1 ring-gv-gold/20' : (isReferralValid ? 'focus:ring-emerald-500/50' : 'focus:ring-red-500/50')}`}
                             placeholder="Code Required"
                         />
-                        <p className="text-[10px] text-zinc-600 font-bold px-1 italic">
+                        <p className="text-[10px] text-gray-500 font-bold px-1 italic">
                             {t.referralNote}
                         </p>
                         {referralCheckMsg && (
@@ -424,9 +424,9 @@ export default function RegisterPage() {
                                 type="checkbox"
                                 checked={isAgreed}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIsAgreed(e.target.checked)}
-                                className="mt-1 h-5 w-5 rounded border-white/10 bg-[#1a1a1a] text-gv-gold focus:ring-gv-gold/50"
+                                className="mt-1 h-5 w-5 rounded border-gray-200 bg-gray-50 text-gv-gold focus:ring-gv-gold/50"
                             />
-                            <span className="text-xs text-zinc-400 leading-relaxed font-medium">
+                            <span className="text-xs text-gray-500 leading-relaxed font-medium">
                                 {t.agreementPrefix}
                                 <button
                                     type="button"
@@ -448,14 +448,14 @@ export default function RegisterPage() {
                     </button>
                 </form>
 
-                <p className="text-center mt-8 text-zinc-500 text-sm font-medium">
+                <p className="text-center mt-8 text-gray-400 text-sm font-medium">
                     {t.footer}
                     <Link href={`/login?lang=${lang}`} className="text-gv-gold hover:underline font-bold ml-1 transition-all">
                         {t.link}
                     </Link>
                 </p>
 
-                <p className="mt-10 text-[10px] text-zinc-600 text-center leading-relaxed font-bold uppercase tracking-widest">
+                <p className="mt-10 text-[10px] text-gray-500 text-center leading-relaxed font-bold uppercase tracking-widest">
                     {t.pdpaNote}
                 </p>
             </div>
@@ -464,16 +464,16 @@ export default function RegisterPage() {
 
             {/* Agreement Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-[#1a1a1a] border border-white/10 rounded-[32px] p-8 max-w-2xl w-full max-h-[80vh] flex flex-col shadow-2xl">
-                        <h2 className="text-2xl font-black text-white mb-6 uppercase tracking-tighter">{t.modalTitle}</h2>
-                        <div className="overflow-y-auto pr-4 text-zinc-400 text-sm leading-relaxed mb-6 font-medium whitespace-pre-line">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-gray-50 border border-gray-200 rounded-[32px] p-8 max-w-2xl w-full max-h-[80vh] flex flex-col shadow-2xl">
+                        <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase tracking-tighter">{t.modalTitle}</h2>
+                        <div className="overflow-y-auto pr-4 text-gray-500 text-sm leading-relaxed mb-6 font-medium whitespace-pre-line">
                             {t.agreementBody}
                         </div>
                         <div className="flex gap-4 pt-4 mt-auto">
                             <button
                                 onClick={() => { setIsAgreed(false); setIsModalOpen(false); }}
-                                className="flex-1 py-4 text-zinc-500 font-bold hover:text-white transition-colors uppercase tracking-widest text-xs"
+                                className="flex-1 py-4 text-gray-400 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-xs"
                             >
                                 {t.modalReject}
                             </button>

@@ -206,6 +206,11 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
         
         let lockedPortion = 0;
         if (amountRM > userWithdrawable) {
+            // New Rule: If touching locked capital, must withdraw everything
+            if (amountRM < (user?.total_assets || 0)) {
+                alert(lang === 'zh' ? "不允许部分提取锁定资金。要提取锁定资金，您必须提取全部余额。" : "Partial withdrawal of locked capital is not permitted. To withdraw from your locked capital, you must withdraw your entire balance.");
+                return;
+            }
             lockedPortion = amountRM - userWithdrawable;
         }
 
@@ -310,7 +315,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         </div>
                         <div className="space-y-1">
                             <h2 className="text-xl font-bold text-amber-500">{t.verificationInProgress}</h2>
-                            <p className="text-zinc-400 text-sm leading-relaxed">{t.verificationInProgressDesc}</p>
+                            <p className="text-gray-500 text-sm leading-relaxed">{t.verificationInProgressDesc}</p>
                         </div>
                     </div>
                 ) : (user?.kyc_status === 'Rejected' || user?.kyc_status === 'rejected') ? (
@@ -321,8 +326,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                             <div className="space-y-1">
                                 <h2 className="text-xl font-bold text-red-500">{t.verificationUnsuccessful}</h2>
-                                <p className="text-zinc-400 text-sm leading-relaxed">
-                                    {t.verificationUnsuccessfulDesc} <span className="text-white font-medium ml-1 bg-red-500/20 px-2 py-0.5 rounded-md">{user?.rejection_reason || t.rejectionReasonLabel}</span>
+                                <p className="text-gray-500 text-sm leading-relaxed">
+                                    {t.verificationUnsuccessfulDesc} <span className="text-gray-900 font-medium ml-1 bg-red-500/20 px-2 py-0.5 rounded-md">{user?.rejection_reason || t.rejectionReasonLabel}</span>
                                 </p>
                             </div>
                         </div>
@@ -339,7 +344,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                             <div className="space-y-2">
                                 <h2 className="text-2xl font-bold text-gv-gold">{t.completeProfile}</h2>
-                                <p className="text-zinc-400 text-sm leading-relaxed max-w-lg">{t.completeProfileDesc}</p>
+                                <p className="text-gray-500 text-sm leading-relaxed max-w-lg">{t.completeProfileDesc}</p>
                             </div>
                         </div>
                         <Link href={`/verify?lang=${lang}`} className="relative z-10 shrink-0 bg-gv-gold text-black hover:bg-gv-gold/90 font-bold px-8 py-4 rounded-2xl transition-all shadow-[0_10px_20px_rgba(212,175,55,0.15)]">{t.startVerification}</Link>
@@ -348,18 +353,18 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             ) : (
                 <>
                     <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
+                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
                             <div className="relative z-10">
-                                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors">{t.totalProfit}</p>
+                                <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-gray-500 transition-colors">{t.totalProfit}</p>
                                 <h2 className="text-4xl font-black tracking-tighter text-emerald-500 tabular-nums whitespace-nowrap">$ {(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                                <p className="text-[10px] font-bold text-zinc-500 mt-2">≈ RM {Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                <p className="text-[10px] font-bold text-gray-400 mt-2">≈ RM {Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                             </div>
                         </div>
 
-                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
+                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                             </div>
@@ -368,13 +373,13 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                         <div>
                                             <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest">{t.totalEquity}</p>
                                             <h2 className="text-4xl font-black tracking-tighter text-gv-gold tabular-nums whitespace-nowrap">$ {(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                                            <p className="text-[10px] font-bold text-zinc-500 mt-2">≈ RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                            <p className="text-[10px] font-bold text-gray-400 mt-2">≈ RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                         </div>
-                                        <div className="sm:border-l border-white/5 sm:pl-8 flex flex-col justify-center">
+                                        <div className="sm:border-l border-gray-200 sm:pl-8 flex flex-col justify-center">
                                             <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
                                             <div className="flex justify-between items-center group/tier">
                                                 <div className="flex flex-col gap-1">
-                                                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
+                                                    <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">
                                                         {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
                                                     </h2>
                                                 </div>
@@ -391,8 +396,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                         <div className="h-14 w-14 bg-gv-gold/10 text-gv-gold rounded-full flex items-center justify-center mb-4 ring-1 ring-gv-gold/20">
                                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                         </div>
-                                        <h2 className="text-2xl font-black tracking-tighter text-white mb-2 uppercase">{lang === 'en' ? 'Start Investing Now' : '立即开始投资'}</h2>
-                                        <p className="text-zinc-500 text-xs font-medium mb-6 max-w-[250px]">{lang === 'en' ? 'Choose from our tier packages to start earning daily dividends.' : '探索我们专业的理财产品，开启您的财富增长之旅。'}</p>
+                                        <h2 className="text-2xl font-black tracking-tighter text-gray-900 mb-2 uppercase">{lang === 'en' ? 'Start Investing Now' : '立即开始投资'}</h2>
+                                        <p className="text-gray-400 text-xs font-medium mb-6 max-w-[250px]">{lang === 'en' ? 'Choose from our tier packages to start earning daily dividends.' : '探索我们专业的理财产品，开启您的财富增长之旅。'}</p>
                                         <a href="/dashboard/products" className="bg-gv-gold text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-2xl shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/20 transition-all border border-gv-gold/50">{lang === 'en' ? 'View Products' : '查看产品'}</a>
                                     </div>
                                 )}
@@ -400,8 +405,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                     </section>
 
                     <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
-                           <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
+                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] relative overflow-hidden group">
+                           <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
                            {(() => {
                                const tier = (user?.tier && user?.tier !== "Standard") 
                                    ? TIERS.find(t => t.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
@@ -409,15 +414,15 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                const maxUSD = Number(user?.total_investment_usd || 0) * tier.maxDividend;
                                return (
                                    <>
-                                       <h3 className="text-3xl font-black text-white tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
-                                       <p className="text-[10px] text-zinc-500 font-bold mt-1">≈ RM {(maxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
-                                       <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
+                                       <h3 className="text-3xl font-black text-gray-900 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+                                       <p className="text-[10px] text-gray-400 font-bold mt-1">≈ RM {(maxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                                       <p className="text-[10px] text-gray-500 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                    </>
                                );
                            })()}
                         </div>
-                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
-                           <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
+                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] relative overflow-hidden group">
+                           <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
                            {(() => {
                                const tier = (user?.tier && user?.tier !== "Standard") 
                                    ? TIERS.find(t => t.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
@@ -433,8 +438,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                                </div>
                                            )}
                                        </div>
-                                       <p className="text-[10px] text-zinc-500 font-bold mt-1">≈ RM {(maxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
-                                       <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
+                                       <p className="text-[10px] text-gray-400 font-bold mt-1">≈ RM {(maxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                                       <p className="text-[10px] text-gray-500 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                    </>
                                );
                            })()}
@@ -443,7 +448,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
                     {/* Temporary hide Dividend Trends
                     <section className="grid grid-cols-1 gap-8">
-                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8 overflow-hidden">
+                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] space-y-8 overflow-hidden">
                             <h3 className="text-xl font-black uppercase tracking-tighter">{t.dividendTrends}</h3>
                             <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 px-2 sm:px-4">
                                 {dividendHistory && dividendHistory.length > 0 ? dividendHistory.slice(-12).map((div: any, i: number) => (
@@ -452,10 +457,10 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                             className="w-full bg-gv-gold rounded-t-xl transition-all duration-500 group-hover:brightness-125"
                                             style={{ height: `${Math.max(10, (div.amount / (Math.max(...dividendHistory.map((d: any) => d.amount)) || 1)) * 100)}%` }}
                                         ></div>
-                                        <span className="text-[8px] font-black text-zinc-600 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
+                                        <span className="text-[8px] font-black text-gray-500 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
                                     </div>
                                 )) : (
-                                    <div className="w-full h-full flex items-center justify-center text-zinc-700 font-black uppercase tracking-widest text-xs">{t.noDividendData}</div>
+                                    <div className="w-full h-full flex items-center justify-center text-gray-400 font-black uppercase tracking-widest text-xs">{t.noDividendData}</div>
                                 )}
                             </div>
                         </div>
@@ -472,7 +477,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         </Link>
                         <button
                             onClick={(e) => handleProtectedAction(e, () => setIsWithdrawModalOpen(true))}
-                            className="flex-1 bg-[#222] text-white font-black text-xl py-6 rounded-[28px] hover:bg-[#333] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 border border-white/10"
+                            className="flex-1 bg-[#222] text-gray-900 font-black text-xl py-6 rounded-[28px] hover:bg-[#333] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 border border-gray-200"
                         >
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                             {t.withdraw}
@@ -483,28 +488,28 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
             {/* Deposit Modal */}
             {isDepositModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm">
+                    <div className="bg-gray-50 border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                         <div className="flex justify-between items-center">
                             <h2 className="text-3xl font-black text-gv-gold tracking-tighter uppercase">{t.depositTitle}</h2>
-                            <button onClick={() => setIsDepositModalOpen(false)} className="text-zinc-600 hover:text-white transition-colors">
+                            <button onClick={() => setIsDepositModalOpen(false)} className="text-gray-500 hover:text-gray-900 transition-colors">
                                 <X className="h-6 w-6" />
                             </button>
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
-                                <input type="number" value={depositAmount} onChange={(e) => setDepositAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
+                                <input type="number" value={depositAmount} onChange={(e) => setDepositAmount(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.transferDate}</label>
-                                <input type="date" value={depositDate} onChange={(e) => setDepositDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-black focus:outline-none focus:border-gv-gold transition-all text-white" />
+                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.transferDate}</label>
+                                <input type="date" value={depositDate} onChange={(e) => setDepositDate(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-xl font-black focus:outline-none focus:border-gv-gold transition-all text-gray-900" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.bankReceipt}</label>
-                                <div className="border border-white/10 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-colors cursor-pointer relative group">
-                                    <svg className="h-10 w-10 text-zinc-600 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{depositReceipt ? depositReceipt.name : t.selectDocument}</span>
+                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.bankReceipt}</label>
+                                <div className="border border-gray-200 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-white hover:bg-gray-100 transition-colors cursor-pointer relative group">
+                                    <svg className="h-10 w-10 text-gray-500 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{depositReceipt ? depositReceipt.name : t.selectDocument}</span>
                                     <input type="file" onChange={(e) => setDepositReceipt(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,.pdf" />
                                 </div>
                             </div>
@@ -518,24 +523,24 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
             {/* Withdraw Modal */}
             {isWithdrawModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#1a1a1a] border border-white/10 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm">
+                    <div className="bg-gray-50 border border-gray-200 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                         <div className="flex justify-between items-center">
-                            <h2 className="text-3xl font-black text-white tracking-tighter uppercase">{t.withdrawTitle}</h2>
-                            <button onClick={() => setIsWithdrawModalOpen(false)} className="text-zinc-600 hover:text-white transition-colors"><X className="h-6 w-6" /></button>
+                            <h2 className="text-3xl font-black text-gray-900 tracking-tighter uppercase">{t.withdrawTitle}</h2>
+                            <button onClick={() => setIsWithdrawModalOpen(false)} className="text-gray-500 hover:text-gray-900 transition-colors"><X className="h-6 w-6" /></button>
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
-                                <input type="number" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
+                                <input type="number" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                                 {withdrawAmount && (
                                     <p className="mt-2 text-[10px] text-gv-gold font-bold px-1 uppercase tracking-tighter">
                                         ≈ RM {(parseFloat(withdrawAmount) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </p>
                                 )}
-                                <div className="flex justify-between px-1 text-[10px] font-black uppercase tracking-widest text-zinc-500 mt-4">
+                                <div className="flex justify-between px-1 text-[10px] font-black uppercase tracking-widest text-gray-400 mt-4">
                                     <span>Withdrawable</span>
-                                    <span className="text-emerald-500 whitespace-nowrap">$ {(Number(user?.withdrawable_balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-zinc-600 ml-1">(≈ RM {user?.withdrawable_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
+                                    <span className="text-emerald-500 whitespace-nowrap">$ {(Number(user?.withdrawable_balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-gray-500 ml-1">(≈ RM {user?.withdrawable_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
                                 </div>
                             </div>
                             <button onClick={handleWithdrawInitiate} disabled={!withdrawAmount} className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:bg-gv-gold">
@@ -548,29 +553,29 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
             {/* Penalty Confirmation Modal */}
             {showPenaltyConfirm && penaltyInfo && (
-                <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md">
-                    <div className="bg-[#111] border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-gray-900/50 backdrop-blur-md">
+                    <div className="bg-white border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                         <div className="h-20 w-20 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto border border-amber-500/20">
                             <svg className="h-10 w-10 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                         </div>
                         <div className="text-center space-y-4">
-                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Penalty Confirmation</h3>
-                            <p className="text-zinc-500 font-bold text-sm leading-relaxed px-4">
-                                Your withdrawal of <span className="text-white">$ {parseFloat(withdrawAmount).toLocaleString()}</span> includes capital protected by our 6/12-month lock-in period.
+                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">Penalty Confirmation</h3>
+                            <p className="text-gray-400 font-bold text-sm leading-relaxed px-4">
+                                Your withdrawal of <span className="text-gray-900">$ {parseFloat(withdrawAmount).toLocaleString()}</span> includes capital protected by our 6/12-month lock-in period.
                             </p>
-                            <div className="bg-white/5 rounded-3xl p-6 border border-white/5 space-y-4">
-                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                            <div className="bg-white rounded-3xl p-6 border border-gray-200 space-y-4">
+                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
                                     <span>Locked Portion</span>
-                                    <span>$ {(penaltyInfo.lockedPortion / forexRate).toLocaleString()} <span className="text-zinc-600 ml-1">(≈ RM {penaltyInfo.lockedPortion.toLocaleString()})</span></span>
+                                    <span>$ {(penaltyInfo.lockedPortion / forexRate).toLocaleString()} <span className="text-gray-500 ml-1">(≈ RM {penaltyInfo.lockedPortion.toLocaleString()})</span></span>
                                 </div>
                                 <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-red-500">
                                     <span>Penalty (40%)</span>
                                     <span>- $ {(penaltyInfo.penalty / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="opacity-50 ml-1">(≈ -RM {penaltyInfo.penalty.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
                                 </div>
-                                <div className="h-px bg-white/5"></div>
+                                <div className="h-px bg-white"></div>
                                 <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-emerald-500">
                                     <span>Estimated Payout</span>
-                                    <span>$ {(penaltyInfo.payout / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-zinc-600 ml-1 text-[10px] font-bold">(≈ RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
+                                    <span>$ {(penaltyInfo.payout / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-gray-500 ml-1 text-[10px] font-bold">(≈ RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
                                 </div>
                             </div>
                         </div>
@@ -581,7 +586,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             >
                                 I Accept & Continue
                             </button>
-                            <button onClick={() => setShowPenaltyConfirm(false)} className="w-full text-zinc-600 font-bold hover:text-white transition-colors uppercase tracking-widest text-[10px]">Back to Edit</button>
+                            <button onClick={() => setShowPenaltyConfirm(false)} className="w-full text-gray-500 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-[10px]">Back to Edit</button>
                         </div>
                     </div>
                 </div>
@@ -589,11 +594,11 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
             {/* PIN Modal */}
             {isPinModalOpen && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl">
-                    <div className="bg-[#111] border border-gv-gold/50 rounded-[40px] p-12 max-w-md w-full text-center space-y-10 shadow-[0_0_100px_rgba(212,175,55,0.15)] animate-in fade-in zoom-in-90 duration-300">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-gray-900/60 backdrop-blur-xl">
+                    <div className="bg-white border border-gv-gold/50 rounded-[40px] p-12 max-w-md w-full text-center space-y-10 shadow-[0_0_100px_rgba(212,175,55,0.15)] animate-in fade-in zoom-in-90 duration-300">
                         <div>
-                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">{t.securityPin}</h3>
-                            <p className="text-zinc-500 font-medium text-sm px-4">{t.enterPin}</p>
+                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-2">{t.securityPin}</h3>
+                            <p className="text-gray-400 font-medium text-sm px-4">{t.enterPin}</p>
                         </div>
                         <div className="relative flex justify-center items-center group">
                             <input
@@ -601,14 +606,14 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                 maxLength={6}
                                 value={withdrawPIN}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value.replace(/\D/g, ''))}
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold placeholder:opacity-20 flex-1"
+                                className="w-full bg-white border border-gray-200 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold placeholder:opacity-20 flex-1"
                                 autoFocus
                                 placeholder="000000"
                             />
                             <button 
                                 type="button"
                                 onClick={() => setIsPinVisible(!isPinVisible)}
-                                className="absolute right-4 p-2 text-zinc-600 hover:text-gv-gold transition-colors"
+                                className="absolute right-4 p-2 text-gray-500 hover:text-gv-gold transition-colors"
                             >
                                 {isPinVisible ? (
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -621,7 +626,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             <button onClick={handleWithdrawConfirm} disabled={isSubmitting || withdrawPIN.length !== 6} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all">
                                 {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.confirmWithdraw}
                             </button>
-                            <button onClick={() => setIsPinModalOpen(false)} className="w-full text-zinc-600 font-bold hover:text-white transition-colors uppercase tracking-widest text-[10px]">{t.cancelTx}</button>
+                            <button onClick={() => setIsPinModalOpen(false)} className="w-full text-gray-500 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-[10px]">{t.cancelTx}</button>
                         </div>
                     </div>
                 </div>
@@ -629,27 +634,27 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
             {/* Action Toast */}
             {actionToast && (
-                <div className="fixed bottom-6 right-6 z-[600] bg-[#1a1a1a] border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 max-w-sm">
+                <div className="fixed bottom-6 right-6 z-[600] bg-gray-50 border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 max-w-sm">
                     <div className="flex flex-col gap-4">
-                        <p className="text-white font-black text-sm uppercase tracking-widest">{actionToast.message}</p>
+                        <p className="text-gray-900 font-black text-sm uppercase tracking-widest">{actionToast.message}</p>
                         {actionToast.actionUrl && (
                             <button onClick={() => { setActionToast(null); router.push(actionToast.actionUrl!); }} className="bg-gv-gold text-black font-black py-3 rounded-xl uppercase tracking-widest text-xs">{actionToast.actionText}</button>
                         )}
-                        <button onClick={() => setActionToast(null)} className="text-zinc-500 hover:text-white text-[10px] font-bold uppercase tracking-widest">Dismiss</button>
+                        <button onClick={() => setActionToast(null)} className="text-gray-400 hover:text-gray-900 text-[10px] font-bold uppercase tracking-widest">Dismiss</button>
                     </div>
                 </div>
             )}
 
             {/* Success Overlay */}
             {showSuccess && (
-                <div className="fixed inset-0 z-[500] bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
-                    <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[40px] p-10 max-w-md w-full text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
+                <div className="fixed inset-0 z-[500] bg-gray-900/40 backdrop-blur-md flex items-center justify-center p-6">
+                    <div className="bg-gray-50 border border-gv-gold/30 rounded-[40px] p-10 max-w-md w-full text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
                         <div className="h-20 w-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_50px_rgba(16,185,129,0.2)]">
-                            <svg className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
+                            <svg className="h-10 w-10 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
                         </div>
-                        <h2 className="text-3xl font-black uppercase text-white tracking-tighter">{t.successTitle}</h2>
-                        <p className="text-zinc-400 font-medium">{t.successDesc}</p>
-                        {successRefId && <div className="bg-white/5 py-3 rounded-2xl border border-emerald-500/20 text-emerald-400 font-black">Ref: {successRefId}</div>}
+                        <h2 className="text-3xl font-black uppercase text-gray-900 tracking-tighter">{t.successTitle}</h2>
+                        <p className="text-gray-500 font-medium">{t.successDesc}</p>
+                        {successRefId && <div className="bg-white py-3 rounded-2xl border border-emerald-500/20 text-emerald-400 font-black">Ref: {successRefId}</div>}
                         <button onClick={() => setShowSuccess(false)} className="w-full bg-gv-gold text-black font-black py-4 rounded-2xl uppercase tracking-widest">Dismiss</button>
                     </div>
                 </div>

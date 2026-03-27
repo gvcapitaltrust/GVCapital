@@ -111,13 +111,13 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#121212] text-white flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
+        <div className="min-h-screen bg-white text-gray-900 flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
             <title>{`Login | GV Capital Trust`}</title>
 
             <div className="absolute top-8 right-8">
                 <button
                     onClick={() => setLang(lang === "en" ? "zh" : "en")}
-                    className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold hover:bg-white/10 transition-all uppercase tracking-widest text-white/50"
+                    className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold hover:bg-gray-100 transition-all uppercase tracking-widest text-gray-900/50"
                 >
                     {lang === "en" ? "简体中文" : "English"}
                 </button>
@@ -129,36 +129,36 @@ export default function LoginPage() {
                         <img
                             src="/logo.png"
                             alt="GV Capital Trust Logo"
-                            className="h-[100px] w-auto object-contain mix-blend-screen drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
+                            className="h-[100px] w-auto object-contain  drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
                         />
                     </Link>
                     <h1 className="text-4xl font-black uppercase tracking-tighter mb-2">{t.title}</h1>
-                    <p className="text-zinc-500 font-medium">{t.subtitle}</p>
+                    <p className="text-gray-400 font-medium">{t.subtitle}</p>
                 </div>
 
                 {errorMsg && <div className="w-full bg-red-500/20 border border-red-500/50 p-4 rounded-xl text-red-500 text-sm mb-6">{errorMsg}</div>}
 
                 <form onSubmit={handleLogin} className="w-full space-y-6">
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.emailLabel}</label>
+                        <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.emailLabel}</label>
                         <input
                             type="email"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_email}
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.passwordLabel}</label>
+                        <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.passwordLabel}</label>
                         <input
                             type="password"
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_pass}
                         />
                     </div>
@@ -172,7 +172,7 @@ export default function LoginPage() {
                     </button>
                 </form>
 
-                <p className="text-center mt-8 text-zinc-500 text-sm font-medium">
+                <p className="text-center mt-8 text-gray-400 text-sm font-medium">
                     {t.footer}
                     <Link href={`/register?lang=${lang}`} className="text-gv-gold hover:underline font-bold ml-1">
                         {t.link}

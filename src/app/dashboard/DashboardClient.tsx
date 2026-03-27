@@ -343,6 +343,11 @@ export default function DashboardClient() {
 
         // Calculate Penalty if amount > withdrawable
         if (amount > totalWithdrawable) {
+            // New Rule: If touching locked capital, must withdraw everything
+            if (amount < Number(user.total_assets)) {
+                alert(lang === 'zh' ? "不允许部分提取锁定资金。要提取锁定资金，您必须提取全部余额。" : "Partial withdrawal of locked capital is not permitted. To withdraw from your locked capital, you must withdraw your entire balance.");
+                return;
+            }
             const lockedPortion = amount - totalWithdrawable;
             const penalty = lockedPortion * 0.4;
             const payout = amount - penalty;
@@ -851,7 +856,7 @@ export default function DashboardClient() {
     const t = (content as any)[lang];
 
     if (!isMounted || isCheckingAuth) {
-        return <div className="min-h-screen bg-[#121212] flex items-center justify-center p-6"><div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
+        return <div className="min-h-screen bg-white flex items-center justify-center p-6"><div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
     }
 
     // Strict verification check
@@ -861,21 +866,21 @@ export default function DashboardClient() {
     // Instead, we will conditionally render the content inside the main area.
 
     return (
-        <div className="min-h-screen bg-[#121212] text-white flex font-sans overflow-hidden">
+        <div className="min-h-screen bg-white text-gray-900 flex font-sans overflow-hidden">
             <title>{`Dashboard | GV Capital Trust`}</title>
 
-            <aside className={`border-r border-white/10 flex flex-col justify-between hidden md:flex bg-[#0a0a0a] transition-all duration-500 ease-in-out relative group/sidebar ${isSidebarCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
+            <aside className={`border-r border-gray-200 flex flex-col justify-between hidden md:flex bg-white transition-all duration-500 ease-in-out relative group/sidebar ${isSidebarCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
                 {/* Collapse Toggle */}
                 <button 
                     onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                    className="absolute -right-3 top-24 z-10 h-6 w-6 bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-gv-gold hover:text-black transition-all shadow-xl opacity-0 group-hover/sidebar:opacity-100"
+                    className="absolute -right-3 top-24 z-10 h-6 w-6 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center text-gray-900 hover:bg-gv-gold hover:text-black transition-all shadow-xl opacity-0 group-hover/sidebar:opacity-100"
                 >
                     <svg className={`h-3 w-3 transition-transform duration-500 ${isSidebarCollapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M15 19l-7-7 7-7" /></svg>
                 </button>
 
                 <div className="space-y-12">
                     <div className={`flex items-center gap-2 transition-all duration-500 ${isSidebarCollapsed ? "justify-center" : ""}`}>
-                        <img src="/logo.png" alt="GV Capital" className={`object-contain mix-blend-screen transition-all duration-500 ${isSidebarCollapsed ? "h-[30px]" : "h-[60px]"}`} />
+                        <img src="/logo.png" alt="GV Capital" className={`object-contain  transition-all duration-500 ${isSidebarCollapsed ? "h-[30px]" : "h-[60px]"}`} />
                     </div>
 
                     <nav className="space-y-2">
@@ -891,7 +896,7 @@ export default function DashboardClient() {
                             <button
                                 key={item.id}
                                 onClick={() => setActiveTab(item.id as any)}
-                                className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeTab === item.id ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white"}`}
+                                className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeTab === item.id ? "bg-gv-gold text-black shadow-lg" : "text-gray-400 hover:text-gray-900"}`}
                                 title={isSidebarCollapsed ? item.label : ""}
                             >
                                 <span className={`shrink-0 ${isSidebarCollapsed ? "mx-auto" : ""}`}>{item.icon}</span>
@@ -900,8 +905,8 @@ export default function DashboardClient() {
                         ))}
                     </nav>
                 </div>
-                <div className={`space-y-4 pt-4 border-t border-white/5 transition-all duration-500 ${isSidebarCollapsed ? "items-center" : ""}`}>
-                    <button onClick={handleLogout} className={`w-full text-zinc-500 hover:text-red-400 transition-colors text-[10px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-2 ${isSidebarCollapsed ? "justify-center" : ""}`}>
+                <div className={`space-y-4 pt-4 border-t border-gray-200 transition-all duration-500 ${isSidebarCollapsed ? "items-center" : ""}`}>
+                    <button onClick={handleLogout} className={`w-full text-gray-400 hover:text-red-400 transition-colors text-[10px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-2 ${isSidebarCollapsed ? "justify-center" : ""}`}>
                         <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
                         {!isSidebarCollapsed && <span>{t.logout}</span>}
                     </button>
@@ -916,7 +921,7 @@ export default function DashboardClient() {
             />
 
             {/* Premium Bottom Navigation (Mobile Only) */}
-            <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-[#0a0a0a]/80 backdrop-blur-2xl border-t border-white/5 flex items-center justify-around px-2 md:hidden">
+            <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-white/90 backdrop-blur-2xl border-t border-gray-200 flex items-center justify-around px-2 md:hidden">
                 {[
                     { id: "overview", label: "Home", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> },
                     { id: "products", label: "Trade", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> },
@@ -927,7 +932,7 @@ export default function DashboardClient() {
                         key={item.id}
                         onClick={() => setActiveTab(item.id as any)}
                         className={`group relative flex flex-col items-center justify-center w-16 h-16 transition-all duration-300 ${
-                            activeTab === item.id ? "text-gv-gold" : "text-zinc-500"
+                            activeTab === item.id ? "text-gv-gold" : "text-gray-400"
                         }`}
                     >
                         {activeTab === item.id && (
@@ -943,16 +948,16 @@ export default function DashboardClient() {
                 ))}
                 <button
                     onClick={() => setIsSidebarOpen(true)}
-                    className={`flex flex-col items-center justify-center w-16 h-16 text-zinc-500`}
+                    className={`flex flex-col items-center justify-center w-16 h-16 text-gray-400`}
                 >
                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                     <span className="text-[8px] font-black uppercase tracking-widest mt-1">Menu</span>
                 </button>
             </nav>
 
-            <main className="flex-1 overflow-y-auto bg-[#121212] relative flex flex-col">
-                <div className="flex items-center justify-between px-6 py-6 border-b border-white/5 md:hidden bg-[#0a0a0a]">
-                    <img src="/logo.png" alt="GV Capital" className="h-8 w-auto mix-blend-screen" />
+            <main className="flex-1 overflow-y-auto bg-white relative flex flex-col">
+                <div className="flex items-center justify-between px-6 py-6 border-b border-gray-200 md:hidden bg-white">
+                    <img src="/logo.png" alt="GV Capital" className="h-8 w-auto " />
                     <div className="flex items-center gap-4">
                         {user && <NotificationBell userId={user.id} lang={lang} />}
                         <div className="h-10 w-10 rounded-xl bg-gv-gold flex items-center justify-center font-black text-black shadow-lg">
@@ -969,14 +974,14 @@ export default function DashboardClient() {
                 <div className="max-w-7xl mx-auto w-full space-y-12 flex-1 pb-32 p-4 sm:p-6 md:p-12">
                     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
                         <div>
-                            <p className="text-zinc-500 text-[10px] sm:text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
+                            <p className="text-gray-400 text-[10px] sm:text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
                             <h1 className="text-3xl sm:text-4xl font-black flex flex-wrap items-center gap-2 sm:gap-4">
                                 <span>{t.welcome}</span>
                                 <span className="text-gv-gold tracking-tighter truncate max-w-[200px] sm:max-w-none">
                                     {(user && (user.fullName || user.full_name)) ? (user.fullName || user.full_name) : (authLoading ? "..." : "Guest")}
                                 </span>
                                 {Number(user?.total_investment || 0) > 0 && (
-                                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur-md hover:bg-white/10 transition-all cursor-default group/tier-badge ml-0 sm:ml-2">
+                                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur-md hover:bg-gray-100 transition-all cursor-default group/tier-badge ml-0 sm:ml-2">
                                         <TierMedal 
                                             tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
                                             size="sm" 
@@ -1019,22 +1024,22 @@ export default function DashboardClient() {
                                     </div>
                                 ) : (user?.kyc_status === 'Rejected' || user?.kyc_status === 'rejected') && !isReuploading ? (
                                     <div className="bg-red-500 p-12 rounded-[40px] text-center space-y-8 py-24 animate-in fade-in zoom-in-95 duration-700 max-w-3xl mx-auto shadow-[0_30px_60px_rgba(239,68,68,0.3)] border border-red-600/20">
-                                        <div className="h-28 w-28 bg-white/20 rounded-full flex items-center justify-center mx-auto border-4 border-white/10">
-                                            <svg className="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                        <div className="h-28 w-28 bg-gray-200 rounded-full flex items-center justify-center mx-auto border-4 border-gray-200">
+                                            <svg className="h-16 w-16 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                             </svg>
                                         </div>
-                                        <div className="space-y-6 text-white">
+                                        <div className="space-y-6 text-gray-900">
                                             <h2 className="text-4xl font-black uppercase tracking-tighter">{t.verificationUnsuccessful}</h2>
-                                            <div className="bg-white/10 p-6 rounded-3xl border border-white/20 max-w-2xl mx-auto">
-                                                <p className="text-white font-bold text-xl leading-relaxed">
+                                            <div className="bg-gray-100 p-6 rounded-3xl border border-white/20 max-w-2xl mx-auto">
+                                                <p className="text-gray-900 font-bold text-xl leading-relaxed">
                                                     {t.verificationUnsuccessfulDesc}<br/>
                                                     <span className="text-black bg-white/90 px-3 py-1 mt-3 inline-block rounded-xl font-black uppercase tracking-tight">
                                                         {user?.rejection_reason || t.rejectionReasonLabel}
                                                     </span>
                                                 </p>
                                             </div>
-                                            <p className="text-white/80 font-medium">{t.reuploadPrompt}</p>
+                                            <p className="text-gray-900/80 font-medium">{t.reuploadPrompt}</p>
                                             <button 
                                                 onClick={() => router.push(`/verify?lang=${lang}`)}
                                                 className="bg-white text-red-600 font-black px-10 py-5 rounded-2xl uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all"
@@ -1044,7 +1049,7 @@ export default function DashboardClient() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="bg-[#1a1a1a] p-12 rounded-[40px] border border-white/5 shadow-xl space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700 text-center py-20">
+                                    <div className="bg-gray-50 p-12 rounded-[40px] border border-gray-200 shadow-xl space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700 text-center py-20">
                                         <div className="h-24 w-24 bg-gv-gold/10 rounded-full flex items-center justify-center mx-auto text-gv-gold shadow-[0_0_50px_rgba(212,175,55,0.1)]">
                                             <svg className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                                         </div>
@@ -1052,28 +1057,28 @@ export default function DashboardClient() {
                                             <h2 className="text-3xl font-black uppercase tracking-tighter">
                                                 {user?.kyc_status === 'Draft' ? t.verificationInProgress : t.completeProfile}
                                             </h2>
-                                            <p className="text-zinc-500 font-medium leading-relaxed max-w-lg mx-auto">
+                                            <p className="text-gray-400 font-medium leading-relaxed max-w-lg mx-auto">
                                                 {t.completeProfileDesc}
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{t.totalEquity}</p>
+                                            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{t.totalEquity}</p>
                                             <div className="flex flex-col items-center">
                                                 <h3 className="text-4xl font-black text-[#e0c872] tracking-tighter tabular-nums">
                                                     $ {(user?.total_assets / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </h3>
-                                                <p className="text-[10px] font-bold text-zinc-500 mt-2">
+                                                <p className="text-[10px] font-bold text-gray-400 mt-2">
                                                     RM {user?.total_assets?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                 </p>
                                             </div>
-                                            <p className="text-zinc-600 text-[10px] font-bold mt-1 lowercase opacity-50">{t.investmentNote}</p>
+                                            <p className="text-gray-500 text-[10px] font-bold mt-1 lowercase opacity-50">{t.investmentNote}</p>
                                             {user?.locked_capital > 0 && (
                                                 <div className="mt-4 flex flex-col items-center gap-1">
                                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
                                                         <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></div>
                                                         <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">$ {(user.locked_capital / forexRate).toLocaleString()} USD Locked</span>
                                                     </div>
-                                                    <p className="text-[8px] text-zinc-600 font-bold uppercase">(RM {user.locked_capital.toLocaleString()} RM)</p>
+                                                    <p className="text-[8px] text-gray-500 font-bold uppercase">(RM {user.locked_capital.toLocaleString()} RM)</p>
                                                 </div>
                                             )}
                                         </div>
@@ -1089,20 +1094,20 @@ export default function DashboardClient() {
                                 <>
                                     <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         {/* Card 1: Total Withdrawable Amount */}
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
+                                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
                                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                             </div>
                                             <div className="relative z-10">
                                                 <div>
-                                                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-zinc-400 transition-colors">{t.totalProfit}</p>
+                                                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-gray-500 transition-colors">{t.totalProfit}</p>
                                                     <div className="flex flex-col gap-2">
                                                         <h2 className="text-4xl font-black tracking-tighter text-emerald-500 tabular-nums whitespace-nowrap">
                                                             {isCheckingAuth ? "..." : `$ ${(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                         </h2>
                                                         {!isCheckingAuth && (
                                                             <div className="flex flex-col gap-1">
-                                                                <p className="text-[10px] font-bold text-zinc-500">
+                                                                <p className="text-[10px] font-bold text-gray-400">
                                                                     ≈ RM {Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                                 </p>
                                                                 <span className="text-[10px] font-black text-emerald-500/60 uppercase tracking-widest">{t.dividendNote}</span>
@@ -1114,7 +1119,7 @@ export default function DashboardClient() {
                                         </div>
 
                                         {/* Card 2: Total Investment & Current Package */}
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
+                                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
                                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                             </div>
@@ -1127,7 +1132,7 @@ export default function DashboardClient() {
                                                         </h2>
                                                         {!isCheckingAuth && (
                                                             <div className="flex flex-col gap-1">
-                                                                <p className="text-[10px] font-bold text-zinc-500">
+                                                                <p className="text-[10px] font-bold text-gray-400">
                                                                     ≈ RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                                 </p>
                                                                 <span className="text-[10px] font-black text-gv-gold/60 uppercase tracking-widest">{t.investmentNote}</span>
@@ -1135,11 +1140,11 @@ export default function DashboardClient() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="sm:border-l border-t sm:border-t-0 border-white/5 pt-6 sm:pt-0 sm:pl-8 flex flex-col justify-center">
+                                                <div className="sm:border-l border-t sm:border-t-0 border-gray-200 pt-6 sm:pt-0 sm:pl-8 flex flex-col justify-center">
                                                     <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
                                                     <div className="flex items-center gap-6 group/tier">
                                                         <div className="flex flex-col gap-1.5 min-w-0 flex-1">
-                                                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter truncate leading-none">
+                                                            <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter truncate leading-none">
                                                                 {Number(user?.total_investment_usd || 0) > 0 
                                                                     ? ((user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name)
                                                                     : t.noInvestment}
@@ -1168,11 +1173,11 @@ export default function DashboardClient() {
 
                                     {(Number(user?.total_investment || 0) > 0 || Number(user?.profit || 0) > 0) && (
                                         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
+                                            <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] relative overflow-hidden group">
                                                 <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
                                                     <svg className="h-20 w-20 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                 </div>
-                                                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
+                                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
                                                 {(() => {
                                                     const currentTier = (user?.tier && user?.tier !== "Standard") 
                                                         ? TIERS.find(t => t.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
@@ -1180,23 +1185,23 @@ export default function DashboardClient() {
                                                     const monthlyMaxUSD = Number(user?.total_investment_usd || 0) * currentTier.maxDividend;
                                                     return (
                                                         <>
-                                                            <h3 className="text-3xl font-black text-white tabular-nums whitespace-nowrap">
+                                                            <h3 className="text-3xl font-black text-gray-900 tabular-nums whitespace-nowrap">
                                                                 <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
                                                                 $ {monthlyMaxUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                                             </h3>
-                                                            <p className="text-[10px] text-zinc-500 font-bold mt-1">≈ RM {(monthlyMaxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
-                                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">
+                                                            <p className="text-[10px] text-gray-400 font-bold mt-1">≈ RM {(monthlyMaxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                                                            <p className="text-[10px] text-gray-500 font-bold uppercase mt-4 tracking-tighter">
                                                                 {t.dividendRateDesc} ({t.basedOn} {currentTier.name})
                                                             </p>
                                                         </>
                                                     );
                                                 })()}
                                             </div>
-                                            <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] relative overflow-hidden group">
+                                            <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] relative overflow-hidden group">
                                                 <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
                                                     <svg className="h-20 w-20 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                                 </div>
-                                                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
+                                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
                                                 {(() => {
                                                     const currentTier = (user?.tier && user?.tier !== "Standard") 
                                                         ? TIERS.find(t => t.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
@@ -1208,8 +1213,8 @@ export default function DashboardClient() {
                                                                 <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
                                                                 $ {yearlyMaxUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                                             </h3>
-                                                            <p className="text-[10px] text-zinc-500 font-bold mt-1">≈ RM {(yearlyMaxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
-                                                            <p className="text-[10px] text-zinc-600 font-bold uppercase mt-4 tracking-tighter">{t.dividendRateDesc} ({t.basedOn} {currentTier.name})</p>
+                                                            <p className="text-[10px] text-gray-400 font-bold mt-1">≈ RM {(yearlyMaxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                                                            <p className="text-[10px] text-gray-500 font-bold uppercase mt-4 tracking-tighter">{t.dividendRateDesc} ({t.basedOn} {currentTier.name})</p>
                                                         </>
                                                     );
                                                 })()}
@@ -1219,7 +1224,7 @@ export default function DashboardClient() {
 
                                     {/* Temporary hide Dividend Trends
                                     <section className="grid grid-cols-1 gap-8">
-                                        <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] space-y-8 overflow-hidden">
+                                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] space-y-8 overflow-hidden">
                                             <h3 className="text-lg font-black uppercase tracking-tight">{t.dividendTrends}</h3>
                                             <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 px-2 sm:px-4">
                                                 {dividendHistory.length > 0 ? dividendHistory.slice(-12).map((div: any, i: number) => (
@@ -1228,10 +1233,10 @@ export default function DashboardClient() {
                                                             className="w-full bg-gv-gold rounded-t-xl transition-all duration-500 group-hover:brightness-125"
                                                             style={{ height: `${Math.max(10, (div.amount / (Math.max(...dividendHistory.map((d: any) => d.amount)) || 1)) * 100)}%` }}
                                                         ></div>
-                                                        <span className="text-[8px] font-black text-zinc-600 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
+                                                        <span className="text-[8px] font-black text-gray-500 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
                                                     </div>
                                                 )) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-zinc-700 font-black uppercase tracking-widest text-xs">{t.noDividendData}</div>
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-400 font-black uppercase tracking-widest text-xs">{t.noDividendData}</div>
                                                 )}
                                             </div>
                                         </div>
@@ -1241,7 +1246,7 @@ export default function DashboardClient() {
                             <section className="flex flex-col sm:flex-row gap-6">
                                 <Link
                                     href={`/deposit?lang=${lang}`}
-                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gv-gold text-black hover:bg-gv-gold/90 hover:-translate-y-1 shadow-[0_15px_30px_rgba(212,175,55,0.2)]" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
+                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gv-gold text-black hover:bg-gv-gold/90 hover:-translate-y-1 shadow-[0_15px_30px_rgba(212,175,55,0.2)]" : "bg-white text-gray-500 cursor-not-allowed grayscale"}`}
                                     onClick={(e) => handleProtectedAction(e, () => router.push(`/deposit?lang=${lang}`))}
                                 >
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4v16m8-8H4" /></svg>
@@ -1249,7 +1254,7 @@ export default function DashboardClient() {
                                 </Link>
                                 <button
                                     onClick={(e) => handleProtectedAction(e, () => setIsWithdrawModalOpen(true))}
-                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-[#222] text-white hover:bg-[#333] hover:-translate-y-1 border border-white/10" : "bg-white/5 text-zinc-600 cursor-not-allowed grayscale"}`}
+                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-[#222] text-gray-900 hover:bg-[#333] hover:-translate-y-1 border border-gray-200" : "bg-white text-gray-500 cursor-not-allowed grayscale"}`}
                                 >
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                                     {t.withdraw}
@@ -1262,29 +1267,29 @@ export default function DashboardClient() {
                                 <h3 className="text-xl font-black uppercase tracking-tight">{t.history}</h3>
                                 <button
                                     onClick={() => generateStatement()}
-                                    className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black text-xs py-3 px-6 rounded-xl uppercase tracking-widest transition-all flex items-center gap-2"
+                                    className="bg-white border border-gray-200 hover:bg-gray-100 text-gray-900 font-black text-xs py-3 px-6 rounded-xl uppercase tracking-widest transition-all flex items-center gap-2"
                                 >
                                     <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
                                     {t.downloadStatement}
                                 </button>
                             </div>
-                            <div className="border border-white/10 rounded-[40px] overflow-x-auto bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
+                            <div className="border border-gray-200 rounded-[40px] overflow-x-auto bg-white backdrop-blur-md shadow-2xl">
                                 <table className="w-full text-left min-w-[800px]">
-                                    <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
+                                    <thead className="bg-white border-b border-gray-200 text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">
                                         <tr><th className="px-8 py-6">{t.date}</th><th className="px-8 py-6">{t.refId}</th><th className="px-8 py-6">{t.type}</th><th className="px-8 py-6">{t.amount}</th><th className="px-8 py-6 text-right">{t.status}</th></tr>
                                     </thead>
-                                    <tbody className="divide-y divide-white/[0.03]">
+                                    <tbody className="divide-y divide-gray-100">
                                         {transactions.map((tx: any, idx: number) => (
-                                            <tr key={idx} className="text-sm font-bold group hover:bg-white/[0.02] transition-colors">
-                                                <td className="px-8 py-6 text-zinc-500">
+                                            <tr key={idx} className="text-sm font-bold group hover:bg-gray-50 transition-colors">
+                                                <td className="px-8 py-6 text-gray-400">
                                                     {new Date(tx.transfer_date || tx.created_at || tx.date).toISOString().split('T')[0]}
                                                 </td>
-                                                <td className="px-8 py-6 font-mono text-xs text-white/40">{tx.ref_id || tx.ref}</td>
+                                                <td className="px-8 py-6 font-mono text-xs text-gray-900/40">{tx.ref_id || tx.ref}</td>
                                                  <td className="px-8 py-6 uppercase tracking-widest text-[10px]">
                                                      <div className="flex flex-col">
                                                          <span>{tx.metadata?.description || tx.type}</span>
                                                          {tx.metadata?.processed_by_name && (
-                                                             <span className="text-[8px] text-zinc-600 font-bold lowercase tracking-tight mt-1">
+                                                             <span className="text-[8px] text-gray-500 font-bold lowercase tracking-tight mt-1">
                                                                  Allocated by {tx.metadata.processed_by_name}
                                                              </span>
                                                          )}
@@ -1293,14 +1298,14 @@ export default function DashboardClient() {
                                                 <td className={`px-8 py-6 text-lg tracking-tighter ${Number(tx.amount) >= 0 ? "text-emerald-400" : "text-red-500"}`}>
                                                     <div className="flex flex-col">
                                                         <span>RM {Number(tx.amount || 0).toFixed(2)}</span>
-                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
+                                                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6 text-right"><span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' : tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>{tx.status}</span></td>
                                             </tr>
                                         ))}
                                         {transactions.length === 0 && (
-                                            <tr><td colSpan={5} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
+                                            <tr><td colSpan={5} className="px-8 py-20 text-center text-gray-500 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
                                         )}
                                     </tbody>
                                 </table>
@@ -1309,36 +1314,36 @@ export default function DashboardClient() {
                     ) : activeTab === "referrals" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-12">
                             {/* Refer-a-Friend Header */}
-                            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                            <div className="bg-gray-50 border border-gray-200 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                 <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                                     <div className="space-y-6">
-                                        <h2 className="text-2xl font-black uppercase tracking-tight text-white">{t.referTitle}</h2>
-                                        <p className="text-zinc-500 font-medium text-base leading-relaxed">{t.referSubtitle}</p>
+                                        <h2 className="text-2xl font-black uppercase tracking-tight text-gray-900">{t.referTitle}</h2>
+                                        <p className="text-gray-400 font-medium text-base leading-relaxed">{t.referSubtitle}</p>
                                         <div className="flex flex-col sm:flex-row gap-4">
-                                            <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex-1 flex items-center justify-between">
+                                            <div className="bg-white border border-gray-200 rounded-2xl p-5 flex-1 flex items-center justify-between">
                                                 <span className="text-gv-gold font-black tracking-widest uppercase">{user?.username}</span>
                                                 <button 
                                                     onClick={() => {
                                                         navigator.clipboard.writeText(user?.username || "");
                                                         setActionToast({ message: t.copied });
                                                     }}
-                                                    className="text-white hover:text-gv-gold transition-colors text-xs font-black uppercase tracking-widest pl-4 border-l border-white/10"
+                                                    className="text-gray-900 hover:text-gv-gold transition-colors text-xs font-black uppercase tracking-widest pl-4 border-l border-gray-200"
                                                 >
                                                     {t.copyCode}
                                                 </button>
                                             </div>
                                             <button 
                                                 onClick={() => window.open(`https://wa.me/601139396338?text=Join%20GV%20Capital%20using%20my%20code:%20${user?.username}`, '_blank')}
-                                                className="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-8 py-5 rounded-2xl flex items-center justify-center gap-3 transition-all"
+                                                className="bg-emerald-500 hover:bg-emerald-600 text-gray-900 font-black px-8 py-5 rounded-2xl flex items-center justify-center gap-3 transition-all"
                                             >
                                                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                                                 {t.shareWA}
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-center justify-center bg-white/5 border border-white/10 rounded-[40px] p-12 text-center group-hover:bg-white/10 transition-all">
-                                        <p className="text-zinc-500 font-black uppercase tracking-widest mb-2 text-[10px]">{t.totalReferred}</p>
+                                    <div className="flex flex-col items-center justify-center bg-white border border-gray-200 rounded-[40px] p-12 text-center group-hover:bg-gray-100 transition-all">
+                                        <p className="text-gray-400 font-black uppercase tracking-widest mb-2 text-[10px]">{t.totalReferred}</p>
                                         <h3 className="text-5xl font-black text-gv-gold tabular-nums">{referredCount}</h3>
                                     </div>
                                 </div>
@@ -1347,9 +1352,9 @@ export default function DashboardClient() {
                             {/* Referred Users List */}
                             <div className="space-y-6">
                                 <h3 className="text-xl font-black uppercase tracking-tight">{t.referredUsersList}</h3>
-                                <div className="border border-white/10 rounded-[40px] overflow-x-auto bg-[#1a1a1a]/50 backdrop-blur-md shadow-2xl">
+                                <div className="border border-gray-200 rounded-[40px] overflow-x-auto bg-white backdrop-blur-md shadow-2xl">
                                     <table className="w-full text-left min-w-[800px]">
-                                        <thead className="bg-white/5 border-b border-white/10 text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">
+                                        <thead className="bg-white border-b border-gray-200 text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">
                                             <tr>
                                                 <th className="px-8 py-6">{t.username}</th>
                                                 <th className="px-8 py-6">{t.registrationDate}</th>
@@ -1357,21 +1362,21 @@ export default function DashboardClient() {
                                                 <th className="px-8 py-6 text-right">{t.accountStatus}</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-white/[0.03]">
+                                        <tbody className="divide-y divide-gray-100">
                                             {referredUsers.map((ref: any, idx: number) => (
-                                                <tr key={idx} className="text-sm font-bold group hover:bg-white/[0.02] transition-colors">
+                                                <tr key={idx} className="text-sm font-bold group hover:bg-gray-50 transition-colors">
                                                     <td className="px-8 py-6">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center text-xs font-black text-gv-gold">
+                                                            <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center text-xs font-black text-gv-gold">
                                                                 {ref.full_name?.[0] || 'U'}
                                                             </div>
                                                             <div className="flex flex-col">
-                                                                <span className="text-white">{ref.full_name}</span>
-                                                                <span className="text-[10px] text-zinc-600">@{ref.username}</span>
+                                                                <span className="text-gray-900">{ref.full_name}</span>
+                                                                <span className="text-[10px] text-gray-500">@{ref.username}</span>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-8 py-6 text-zinc-500 font-mono text-xs">
+                                                    <td className="px-8 py-6 text-gray-400 font-mono text-xs">
                                                         {new Date(ref.created_at).toLocaleDateString()}
                                                     </td>
                                                     <td className="px-8 py-6">
@@ -1387,7 +1392,7 @@ export default function DashboardClient() {
                                                 </tr>
                                             ))}
                                             {referredUsers.length === 0 && (
-                                                <tr><td colSpan={4} className="px-8 py-20 text-center text-zinc-600 font-bold uppercase tracking-widest">No referrals yet</td></tr>
+                                                <tr><td colSpan={4} className="px-8 py-20 text-center text-gray-500 font-bold uppercase tracking-widest">No referrals yet</td></tr>
                                             )}
                                         </tbody>
                                     </table>
@@ -1403,34 +1408,34 @@ export default function DashboardClient() {
                         />
                     ) : activeTab === "statements" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl overflow-hidden relative group">
+                            <div className="bg-gray-50 border border-gray-200 p-12 rounded-[40px] shadow-2xl overflow-hidden relative group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                 <div className="relative z-10 max-w-2xl">
-                                    <h2 className="text-2xl font-black uppercase tracking-tight mb-3 text-white">{t.statementCenter}</h2>
-                                    <p className="text-zinc-500 font-medium text-sm">{t.statementCenterDesc}</p>
+                                    <h2 className="text-2xl font-black uppercase tracking-tight mb-3 text-gray-900">{t.statementCenter}</h2>
+                                    <p className="text-gray-400 font-medium text-sm">{t.statementCenterDesc}</p>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12">
                                         <div className="space-y-4">
-                                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.selectMonth}</label>
+                                            <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.selectMonth}</label>
                                             <select
                                                 value={selectedMonth}
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedMonth(parseInt(e.target.value))}
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
+                                                className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
                                             >
                                                 {t.months.map((m: string, i: number) => (
-                                                    <option key={i} value={i} className="bg-[#1a1a1a] text-white">{m}</option>
+                                                    <option key={i} value={i} className="bg-gray-50 text-gray-900">{m}</option>
                                                 ))}
                                             </select>
                                         </div>
                                         <div className="space-y-4">
-                                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.selectYear}</label>
+                                            <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.selectYear}</label>
                                             <select
                                                 value={selectedYear}
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedYear(parseInt(e.target.value))}
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
+                                                className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
                                             >
                                                 {[2024, 2025, 2026].map(y => (
-                                                    <option key={y} value={y} className="bg-[#1a1a1a] text-white">{y}</option>
+                                                    <option key={y} value={y} className="bg-gray-50 text-gray-900">{y}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -1450,7 +1455,7 @@ export default function DashboardClient() {
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {/* Personal Information */}
-                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-2xl space-y-8 relative overflow-hidden group">
+                                <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-2xl space-y-8 relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                     <div className="relative z-10">
                                         <h3 className="text-xl font-black uppercase tracking-tighter text-gv-gold mb-8 flex items-center gap-3">
@@ -1459,25 +1464,25 @@ export default function DashboardClient() {
                                         </h3>
                                         <div className="grid gap-6">
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.fullName}</p>
-                                                <p className="text-lg font-bold text-white tracking-tight">{user?.fullName || "-"}</p>
+                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.fullName}</p>
+                                                <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.fullName || "-"}</p>
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.username}</p>
-                                                <p className="text-lg font-bold text-white tracking-tight">@{user?.username || "-"}</p>
+                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.username}</p>
+                                                <p className="text-lg font-bold text-gray-900 tracking-tight">@{user?.username || "-"}</p>
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.email}</p>
-                                                <p className="text-lg font-bold text-white tracking-tight">{user?.email || "-"}</p>
+                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.email}</p>
+                                                <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.email || "-"}</p>
                                             </div>
                                             <div className="grid grid-cols-2 gap-6">
                                                 <div className="space-y-1">
-                                                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.phone}</p>
-                                                    <p className="text-lg font-bold text-white tracking-tight">{user?.phone || "-"}</p>
+                                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.phone}</p>
+                                                    <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.phone || "-"}</p>
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.country}</p>
-                                                    <p className="text-lg font-bold text-white tracking-tight">{user?.country || "-"}</p>
+                                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.country}</p>
+                                                    <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.country || "-"}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1485,7 +1490,7 @@ export default function DashboardClient() {
                                 </div>
 
                                 {/* Compliance & Industry */}
-                                <div className="bg-[#1a1a1a] border border-white/5 p-10 rounded-[40px] shadow-2xl space-y-8 relative overflow-hidden group">
+                                <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-2xl space-y-8 relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                     <div className="relative z-10">
                                         <h3 className="text-xl font-black uppercase tracking-tighter text-gv-gold mb-8 flex items-center gap-3">
@@ -1494,19 +1499,19 @@ export default function DashboardClient() {
                                         </h3>
                                         <div className="grid gap-6">
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.occupation}</p>
-                                                <p className="text-lg font-bold text-white tracking-tight">{user?.occupation || "-"}</p>
+                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.occupation}</p>
+                                                <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.occupation || "-"}</p>
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.industry}</p>
-                                                <p className="text-lg font-bold text-white tracking-tight">{user?.industry || "-"}</p>
+                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.industry}</p>
+                                                <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.industry || "-"}</p>
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.wealthSource}</p>
-                                                <p className="text-lg font-bold text-white tracking-tight">{user?.source_of_wealth || "-"}</p>
+                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.wealthSource}</p>
+                                                <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.source_of_wealth || "-"}</p>
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.riskProfile}</p>
+                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.riskProfile}</p>
                                                 <p className="text-lg font-bold text-emerald-400 tracking-tight">{user?.risk_profile === "Moderate" ? "40%" : (user?.risk_profile || "-")}</p>
                                             </div>
                                         </div>
@@ -1524,22 +1529,22 @@ export default function DashboardClient() {
                                     </h3>
                                     <div className="flex flex-col md:flex-row gap-12">
                                         <div className="space-y-1 flex-1">
-                                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.bankName}</p>
-                                            <p className="text-2xl font-black text-white tracking-widest uppercase">{user?.bank_name || "-"}</p>
+                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.bankName}</p>
+                                            <p className="text-2xl font-black text-gray-900 tracking-widest uppercase">{user?.bank_name || "-"}</p>
                                         </div>
                                         <div className="space-y-1 flex-1">
-                                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.accNumber}</p>
-                                            <p className="text-2xl font-black text-white tracking-[0.2em] font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
+                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.accNumber}</p>
+                                            <p className="text-2xl font-black text-gray-900 tracking-[0.2em] font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col md:flex-row gap-12 mt-8 pt-8 border-t border-white/5">
+                                    <div className="flex flex-col md:flex-row gap-12 mt-8 pt-8 border-t border-gray-200">
                                         <div className="space-y-1 flex-1">
-                                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.accHolder}</p>
-                                            <p className="text-2xl font-black text-white tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
+                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.accHolder}</p>
+                                            <p className="text-2xl font-black text-gray-900 tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
                                         </div>
                                         <div className="space-y-1 flex-1">
-                                            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.bankStatement}</p>
+                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.bankStatement}</p>
                                             {user?.bank_statement_url ? (
                                                 <button 
                                                     onClick={async () => {
@@ -1547,13 +1552,13 @@ export default function DashboardClient() {
                                                         if (data?.signedUrl) window.open(data.signedUrl, '_blank');
                                                         else alert("Could not generate secure link for your statement.");
                                                     }}
-                                                    className="inline-flex items-center gap-2 bg-white/5 hover:bg-gv-gold hover:text-black border border-white/10 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all mt-2"
+                                                    className="inline-flex items-center gap-2 bg-white hover:bg-gv-gold hover:text-black border border-gray-200 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all mt-2"
                                                 >
                                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                     {t.viewStatement}
                                                 </button>
                                             ) : (
-                                                <p className="text-zinc-600 font-bold uppercase text-[10px] mt-2 italic">Not Provided</p>
+                                                <p className="text-gray-500 font-bold uppercase text-[10px] mt-2 italic">Not Provided</p>
                                             )}
                                         </div>
                                     </div>
@@ -1562,7 +1567,7 @@ export default function DashboardClient() {
                         </section>
                     ) : (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="bg-[#1a1a1a] border border-white/5 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                            <div className="bg-gray-50 border border-gray-200 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                 <div className="relative z-10 max-w-xl text-left space-y-10">
                                     <div className="mb-10 p-6 bg-gv-gold/10 border border-gv-gold/20 rounded-3xl">
@@ -1570,7 +1575,7 @@ export default function DashboardClient() {
                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A3.323 3.323 0 0010.605 7.88a3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651" /></svg>
                                             Active Protection
                                         </h4>
-                                        <p className="text-zinc-400 text-xs font-medium leading-relaxed">
+                                        <p className="text-gray-500 text-xs font-medium leading-relaxed">
                                             {lang === 'en' 
                                                 ? "Withdrawals are secured by your unique 6-digit Security PIN established during account registration."
                                                 : "提款由您在开户时设置的唯一 6 位安全密码保护。"}
@@ -1578,38 +1583,38 @@ export default function DashboardClient() {
                                     </div>
 
                                     <div>
-                                        <h2 className="text-2xl font-black uppercase tracking-tight mb-2 text-white">{t.securityTitle}</h2>
-                                        <p className="text-zinc-500 font-medium">{t.securitySubtitle}</p>
+                                        <h2 className="text-2xl font-black uppercase tracking-tight mb-2 text-gray-900">{t.securityTitle}</h2>
+                                        <p className="text-gray-400 font-medium">{t.securitySubtitle}</p>
                                     </div>
 
                                     <form onSubmit={handlePasswordUpdate} className="space-y-6 text-left">
                                         <div className="space-y-2">
-                                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.currentPass}</label>
+                                            <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.currentPass}</label>
                                             <input
                                                 name="currentPassword"
                                                 type="password"
                                                 required
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
+                                                className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
                                                 placeholder="••••••••"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.newPass}</label>
+                                            <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.newPass}</label>
                                             <input
                                                 name="newPassword"
                                                 type="password"
                                                 required
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
+                                                className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
                                                 placeholder="••••••••"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.confirmPass}</label>
+                                            <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.confirmPass}</label>
                                             <input
                                                 name="confirmPassword"
                                                 type="password"
                                                 required
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
+                                                className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
                                                 placeholder="••••••••"
                                             />
                                         </div>
@@ -1631,28 +1636,28 @@ export default function DashboardClient() {
 
             {/* Deposit Modal */}
             {isDepositModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm">
+                    <div className="bg-gray-50 border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-black text-gv-gold tracking-tight uppercase">{t.depositTitle}</h2>
-                            <button onClick={() => setIsDepositModalOpen(false)} className="text-zinc-600 hover:text-white transition-colors">
+                            <button onClick={() => setIsDepositModalOpen(false)} className="text-gray-500 hover:text-gray-900 transition-colors">
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
-                                <input type="number" value={depositAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
+                                <input type="number" value={depositAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositAmount(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.transferDate}</label>
-                                <input type="date" value={depositDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositDate(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-black focus:outline-none focus:border-gv-gold transition-all text-white inverted-scheme-date-picker" />
+                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.transferDate}</label>
+                                <input type="date" value={depositDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositDate(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-xl font-black focus:outline-none focus:border-gv-gold transition-all text-gray-900 inverted-scheme-date-picker" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.bankReceipt}</label>
-                                <div className="border border-white/10 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-white/5 hover:bg-white/10 transition-colors cursor-pointer relative group">
-                                    <svg className="h-10 w-10 text-zinc-600 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{depositReceipt ? (depositReceipt as File).name : t.selectDocument}</span>
+                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.bankReceipt}</label>
+                                <div className="border border-gray-200 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-white hover:bg-gray-100 transition-colors cursor-pointer relative group">
+                                    <svg className="h-10 w-10 text-gray-500 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{depositReceipt ? (depositReceipt as File).name : t.selectDocument}</span>
                                     <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositReceipt(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,.pdf" />
                                 </div>
                             </div>
@@ -1666,28 +1671,28 @@ export default function DashboardClient() {
 
             {/* Penalty Confirmation Modal */}
             {showPenaltyConfirm && penaltyInfo && (
-                <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md">
-                    <div className="bg-[#1a1a1a] border border-red-500/50 rounded-[40px] p-10 max-w-lg w-full text-center space-y-8 shadow-[0_0_50px_rgba(239,68,68,0.2)] animate-in fade-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-gray-900/50 backdrop-blur-md">
+                    <div className="bg-gray-50 border border-red-500/50 rounded-[40px] p-10 max-w-lg w-full text-center space-y-8 shadow-[0_0_50px_rgba(239,68,68,0.2)] animate-in fade-in zoom-in-95 duration-300">
                         <div className="h-20 w-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
                             <svg className="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                         </div>
                         <div>
-                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-4">
+                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-4">
                                 {lang === 'en' ? "Penalty Warning" : "违约处罚提示"}
                             </h3>
-                            <div className="space-y-4 text-left bg-white/5 p-6 rounded-2xl border border-white/10">
-                                <p className="text-zinc-400 text-sm font-medium leading-relaxed">
+                            <div className="space-y-4 text-left bg-white p-6 rounded-2xl border border-gray-200">
+                                <p className="text-gray-500 text-sm font-medium leading-relaxed">
                                     {lang === 'en' 
                                         ? `Part of your withdrawal (RM ${penaltyInfo.lockedPortion.toLocaleString(undefined, { minimumFractionDigits: 2 })}) is still within the 6-month capital lock-in period. An early withdrawal penalty of 40% applies to this portion.`
                                         : `您的提款中有一部分 (RM ${penaltyInfo.lockedPortion.toLocaleString(undefined, { minimumFractionDigits: 2 })}) 仍处于 6 个月的资金锁定期内。根据协议，该部分将收取 40% 的提前提款违约金。`}
                                 </p>
-                                <div className="pt-4 border-t border-white/10 space-y-2">
+                                <div className="pt-4 border-t border-gray-200 space-y-2">
                                     <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                                        <span className="text-zinc-500">{lang === 'en' ? "Penalty Amount" : "处罚金额"}</span>
+                                        <span className="text-gray-400">{lang === 'en' ? "Penalty Amount" : "处罚金额"}</span>
                                         <span className="text-red-500">- RM {penaltyInfo.penalty.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                     </div>
                                     <div className="flex justify-between text-base font-black uppercase tracking-tight">
-                                        <span className="text-zinc-300">{lang === 'en' ? "Estimated Payout" : "预计到账金额"}</span>
+                                        <span className="text-gray-700">{lang === 'en' ? "Estimated Payout" : "预计到账金额"}</span>
                                         <span className="text-gv-gold">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                     </div>
                                 </div>
@@ -1699,7 +1704,7 @@ export default function DashboardClient() {
                                     setShowPenaltyConfirm(false);
                                     setIsPinModalOpen(true);
                                 }} 
-                                className="w-full bg-red-500 text-white font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl hover:bg-red-600 transition-all hover:-translate-y-1"
+                                className="w-full bg-red-500 text-gray-900 font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl hover:bg-red-600 transition-all hover:-translate-y-1"
                             >
                                 {lang === 'en' ? "I Accept Penalty" : "我接受并继续"}
                             </button>
@@ -1708,7 +1713,7 @@ export default function DashboardClient() {
                                     setShowPenaltyConfirm(false);
                                     setPenaltyInfo(null);
                                 }} 
-                                className="w-full text-zinc-500 font-bold hover:text-white transition-colors uppercase tracking-widest text-[10px]"
+                                className="w-full text-gray-400 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-[10px]"
                             >
                                 {lang === 'en' ? "Cancel & Re-adjust Amount" : "取消并重新调整金额"}
                             </button>
@@ -1719,30 +1724,30 @@ export default function DashboardClient() {
 
             {/* Withdraw Modal */}
             {isWithdrawModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#1a1a1a] border border-white/10 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm">
+                    <div className="bg-gray-50 border border-gray-200 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                          <div className="flex justify-between items-center">
-                            <h2 className="text-xl font-black text-white tracking-tight uppercase">{t.withdrawTitle}</h2>
-                            <button onClick={() => setIsWithdrawModalOpen(false)} className="text-zinc-600 hover:text-white transition-colors">
+                            <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase">{t.withdrawTitle}</h2>
+                            <button onClick={() => setIsWithdrawModalOpen(false)} className="text-gray-500 hover:text-gray-900 transition-colors">
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
-                                    <input type="number" value={withdrawAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawAmount(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                                    <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
+                                    <input type="number" value={withdrawAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawAmount(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                                 </div>
                                 
                                 <div className="px-1 space-y-4">
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                                            <span className="text-zinc-500">Withdrawable Balance</span>
+                                            <span className="text-gray-400">Withdrawable Balance</span>
                                             <span className="text-emerald-500">RM {withdrawalMetrics.withdrawable.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
                                         </div>
                                         {withdrawalMetrics.lockedCapital > 0 && (
                                             <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-tighter">
-                                                <span className="text-zinc-600">Locked (6-month term)</span>
+                                                <span className="text-gray-500">Locked (6-month term)</span>
                                                 <span className="text-amber-500/70">RM {withdrawalMetrics.lockedCapital.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         )}
@@ -1758,7 +1763,7 @@ export default function DashboardClient() {
                                                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                                         <span>{lang === 'en' ? "Penalty Notice" : "扣除提示"}</span>
                                                     </div>
-                                                    <p className="text-[10px] text-zinc-400 font-bold leading-relaxed">
+                                                    <p className="text-[10px] text-gray-500 font-bold leading-relaxed">
                                                         {lang === 'en' 
                                                             ? "A 40% penalty will be applied to the portion of your withdrawal taken from locked capital."
                                                             : "提款金额超出可自由提取部分，超出部分将涉及 40% 的提前提取费用。"}
@@ -1784,14 +1789,14 @@ export default function DashboardClient() {
 
             {/* PIN Modal */}
             {isPinModalOpen && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl">
-                    <div className="bg-[#111] border border-gv-gold/50 rounded-[40px] p-12 max-w-md w-full text-center space-y-10 shadow-[0_0_100px_rgba(212,175,55,0.15)] animate-in fade-in zoom-in-90 duration-300">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-gray-900/60 backdrop-blur-xl">
+                    <div className="bg-white border border-gv-gold/50 rounded-[40px] p-12 max-w-md w-full text-center space-y-10 shadow-[0_0_100px_rgba(212,175,55,0.15)] animate-in fade-in zoom-in-90 duration-300">
                         <div className="h-20 w-20 bg-gv-gold/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-gv-gold/20">
                             <svg className="h-10 w-10 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                         </div>
                         <div>
-                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">{t.securityPin}</h3>
-                            <p className="text-zinc-500 font-medium text-sm px-4">{t.enterPin}</p>
+                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-2">{t.securityPin}</h3>
+                            <p className="text-gray-400 font-medium text-sm px-4">{t.enterPin}</p>
                         </div>
                         <div className="relative flex justify-center items-center group">
                             <input
@@ -1799,14 +1804,14 @@ export default function DashboardClient() {
                                 maxLength={6}
                                 value={withdrawPIN}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value.replace(/\D/g, ''))}
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold placeholder:opacity-20 flex-1"
+                                className="w-full bg-white border border-gray-200 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold placeholder:opacity-20 flex-1"
                                 autoFocus
                                 placeholder="000000"
                             />
                             <button 
                                 type="button"
                                 onClick={() => setIsPinVisible(!isPinVisible)}
-                                className="absolute right-4 p-2 text-zinc-600 hover:text-gv-gold transition-colors"
+                                className="absolute right-4 p-2 text-gray-500 hover:text-gv-gold transition-colors"
                             >
                                 {isPinVisible ? (
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -1824,7 +1829,7 @@ export default function DashboardClient() {
                                 {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.confirmWithdraw}
                             </button>
                             
-                            <button onClick={() => setIsPinModalOpen(false)} className="w-full text-zinc-600 font-bold hover:text-white transition-colors uppercase tracking-widest text-[10px]">
+                            <button onClick={() => setIsPinModalOpen(false)} className="w-full text-gray-500 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-[10px]">
                                 {t.cancelTx}
                             </button>
                         </div>
@@ -1838,21 +1843,21 @@ export default function DashboardClient() {
 
             {/* Success Overlays */}
             {(showSuccess || kycShowSuccess) && (
-                <div className="fixed inset-0 z-[500] bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
-                    <div className="bg-[#1a1a1a] border border-gv-gold/30 rounded-[40px] p-10 max-w-md w-full text-center space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-500">
+                <div className="fixed inset-0 z-[500] bg-gray-900/40 backdrop-blur-md flex items-center justify-center p-6">
+                    <div className="bg-gray-50 border border-gv-gold/30 rounded-[40px] p-10 max-w-md w-full text-center space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-500">
                         <div className="h-20 w-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_50px_rgba(16,185,129,0.2)] animate-bounce-subtle">
-                            <svg className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
+                            <svg className="h-10 w-10 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
                         </div>
                         <div className="space-y-4">
-                            <h2 className="text-3xl font-black mb-2 uppercase tracking-tighter text-white">
+                            <h2 className="text-3xl font-black mb-2 uppercase tracking-tighter text-gray-900">
                                 {kycShowSuccess ? t.docSubmitted : t.successTitle}
                             </h2>
-                            <p className="text-zinc-400 font-medium text-base leading-relaxed">
+                            <p className="text-gray-500 font-medium text-base leading-relaxed">
                                 {kycShowSuccess ? t.docSubmittedDesc : t.successDesc}
                             </p>
                         </div>
                         {successRefId && !kycShowSuccess && (
-                            <div className="bg-white/5 px-6 py-3 rounded-2xl border border-emerald-500/20 text-emerald-400 font-black tracking-widest uppercase text-sm flex items-center justify-center gap-3">
+                            <div className="bg-white px-6 py-3 rounded-2xl border border-emerald-500/20 text-emerald-400 font-black tracking-widest uppercase text-sm flex items-center justify-center gap-3">
                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>Ref: {successRefId}
                             </div>
                         )}
@@ -1864,11 +1869,11 @@ export default function DashboardClient() {
             )}
             {/* Action Toast */}
             {actionToast && (
-                <div className="fixed bottom-6 right-6 z-[600] bg-[#1a1a1a] border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 max-w-sm shadow-gv-gold/10">
+                <div className="fixed bottom-6 right-6 z-[600] bg-gray-50 border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 max-w-sm shadow-gv-gold/10">
                     <div className="flex flex-col gap-5">
                         <div className="flex items-start justify-between gap-4">
-                            <p className="text-white font-black text-sm uppercase tracking-widest leading-relaxed">{actionToast.message}</p>
-                            <button onClick={() => setActionToast(null)} className="text-zinc-500 hover:text-white transition-colors shrink-0">
+                            <p className="text-gray-900 font-black text-sm uppercase tracking-widest leading-relaxed">{actionToast.message}</p>
+                            <button onClick={() => setActionToast(null)} className="text-gray-400 hover:text-gray-900 transition-colors shrink-0">
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>

@@ -79,8 +79,8 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter text-white">{t.title}</h2>
-                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{t.subtitle}</p>
+                    <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h2>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
                 </div>
                 <div className="flex flex-col md:flex-row gap-4">
                     <input
@@ -88,25 +88,25 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                         placeholder={t.searchPlaceholder}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs w-full md:w-64 focus:outline-none focus:border-gv-gold transition-all"
+                        className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs w-full md:w-64 focus:outline-none focus:border-gv-gold transition-all"
                     />
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-gv-gold transition-all text-white"
+                        className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-gv-gold transition-all text-gray-900"
                     >
-                        <option value="All" className="bg-[#111]">{t.statusAll}</option>
-                        <option value="Pending" className="bg-[#111]">{t.statusPending}</option>
-                        <option value="Approved" className="bg-[#111]">{t.statusApproved}</option>
-                        <option value="Rejected" className="bg-[#111]">{t.statusRejected}</option>
+                        <option value="All" className="bg-white">{t.statusAll}</option>
+                        <option value="Pending" className="bg-white">{t.statusPending}</option>
+                        <option value="Approved" className="bg-white">{t.statusApproved}</option>
+                        <option value="Rejected" className="bg-white">{t.statusRejected}</option>
                     </select>
                 </div>
             </div>
 
-            <div className="bg-[#1a1a1a]/50 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+            <div className="bg-white backdrop-blur-md rounded-3xl border border-gray-200 overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                        <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400">
                             <tr>
                                 <th className="px-8 py-6">{t.tableUser}</th>
                                 <th className="px-8 py-6">{t.tableAmount}</th>
@@ -115,22 +115,22 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                 <th className="px-8 py-6 text-right">{t.tableActions}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/[0.03]">
+                        <tbody className="divide-y divide-gray-100">
                             {filteredDeposits.map((tx, idx) => (
-                                <tr key={idx} className="text-sm group hover:bg-white/[0.02] transition-all">
+                                <tr key={idx} className="text-sm group hover:bg-gray-50 transition-all">
                                     <td className="px-8 py-6">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-white uppercase tracking-tight">{tx.profiles?.full_name}</span>
-                                            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
+                                            <span className="font-black text-gray-900 uppercase tracking-tight">{tx.profiles?.full_name}</span>
+                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">
                                         <div className="flex flex-col">
                                             <span className="font-black text-emerald-400 tabular-nums">RM {Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-tighter">(${(Number(tx.amount) / forexRate).toFixed(2)} USD)</span>
+                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(tx.amount) / forexRate).toFixed(2)} USD)</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6 text-zinc-500 font-mono text-[10px] uppercase">
+                                    <td className="px-8 py-6 text-gray-400 font-mono text-[10px] uppercase">
                                         {new Date(tx.created_at).toLocaleString('en-GB', { 
                                             day: '2-digit', 
                                             month: '2-digit', 
@@ -151,9 +151,9 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                     <td className="px-8 py-6 text-right">
                                         <div className="flex items-center justify-end gap-3">
                                             {tx.status === 'Pending' && (
-                                                <button onClick={() => openReceipt(tx)} className="bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all border border-white/5">{t.viewReceipt}</button>
+                                                <button onClick={() => openReceipt(tx)} className="bg-white hover:bg-gray-100 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all border border-gray-200">{t.viewReceipt}</button>
                                             )}
-                                            {tx.status !== 'Pending' && <span className="text-[10px] text-zinc-700 font-black uppercase italic">Processed</span>}
+                                            {tx.status !== 'Pending' && <span className="text-[10px] text-gray-400 font-black uppercase italic">Processed</span>}
                                         </div>
                                     </td>
                                 </tr>
@@ -161,7 +161,7 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                         </tbody>
                     </table>
                     {filteredDeposits.length === 0 && (
-                        <div className="p-20 text-center text-zinc-600 font-black uppercase tracking-[0.2em]">{t.noDeposits}</div>
+                        <div className="p-20 text-center text-gray-500 font-black uppercase tracking-[0.2em]">{t.noDeposits}</div>
                     )}
                 </div>
             </div>
@@ -169,20 +169,20 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
             {/* Receipt Modal/Drawer */}
             {isDrawerOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-300">
-                    <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={() => setIsDrawerOpen(false)}></div>
-                    <div className="relative bg-[#111] border border-white/10 rounded-[40px] w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
-                        <div className="p-6 border-b border-white/5 flex items-center justify-between shrink-0">
+                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-xl" onClick={() => setIsDrawerOpen(false)}></div>
+                    <div className="relative bg-white border border-gray-200 rounded-[40px] w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+                        <div className="p-6 border-b border-gray-200 flex items-center justify-between shrink-0">
                             <div>
-                                <h3 className="text-xl font-black uppercase tracking-tighter text-white">Deposit Verification</h3>
-                                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Ref: {selectedTx?.ref_id}</p>
+                                <h3 className="text-xl font-black uppercase tracking-tighter text-gray-900">Deposit Verification</h3>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Ref: {selectedTx?.ref_id}</p>
                             </div>
-                            <button onClick={() => setIsDrawerOpen(false)} className="h-10 w-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-all">
+                            <button onClick={() => setIsDrawerOpen(false)} className="h-10 w-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-all">
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
                         
                         <div className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto">
-                            <div className="h-full rounded-2xl border border-white/10 bg-black overflow-hidden relative">
+                            <div className="h-full rounded-2xl border border-gray-200 bg-white overflow-hidden relative">
                                 {receiptUrl ? (
                                     <img src={receiptUrl} alt="Receipt" className="w-full h-full object-contain" />
                                 ) : (
@@ -191,27 +191,27 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                             <div className="space-y-8 flex flex-col justify-between">
                                 <div className="space-y-6">
-                                    <div className="bg-white/5 p-5 rounded-3xl border border-white/5">
-                                        <p className="text-[9px] text-zinc-500 font-black uppercase tracking-widest mb-3">Transaction Details</p>
+                                    <div className="bg-white p-5 rounded-3xl border border-gray-200">
+                                        <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-3">Transaction Details</p>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <p className="text-[8px] font-black uppercase text-zinc-600 tracking-tighter">Amount MYR</p>
-                                                <p className="text-xl font-black text-white">RM {Number(selectedTx?.amount).toFixed(2)}</p>
+                                                <p className="text-[8px] font-black uppercase text-gray-500 tracking-tighter">Amount MYR</p>
+                                                <p className="text-xl font-black text-gray-900">RM {Number(selectedTx?.amount).toFixed(2)}</p>
                                             </div>
                                             <div>
-                                                <p className="text-[8px] font-black uppercase text-zinc-600 tracking-tighter">Credit USD</p>
+                                                <p className="text-[8px] font-black uppercase text-gray-500 tracking-tighter">Credit USD</p>
                                                 <p className="text-xl font-black text-gv-gold">${(Number(selectedTx?.amount) / forexRate).toFixed(2)}</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="space-y-3">
                                         <div className="flex flex-col">
-                                            <span className="text-[9px] text-zinc-500 font-black uppercase tracking-widest">Client Identity</span>
-                                            <span className="text-base font-black text-white uppercase">{selectedTx?.profiles?.full_name}</span>
+                                            <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">Client Identity</span>
+                                            <span className="text-base font-black text-gray-900 uppercase">{selectedTx?.profiles?.full_name}</span>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-[9px] text-zinc-500 font-black uppercase tracking-widest">Transfer Reference</span>
-                                            <span className="text-base font-black text-zinc-400 font-mono italic">{selectedTx?.metadata?.bank_reference || "None Provided"}</span>
+                                            <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">Transfer Reference</span>
+                                            <span className="text-base font-black text-gray-500 font-mono italic">{selectedTx?.metadata?.bank_reference || "None Provided"}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -219,7 +219,7 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                     <button onClick={async () => {
                                         await handleRejectDeposit(selectedTx);
                                         setIsDrawerOpen(false);
-                                    }} className="bg-red-500/10 border border-red-500/20 text-red-500 font-black py-4 rounded-2xl uppercase tracking-widest text-[10px] hover:bg-red-500 hover:text-white transition-all">{t.reject}</button>
+                                    }} className="bg-red-500/10 border border-red-500/20 text-red-500 font-black py-4 rounded-2xl uppercase tracking-widest text-[10px] hover:bg-red-500 hover:text-gray-900 transition-all">{t.reject}</button>
                                     <button onClick={async () => {
                                         await handleApproveDeposit(selectedTx);
                                         setIsDrawerOpen(false);

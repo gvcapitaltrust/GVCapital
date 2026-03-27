@@ -74,17 +74,17 @@ export default function AdminSidebar({
     };
 
     return (
-        <aside className={`border-r border-white/10 flex flex-col justify-between hidden lg:flex bg-[#0a0a0a] transition-all duration-500 ease-in-out relative group/sidebar ${isCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
+        <aside className={`border-r border-gray-200 flex flex-col justify-between hidden lg:flex bg-white transition-all duration-500 ease-in-out relative group/sidebar ${isCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
             <button 
                 onClick={onToggleCollapse}
-                className="absolute -right-3 top-24 z-10 h-6 w-6 bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-gv-gold hover:text-black transition-all shadow-xl opacity-0 group-hover/sidebar:opacity-100"
+                className="absolute -right-3 top-24 z-10 h-6 w-6 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:bg-gv-gold hover:text-white transition-all shadow-lg opacity-0 group-hover/sidebar:opacity-100"
             >
                 <svg className={`h-3 w-3 transition-transform duration-500 ${isCollapsed ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M15 19l-7-7 7-7" /></svg>
             </button>
 
             <div className="space-y-12">
                 <div className={`flex items-center transition-all duration-500 ${isCollapsed ? "justify-center" : "gap-2"}`}>
-                    <img src="/logo.png" alt="GV Capital" className={`transition-all duration-500 object-contain mix-blend-screen ${isCollapsed ? "h-8" : "h-[60px]"}`} />
+                    <img src="/logo.png" alt="GV Capital" className={`transition-all duration-500 object-contain ${isCollapsed ? "h-8" : "h-[60px]"}`} />
                 </div>
 
                 <nav className="space-y-2">
@@ -96,7 +96,7 @@ export default function AdminSidebar({
                                 href={`${item.path}?lang=${lang}`}
                                 className={`w-full flex items-center transition-all duration-300 relative group/item ${
                                     isCollapsed ? "justify-center p-3 rounded-xl" : "gap-4 px-4 py-2.5 rounded-2xl"
-                                } ${isActive ? "bg-gv-gold text-black shadow-lg shadow-gv-gold/20" : "text-zinc-500 hover:text-white"}`}
+                                } ${isActive ? "bg-gv-gold text-white shadow-lg shadow-gv-gold/20" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"}`}
                                 title={isCollapsed ? item.label : ""}
                             >
                                 {item.icon}
@@ -104,7 +104,7 @@ export default function AdminSidebar({
                                     <span className="text-[10px] font-black uppercase tracking-widest truncate">{item.label}</span>
                                 )}
                                 {isCollapsed && (
-                                    <div className="absolute left-full ml-4 px-3 py-1.5 bg-gv-gold text-black text-[9px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover/item:opacity-100 transition-all z-[100] shadow-2xl whitespace-nowrap">
+                                    <div className="absolute left-full ml-4 px-3 py-1.5 bg-gv-gold text-white text-[9px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover/item:opacity-100 transition-all z-[100] shadow-2xl whitespace-nowrap">
                                         {item.label}
                                     </div>
                                 )}
@@ -114,14 +114,14 @@ export default function AdminSidebar({
                 </nav>
             </div>
             
-            <div className="space-y-4 pt-4 border-t border-white/5 overflow-hidden">
+            <div className="space-y-4 pt-4 border-t border-gray-200 overflow-hidden">
                 <div className={`flex items-center px-4 pb-2 transition-all duration-500 ${isCollapsed ? "justify-center" : "justify-between"}`}>
-                    {!isCollapsed && <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.maintenance}</span>}
-                    <button onClick={onToggleMaintenance} className={`h-5 rounded-full relative transition-all ${isCollapsed ? "w-8" : "w-10"} ${maintenanceMode ? "bg-red-500" : "bg-white/10"}`}>
-                        <div className={`h-3.5 w-3.5 bg-white rounded-full absolute top-[3px] transition-all ${maintenanceMode ? (isCollapsed ? "right-0.5" : "right-1") : (isCollapsed ? "left-0.5" : "left-1")}`}></div>
+                    {!isCollapsed && <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t.maintenance}</span>}
+                    <button onClick={onToggleMaintenance} className={`h-5 rounded-full relative transition-all ${isCollapsed ? "w-8" : "w-10"} ${maintenanceMode ? "bg-red-500" : "bg-gray-200"}`}>
+                        <div className={`h-3.5 w-3.5 bg-white rounded-full absolute top-[3px] transition-all shadow-sm ${maintenanceMode ? (isCollapsed ? "right-0.5" : "right-1") : (isCollapsed ? "left-0.5" : "left-1")}`}></div>
                     </button>
                 </div>
-                <button onClick={handleLogout} className={`w-full text-zinc-500 hover:text-red-400 transition-colors flex items-center ${isCollapsed ? "justify-center p-3" : "gap-4 px-4 py-2.5"} rounded-2xl`}>
+                <button onClick={handleLogout} className={`w-full text-gray-400 hover:text-red-500 transition-colors flex items-center ${isCollapsed ? "justify-center p-3" : "gap-4 px-4 py-2.5"} rounded-2xl hover:bg-red-50`}>
                     <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
                     {!isCollapsed && <span className="text-[10px] font-black uppercase tracking-widest truncate">Logout</span>}
                 </button>

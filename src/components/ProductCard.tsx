@@ -13,7 +13,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ tier, isActive, isQualified }: ProductCardProps) {
   const colorMap: Record<string, string> = {
-    zinc: "border-zinc-500/30 text-zinc-400",
+    zinc: "border-zinc-500/30 text-gray-500",
     slate: "border-slate-400/30 text-slate-300",
     "gv-gold": "border-gv-gold/50 text-gv-gold",
     amber: "border-amber-500/50 text-amber-500",
@@ -30,8 +30,8 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
     <div
       className={`relative flex flex-col p-4 rounded-xl border transition-all duration-500 ${
         isActive
-          ? `${colorMap[tier.color]} bg-[#1a1a1a] scale-[1.02] ${glowMap[tier.color]} z-10`
-          : "border-white/5 bg-[#111] opacity-60 hover:opacity-100"
+          ? `${colorMap[tier.color]} bg-gray-50 scale-[1.02] ${glowMap[tier.color]} z-10`
+          : "border-gray-200 bg-white opacity-60 hover:opacity-100"
       }`}
     >
       {isQualified && isActive && (
@@ -43,7 +43,7 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
       <div className="flex justify-between items-start mb-3 gap-2">
         <div className="min-w-0 flex-1">
           <h3 className="text-sm xl:text-base font-black mb-0.5 uppercase tracking-tight break-words">{tier.name}</h3>
-          <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
+          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
             {tier.id === 'vvip' 
               ? `> ${formatUSD(tier.minAmount)}` 
               : `${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
@@ -54,15 +54,15 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
 
       <div className="mb-4 flex flex-col gap-1">
         <div className="flex items-baseline gap-1">
-          <span className="text-xl font-black text-white shrink-0 flex items-baseline">
-            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mr-1 whitespace-nowrap">
+          <span className="text-xl font-black text-gray-900 shrink-0 flex items-baseline">
+            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-1 whitespace-nowrap">
               {tier.id === "silver" ? "min" : "up to"}
             </span>
             {tier.id === "silver" 
               ? `${(tier.minDividend * 100).toFixed(0)}%` 
               : `${(tier.maxDividend * 100).toFixed(0)}%`}
           </span>
-          <span className="text-[9px] font-bold text-zinc-500 ml-0.5 uppercase tracking-tighter">Monthly Dividend</span>
+          <span className="text-[9px] font-bold text-gray-400 ml-0.5 uppercase tracking-tighter">Monthly Dividend</span>
         </div>
         
         <div className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
 
       <ul className="space-y-2 flex-1">
         {tier.id === 'platinum' && (
-          <li className="flex items-start gap-1.5 pb-2 border-b border-white/5 mb-2">
+          <li className="flex items-start gap-1.5 pb-2 border-b border-gray-200 mb-2">
             <div className="h-4 w-4 rounded-md bg-gv-gold/10 flex items-center justify-center shrink-0">
               <Check className="h-2.5 w-2.5 text-gv-gold" />
             </div>
@@ -97,8 +97,8 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
         )}
         {tier.benefits.map((benefit, idx) => (
           <li key={idx} className="flex items-start gap-1.5">
-            <Check className={`h-3 w-3 mt-0.5 shrink-0 ${isActive ? 'text-gv-gold' : 'text-zinc-600'}`} />
-            <span className="text-[11px] text-zinc-400 font-medium leading-tight">{benefit}</span>
+            <Check className={`h-3 w-3 mt-0.5 shrink-0 ${isActive ? 'text-gv-gold' : 'text-gray-500'}`} />
+            <span className="text-[11px] text-gray-500 font-medium leading-tight">{benefit}</span>
           </li>
         ))}
       </ul>

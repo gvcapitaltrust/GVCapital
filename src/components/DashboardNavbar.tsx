@@ -34,21 +34,21 @@ export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNav
             <div className="flex items-center gap-4 md:hidden mb-2">
                 <button 
                    onClick={onOpenMobileMenu}
-                   className="h-9 w-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-zinc-500"
+                   className="h-9 w-9 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-400"
                 >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
-                <img src="/logo.png" alt="GV Capital" className="h-6 w-auto object-contain mix-blend-screen" />
+                <img src="/logo.png" alt="GV Capital" className="h-6 w-auto object-contain " />
             </div>
 
             <div>
                 <h1 className="text-lg sm:text-xl font-bold flex flex-wrap items-center gap-2">
-                    <span className="text-zinc-300">{t.welcome}</span>
+                    <span className="text-gray-700">{t.welcome}</span>
                     <span className="text-gv-gold font-black tracking-tight truncate max-w-[200px] sm:max-w-none">
                         {(user && (user.fullName || user.full_name)) ? (user.fullName || user.full_name) : (isCheckingAuth ? "..." : "Guest")}
                     </span>
                     {Number(user?.total_investment || 0) > 0 && (
-                        <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1 backdrop-blur-md hover:bg-white/10 transition-all cursor-default group/tier-badge">
+                        <div className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-xl px-2.5 py-1 backdrop-blur-md hover:bg-gray-100 transition-all cursor-default group/tier-badge">
                             <TierMedal 
                                 tierId={(user.tier && user.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(balanceUSD || 0)).id} 
                                 size="sm" 
@@ -63,7 +63,7 @@ export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNav
             </div>
             <div className="flex items-center gap-4 hidden sm:flex">
                 {user && <NotificationBell userId={user.id} lang={lang} />}
-                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-1.5 backdrop-blur-md">
+                <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl p-1.5 backdrop-blur-md">
                     <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-xs border border-gv-gold/30 shadow-lg capitalize">
                         {user ? (user.fullName?.[0] || user.email?.[0] || "U") : (
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

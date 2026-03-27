@@ -111,15 +111,15 @@ export default function NotificationBell({ userId, lang = "en" }: NotificationBe
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={handleToggle}
-                className="relative p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-gv-gold/30 transition-all group"
+                className="relative p-3 rounded-2xl bg-white border border-gray-200 hover:bg-gray-100 hover:border-gv-gold/30 transition-all group"
             >
-                <svg className={`h-6 w-6 transition-all ${unreadCount > 0 ? "text-gv-gold" : "text-zinc-500 group-hover:text-white"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg className={`h-6 w-6 transition-all ${unreadCount > 0 ? "text-gv-gold" : "text-gray-400 group-hover:text-gray-900"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 {unreadCount > 0 && (
                     <span className="absolute top-2.5 right-2.5 flex h-4 w-4">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 text-[10px] font-black text-white items-center justify-center">
+                        <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 text-[10px] font-black text-gray-900 items-center justify-center">
                             {unreadCount}
                         </span>
                     </span>
@@ -127,31 +127,31 @@ export default function NotificationBell({ userId, lang = "en" }: NotificationBe
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-4 w-80 bg-[#1a1a1a] border border-white/10 rounded-[32px] shadow-2xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
-                    <div className="p-6 border-b border-white/10 flex justify-between items-center bg-[#121212]/50">
-                        <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">{t.notifications}</h3>
+                <div className="absolute right-0 mt-4 w-80 bg-gray-50 border border-gray-200 rounded-[32px] shadow-2xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-white0">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-gray-500">{t.notifications}</h3>
                         {unreadCount > 0 && <span className="text-[10px] bg-gv-gold text-black font-black px-2 py-0.5 rounded-full">{unreadCount} {t.new}</span>}
                     </div>
-                    <div className="max-h-[400px] overflow-y-auto divide-y divide-white/[0.03]">
+                    <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
                         {notifications.length > 0 ? notifications.map((notification) => (
                             <div key={notification.id} className={`p-6 transition-colors ${notification.is_read ? "opacity-60" : "bg-gv-gold/5"}`}>
                                 <div className="flex justify-between items-start mb-1">
-                                    <h4 className="text-sm font-black text-white uppercase tracking-tight leading-tight">{notification.title}</h4>
-                                    <span className="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">
+                                    <h4 className="text-sm font-black text-gray-900 uppercase tracking-tight leading-tight">{notification.title}</h4>
+                                    <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">
                                         {new Date(notification.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>
-                                <p className="text-xs text-zinc-400 font-medium leading-relaxed">{notification.message}</p>
+                                <p className="text-xs text-gray-500 font-medium leading-relaxed">{notification.message}</p>
                             </div>
                         )) : (
-                            <div className="p-10 text-center text-zinc-600 font-bold uppercase tracking-widest text-[10px]">
+                            <div className="p-10 text-center text-gray-500 font-bold uppercase tracking-widest text-[10px]">
                                 {t.noNotifications}
                             </div>
                         )}
                     </div>
                     {notifications.length > 0 && (
-                        <div className="p-4 bg-[#121212]/30 text-center">
-                            <span className="text-[9px] font-black text-zinc-700 uppercase tracking-[0.2em]">{t.endOfFeed}</span>
+                        <div className="p-4 bg-white/30 text-center">
+                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">{t.endOfFeed}</span>
                         </div>
                     )}
                 </div>

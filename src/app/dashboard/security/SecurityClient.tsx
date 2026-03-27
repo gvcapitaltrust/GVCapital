@@ -53,7 +53,7 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
-            <div className="bg-[#1a1a1a] border border-white/5 p-8 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl">
+            <div className="bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                 <div className="relative z-10 space-y-10">
                     <div className="mb-10 p-6 bg-gv-gold/10 border border-gv-gold/20 rounded-3xl">
@@ -61,7 +61,7 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A3.323 3.323 0 0010.605 7.88a3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651" /></svg>
                             Active Protection
                         </h4>
-                        <p className="text-zinc-400 text-xs font-medium leading-relaxed">
+                        <p className="text-gray-500 text-xs font-medium leading-relaxed">
                             {lang === 'en' 
                                 ? "Withdrawals are secured by your unique 6-digit Security PIN established during account registration."
                                 : "提款由您在开户时设置的唯一 6 位安全密码保护。"}
@@ -69,8 +69,8 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                     </div>
 
                     <div className="space-y-4">
-                        <h2 className="text-2xl font-bold uppercase tracking-tight text-white">{t.securityTitle}</h2>
-                        <p className="text-zinc-500 font-medium leading-relaxed max-w-lg">{t.securitySubtitle}</p>
+                        <h2 className="text-2xl font-bold uppercase tracking-tight text-gray-900">{t.securityTitle}</h2>
+                        <p className="text-gray-400 font-medium leading-relaxed max-w-lg">{t.securitySubtitle}</p>
                     </div>
 
                     <form onSubmit={handlePasswordUpdate} className="grid gap-6">
@@ -80,12 +80,12 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                             { label: t.confirmPass, name: "confirmPassword" },
                         ].map((field, i) => (
                             <div key={i} className="space-y-2">
-                                <label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest px-1">{field.label}</label>
+                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{field.label}</label>
                                 <input
                                     name={field.name}
                                     type="password"
                                     required
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-base font-bold focus:outline-none focus:border-gv-gold transition-all"
+                                    className="w-full bg-white border border-gray-200 rounded-xl p-4 text-base font-bold focus:outline-none focus:border-gv-gold transition-all"
                                     placeholder="••••••••"
                                 />
                             </div>

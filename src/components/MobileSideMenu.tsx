@@ -76,16 +76,16 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                 onClick={onClose}
             />
             <aside
-                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#0a0a0a] border-r border-white/5 p-8 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden ${
+                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-white border-r border-gray-200 p-8 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden ${
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
                 <div className="space-y-12">
                     <div className="flex items-center justify-between">
-                        <img src="/logo.png" alt="GV Capital" className="h-[40px] w-auto object-contain mix-blend-screen" />
+                        <img src="/logo.png" alt="GV Capital" className="h-[40px] w-auto object-contain " />
                         <button
                             onClick={onClose}
-                            className="h-10 w-10 flex items-center justify-center rounded-full border border-white/10 text-zinc-500 hover:text-white transition-colors"
+                            className="h-10 w-10 flex items-center justify-center rounded-full border border-gray-200 text-gray-400 hover:text-gray-900 transition-colors"
                         >
                             <X className="h-5 w-5" />
                         </button>
@@ -93,14 +93,14 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
 
                     <div className="space-y-8">
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-4 px-2">Settings & Tools</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-4 px-2">Settings & Tools</p>
                             <nav className="space-y-1">
                                 {menuItems.map((item) => (
                                     <button
                                         key={item.id}
                                         onClick={() => { router.push(`${item.path}?lang=${lang}`); onClose(); }}
                                         className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                                            currentTab === item.id ? "bg-gv-gold text-black shadow-lg" : "text-zinc-500 hover:text-white hover:bg-white/5"
+                                            currentTab === item.id ? "bg-gv-gold text-black shadow-lg" : "text-gray-400 hover:text-gray-900 hover:bg-white"
                                         }`}
                                     >
                                         {item.icon}
@@ -111,8 +111,8 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                         </div>
 
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-4 px-2">Support</p>
-                            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-white hover:bg-white/5 transition-all">
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-4 px-2">Support</p>
+                            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 hover:bg-white transition-all">
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
                                 Contact Support
                             </button>
@@ -122,13 +122,13 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
 
                 <div className="space-y-6">
                     {isReallyLoggedIn ? (
-                        <div className="p-6 bg-white/5 rounded-[32px] border border-white/5 space-y-4">
+                        <div className="p-6 bg-white rounded-[32px] border border-gray-200 space-y-4">
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-lg">
                                     {(user?.fullName?.[0] || user?.email?.[0] || "U").toUpperCase()}
                                 </div>
                                 <div>
-                                    <p className="text-xs font-black text-white truncate w-32">
+                                    <p className="text-xs font-black text-gray-900 truncate w-32">
                                         {user?.fullName || user?.full_name || user?.email?.split('@')[0] || "User"}
                                     </p>
                                     <p className="text-[9px] font-bold text-gv-gold uppercase tracking-widest">
@@ -136,7 +136,7 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                                     </p>
                                 </div>
                             </div>
-                            <button onClick={handleLogout} className="w-full bg-red-600 hover:bg-red-700 text-white py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-red-900/20 active:scale-[0.98]">
+                            <button onClick={handleLogout} className="w-full bg-red-600 hover:bg-red-700 text-gray-900 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-red-900/20 active:scale-[0.98]">
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
                                 {t.logout}
                             </button>

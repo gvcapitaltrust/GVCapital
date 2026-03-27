@@ -28,9 +28,9 @@ export default function TierMedal({ tierId, className = "", size = "md" }: TierM
       case "silver":
         return <Medal className={`${sizeMap[size]} text-slate-300 drop-shadow-[0_0_10px_rgba(148,163,184,0.3)]`} />;
       case "none":
-        return <X className={`${sizeMap[size]} text-zinc-400`} />;
+        return <X className={`${sizeMap[size]} text-gray-500`} />;
       default:
-        return <Shield className={`${sizeMap[size]} text-zinc-500`} />;
+        return <Shield className={`${sizeMap[size]} text-gray-400`} />;
     }
   };
 
@@ -45,9 +45,9 @@ export default function TierMedal({ tierId, className = "", size = "md" }: TierM
       case "silver":
         return "bg-gradient-to-br from-slate-200 via-slate-400 to-slate-600";
       case "none":
-        return "bg-gradient-to-br from-zinc-800 via-zinc-900 to-black";
+        return "bg-gradient-to-br from-gray-200 via-zinc-900 to-black";
       default:
-        return "bg-gradient-to-br from-zinc-400 via-zinc-600 to-zinc-800";
+        return "bg-gradient-to-br from-zinc-400 via-zinc-600 to-gray-200";
     }
   };
 
@@ -58,8 +58,8 @@ export default function TierMedal({ tierId, className = "", size = "md" }: TierM
       size === 'lg' ? 'w-16 h-16' : 
       'w-24 h-24'
     } ${className}`}>
-      <div className={`absolute inset-0 blur-2xl opacity-20 ${tierId === 'vvip' ? 'bg-cyan-500' : tierId === 'platinum' ? 'bg-zinc-300' : tierId === 'gold' ? 'bg-gv-gold' : 'bg-white/10'}`} />
-      <div className={`relative rounded-full flex items-center justify-center p-2 border border-white/10 ${getGradient()} shadow-2xl transition-transform duration-500`}>
+      <div className={`absolute inset-0 blur-2xl opacity-20 ${tierId === 'vvip' ? 'bg-cyan-500' : tierId === 'platinum' ? 'bg-zinc-300' : tierId === 'gold' ? 'bg-gv-gold' : 'bg-gray-100'}`} />
+      <div className={`relative rounded-full flex items-center justify-center p-2 border border-gray-200 ${getGradient()} shadow-2xl transition-transform duration-500`}>
         {getIcon()}
       </div>
     </div>

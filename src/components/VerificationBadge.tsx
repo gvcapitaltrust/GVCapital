@@ -7,7 +7,7 @@ interface VerificationBadgeProps {
 
 export default function VerificationBadge({ is_verified, kyc_step }: VerificationBadgeProps) {
     let statusText = 'Unverified';
-    let colorClass = 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
+    let colorClass = 'bg-zinc-500/10 text-gray-500 border-zinc-500/20';
     let dotClass = 'bg-zinc-500';
 
     if (is_verified) {
