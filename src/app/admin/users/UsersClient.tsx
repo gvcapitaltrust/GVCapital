@@ -211,7 +211,6 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                     <span className="text-[14px] font-black text-gray-900 tabular-nums">$</span>
                                                     <span className="text-[16px] font-black text-gray-900 tabular-nums">{(totalEquity / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 </div>
-                                                <span className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter opacity-70">RM {totalEquity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
@@ -219,7 +218,6 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                 <div className="flex items-baseline gap-1">
                                                     <span className="text-xs font-black text-emerald-600 tabular-nums font-mono">$ {(Number(user.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                                 </div>
-                                                <span className="text-[8px] text-gray-400 font-bold uppercase tracking-tighter opacity-60">RM {Number(user.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
@@ -227,7 +225,6 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                 <div className="flex items-baseline gap-1">
                                                     <span className="text-xs font-black text-gv-gold tabular-nums font-mono">$ {(Number(user.withdrawable_balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                                 </div>
-                                                <span className="text-[8px] text-gray-400 font-bold uppercase tracking-tighter opacity-60">RM {Number(user.withdrawable_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
@@ -478,7 +475,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                             <div className="text-[8px] text-gray-500 font-medium truncate max-w-[200px]">{log.rejection_reason}</div>
                                                         </td>
                                                         <td className={`px-4 py-4 tabular-nums text-right ${log.txType === 'Withdrawal' && log.action !== 'Adjustment' ? 'text-red-400' : (log.rejection_reason?.toLowerCase().includes('decrease') ? 'text-red-400' : 'text-emerald-400')}`}>
-                                                            RM {Number(log.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                            $ {(Number(log.amount) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </td>
                                                         <td className="px-4 py-4 text-right text-gray-400">{log.admin_username}</td>
                                                     </tr>

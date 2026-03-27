@@ -191,7 +191,7 @@ export default function ApprovalsClient() {
                                 <tr>
                                      <th className="px-4 py-4">Client Details</th>
                                      <th className="px-4 py-4">Reference ID</th>
-                                     <th className="px-4 py-4">Amount (RM)</th>
+                                     <th className="px-4 py-4">Amount (USD)</th>
                                      <th className="px-4 py-4">Status</th>
                                      <th className="px-4 py-4">Date</th>
                                      <th className="px-4 py-4">Receipt</th>
@@ -209,8 +209,7 @@ export default function ApprovalsClient() {
                                              <span className="font-mono text-[10px] text-gray-400">{tx.ref_id}</span>
                                          </td>
                                           <td className="px-4 py-4 font-bold text-emerald-400">
-                                               RM {Number(tx.amount || 0).toFixed(2)}
-                                               <span className="text-[10px] text-gray-400 ml-1.5 font-medium">(${(Number(tx.amount || 0) / forexRate).toFixed(2)})</span>
+                                               ${(Number(tx.amount || 0) / forexRate).toFixed(2)}
                                           </td>
                                          <td className="px-4 py-4">
                                              <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${

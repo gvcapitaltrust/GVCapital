@@ -82,7 +82,7 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
             >
                 <div className="space-y-12">
                     <div className="flex items-center justify-between">
-                        <img src="/logo.png" alt="GV Capital" className="h-[40px] w-auto object-contain " />
+                        <img src="/logo2.png" alt="GV Capital" className="h-[40px] w-auto object-contain " />
                         <button
                             onClick={onClose}
                             className="h-10 w-10 flex items-center justify-center rounded-full border border-gray-200 text-gray-400 hover:text-gray-900 transition-colors"

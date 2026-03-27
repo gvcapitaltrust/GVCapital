@@ -75,9 +75,9 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                 <div className="space-y-12">
                     <div className={`flex items-center gap-4 px-2 transition-all duration-500 ${isCollapsed ? "justify-center" : ""}`}>
                         {isCollapsed ? (
-                            <img src="/logo.png" alt="GV Capital" className="h-8 w-auto object-contain" />
+                            <img src="/logo2.png" alt="GV Capital" className="h-8 w-auto object-contain" />
                         ) : (
-                            <img src="/logo.png" alt="GV Capital" className="h-[21px] w-[170px] object-contain" />
+                            <img src="/logo2.png" alt="GV Capital" className="h-[21px] w-auto object-contain" />
                         )}
                     </div>
 

@@ -85,6 +85,9 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             successDesc: "Your request has been received and is now being processed by our finance team.",
             docSubmitted: "Documents Received",
             docSubmittedDesc: "Your verification request has been updated. Our team will review it within 24-48 hours.",
+            totalWithdraw: "Total Withdrawals",
+            walletBalance: "Wallet Balance",
+            member: "Member",
         },
         zh: {
             verificationInProgress: "审核中",
@@ -131,6 +134,9 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             successDesc: "您的请求已收到，财务团队正在处理中。",
             docSubmitted: "文档已接收",
             docSubmittedDesc: "您的验证请求已更新。我们的团队将在 24-48 小时内进行审核。",
+            totalWithdraw: "总提款额",
+            walletBalance: "钱包余额",
+            member: "会员",
         }
     }[lang];
 
@@ -336,69 +342,67 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                 ) : (
                     <div className="bg-gv-gold/5 border border-gv-gold/20 p-8 rounded-[32px] flex flex-col md:flex-row items-center gap-8 animate-in fade-in duration-700 justify-between relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-5">
-                            <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                            <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 d9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                         </div>
                         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10 text-center sm:text-left">
                             <div className="h-16 w-16 bg-gv-gold/20 rounded-full flex items-center justify-center shrink-0 text-gv-gold">
                                 <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             </div>
                             <div className="space-y-2">
-                                <h2 className="text-2xl font-bold text-gv-gold">{t.completeProfile}</h2>
+                                <h2 className="text-3xl font-black uppercase tracking-tighter text-gv-gold">{t.completeProfile}</h2>
                                 <p className="text-gray-500 text-sm leading-relaxed max-w-lg">{t.completeProfileDesc}</p>
                             </div>
                         </div>
-                        <Link href={`/verify?lang=${lang}`} className="relative z-10 shrink-0 bg-gv-gold text-black hover:bg-gv-gold/90 font-bold px-8 py-4 rounded-2xl transition-all shadow-[0_10px_20px_rgba(212,175,55,0.15)]">{t.startVerification}</Link>
+                        <Link href={`/verify?lang=${lang}`} className="relative z-10 shrink-0 bg-gv-gold text-black hover:bg-gv-gold/90 font-black uppercase tracking-widest px-8 py-4 rounded-2xl transition-all shadow-[0_10px_20px_rgba(212,175,55,0.15)]">{t.startVerification}</Link>
                     </div>
                 )
             ) : (
                 <>
                     <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
+                        <div className="bg-zinc-900 border border-zinc-800 p-10 rounded-[40px] shadow-2xl hover:border-gv-gold/30 transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none group-hover:opacity-20 transition-opacity">
                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
                             <div className="relative z-10">
-                                <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-gray-500 transition-colors">{t.totalProfit}</p>
-                                <h2 className="text-4xl font-black tracking-tighter text-emerald-500 tabular-nums whitespace-nowrap">$ {(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                                <p className="text-[10px] font-bold text-gray-400 mt-2">≈ RM {Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                <p className="text-gv-gold/60 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
+                                <h2 className="text-5xl font-black tracking-tighter text-emerald-500 tabular-nums whitespace-nowrap">$ {(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                             </div>
                         </div>
 
-                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
+                        <div className="bg-zinc-900 border border-zinc-800 p-10 rounded-[40px] shadow-2xl hover:border-gv-gold/30 transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none group-hover:opacity-20 transition-opacity">
                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                             </div>
                                 {Number(user?.total_investment || 0) > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10 w-full">
                                         <div>
-                                            <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest">{t.totalEquity}</p>
-                                            <h2 className="text-4xl font-black tracking-tighter text-gv-gold tabular-nums whitespace-nowrap">$ {(Number(user?.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                                            <p className="text-[10px] font-bold text-gray-400 mt-2">≈ RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                            <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">{t.totalWithdraw}</p>
+                            <h2 className="text-4xl font-black tracking-tighter text-red-500 tabular-nums">$ {(Math.abs(Number(user?.total_withdrawals || 0)) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                                         </div>
-                                        <div className="sm:border-l border-gray-200 sm:pl-8 flex flex-col justify-center">
-                                            <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
+                                        <div className="sm:border-l border-zinc-800 sm:pl-8 flex flex-col justify-center">
+                                            <p className="text-gv-gold/60 text-[10px] font-black uppercase tracking-[0.3em] mb-4">{t.currentPackage}</p>
                                             <div className="flex justify-between items-center group/tier">
                                                 <div className="flex flex-col gap-1">
-                                                    <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">
+                                                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
                                                         {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
                                                     </h2>
                                                 </div>
                                                 <TierMedal 
                                                     tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
-                                                    size="sm" 
-                                                    className="shrink-0 md:scale-90 origin-right" 
+                                                    size="md" 
+                                                    className="shrink-0 md:scale-110 origin-right drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]" 
                                                 />
                                             </div>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="relative z-10 w-full flex flex-col items-center justify-center text-center py-2">
-                                        <div className="h-14 w-14 bg-gv-gold/10 text-gv-gold rounded-full flex items-center justify-center mb-4 ring-1 ring-gv-gold/20">
+                                        <div className="h-14 w-14 bg-gv-gold/20 text-gv-gold rounded-full flex items-center justify-center mb-4 ring-1 ring-gv-gold/40">
                                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                         </div>
-                                        <h2 className="text-2xl font-black tracking-tighter text-gray-900 mb-2 uppercase">{lang === 'en' ? 'Start Investing Now' : '立即开始投资'}</h2>
-                                        <p className="text-gray-400 text-xs font-medium mb-6 max-w-[250px]">{lang === 'en' ? 'Choose from our tier packages to start earning daily dividends.' : '探索我们专业的理财产品，开启您的财富增长之旅。'}</p>
-                                        <a href="/dashboard/products" className="bg-gv-gold text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-2xl shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/20 transition-all border border-gv-gold/50">{lang === 'en' ? 'View Products' : '查看产品'}</a>
+                                        <h2 className="text-3xl font-black tracking-tighter text-white mb-2 uppercase">{lang === 'en' ? 'Start Investing Now' : '立即开始投资'}</h2>
+                                        <p className="text-zinc-500 text-xs font-medium mb-6 max-w-[250px]">{lang === 'en' ? 'Choose from our tier packages to start earning daily dividends.' : '探索我们专业的理财产品，开启您的财富增长之旅。'}</p>
+                                        <a href="/dashboard/products" className="bg-gv-gold text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-2xl shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/40 transition-all border border-gv-gold/50">{lang === 'en' ? 'View Products' : '查看产品'}</a>
                                     </div>
                                 )}
                         </div>
@@ -415,7 +419,6 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                return (
                                    <>
                                        <h3 className="text-3xl font-black text-gray-900 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
-                                       <p className="text-[10px] text-gray-400 font-bold mt-1">≈ RM {(maxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
                                        <p className="text-[10px] text-gray-500 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                    </>
                                );
@@ -438,7 +441,6 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                                </div>
                                            )}
                                        </div>
-                                       <p className="text-[10px] text-gray-400 font-bold mt-1">≈ RM {(maxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
                                        <p className="text-[10px] text-gray-500 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                    </>
                                );
@@ -634,7 +636,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
             {/* Action Toast */}
             {actionToast && (
-                <div className="fixed bottom-6 right-6 z-[600] bg-gray-50 border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 max-w-sm">
+                <div className="fixed bottom-24 sm:bottom-6 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-6 z-[600] bg-gray-50 border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 w-[90%] sm:max-w-sm">
                     <div className="flex flex-col gap-4">
                         <p className="text-gray-900 font-black text-sm uppercase tracking-widest">{actionToast.message}</p>
                         {actionToast.actionUrl && (

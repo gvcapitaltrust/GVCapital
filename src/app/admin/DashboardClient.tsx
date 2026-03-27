@@ -58,7 +58,6 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
                     </div>
                     <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t.cardTotal}</div>
                     <div className="text-2xl font-black text-gray-900 tracking-tight tabular-nums">$ {(totalAssets / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
-                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">≈ RM {totalAssets.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                 </div>
 
                 <Link href="/admin/deposits" className="bg-white border border-gray-200 rounded-[40px] p-8 space-y-4 shadow-sm relative overflow-hidden group transition-all hover:shadow-md hover:-translate-y-1">

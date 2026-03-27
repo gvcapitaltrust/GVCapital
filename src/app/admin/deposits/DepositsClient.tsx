@@ -126,8 +126,7 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                     </td>
                                     <td className="px-8 py-6">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-emerald-400 tabular-nums">RM {Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(tx.amount) / forexRate).toFixed(2)} USD)</span>
+                                            <span className="font-black text-emerald-400 tabular-nums text-lg">$ {(Number(tx.amount) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6 text-gray-400 font-mono text-[10px] uppercase">
@@ -195,12 +194,8 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                         <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-3">Transaction Details</p>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <p className="text-[8px] font-black uppercase text-gray-500 tracking-tighter">Amount MYR</p>
-                                                <p className="text-xl font-black text-gray-900">RM {Number(selectedTx?.amount).toFixed(2)}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-[8px] font-black uppercase text-gray-500 tracking-tighter">Credit USD</p>
-                                                <p className="text-xl font-black text-gv-gold">${(Number(selectedTx?.amount) / forexRate).toFixed(2)}</p>
+                                                <p className="text-[8px] font-black uppercase text-gray-500 tracking-tighter">Amount USD</p>
+                                                <p className="text-xl font-black text-gv-gold text-2xl">$ {(Number(selectedTx?.amount) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                             </div>
                                         </div>
                                     </div>

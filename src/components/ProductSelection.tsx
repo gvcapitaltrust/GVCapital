@@ -86,9 +86,6 @@ export default function ProductSelection({
                   <span className="text-2xl font-black text-gv-gold tracking-tighter">
                     {formatUSD(amount)}
                   </span>
-                  <span className="text-[10px] font-bold text-gray-400">
-                    ≈ RM {(amount * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </span>
                 </div>
               </div>
               <input
@@ -117,9 +114,6 @@ export default function ProductSelection({
                   <p className="text-lg font-black text-emerald-500 tracking-tight">
                     <span className="text-xs font-normal opacity-60 mr-1">up to</span>
                     {formatUSD(dividendRange.max)}
-                  </p>
-                  <p className="text-[9px] font-bold text-emerald-500/60 uppercase">
-                    ≈ up to RM {(dividendRange.max * forexRate).toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -159,7 +153,7 @@ export default function ProductSelection({
                 <div className="pt-2 border-t border-gv-gold/10 w-full">
                   <p className="text-[9px] text-gv-gold/60 font-black uppercase">{t.potentialUpgrade}</p>
                   <p className="text-gray-900 text-xs font-bold italic">
-                    {t.increaseBy} {formatUSD(amount - currentInvestment)} (≈ RM {((amount - currentInvestment) * forexRate).toLocaleString()}) {t.toReach} {activeTier.name.replace(/ package/gi, '')}
+                    {t.increaseBy} {formatUSD(amount - currentInvestment)} {t.toReach} {activeTier.name.replace(/ package/gi, '')}
                   </p>
                 </div>
               )}

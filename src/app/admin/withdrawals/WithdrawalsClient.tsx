@@ -115,8 +115,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                     </td>
                                     <td className="px-4 py-3">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-red-500 tabular-nums">RM {Math.abs(Number(tx.amount)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">(${(Math.abs(Number(tx.amount)) / forexRate).toFixed(2)} USD)</span>
+                                            <span className="font-black text-red-500 tabular-nums text-lg">$ {(Math.abs(Number(tx.amount)) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3">
@@ -143,7 +142,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                         </div>
                                     </td>
                                     <td className="px-4 py-3 font-black text-emerald-500 tabular-nums">
-                                        RM {Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        $ {(Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </td>
                                     <td className="px-4 py-3 text-gray-400 font-mono text-xs">{new Date(tx.created_at).toLocaleDateString()}</td>
                                     <td className="px-4 py-3">

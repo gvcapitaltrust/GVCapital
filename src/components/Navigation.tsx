@@ -41,7 +41,7 @@ export default function Navigation({ lang, setLang }: NavigationProps) {
           <div className="flex items-center gap-2">
             <Link href={`/?lang=${lang}`} className="flex items-center transition-transform hover:scale-105">
               <img
-                src="/logo.png"
+                src="/logo2.png"
                 alt="GV Capital Trust Logo"
                 className="h-[40px] sm:h-[60px] w-auto object-contain  drop-shadow-[0_4px_6px_rgba(212,175,55,0.4)]"
               />

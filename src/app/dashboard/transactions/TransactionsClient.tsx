@@ -177,9 +177,6 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                     <span className={`text-sm font-black tabular-nums ${filteredTotalUSD >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
                         {filteredTotalUSD >= 0 ? '+' : '-'}$ {Math.abs(filteredTotalUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                     </span>
-                    <span className="text-[10px] font-bold text-gray-400 opacity-60">
-                        ≈ RM {(filteredTotalUSD * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </span>
                 </div>
 
                 <div className="border border-gray-200 rounded-[40px] overflow-hidden bg-white backdrop-blur-md shadow-2xl">
@@ -253,7 +250,6 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                     <span className="text-emerald-500 uppercase">Final Payout (Net)</span>
                                                                     <span className="text-emerald-500 underline decoration-gv-gold">$ {(Number(tx.metadata?.finalized_payout || tx.amount) / forexRate).toFixed(2)}</span>
                                                                 </div>
-                                                                <p className="text-[9px] text-gray-400 text-right font-medium">≈ RM {Number(tx.metadata?.finalized_payout || tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                                             </div>
                                                         </div>
 
