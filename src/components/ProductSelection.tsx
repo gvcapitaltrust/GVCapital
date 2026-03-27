@@ -94,16 +94,16 @@ export default function ProductSelection({
               <input
                 type="range"
                 min="0"
-                max="1000000"
-                step="500"
+                max="15000"
+                step="100"
                 value={amount}
                 onChange={(e) => setAmount(parseInt(e.target.value))}
                 className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-gv-gold hover:accent-gv-gold/80 transition-all"
               />
               <div className="flex justify-between text-[8px] font-black text-zinc-700 uppercase tracking-widest pt-1">
                 <span>$0</span>
-                <span>$500,000</span>
-                <span>$1,000,000+</span>
+                <span>$7,500</span>
+                <span>$15,000+</span>
               </div>
             </div>
 
