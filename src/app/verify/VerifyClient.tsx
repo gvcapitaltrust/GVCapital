@@ -391,7 +391,7 @@ export default function VerifyPage() {
                         <img src="/logo.png" className="h-[60px] w-auto  brightness-110" />
                     </Link>
                     <div className="space-y-2">
-                        <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tighter">{t.identityVerification}</h1>
+                        <h1 className="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter">{t.identityVerification}</h1>
                         <p className="text-[10px] text-gv-gold font-black tracking-[0.2em] uppercase">{t.investorPortal}</p>
                     </div>
 

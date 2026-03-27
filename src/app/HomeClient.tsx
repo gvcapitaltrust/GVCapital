@@ -135,7 +135,7 @@ export default function HomeClient() {
                         </h2>
                     </div>
 
-                    <h1 className="mb-6 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl leading-tight">
+                    <h1 className="mb-6 text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-tight text-gray-900">
                         <span className="block text-gray-900 uppercase">{t.hero.title}</span>
                     </h1>
                     

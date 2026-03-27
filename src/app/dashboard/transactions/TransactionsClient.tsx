@@ -30,6 +30,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             selectYear: "Select Year",
             generateDownload: "Generate & Download PDF",
             months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            totalInView: "Total Assets in View",
         },
         zh: {
             history: "交易历史",
@@ -174,9 +175,9 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                 <div className="flex items-center gap-4 px-2">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.totalInView}:</span>
                     <span className={`text-sm font-black tabular-nums ${filteredTotalUSD >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                        $ {filteredTotalUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {filteredTotalUSD >= 0 ? '+' : '-'}$ {Math.abs(filteredTotalUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                     </span>
-                    <span className="text-[10px] font-bold text-gray-400">
+                    <span className="text-[10px] font-bold text-gray-400 opacity-60">
                         ≈ RM {(filteredTotalUSD * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </span>
                 </div>

@@ -84,7 +84,7 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h2>
+                    <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h1>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
                 </div>
                 <input

@@ -35,7 +35,7 @@ export default function GlobalFooter() {
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 grayscale opacity-50">
                             <img
-                                src="/logo.png"
+                                src="/logo2.png"
                                 alt="GV Capital Trust Logo"
                                 className="h-[24px] w-auto object-contain "
                             />

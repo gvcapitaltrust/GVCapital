@@ -314,7 +314,7 @@ export default function RegisterPage() {
                             className="h-[80px] w-auto object-contain  drop-shadow-[0_4px_10px_rgba(212,175,55,0.4)]"
                         />
                     </Link>
-                    <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tighter mb-2">{t.title}</h1>
+                    <h1 className="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter mb-2">{t.title}</h1>
                     <p className="text-gray-400 font-medium tracking-wide">{t.subtitle}</p>
                 </div>
 

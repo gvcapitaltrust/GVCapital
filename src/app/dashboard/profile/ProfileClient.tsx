@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useUser } from "@/providers/UserProvider";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, loading } = useUser();
+    const [viewDocumentUrl, setViewDocumentUrl] = useState<string | null>(null);
 
     const t = {
         en: {
@@ -51,7 +52,7 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
     const viewStatement = async () => {
         if (!user?.bank_statement_url) return;
         const { data, error } = await supabase.storage.from('agreements').createSignedUrl(user.bank_statement_url, 3600);
-        if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+        if (data?.signedUrl) setViewDocumentUrl(data.signedUrl);
         else alert("Could not generate secure link.");
     };
 
@@ -155,6 +156,42 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                     </div>
                 </div>
             </div>
+
+            {/* Document Viewer Modal */}
+            {viewDocumentUrl && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 md:p-12 animate-in fade-in duration-300">
+                    <button 
+                        onClick={() => setViewDocumentUrl(null)}
+                        className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full z-[110]"
+                    >
+                        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <div className="w-full h-full max-w-6xl relative overflow-hidden rounded-[32px] border border-white/10 bg-[#0A0A0A] shadow-2xl flex flex-col">
+                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-zinc-900/50">
+                            <h3 className="text-white font-black uppercase tracking-widest text-xs flex items-center gap-2">
+                                <div className="h-1.5 w-1.5 rounded-full bg-gv-gold animate-pulse"></div>
+                                {t.bankStatement}
+                            </h3>
+                            <a 
+                                href={viewDocumentUrl || undefined} 
+                                download 
+                                className="text-[10px] font-black uppercase tracking-widest text-gv-gold hover:text-white transition-colors"
+                            >
+                                Download Original
+                            </a>
+                        </div>
+                        <div className="flex-1 overflow-hidden relative group">
+                            <iframe 
+                                src={viewDocumentUrl || undefined} 
+                                className="w-full h-full border-none bg-white rounded-b-[32px]"
+                                title="Document Viewer"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

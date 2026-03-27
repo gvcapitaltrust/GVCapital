@@ -34,12 +34,12 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             subtitle: "Manage institutional client profiles, internal capital allocations, and portfolio mapping.",
             searchPlaceholder: "Search by name, email, or username...",
             tableUser: "User",
-            tableAssets: "Total Assets",
-            tableInvestment: "Investment",
-            tableWithdrawable: "Withdrawable",
-            tableTier: "Tier",
-            tableStatus: "Status",
-            tableActions: "Manage",
+            tableAssets: "Total Assets (USD)",
+            tableInvestment: "Invested (USD)",
+            tableWithdrawable: "Withdrawable (USD)",
+            tableTier: "Tier Status",
+            tableStatus: "Verification",
+            tableActions: "Details",
             noUsers: "No clients found in directory.",
             adjustHeader: "Capital Allocation",
             adjustAmount: "Adjustment Amount (USD)",
@@ -163,7 +163,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h2>
+                    <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h1>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
                 </div>
                 <input
@@ -206,27 +206,45 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <div className="flex flex-col">
-                                                <span className="font-black text-gray-900 tabular-nums text-[10px]">$ {(totalEquity / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                <span className="text-[8px] text-gray-400 font-bold uppercase whitespace-nowrap">RM {totalEquity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            <div className="flex flex-col gap-0.5">
+                                                <div className="flex items-baseline gap-1.5">
+                                                    <span className="text-[14px] font-black text-gray-900 tabular-nums">$</span>
+                                                    <span className="text-[16px] font-black text-gray-900 tabular-nums">{(totalEquity / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                </div>
+                                                <span className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter opacity-70">RM {totalEquity.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <div className="flex flex-col">
-                                                <span className="font-black text-gray-900 tabular-nums text-[10px] text-emerald-500">$ {(Number(user.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                <span className="text-[8px] text-gray-400 font-bold uppercase whitespace-nowrap">RM {Number(user.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            <div className="flex flex-col gap-0.5">
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-xs font-black text-emerald-600 tabular-nums font-mono">$ {(Number(user.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                </div>
+                                                <span className="text-[8px] text-gray-400 font-bold uppercase tracking-tighter opacity-60">RM {Number(user.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <div className="flex flex-col">
-                                                <span className="font-black text-gray-900 tabular-nums text-[10px] text-gv-gold">$ {(Number(user.withdrawable_balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                <span className="text-[8px] text-gray-400 font-bold uppercase whitespace-nowrap">RM {Number(user.withdrawable_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                            <div className="flex flex-col gap-0.5">
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-xs font-black text-gv-gold tabular-nums font-mono">$ {(Number(user.withdrawable_balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                </div>
+                                                <span className="text-[8px] text-gray-400 font-bold uppercase tracking-tighter opacity-60">RM {Number(user.withdrawable_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className="px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest bg-gray-200 border border-gray-200 text-gv-gold">
-                                                {(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(Number(user.total_investment || 0) / forexRate).name}
-                                            </span>
+                                            {(() => {
+                                                const tierName = (user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(Number(user.total_investment || 0) / forexRate).name;
+                                                const isNoTier = tierName.toLowerCase().includes('no tier') || tierName.toLowerCase() === 'standard';
+                                                return (
+                                                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm transition-all ${
+                                                        isNoTier 
+                                                            ? 'bg-gray-100 border-gray-200 text-gray-400' 
+                                                            : 'bg-white border-gv-gold/30 text-gv-gold hover:border-gv-gold'
+                                                    }`}>
+                                                        <div className={`h-1.5 w-1.5 rounded-full ${isNoTier ? 'bg-gray-300' : 'bg-gv-gold shadow-[0_0_8px_rgba(212,175,55,0.5)]'}`}></div>
+                                                        <span className="text-[9px] font-black uppercase tracking-widest">{tierName}</span>
+                                                    </div>
+                                                );
+                                            })()}
                                         </td>
                                         <td className="px-8 py-6">
                                             <span className={`px-2 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest ${

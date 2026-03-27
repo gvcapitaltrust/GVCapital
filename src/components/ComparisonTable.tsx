@@ -131,34 +131,6 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                   </td>
                 ))}
               </tr>
-              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
-                <td className="py-6 px-4 text-gray-500">{t.priority}</td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
-                <td className="py-6 px-4 text-center"><Check className="h-4 w-4 mx-auto text-gv-gold" /></td>
-                <td className="py-6 px-4 text-center"><Check className="h-4 w-4 mx-auto text-gv-gold" /></td>
-                <td className="py-6 px-4 text-center"><Check className="h-4 w-4 mx-auto text-gv-gold" /></td>
-              </tr>
-              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
-                <td className="py-6 px-4 text-gray-500">{t.accountManager}</td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
-                <td className="py-6 px-4 text-center"><Check className="h-4 w-4 mx-auto text-gv-gold" /></td>
-                <td className="py-6 px-4 text-center"><Check className="h-4 w-4 mx-auto text-gv-gold" /></td>
-              </tr>
-              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
-                <td className="py-6 px-4 text-gray-500">{t.insurance}</td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
-                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-gray-500" /></td>
-              </tr>
-              <tr className="border-b border-gray-200 hover:bg-white transition-colors">
-                <td className="py-6 px-4 text-gray-500">{t.fees}</td>
-                <td className="py-6 px-4 text-center text-gray-400">{t.standard}</td>
-                <td className="py-6 px-4 text-center text-gray-400">{t.standard}</td>
-                <td className="py-6 px-4 text-center text-gray-400">{t.standard}</td>
-                <td className="py-6 px-4 text-center text-gray-400">{t.standard}</td>
-              </tr>
             </tbody>
           </table>
         </div>

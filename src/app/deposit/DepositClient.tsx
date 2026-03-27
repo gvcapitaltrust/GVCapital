@@ -140,7 +140,7 @@ export default function DepositClient() {
             <main className="flex-1 flex flex-col items-center justify-center p-6">
                 <div className="w-full max-w-xl animate-in fade-in slide-in-from-bottom-8 duration-700">
                     <div className="text-center mb-10">
-                        <h1 className="text-4xl font-black uppercase tracking-tighter mb-2">{t.title}</h1>
+                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-2 text-gray-900">{t.title}</h1>
                         <p className="text-gray-400 font-medium">{t.subtitle}</p>
                     </div>
 

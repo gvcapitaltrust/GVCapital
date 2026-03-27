@@ -162,7 +162,7 @@ export default function ApprovalsClient() {
             <header className="max-w-7xl mx-auto mb-12 flex justify-between items-end">
                 <div>
                     <Link href="/admin" className="text-gray-500 hover:text-gray-900 transition-colors text-xs font-black uppercase tracking-widest mb-4 inline-block">← Back to Master Control</Link>
-                    <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tighter">Approval Center</h1>
+                    <h1 className="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter">Approval Center</h1>
                     <p className="text-gv-gold text-[10px] font-black tracking-widest uppercase mt-1">Manage pending deposits & dividend payouts</p>
                 </div>
 
