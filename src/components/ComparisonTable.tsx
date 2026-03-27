@@ -115,7 +115,11 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                 <td className="py-6 px-4 text-zinc-400">{t.lockIn}</td>
                 {TIERS.map((tier) => (
                   <td key={tier.id} className="py-6 px-4 text-center text-white font-bold">
-                    {tier.lockInDays === 365 ? `12 ${t.months}` : `6 ${t.months}`}
+                    {tier.id === 'vvip' 
+                      ? `12 ${t.months}` 
+                      : tier.id === 'platinum'
+                        ? `6 - 12 ${t.months}*`
+                        : `6 ${t.months}`}
                   </td>
                 ))}
               </tr>
@@ -138,14 +142,14 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                 <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-zinc-600" /></td>
                 <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-zinc-600" /></td>
                 <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-zinc-600" /></td>
-                <td className="py-6 px-4 text-center"><Check className="h-4 w-4 mx-auto text-gv-gold" /></td>
+                <td className="py-6 px-4 text-center"><Minus className="h-4 w-4 mx-auto text-zinc-600" /></td>
               </tr>
               <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
                 <td className="py-6 px-4 text-zinc-400">{t.fees}</td>
-                <td className="py-6 px-4 text-center text-white">{t.standard}</td>
-                <td className="py-6 px-4 text-center text-white">{t.standard}</td>
-                <td className="py-6 px-4 text-center text-white">{t.reduced}</td>
-                <td className="py-6 px-4 text-center text-emerald-500 font-bold">{t.zero}</td>
+                <td className="py-6 px-4 text-center text-zinc-500">{t.standard}</td>
+                <td className="py-6 px-4 text-center text-zinc-500">{t.standard}</td>
+                <td className="py-6 px-4 text-center text-zinc-500">{t.standard}</td>
+                <td className="py-6 px-4 text-center text-zinc-500">{t.standard}</td>
               </tr>
             </tbody>
           </table>
@@ -154,6 +158,10 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
         <div className="mt-10 p-6 bg-white/5 rounded-2xl border border-white/5">
           <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-widest text-center leading-relaxed">
             {t.footnote}
+            <br />
+            {lang === 'en' 
+              ? "* Platinum users who opt for the 12-month lock-in period will receive an extra 3% yearly bonus." 
+              : "* 选择 12 个月锁定期的白金用户将获得额外的 3% 年度奖金。"}
           </p>
         </div>
       </div>

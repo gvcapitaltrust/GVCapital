@@ -444,7 +444,17 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                 .filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction')
                                                 .map((log, i) => (
                                                     <tr key={i} className="text-[10px] font-bold hover:bg-white/[0.02] transition-colors">
-                                                        <td className="px-4 py-4 text-zinc-500 whitespace-nowrap">{new Date(log.created_at).toLocaleDateString()}</td>
+                                                        <td className="px-4 py-4 text-zinc-500 whitespace-nowrap">
+                                                            {new Date(log.created_at).toLocaleString('en-GB', { 
+                                                                day: '2-digit', 
+                                                                month: '2-digit', 
+                                                                year: 'numeric',
+                                                                hour: '2-digit',
+                                                                minute: '2-digit',
+                                                                second: '2-digit',
+                                                                hour12: false
+                                                            })}
+                                                        </td>
                                                         <td className="px-4 py-4">
                                                             <div className="text-zinc-300 uppercase tracking-tight">{log.action === 'Adjustment' ? (log.txType === 'Deposit' ? 'Admin Add' : 'Admin Remove') : log.action}</div>
                                                             <div className="text-[8px] text-zinc-600 font-medium truncate max-w-[200px]">{log.rejection_reason}</div>

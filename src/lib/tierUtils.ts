@@ -21,7 +21,7 @@ export const TIERS: Tier[] = [
     maxDividend: 0.03,
     lockInDays: 180,
     color: "zinc",
-    benefits: ["Entry-level Access", "Standard Support", "Monthly Statements"],
+    benefits: [],
   },
   {
     id: "gold",
@@ -32,7 +32,7 @@ export const TIERS: Tier[] = [
     maxDividend: 0.05,
     lockInDays: 180,
     color: "slate",
-    benefits: ["Priority Support", "Quarterly Strategy Review", "Enhanced Yield"],
+    benefits: [],
   },
   {
     id: "platinum",
@@ -44,7 +44,7 @@ export const TIERS: Tier[] = [
     yearlyBonus: 0.03,
     lockInDays: 180,
     color: "gv-gold",
-    benefits: ["Dedicated Account Manager", "Custom Portfolio Alerts", "VIP Events Access", "Extra 3% Yearly Bonus"],
+    benefits: ["Dedicated Account Manager", "Extra 3% Yearly Bonus"],
   },
   {
     id: "vvip",
@@ -57,11 +57,8 @@ export const TIERS: Tier[] = [
     lockInDays: 365,
     color: "amber",
     benefits: [
-      "Premium Fixed Returns",
       "Extra 4% Yearly Bonus",
       "12-Month Lock-in Period",
-      "Zero Withdrawal Fees",
-      "Insurance Coverage",
       "Legacy Wealth Planning",
     ],
   },

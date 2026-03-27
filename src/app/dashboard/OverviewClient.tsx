@@ -556,7 +556,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         <div className="text-center space-y-4">
                             <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Penalty Confirmation</h3>
                             <p className="text-zinc-500 font-bold text-sm leading-relaxed px-4">
-                                Your withdrawal of <span className="text-white">$ {parseFloat(withdrawAmount).toLocaleString()}</span> includes capital protected by our 6-month lock-in period.
+                                Your withdrawal of <span className="text-white">$ {parseFloat(withdrawAmount).toLocaleString()}</span> includes capital protected by our 6/12-month lock-in period.
                             </p>
                             <div className="bg-white/5 rounded-3xl p-6 border border-white/5 space-y-4">
                                 <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-zinc-500">
