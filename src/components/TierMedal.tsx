@@ -19,7 +19,7 @@ export default function TierMedal({ tierId, className = "", size = "md" }: TierM
 
   const getIcon = () => {
     switch (tierId.toLowerCase()) {
-      case "diamond":
+      case "vvip":
         return <Trophy className={`${sizeMap[size]} text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]`} />;
       case "platinum":
         return <Star className={`${sizeMap[size]} text-zinc-200 drop-shadow-[0_0_10px_rgba(228,228,231,0.5)]`} />;
@@ -36,7 +36,7 @@ export default function TierMedal({ tierId, className = "", size = "md" }: TierM
 
   const getGradient = () => {
     switch (tierId.toLowerCase()) {
-      case "diamond":
+      case "vvip":
         return "bg-gradient-to-br from-cyan-300 via-cyan-600 to-cyan-900";
       case "platinum":
         return "bg-gradient-to-br from-zinc-100 via-zinc-400 to-zinc-700";
@@ -58,7 +58,7 @@ export default function TierMedal({ tierId, className = "", size = "md" }: TierM
       size === 'lg' ? 'w-16 h-16' : 
       'w-24 h-24'
     } ${className}`}>
-      <div className={`absolute inset-0 blur-2xl opacity-20 ${tierId === 'diamond' ? 'bg-cyan-500' : tierId === 'platinum' ? 'bg-zinc-300' : tierId === 'gold' ? 'bg-gv-gold' : 'bg-white/10'}`} />
+      <div className={`absolute inset-0 blur-2xl opacity-20 ${tierId === 'vvip' ? 'bg-cyan-500' : tierId === 'platinum' ? 'bg-zinc-300' : tierId === 'gold' ? 'bg-gv-gold' : 'bg-white/10'}`} />
       <div className={`relative rounded-full flex items-center justify-center p-2 border border-white/10 ${getGradient()} shadow-2xl transition-transform duration-500`}>
         {getIcon()}
       </div>

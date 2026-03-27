@@ -27,7 +27,7 @@ export default function LoginPage() {
                 // Sync session to cookie so Next.js middleware can read it before redirecting
                 document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(session))}; path=/; max-age=31536000; SameSite=Lax;`;
                 const user = session.user;
-                const isAdmin = user.user_metadata?.role === "Admin" || user.email === "admin@gvcapital.trust";
+                const isAdmin = user.user_metadata?.role?.toLowerCase() === "admin" || user.email === "thenja96@gmail.com";
                 const redirectPath = isAdmin ? "/admin" : `/dashboard?lang=${urlLang || lang}`;
 
                 // Only redirect if we are authenticated and NOT on the target page
@@ -76,7 +76,7 @@ export default function LoginPage() {
         setErrorMsg("");
 
         // Check Maintenance Mode (Standardized from useSettings)
-        if (maintenanceMode && email !== "admin@gvcapital.trust") {
+        if (maintenanceMode && email.toLowerCase() !== "thenja96@gmail.com") {
             setIsLoading(false);
             router.push('/maintenance');
             return;
@@ -100,7 +100,7 @@ export default function LoginPage() {
             if (data.session) {
                 document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(data.session))}; path=/; max-age=31536000; SameSite=Lax;`;
                 const user = data.session.user;
-                const isAdmin = user.user_metadata?.role === "Admin" || user.email === "admin@gvcapital.trust";
+                const isAdmin = user.user_metadata?.role?.toLowerCase() === "admin" || user.email === "thenja96@gmail.com";
                 window.location.href = isAdmin ? "/admin" : `/dashboard?lang=${lang}`;
             }
         } catch (error: any) {

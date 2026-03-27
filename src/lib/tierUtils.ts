@@ -5,6 +5,7 @@ export interface Tier {
   maxAmount: number;
   minDividend: number;
   maxDividend: number;
+  yearlyBonus?: number;
   color: string;
   benefits: string[];
 }
@@ -14,7 +15,7 @@ export const TIERS: Tier[] = [
     id: "silver",
     name: "Silver",
     minAmount: 1,
-    maxAmount: 999,
+    maxAmount: 3000,
     minDividend: 0.03,
     maxDividend: 0.03,
     color: "zinc",
@@ -23,8 +24,8 @@ export const TIERS: Tier[] = [
   {
     id: "gold",
     name: "Gold",
-    minAmount: 1000,
-    maxAmount: 2999,
+    minAmount: 3001,
+    maxAmount: 5000,
     minDividend: 0.03,
     maxDividend: 0.05,
     color: "slate",
@@ -33,23 +34,26 @@ export const TIERS: Tier[] = [
   {
     id: "platinum",
     name: "Platinum",
-    minAmount: 3000,
-    maxAmount: 4999,
+    minAmount: 5001,
+    maxAmount: 10000,
     minDividend: 0.05,
-    maxDividend: 0.08,
+    maxDividend: 0.05,
+    yearlyBonus: 0.03,
     color: "gv-gold",
-    benefits: ["Dedicated Account Manager", "Custom Portfolio Alerts", "VIP Events Access"],
+    benefits: ["Dedicated Account Manager", "Custom Portfolio Alerts", "VIP Events Access", "Extra 3% Yearly Bonus"],
   },
   {
-    id: "diamond",
-    name: "Diamond",
-    minAmount: 5000,
-    maxAmount: 10000, // Capped at 10k per user request
+    id: "vvip",
+    name: "VVIP",
+    minAmount: 10001,
+    maxAmount: Number.MAX_SAFE_INTEGER,
     minDividend: 0.08,
-    maxDividend: 0.1,
+    maxDividend: 0.08,
+    yearlyBonus: 0.05,
     color: "amber",
     benefits: [
       "Premium Fixed Returns",
+      "Extra 5% Yearly Bonus",
       "Zero Withdrawal Fees",
       "Insurance Coverage",
       "Legacy Wealth Planning",

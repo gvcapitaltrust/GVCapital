@@ -17,28 +17,13 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    // For admin routes: parse the session to verify role
+    // Admin route protection: Verify authentication
     if (pathname.startsWith('/admin')) {
-        try {
-            // The cookie value is a JSON string; parse the user's role
-            const sessionData = JSON.parse(decodeURIComponent(authCookie!.value));
-            const userRole: string =
-                sessionData?.user?.user_metadata?.role ??
-                sessionData?.user?.role ??
-                '';
-            const userEmail: string = sessionData?.user?.email ?? '';
-
-            const masterAdmin = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL ?? 'thenja96@gmail.com';
-            const isAdmin =
-                userEmail === masterAdmin ||
-                userRole.toLowerCase() === 'admin';
-
-            if (!isAdmin) {
-                return NextResponse.redirect(new URL('/dashboard', request.url));
-            }
-        } catch {
-            // If cookie can't be parsed, fall back to allowing through (client AuthGuard will catch it)
+        if (!isAuthenticated) {
+            return NextResponse.redirect(new URL('/login?redirect=' + pathname, request.url));
         }
+        // Specific role-based authorization is deferred to the client-side AuthGuard 
+        // to ensure the most up-to-date role from the 'profiles' table is used.
     }
 
     return NextResponse.next();

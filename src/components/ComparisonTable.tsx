@@ -23,6 +23,7 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
       standard: "Standard",
       reduced: "Reduced",
       zero: "Zero",
+      yearlyBonus: "Yearly Bonus",
       footnote: "* All dividends are calculated monthly based on your investment capital. Higher tiers enjoy lower withdrawal fees and priority liquidation."
     },
     zh: {
@@ -37,6 +38,7 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
       standard: "标准",
       reduced: "降低",
       zero: "零",
+      yearlyBonus: "年度奖金",
       footnote: "* 所有分红均根据您的投资本金按月计算。更高级别享受更低的提款费和优先清算权。"
     }
   }[lang];
@@ -60,7 +62,7 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                 <th className="py-6 px-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">{t.feature}</th>
                 {TIERS.map((tier) => (
                   <th key={tier.id} className="py-6 px-4 text-center">
-                    <span className={`text-xs font-black uppercase tracking-widest ${tier.id === 'gold' ? 'text-gv-gold' : tier.id === 'platinum' ? 'text-zinc-200' : tier.id === 'diamond' ? 'text-cyan-400' : 'text-slate-300'}`}>
+                    <span className={`text-xs font-black uppercase tracking-widest ${tier.id === 'gold' ? 'text-gv-gold' : tier.id === 'platinum' ? 'text-zinc-200' : tier.id === 'vvip' ? 'text-cyan-400' : 'text-slate-300'}`}>
                       {tier.name}
                     </span>
                   </th>
@@ -72,7 +74,9 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                 <td className="py-6 px-4 text-zinc-400">{t.range}</td>
                 {TIERS.map((tier) => (
                   <td key={tier.id} className="py-6 px-4 text-center text-white font-bold">
-                    {formatUSD(tier.minAmount)} - {formatUSD(tier.maxAmount)}
+                    {tier.maxAmount > 10000000 
+                      ? `${formatUSD(tier.minAmount)}+` 
+                      : `${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
                   </td>
                 ))}
               </tr>
@@ -82,6 +86,14 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                   <td key={tier.id} className="py-6 px-4 text-center text-emerald-500 font-black">
                     <span className="text-[10px] font-normal opacity-60 mr-1 italic">up to</span>
                     {(tier.maxDividend * 100).toFixed(0)}%
+                  </td>
+                ))}
+              </tr>
+              <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                <td className="py-6 px-4 text-zinc-400">{t.yearlyBonus}</td>
+                {TIERS.map((tier) => (
+                  <td key={tier.id} className="py-6 px-4 text-center text-gv-gold font-bold">
+                    {tier.yearlyBonus ? `+${(tier.yearlyBonus * 100).toFixed(0)}%` : <Minus className="h-4 w-4 mx-auto text-zinc-600" />}
                   </td>
                 ))}
               </tr>

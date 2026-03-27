@@ -158,7 +158,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     user_email: t.profiles?.email || 'Unknown',
                     action: t.type === 'Deposit' ? 'Deposit Approved' : 
                             t.type === 'Withdrawal' ? (t.status === 'Pending Release' ? 'Withdrawal Accepted' : 'Withdrawal Released') : 
-                            t.type === 'Audit' ? t.metadata?.action : 'Adjustment',
+                            t.type === 'Audit' ? t.metadata?.action : 
+                            t.type === 'Dividend' ? 'Dividend Payout' :
+                            t.type === 'Bonus' ? 'Bonus Awarded' :
+                            t.type === 'Penalty' ? 'Withdrawal Penalty' :
+                            'Adjustment',
                     processed_by_name: t.metadata?.processed_by_name,
                     rejection_reason: t.metadata?.reason || t.metadata?.description || `${t.type} processed (${t.status})`,
                     auditType: 'transaction',
@@ -351,7 +355,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     .from('transactions')
                     .insert({
                         user_id: tx.user_id,
-                        type: 'Withdrawal',
+                        type: 'Penalty',
                         amount: -Math.abs(penalty),
                         status: 'Pending Release', // Keep it in the queue for visibility
                         ref_id: `PEN-${tx.ref_id || Math.random().toString(36).substring(2, 8).toUpperCase()}`,
@@ -477,25 +481,25 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .eq('id', user.id);
             if (profileError) throw profileError;
 
-            const txBaseType = amountUSD >= 0 ? 'Deposit' : 'Withdrawal';
+            const txType = isDividendOrBonus ? (reason?.toLowerCase().includes('bonus') ? 'Bonus' : 'Dividend') : (amountUSD >= 0 ? 'Deposit' : 'Withdrawal');
             const { error: txError } = await supabase
                 .from('transactions')
                 .insert({
                     user_id: user.id,
-                    type: txBaseType,
+                    type: txType,
                     amount: Math.abs(amountRM),
                     status: 'Approved',
                     original_currency: 'USD',
                     original_currency_amount: amountUSD,
-                    ref_id: `ADJ-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+                    ref_id: `${txType.substring(0, 3).toUpperCase()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
                     metadata: { 
                         is_adjustment: true,
                         reason: reason,
-                        adjustment_category: isDividendOrBonus ? 'Dividend' : 'Capital',
+                        adjustment_category: isDividendOrBonus ? (reason?.toLowerCase().includes('bonus') ? 'Bonus' : 'Dividend') : 'Capital',
                         adjustment_type: amountUSD >= 0 ? 'Increase' : 'Decrease',
                         original_usd_amount: amountUSD,
                         forex_rate: forexRate,
-                        description: reason || `${txBaseType} ${amountUSD >= 0 ? 'Increase' : 'Decrease'} Adjustment`,
+                        description: reason || `${txType} ${amountUSD >= 0 ? 'Increase' : 'Decrease'} Adjustment`,
                         processed_by_name: authUser?.user_metadata?.full_name || "Admin",
                         processed_by_id: authUser?.id,
                         processed_by_email: authUser?.email
@@ -640,11 +644,21 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
     const handleSetAdminRole = async (userId: string, makeAdmin: boolean) => {
         try {
-            const { error } = await supabase
-                .from('profiles')
-                .update({ role: makeAdmin ? 'admin' : 'User' })
-                .eq('id', userId);
-            if (error) throw error;
+            const role = makeAdmin ? 'admin' : 'User';
+            const res = await fetch("/api/admin/users/role", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userId,
+                    role,
+                    adminId: authUser?.id,
+                    adminName: authUser?.user_metadata?.full_name
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to update role");
+            
             showToast(makeAdmin ? 'User promoted to Admin.' : 'Admin role removed.');
             fetchData();
         } catch (err: any) {

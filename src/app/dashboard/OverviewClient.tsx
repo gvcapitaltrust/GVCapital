@@ -422,7 +422,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                const tier = (user?.tier && user?.tier !== "Standard") 
                                    ? TIERS.find(t => t.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
                                    : getTierByAmount(Number(user?.total_investment_usd || 0));
-                               const maxUSD = Number(user?.total_investment_usd || 0) * tier.maxDividend * 12;
+                               const maxUSD = Number(user?.total_investment_usd || 0) * ((tier.maxDividend * 12) + (tier.yearlyBonus || 0));
                                return (
                                    <>
                                        <h3 className="text-3xl font-black text-emerald-500 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>

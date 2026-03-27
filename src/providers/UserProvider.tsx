@@ -99,13 +99,17 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
                 setUserProfile(fullProfile);
                 setTransactions(txs);
-                setDividendHistory(txs.filter((t: any) => 
-                    (t.metadata?.adjustment_category === 'Dividend' || 
-                     t.metadata?.adjustment_category === 'Bonus' ||
-                     t.type?.toLowerCase().includes('dividend') || 
-                     t.type?.toLowerCase().includes('bonus')) &&
-                    t.status === 'Approved'
-                ).reverse());
+                setDividendHistory(txs.filter((t: any) => {
+                    const type = (t.type || "").toLowerCase();
+                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                    const isDividendOrBonus = 
+                        type === 'dividend' || 
+                        type === 'bonus' ||
+                        category === 'dividend' || 
+                        category === 'bonus';
+                    
+                    return isDividendOrBonus && t.status === 'Approved';
+                }).reverse());
             }
 
             // 4. Fetch Referrals
