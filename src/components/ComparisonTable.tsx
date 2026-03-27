@@ -108,10 +108,10 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                           </span>
                         </div>
                         {tier.id === 'platinum' && (
-                          <span className="text-[8px] font-black text-gv-gold/60 uppercase tracking-tighter italic whitespace-nowrap">
-                            * Requires 12-Mo Lock-in
-                          </span>
-                        )}
+                        <p className="text-[7px] font-bold text-gv-gold/60 uppercase tracking-tighter italic whitespace-nowrap leading-none mt-0.5">
+                          * 12 months lock-in period is required
+                        </p>
+                      )}
                       </div>
                     ) : (
                       <Minus className="h-4 w-4 mx-auto text-zinc-600" />

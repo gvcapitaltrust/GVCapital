@@ -111,7 +111,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         return t.user_id === p.id && isCapitalWithdrawal && ['Approved', 'Completed', 'Pending Release'].includes(t.status);
                     }).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
 
-                    const totalInvestment = totalDeposited - totalWithdrawn;
+                    const totalInvestment = Number(p.balance || 0);
                     const withdrawableBalance = Math.max(0, (Number(p.balance || 0) - lockedCapital) + Number(p.profit || 0));
 
                     return {

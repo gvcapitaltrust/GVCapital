@@ -90,8 +90,8 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
             <div className="h-4 w-4 rounded-md bg-gv-gold/10 flex items-center justify-center shrink-0">
               <Check className="h-2.5 w-2.5 text-gv-gold" />
             </div>
-            <span className="text-[10px] text-gv-gold font-black uppercase tracking-tighter italic">
-              * BONUS REQUIRES 12-MO LOCK-IN
+            <span className="text-[8px] text-gv-gold font-bold uppercase tracking-tighter italic">
+              * 12 months lock-in period is required
             </span>
           </li>
         )}

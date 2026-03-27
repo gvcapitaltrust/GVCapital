@@ -147,8 +147,8 @@ export default function ProductSelection({
                         <span className="text-gv-gold text-[8px] font-black">+{ (qualifiedTier.yearlyBonus * 100).toFixed(0) }% Yearly Bonus</span>
                       </div>
                       {qualifiedTier.id === 'platinum' && (
-                        <p className="text-[7px] font-black text-gv-gold/60 uppercase tracking-tighter italic whitespace-nowrap leading-none mt-0.5">
-                          * Requires 12-Month Lock-in
+                        <p className="text-[7px] font-bold text-gv-gold/60 uppercase tracking-tighter italic whitespace-nowrap leading-none mt-0.5">
+                          * 12 months lock-in period is required
                         </p>
                       )}
                     </div>

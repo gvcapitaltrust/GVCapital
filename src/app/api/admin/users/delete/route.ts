@@ -29,29 +29,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
         }
 
-        // Optional: First delete the profile manually if no cascading delete exists
-        const { error: profileError } = await supabaseAdmin
-            .from('profiles')
-            .delete()
-            .eq('id', userId);
-
-        if (profileError) {
-            console.error('Error deleting profile:', profileError);
-            // Non-fatal, might have been deleted already or cascading exist
-        }
-
-        // Delete user auth account
-        const { data, error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
-
-        if (authError) {
-            console.error('Error deleting user auth:', authError);
-            return NextResponse.json({ error: authError.message }, { status: 400 });
-        }
-
-        // Optional: Log the deletion
+        // 1. Audit Log Entry (Before Deletion)
         if (adminId) {
             await supabaseAdmin.from('transactions').insert({
-                user_id: userId, // Keep reference or use 000-000 for deleted user
                 type: 'Audit',
                 amount: 0,
                 status: 'Approved',
@@ -59,11 +39,47 @@ export async function POST(req: Request) {
                 metadata: {
                     is_audit: true,
                     action: 'User Deleted',
-                    description: `Admin deleted user ${userId}`,
+                    description: `Admin ${adminName} deleted user ${userId}`,
                     processed_by_name: adminName || "Admin",
                     processed_by_id: adminId,
                 }
             });
+        }
+
+        // 2. Clear Referrals in profiles
+        await supabaseAdmin
+            .from('profiles')
+            .update({ referred_by: null })
+            .eq('referred_by', userId);
+
+        // 3. Delete from transactions
+        await supabaseAdmin
+            .from('transactions')
+            .delete()
+            .eq('user_id', userId);
+
+        // 4. Delete from verification_logs
+        await supabaseAdmin
+            .from('verification_logs')
+            .delete()
+            .eq('user_id', userId);
+
+        // 5. Delete specific profile
+        const { error: profileError } = await supabaseAdmin
+            .from('profiles')
+            .delete()
+            .eq('id', userId);
+
+        if (profileError) {
+            console.error('Error deleting profile:', profileError);
+        }
+
+        // 6. Delete user auth account
+        const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+        if (authError) {
+            console.error('Error deleting user auth:', authError);
+            return NextResponse.json({ error: authError.message }, { status: 400 });
         }
 
         return NextResponse.json({ success: true, message: 'User deleted successfully' });

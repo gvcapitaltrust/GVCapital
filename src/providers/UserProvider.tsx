@@ -70,7 +70,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     return isCapitalWithdrawal && ['Approved', 'Completed', 'Pending Release'].includes(t.status);
                 }).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
 
-                const currentTier = getTierByAmount((totalDepositedRaw - totalWithdrawnRaw) / forexRate);
+                const totalInvestmentRM = Number(profile.balance || 0);
+                const currentTier = getTierByAmount(totalInvestmentRM / forexRate);
                 const lockPeriodDays = currentTier.lockInDays || 180;
 
                 const lockedCapital = approvedDeposits.reduce((acc, tx) => {
@@ -110,11 +111,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     locked_capital: lockedCapital,
                     total_deposited: totalDeposited,
                     total_withdrawn: totalWithdrawn,
-                    total_investment: totalDeposited - totalWithdrawn,
-                    total_investment_usd: (totalDeposited - totalWithdrawn) / forexRate,
+                    total_investment: totalInvestmentRM,
+                    total_investment_usd: totalInvestmentRM / forexRate,
                     totalEquity: totalAssetsRM,
                     total_assets_usd: totalAssetsRM / forexRate,
-                    balanceUSD: Number(profile.balance || 0) / forexRate
+                    balanceUSD: totalInvestmentRM / forexRate
                 };
 
                 setUserProfile(fullProfile);
