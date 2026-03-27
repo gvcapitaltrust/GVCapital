@@ -100,10 +100,17 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                 {TIERS.map((tier) => (
                   <td key={tier.id} className="py-6 px-4 text-center">
                     {tier.yearlyBonus ? (
-                      <div className="relative inline-block py-1.5 px-3 rounded-full bg-gv-gold/10 border border-gv-gold/20 shadow-[0_0_15px_rgba(201,168,76,0.1)] animate-pulse">
-                        <span className="text-gv-gold font-black">
-                          +{ (tier.yearlyBonus * 100).toFixed(0) }%
-                        </span>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="relative inline-block py-1.5 px-3 rounded-full bg-gv-gold/10 border border-gv-gold/20 shadow-[0_0_15px_rgba(201,168,76,0.1)] animate-pulse">
+                          <span className="text-gv-gold font-black">
+                            +{ (tier.yearlyBonus * 100).toFixed(0) }%
+                          </span>
+                        </div>
+                        {tier.id === 'platinum' && (
+                          <span className="text-[8px] font-black text-gv-gold/60 uppercase tracking-tighter italic whitespace-nowrap">
+                            * Requires 12-Mo Lock-in
+                          </span>
+                        )}
                       </div>
                     ) : (
                       <Minus className="h-4 w-4 mx-auto text-zinc-600" />

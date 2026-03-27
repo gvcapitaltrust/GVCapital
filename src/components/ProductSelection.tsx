@@ -21,7 +21,7 @@ export default function ProductSelection({
   onOpenComparison,
   forexRate 
 }: ProductSelectionProps) {
-  const [amount, setAmount] = useState(Math.max(1, currentInvestment));
+  const [amount, setAmount] = useState(currentInvestment > 0 ? currentInvestment : 1000);
   const activeTier = getTierByAmount(amount);
   const qualifiedTier = getTierByAmount(currentInvestment);
   const dividendRange = calculateDividendRange(amount, activeTier);
@@ -93,17 +93,17 @@ export default function ProductSelection({
               </div>
               <input
                 type="range"
-                min="1"
-                max="100000"
-                step="100"
+                min="0"
+                max="1000000"
+                step="500"
                 value={amount}
                 onChange={(e) => setAmount(parseInt(e.target.value))}
-                className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-gv-gold"
+                className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-gv-gold hover:accent-gv-gold/80 transition-all"
               />
-              <div className="flex justify-between text-[8px] font-black text-zinc-700 uppercase tracking-widest">
-                <span>$1</span>
-                <span>$50,000</span>
-                <span>$100,000+</span>
+              <div className="flex justify-between text-[8px] font-black text-zinc-700 uppercase tracking-widest pt-1">
+                <span>$0</span>
+                <span>$500,000</span>
+                <span>$1,000,000+</span>
               </div>
             </div>
 
@@ -142,8 +142,15 @@ export default function ProductSelection({
                     </span>
                   </div>
                   {currentInvestment > 0 && qualifiedTier.yearlyBonus && (
-                    <div className="bg-gv-gold/10 border border-gv-gold/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
-                      <span className="text-gv-gold text-[8px] font-black">+{ (qualifiedTier.yearlyBonus * 100).toFixed(0) }% Yearly Bonus</span>
+                    <div className="flex flex-col items-center gap-1">
+                      <div className="bg-gv-gold/10 border border-gv-gold/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+                        <span className="text-gv-gold text-[8px] font-black">+{ (qualifiedTier.yearlyBonus * 100).toFixed(0) }% Yearly Bonus</span>
+                      </div>
+                      {qualifiedTier.id === 'platinum' && (
+                        <p className="text-[7px] font-black text-gv-gold/60 uppercase tracking-tighter italic whitespace-nowrap leading-none mt-0.5">
+                          * Requires 12-Month Lock-in
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>

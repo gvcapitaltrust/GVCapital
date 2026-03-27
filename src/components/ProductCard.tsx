@@ -62,13 +62,23 @@ export default function ProductCard({ tier, isActive, isQualified }: ProductCard
               ? `${(tier.minDividend * 100).toFixed(0)}%` 
               : `${(tier.maxDividend * 100).toFixed(0)}%`}
           </span>
-          <span className="text-[9px] font-bold text-zinc-500 ml-0.5 uppercase">Monthly</span>
+          <span className="text-[9px] font-bold text-zinc-500 ml-0.5 uppercase tracking-tighter">Monthly + </span>
+          <span className="text-[9px] font-black text-amber-500 ml-1 uppercase tracking-widest bg-amber-500/10 px-1.5 py-0.5 rounded-lg border border-amber-500/20">
+            {tier.lockInDays === 365 ? '12-Month' : '6-Month'} Lock-in
+          </span>
         </div>
         
         {tier.yearlyBonus && (
-          <div className="bg-gv-gold/10 border border-gv-gold/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
-            <span className="text-gv-gold text-[10px] font-black">+{ (tier.yearlyBonus * 100).toFixed(0) }%</span>
-            <span className="text-gv-gold/60 text-[7px] font-black uppercase tracking-widest">Yearly</span>
+          <div className="flex flex-col gap-1 items-start">
+            <div className="bg-gv-gold/10 border border-gv-gold/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+              <span className="text-gv-gold text-[10px] font-black">+{ (tier.yearlyBonus * 100).toFixed(0) }%</span>
+              <span className="text-gv-gold/60 text-[7px] font-black uppercase tracking-widest">Yearly</span>
+            </div>
+            {tier.id === 'platinum' && (
+              <p className="text-[7px] font-black text-gv-gold/60 uppercase tracking-tighter italic px-1 leading-none">
+                * Requires 12-Month Lock-in
+              </p>
+            )}
           </div>
         )}
       </div>
