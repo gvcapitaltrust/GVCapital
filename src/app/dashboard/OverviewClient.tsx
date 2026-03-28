@@ -36,6 +36,9 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
         penalty: number;
         payout: number;
         lockedPortion: number;
+        penalty_usd: number;
+        payout_usd: number;
+        lockedPortion_usd: number;
         isApplied: boolean;
     } | null>(null);
 
@@ -222,10 +225,14 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
         if (lockedPortion > 0) {
             const penalty = lockedPortion * 0.4;
+            const finalPayout = amountRM - penalty;
             setPenaltyInfo({
                 penalty,
-                payout: amountRM - penalty,
+                payout: finalPayout,
                 lockedPortion,
+                penalty_usd: penalty / forexRate,
+                payout_usd: finalPayout / forexRate,
+                lockedPortion_usd: lockedPortion / forexRate,
                 isApplied: true
             });
             setShowPenaltyConfirm(true);
@@ -235,6 +242,9 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                 penalty: 0,
                 payout: amountRM,
                 lockedPortion: 0,
+                penalty_usd: 0,
+                payout_usd: amountUSD,
+                lockedPortion_usd: 0,
                 isApplied: false
             });
         }
@@ -532,6 +542,21 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             <button onClick={() => setIsWithdrawModalOpen(false)} className="text-gray-500 hover:text-gray-900 transition-colors"><X className="h-6 w-6" /></button>
                         </div>
                         <div className="space-y-6">
+                            <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm group hover:border-gv-gold/30 transition-all">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-4">{t.currentPackage}</span>
+                                <div className="flex items-center gap-4">
+                                    <TierMedal 
+                                        tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
+                                        size="lg" 
+                                    />
+                                    <div className="flex flex-col">
+                                        <span className="text-xl font-black text-gray-900 uppercase tracking-tighter">
+                                            {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
+                                        </span>
+                                        <span className="text-[10px] font-bold text-gv-gold uppercase tracking-widest">{t.member}</span>
+                                    </div>
+                                </div>
+                            </div>
                             <div className="space-y-2">
                                 <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
                                 <input type="number" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
@@ -542,7 +567,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                 )}
                                 <div className="flex justify-between px-1 text-[10px] font-black uppercase tracking-widest text-gray-400 mt-4">
                                     <span>Withdrawable</span>
-                                    <span className="text-emerald-500 whitespace-nowrap">$ {(Number(user?.withdrawable_balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-gray-500 ml-1">(≈ RM {user?.withdrawable_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
+                                    <span className="text-emerald-500 whitespace-nowrap">$ {(user?.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-gray-500 ml-1">(≈ RM {user?.withdrawable_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
                                 </div>
                             </div>
                             <button onClick={handleWithdrawInitiate} disabled={!withdrawAmount} className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:bg-gv-gold">
@@ -568,16 +593,16 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             <div className="bg-white rounded-3xl p-6 border border-gray-200 space-y-4">
                                 <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
                                     <span>Locked Portion</span>
-                                    <span>$ {(penaltyInfo.lockedPortion / forexRate).toLocaleString()} <span className="text-gray-500 ml-1">(≈ RM {penaltyInfo.lockedPortion.toLocaleString()})</span></span>
+                                     <span>$ {(penaltyInfo.lockedPortion_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-red-500">
                                     <span>Penalty (40%)</span>
-                                    <span>- $ {(penaltyInfo.penalty / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="opacity-50 ml-1">(≈ -RM {penaltyInfo.penalty.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
+                                     <span>- $ {(penaltyInfo.penalty_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                                 <div className="h-px bg-white"></div>
                                 <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-emerald-500">
                                     <span>Estimated Payout</span>
-                                    <span>$ {(penaltyInfo.payout / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-gray-500 ml-1 text-[10px] font-bold">(≈ RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
+                                     <span>$ {(penaltyInfo.payout_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                             </div>
                         </div>

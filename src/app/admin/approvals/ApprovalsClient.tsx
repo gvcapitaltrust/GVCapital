@@ -118,22 +118,24 @@ export default function ApprovalsClient() {
                     })
                     .eq('id', user.id);
 
-                // Add Transaction Record
-                await supabase
-                    .from('transactions')
-                    .insert({
-                        user_id: user.id,
-                        type: 'Deposit',
-                        amount: dividend,
-                        status: 'Approved',
-                        ref_id: `DIV-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
-                        metadata: {
-                            is_adjustment: true,
-                            adjustment_category: 'Dividend',
-                            adjustment_type: 'Increase',
-                            reason: 'Monthly Dividend Distribution (1%)'
-                        }
-                    });
+                    await supabase
+                        .from('transactions')
+                        .insert({
+                            user_id: user.id,
+                            type: 'Deposit',
+                            amount: dividend,
+                            status: 'Approved',
+                            original_currency: 'USD',
+                            original_currency_amount: dividend / forexRate,
+                            ref_id: `DIV-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
+                            metadata: {
+                                is_adjustment: true,
+                                adjustment_category: 'Dividend',
+                                adjustment_type: 'Increase',
+                                reason: 'Monthly Dividend Distribution (1%)',
+                                forex_rate: forexRate
+                            }
+                        });
             }
 
             alert("Monthly dividends distributed successfully!");

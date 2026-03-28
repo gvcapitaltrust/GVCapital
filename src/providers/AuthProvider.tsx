@@ -112,17 +112,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const { data: settings } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
                 const rate = Number(settings?.value || 4.4);
                 
-                // Use stable USD balance if exists, else fallback to conversion
+                // Fetch transactions for stable USD profit calculation
+                const { data: txs } = await supabase
+                    .from('transactions')
+                    .select('type, amount, status, metadata, original_currency_amount')
+                    .eq('user_id', uid)
+                    .eq('status', 'Approved');
+
+                const totalProfitUSD = (txs || []).filter((t: any) => {
+                    const type = (t.type || "").toLowerCase();
+                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                    const isDividendOrBonus = 
+                        type === 'dividend' || 
+                        type === 'bonus' ||
+                        category === 'dividend' || 
+                        category === 'bonus';
+                    return isDividendOrBonus;
+                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount || (Number(t.amount || 0) / rate)), 0);
+
                 const currentBalanceUSD = profile.balance_usd ?? (Number(profile.balance || 0) / rate);
                 setBalanceUSD(currentBalanceUSD);
                 
                 const assetsRM = Number(profile.balance || 0) + Number(profile.profit || 0);
-                const profitUSD = Number(profile.profit || 0) / rate;
                 
                 setTotalEquity(assetsRM);
                 setTotalAssets(assetsRM);
-                setTotalAssetsUSD(currentBalanceUSD + profitUSD);
-                setUser({ ...session.user, ...profile });
+                setTotalAssetsUSD(currentBalanceUSD + totalProfitUSD);
+                setUser({ ...session.user, ...profile, profit_usd: totalProfitUSD });
             } else if (session?.user && !isFetching.current) {
                 // Profile missing but auth session exists -> User was likely deleted by admin
                 console.warn("[AUTH] Profile missing for active session. Signing out...");

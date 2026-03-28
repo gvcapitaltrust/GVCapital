@@ -121,7 +121,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                     <td className="px-4 py-3">
                                         {tx.metadata?.penalty_applied || tx.metadata?.penalty_amount ? (
                                             <div className="flex flex-col">
-                                                <span className="font-black text-red-400 tabular-nums">RM {Number(tx.metadata?.finalized_penalty || tx.metadata?.penalty_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                <span className="font-black text-red-400 tabular-nums">$ {(Number(tx.metadata?.finalized_penalty || tx.metadata?.penalty_amount || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">40% Early</span>
                                             </div>
                                         ) : (

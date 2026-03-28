@@ -478,7 +478,6 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             const targetField = isDividendOrBonus ? 'profit' : 'balance';
 
             const amountRM = amountUSD * forexRate;
-
             const updatePayload: any = { [targetField]: Number(user[targetField] || 0) + amountRM };
             if (targetField === 'balance') {
                 const currentBalanceUSD = user.balance_usd || (Number(user.balance || 0) / forexRate);
