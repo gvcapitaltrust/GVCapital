@@ -65,8 +65,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     const filteredTotalUSD = filteredTransactions
         .filter(tx => ['Approved', 'Completed', 'Pending Release'].includes(tx.status))
         .reduce((acc, tx) => {
-            const amountRM = Number(tx.amount);
-            const amountUSD = amountRM / forexRate;
+            const amountUSD = Number(tx.original_currency_amount || (Number(tx.amount) / forexRate));
             if (tx.type === 'Withdrawal' && !tx.metadata?.adjustment_category) return acc - Math.abs(amountUSD);
             if (tx.metadata?.adjustment_type === 'Decrease') return acc - Math.abs(amountUSD);
             return acc + amountUSD;
@@ -143,7 +142,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                 tx.ref_id || "-",
                 tx.metadata?.description || tx.type,
                 tx.status,
-                (Number(tx.amount) / forexRate).toFixed(2)
+                (Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toFixed(2)
             ]),
             headStyles: { fillColor: [71, 85, 105] }
         });
@@ -218,8 +217,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                             </td>
                                             {(() => {
                                                 const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease' || tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty');
-                                                const amountRM = Number(tx.amount);
-                                                const amountUSD = amountRM / forexRate;
+                                                const amountUSD = Number(tx.original_currency_amount || (Number(tx.amount) / forexRate));
                                                 const displayAmount = isWithdrawal ? -Math.abs(amountUSD) : amountUSD;
                                                 
                                                 return (
@@ -238,17 +236,17 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                             <div className="space-y-2">
                                                                 <div className="flex justify-between text-xs font-bold">
                                                                     <span className="text-gray-400 uppercase">Gross Amount</span>
-                                                                    <span className="text-gray-900">$ {Math.abs(Number(tx.metadata?.original_request_amount || tx.amount) / forexRate).toFixed(2)}</span>
+                                                                    <span className="text-gray-900">$ {Math.abs(Number(tx.original_currency_amount || tx.amount) / (tx.original_currency_amount ? 1 : forexRate)).toFixed(2)}</span>
                                                                 </div>
                                                                 {tx.metadata?.penalty_applied && (
                                                                     <div className="flex justify-between text-xs font-bold">
                                                                         <span className="text-red-500 uppercase italic">Early Withdrawal Penalty (40%)</span>
-                                                                        <span className="text-red-500">-$ {(Number(tx.metadata?.finalized_penalty) / forexRate).toFixed(2)}</span>
+                                                                        <span className="text-red-500">-$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toFixed(2)}</span>
                                                                     </div>
                                                                 )}
                                                                 <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2">
                                                                     <span className="text-emerald-500 uppercase">Final Payout (Net)</span>
-                                                                    <span className="text-emerald-500 underline decoration-gv-gold">$ {(Number(tx.metadata?.finalized_payout || tx.amount) / forexRate).toFixed(2)}</span>
+                                                                    <span className="text-emerald-500 underline decoration-gv-gold">$ {(Number(tx.metadata?.original_usd_payout || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toFixed(2)}</span>
                                                                 </div>
                                                             </div>
                                                         </div>

@@ -375,7 +375,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                             <div className="relative z-10">
                                 <p className="text-gv-gold/60 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
-                                <h2 className="text-5xl font-black tracking-tighter text-emerald-500 tabular-nums whitespace-nowrap">$ {(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                <h2 className="text-5xl font-black tracking-tighter text-emerald-500 tabular-nums whitespace-nowrap">$ {(user?.profit_usd || (Number(user?.profit || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                             </div>
                         </div>
 
@@ -387,7 +387,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10 w-full">
                                         <div>
                                             <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">{t.totalWithdraw}</p>
-                            <h2 className="text-4xl font-black tracking-tighter text-red-500 tabular-nums">$ {(Math.abs(Number(user?.total_withdrawals || 0)) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                            <h2 className="text-4xl font-black tracking-tighter text-red-500 tabular-nums">$ {(user?.total_withdrawn_usd || (Math.abs(Number(user?.total_withdrawals || 0)) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                                         </div>
                                         <div className="sm:border-l border-zinc-800 sm:pl-8 flex flex-col justify-center">
                                             <p className="text-gv-gold/60 text-[10px] font-black uppercase tracking-[0.3em] mb-4">{t.currentPackage}</p>

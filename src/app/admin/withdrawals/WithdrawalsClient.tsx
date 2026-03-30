@@ -115,13 +115,13 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                     </td>
                                     <td className="px-4 py-3">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-red-500 tabular-nums text-lg">$ {(Math.abs(Number(tx.amount)) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="font-black text-red-500 tabular-nums text-lg">$ {(Number(tx.original_currency_amount || (Math.abs(Number(tx.amount)) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3">
                                         {tx.metadata?.penalty_applied || tx.metadata?.penalty_amount ? (
                                             <div className="flex flex-col">
-                                                <span className="font-black text-red-400 tabular-nums">$ {(Number(tx.metadata?.finalized_penalty || tx.metadata?.penalty_amount || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <span className="font-black text-red-400 tabular-nums">$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty || tx.metadata?.penalty_amount || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">40% Early</span>
                                             </div>
                                         ) : (
@@ -142,7 +142,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                         </div>
                                     </td>
                                     <td className="px-4 py-3 font-black text-emerald-500 tabular-nums">
-                                        $ {(Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        $ {(Number(tx.metadata?.original_usd_payout || (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </td>
                                     <td className="px-4 py-3 text-gray-400 font-mono text-xs">{new Date(tx.created_at).toLocaleDateString()}</td>
                                     <td className="px-4 py-3">

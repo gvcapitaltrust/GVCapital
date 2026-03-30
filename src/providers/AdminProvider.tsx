@@ -12,8 +12,11 @@ interface AdminContextType {
     salesData: any[];
     platformStats: {
         totalBalance: number;
+        totalBalanceUSD: number;
         totalProfit: number;
+        totalProfitUSD: number;
         totalAssets: number;
+        totalAssetsUSD: number;
         userCount: number;
         verifiedCount: number;
     };
@@ -100,28 +103,41 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     }, 0);
 
                     const totalInvestment = Number(p.balance || 0);
+                    const totalInvestmentUSD = p.balance_usd ?? (totalInvestment / forexRate);
                     const withdrawableBalance = Math.max(0, (Number(p.balance || 0) - lockedCapital) + Number(p.profit || 0));
+                    
+                    // Stabilize Profit and Withdrawable USD
+                    const profitUSD = Number(p.profit || 0) / forexRate; // Profit usually fluctuates, but we can eventually track it. For now, we prioritize principal.
+                    const withdrawableBalanceUSD = Math.max(0, (totalInvestmentUSD - (lockedCapital / forexRate)) + profitUSD);
+                    const totalAssetsUSD = totalInvestmentUSD + profitUSD;
 
                     return {
                         ...p,
                         total_investment: totalInvestment,
+                        total_investment_usd: totalInvestmentUSD,
                         withdrawable_balance: withdrawableBalance,
-                        locked_capital: lockedCapital
+                        withdrawable_balance_usd: withdrawableBalanceUSD,
+                        locked_capital: lockedCapital,
+                        profit_usd: profitUSD,
+                        total_assets_usd: totalAssetsUSD
                     };
                 });
 
                 setUsers(enrichedUsers);
                 setKycQueue(kycPendingList || []);
 
-                // Calculate Global Platform Stats (Always RM)
+                // Calculate Global Platform Stats (Both RM and USD)
                 const stats = profileList.reduce((acc, p) => ({
                     totalBalance: acc.totalBalance + Number(p.balance || 0),
+                    totalBalanceUSD: acc.totalBalanceUSD + Number(p.balance_usd || (Number(p.balance || 0) / forexRate)),
                     totalProfit: acc.totalProfit + Number(p.profit || 0),
+                    totalProfitUSD: acc.totalProfitUSD + (Number(p.profit || 0) / forexRate),
                     totalAssets: acc.totalAssets + (Number(p.balance || 0) + Number(p.profit || 0)),
+                    totalAssetsUSD: acc.totalAssetsUSD + Number(p.balance_usd || (Number(p.balance || 0) / forexRate)) + (Number(p.profit || 0) / forexRate),
                     userCount: acc.userCount + 1,
                     verifiedCount: acc.verifiedCount + (p.kyc_status === 'Verified' ? 1 : 0)
-                }), { totalBalance: 0, totalProfit: 0, totalAssets: 0, userCount: 0, verifiedCount: 0 });
-                setPlatformStats(stats);
+                }), { totalBalance: 0, totalBalanceUSD: 0, totalProfit: 0, totalProfitUSD: 0, totalAssets: 0, totalAssetsUSD: 0, userCount: 0, verifiedCount: 0 });
+                setPlatformStats(stats as any);
             }
 
             if (txList) {
@@ -157,6 +173,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     rejection_reason: t.metadata?.reason || t.metadata?.description || `${t.type} processed (${t.status})`,
                     auditType: 'transaction',
                     amount: t.amount,
+                    original_currency: t.original_currency,
+                    original_currency_amount: t.original_currency_amount,
                     txType: t.type
                 }))
             ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());

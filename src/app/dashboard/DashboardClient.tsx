@@ -133,9 +133,9 @@ export default function DashboardClient() {
                         profile.role = "admin";
                     }
 
-                    // Standardizing RM-Base
+                    // Standardizing USD-Base for Capital
                     const totalAssetsRM = Number(profile.balance || 0) + Number(profile.profit || 0);
-                    const balUSD = Number(profile.balance || 0) / forexRate;
+                    const balUSD = profile.balance_usd ?? (Number(profile.balance || 0) / forexRate);
                     
                     // 2. Fetch Transactions
                     let txQuery = supabase.from('transactions').select('*');

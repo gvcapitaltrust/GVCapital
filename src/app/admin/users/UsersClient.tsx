@@ -209,27 +209,27 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className="flex flex-col gap-0.5">
                                                 <div className="flex items-baseline gap-1.5">
                                                     <span className="text-[14px] font-black text-gray-900 tabular-nums">$</span>
-                                                    <span className="text-[16px] font-black text-gray-900 tabular-nums">{(totalEquity / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                    <span className="text-[16px] font-black text-gray-900 tabular-nums">{(user.total_assets_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col gap-0.5">
                                                 <div className="flex items-baseline gap-1">
-                                                    <span className="text-xs font-black text-emerald-600 tabular-nums font-mono">$ {(Number(user.total_investment || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                    <span className="text-xs font-black text-emerald-600 tabular-nums font-mono">$ {(user.total_investment_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col gap-0.5">
                                                 <div className="flex items-baseline gap-1">
-                                                    <span className="text-xs font-black text-gv-gold tabular-nums font-mono">$ {(Number(user.withdrawable_balance || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                    <span className="text-xs font-black text-gv-gold tabular-nums font-mono">$ {(user.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
                                             {(() => {
-                                                const tierName = (user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(Number(user.total_investment || 0) / forexRate).name;
+                                                const tierName = (user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(user.total_investment_usd || 0).name;
                                                 const isNoTier = tierName.toLowerCase().includes('no tier') || tierName.toLowerCase() === 'standard';
                                                 return (
                                                     <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm transition-all ${
@@ -274,7 +274,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                     <h3 className="text-2xl font-black uppercase tracking-tighter text-gray-900">{selectedUser?.full_name}</h3>
                                     <div className="flex items-center gap-3">
                                         <span className="text-[9px] text-gv-gold font-black uppercase tracking-[0.2em]">
-                                            {(selectedUser?.tier && selectedUser?.tier !== "Standard") ? selectedUser?.tier : getTierByAmount((Number(selectedUser?.balance || 0) + Number(selectedUser?.profit || 0)) / forexRate).name} Class
+                                            {(selectedUser?.tier && selectedUser?.tier !== "Standard") ? selectedUser?.tier : getTierByAmount(selectedUser?.total_investment_usd || 0).name} Class
                                         </span>
                                         <span className="h-1 w-1 rounded-full bg-zinc-700"></span>
                                         <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">@{selectedUser?.username}</span>
@@ -475,7 +475,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                             <div className="text-[8px] text-gray-500 font-medium truncate max-w-[200px]">{log.rejection_reason}</div>
                                                         </td>
                                                         <td className={`px-4 py-4 tabular-nums text-right ${log.txType === 'Withdrawal' && log.action !== 'Adjustment' ? 'text-red-400' : (log.rejection_reason?.toLowerCase().includes('decrease') ? 'text-red-400' : 'text-emerald-400')}`}>
-                                                            $ {(Number(log.amount) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                            $ {(Number(log.original_currency_amount || (Number(log.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </td>
                                                         <td className="px-4 py-4 text-right text-gray-400">{log.admin_username}</td>
                                                     </tr>

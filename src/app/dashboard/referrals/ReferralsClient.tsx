@@ -117,7 +117,7 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                                         <td className="px-6 py-4">
                                                 {ref.tier && ref.tier !== "Standard" 
                                                     ? ref.tier 
-                                                    : (ref.balance > 0 ? getTierByAmount(ref.balance / forexRate).name : t.noInvestment)}
+                                                    : ((ref.balance_usd || ref.balance > 0) ? getTierByAmount(ref.balance_usd || (ref.balance / forexRate)).name : t.noInvestment)}
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${ref.is_verified ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-500'}`}>

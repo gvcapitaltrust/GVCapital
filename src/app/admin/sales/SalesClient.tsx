@@ -118,7 +118,7 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
                                         <td className="px-8 py-6 text-right">
                                             <div className="flex flex-col">
                                                 <span className="font-black text-emerald-400 tabular-nums">RM {Number(agent.total_referred_capital || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(agent.total_referred_capital || 0) / forexRate).toFixed(2)})</span>
+                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(agent.total_referred_capital_usd || (Number(agent.total_referred_capital || 0) / forexRate))).toFixed(2)})</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -155,7 +155,7 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className="text-right">
                                                 <div className="flex flex-col">
                                                     <span className="text-xs font-black text-emerald-400">RM {Number(ref.balance || 0).toFixed(0)}</span>
-                                                    <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(ref.balance || 0) / forexRate).toFixed(2)})</span>
+                                                    <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(ref.balance_usd || (Number(ref.balance || 0) / forexRate))).toFixed(2)})</span>
                                                 </div>
                                             </div>
                                         </div>
