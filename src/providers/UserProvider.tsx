@@ -182,14 +182,28 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         // Real-time listeners
         const profileChannel = supabase
             .channel(`profile-updates-${user.id}`)
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` }, 
-            () => fetchData())
+            .on('postgres_changes', { 
+                event: '*', 
+                schema: 'public', 
+                table: 'profiles', 
+                filter: `id=eq.${user.id}` 
+            }, (payload) => {
+                console.log("[USER REALTIME] Profile change:", payload.eventType);
+                fetchData();
+            })
             .subscribe();
 
         const txChannel = supabase
             .channel(`tx-updates-${user.id}`)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` }, 
-            () => fetchData())
+            .on('postgres_changes', { 
+                event: '*', 
+                schema: 'public', 
+                table: 'transactions', 
+                filter: `user_id=eq.${user.id}` 
+            }, (payload) => {
+                console.log("[USER REALTIME] Transaction change:", payload.eventType);
+                fetchData();
+            })
             .subscribe();
 
         return () => {

@@ -737,11 +737,24 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
         const channel = supabase
             .channel('admin-realtime-sync')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => fetchData(true))
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchData(true))
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'platform_settings' }, () => fetchData(true))
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, (payload) => {
+                console.log("[ADMIN REALTIME] Transactions update:", payload.eventType);
+                fetchData(true);
+            })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, (payload) => {
+                console.log("[ADMIN REALTIME] Profiles update:", payload.eventType);
+                fetchData(true);
+            })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'platform_settings' }, (payload) => {
+                console.log("[ADMIN REALTIME] Settings update:", payload.eventType);
+                fetchData(true);
+            })
             .subscribe((status) => {
-                console.log(`[ADMIN REALTIME] Subscription: ${status}`);
+                if (status === 'SUBSCRIBED') {
+                    console.log("[ADMIN REALTIME] Subscription active.");
+                } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                    console.error("[ADMIN REALTIME] Subscription failed/timed out. Status:", status);
+                }
             });
 
         return () => {

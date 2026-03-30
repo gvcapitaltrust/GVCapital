@@ -75,18 +75,25 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         fetchSettings();
 
-        // Optional: Real-time subscription to platform_settings changes
+        // Robust Real-time subscription to platform_settings changes
         const channel = supabase
             .channel('platform_settings_changes')
             .on('postgres_changes', { 
-                event: 'UPDATE', 
+                event: '*', // Listen to All events (UPDATE, INSERT, DELETE)
                 schema: 'public', 
                 table: 'platform_settings' 
-            }, () => {
-                console.log("[SETTINGS] Change detected, refreshing...");
+            }, (payload: any) => {
+                console.log("[SETTINGS] Change detected:", payload.eventType, payload.new?.key || "");
+                // Always refresh to ensure state remains in sync with DB
                 fetchSettings();
             })
-            .subscribe();
+            .subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                    console.log("[SETTINGS] Realtime subscription established.");
+                } else if (status === 'CHANNEL_ERROR') {
+                    console.error("[SETTINGS] Realtime connection failed. Check if Realtime is enabled in Supabase.");
+                }
+            });
 
         return () => {
             supabase.removeChannel(channel);
