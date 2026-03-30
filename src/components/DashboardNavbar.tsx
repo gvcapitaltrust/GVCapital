@@ -48,7 +48,7 @@ export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNav
                         {(user && (user.fullName || user.full_name)) ? (user.fullName || user.full_name) : (isCheckingAuth ? "..." : "Guest")}
                     </span>
                     {Number(user?.total_investment || 0) > 0 && (
-                        <div className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-xl px-2.5 py-1 backdrop-blur-md hover:bg-gray-100 transition-all cursor-default group/tier-badge">
+                        <div className="flex items-center gap-1.5 bg-[#FAFAF8] border border-gray-200 rounded-xl px-2.5 py-1 backdrop-blur-md hover:bg-gray-100 transition-all cursor-default group/tier-badge">
                             <TierMedal 
                                 tierId={(user.tier && user.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(balanceUSD || 0)).id} 
                                 size="sm" 

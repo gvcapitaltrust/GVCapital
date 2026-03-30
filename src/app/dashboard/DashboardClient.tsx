@@ -857,7 +857,7 @@ export default function DashboardClient() {
     const t = (content as any)[lang];
 
     if (!isMounted || isCheckingAuth) {
-        return <div className="min-h-screen bg-white flex items-center justify-center p-6"><div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
+        return <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center p-6"><div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
     }
 
     // Strict verification check
@@ -867,10 +867,10 @@ export default function DashboardClient() {
     // Instead, we will conditionally render the content inside the main area.
 
     return (
-        <div className="min-h-screen bg-white text-gray-900 flex font-sans overflow-hidden">
+        <div className="min-h-screen bg-[#FAFAF8] text-gray-900 flex font-sans overflow-hidden">
             <title>{`Dashboard | GV Capital Trust`}</title>
 
-            <aside className={`border-r border-gray-200 flex flex-col justify-between hidden md:flex bg-white transition-all duration-500 ease-in-out relative group/sidebar ${isSidebarCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
+            <aside className={`border-r border-gray-200 flex flex-col justify-between hidden md:flex bg-[#FAFAF8] transition-all duration-500 ease-in-out relative group/sidebar ${isSidebarCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
                 {/* Collapse Toggle */}
                 <button 
                     onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -897,7 +897,7 @@ export default function DashboardClient() {
                             <button
                                 key={item.id}
                                 onClick={() => setActiveTab(item.id as any)}
-                                className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeTab === item.id ? "bg-gv-gold text-black shadow-lg" : "text-gray-400 hover:text-gray-900"}`}
+                                className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeTab === item.id ? "bg-gv-gold/10 text-gv-gold border border-gv-gold/20" : "text-gray-400 hover:text-gray-900"}`}
                                 title={isSidebarCollapsed ? item.label : ""}
                             >
                                 <span className={`shrink-0 ${isSidebarCollapsed ? "mx-auto" : ""}`}>{item.icon}</span>
@@ -922,7 +922,7 @@ export default function DashboardClient() {
             />
 
             {/* Premium Bottom Navigation (Mobile Only) */}
-            <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-white/90 backdrop-blur-2xl border-t border-gray-200 flex items-center justify-around px-2 md:hidden">
+            <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-[#FAFAF8]/90 backdrop-blur-2xl border-t border-gray-200 flex items-center justify-around px-2 md:hidden">
                 {[
                     { id: "overview", label: "Home", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> },
                     { id: "products", label: "Trade", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> },
@@ -956,7 +956,7 @@ export default function DashboardClient() {
                 </button>
             </nav>
 
-            <main className="flex-1 overflow-y-auto bg-white relative flex flex-col">
+            <main className="flex-1 overflow-y-auto bg-[#FAFAF8] relative flex flex-col">
                 <div className="flex items-center justify-between px-6 py-6 border-b border-gray-200 md:hidden bg-white">
                     <img src="/logo.png" alt="GV Capital" className="h-8 w-auto " />
                     <div className="flex items-center gap-4">
@@ -1255,7 +1255,7 @@ export default function DashboardClient() {
                                 </Link>
                                 <button
                                     onClick={(e) => handleProtectedAction(e, () => setIsWithdrawModalOpen(true))}
-                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-[#222] text-gray-900 hover:bg-[#333] hover:-translate-y-1 border border-gray-200" : "bg-white text-gray-500 cursor-not-allowed grayscale"}`}
+                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gray-100 text-gray-900 hover:bg-gray-200 hover:-translate-y-1 border border-gray-300" : "bg-white text-gray-500 cursor-not-allowed grayscale"}`}
                                 >
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                                     {t.withdraw}

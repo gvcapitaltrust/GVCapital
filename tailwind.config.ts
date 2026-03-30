@@ -9,8 +9,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        "gv-gold": "#B8860B",
-        background: "#ffffff",
+        "gv-gold": "#9A7D2E",
+        background: "#FAFAF8",
         foreground: "#1a1a1a",
       },
     },

@@ -31,7 +31,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 .maybeSingle();
             
             if (psRate && !psError) {
-                setForexRate(parseFloat(psRate.value) || 4.0);
+                const rateVal = parseFloat(psRate.value);
+                setForexRate(rateVal > 0 ? rateVal : 4.4);
             }
 
             // 2. Fetch Return Rates (if stored in platform_settings)

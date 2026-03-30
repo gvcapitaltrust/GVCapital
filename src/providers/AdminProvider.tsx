@@ -53,7 +53,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const [deposits, setDeposits] = useState<any[]>([]);
     const [withdrawals, setWithdrawals] = useState<any[]>([]);
     const [salesData, setSalesData] = useState<any[]>([]);
-    const [platformStats, setPlatformStats] = useState({ totalBalance: 0, totalProfit: 0, totalAssets: 0, userCount: 0, verifiedCount: 0 });
+    const [platformStats, setPlatformStats] = useState({ totalBalance: 0, totalBalanceUSD: 0, totalProfit: 0, totalProfitUSD: 0, totalAssets: 0, totalAssetsUSD: 0, userCount: 0, verifiedCount: 0 });
     const [forexHistory, setForexHistory] = useState<any[]>([]);
     const [verificationLogs, setVerificationLogs] = useState<any[]>([]);
     const [combinedAuditLogs, setCombinedAuditLogs] = useState<any[]>([]);
@@ -107,7 +107,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     const withdrawableBalance = Math.max(0, (Number(p.balance || 0) - lockedCapital) + Number(p.profit || 0));
                     
                     // Stabilize Profit and Withdrawable USD
-                    const profitUSD = Number(p.profit || 0) / forexRate; // Profit usually fluctuates, but we can eventually track it. For now, we prioritize principal.
+                    const profitUSD = Number(p.profit || 0) / forexRate; 
                     const withdrawableBalanceUSD = Math.max(0, (totalInvestmentUSD - (lockedCapital / forexRate)) + profitUSD);
                     const totalAssetsUSD = totalInvestmentUSD + profitUSD;
 
@@ -127,16 +127,20 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 setKycQueue(kycPendingList || []);
 
                 // Calculate Global Platform Stats (Both RM and USD)
-                const stats = profileList.reduce((acc, p) => ({
-                    totalBalance: acc.totalBalance + Number(p.balance || 0),
-                    totalBalanceUSD: acc.totalBalanceUSD + Number(p.balance_usd || (Number(p.balance || 0) / forexRate)),
-                    totalProfit: acc.totalProfit + Number(p.profit || 0),
-                    totalProfitUSD: acc.totalProfitUSD + (Number(p.profit || 0) / forexRate),
-                    totalAssets: acc.totalAssets + (Number(p.balance || 0) + Number(p.profit || 0)),
-                    totalAssetsUSD: acc.totalAssetsUSD + Number(p.balance_usd || (Number(p.balance || 0) / forexRate)) + (Number(p.profit || 0) / forexRate),
-                    userCount: acc.userCount + 1,
-                    verifiedCount: acc.verifiedCount + (p.kyc_status === 'Verified' ? 1 : 0)
-                }), { totalBalance: 0, totalBalanceUSD: 0, totalProfit: 0, totalProfitUSD: 0, totalAssets: 0, totalAssetsUSD: 0, userCount: 0, verifiedCount: 0 });
+                const stats = profileList.reduce((acc, p) => {
+                    const currentBalanceUSD = p.balance_usd ?? (Number(p.balance || 0) / forexRate);
+                    const currentProfitUSD = Number(p.profit || 0) / forexRate;
+                    return {
+                        totalBalance: acc.totalBalance + Number(p.balance || 0),
+                        totalBalanceUSD: acc.totalBalanceUSD + currentBalanceUSD,
+                        totalProfit: acc.totalProfit + Number(p.profit || 0),
+                        totalProfitUSD: acc.totalProfitUSD + currentProfitUSD,
+                        totalAssets: acc.totalAssets + (Number(p.balance || 0) + Number(p.profit || 0)),
+                        totalAssetsUSD: acc.totalAssetsUSD + currentBalanceUSD + currentProfitUSD,
+                        userCount: acc.userCount + 1,
+                        verifiedCount: acc.verifiedCount + (p.kyc_status === 'Verified' ? 1 : 0)
+                    };
+                }, { totalBalance: 0, totalBalanceUSD: 0, totalProfit: 0, totalProfitUSD: 0, totalAssets: 0, totalAssetsUSD: 0, userCount: 0, verifiedCount: 0 });
                 setPlatformStats(stats as any);
             }
 

@@ -118,11 +118,11 @@ export default function HomeClient() {
     const targetLink = user ? `/dashboard?lang=${lang}` : `/register?lang=${lang}`;
 
     return (
-        <div className="min-h-screen bg-white text-gray-900 selection:bg-gv-gold selection:text-black flex flex-col overflow-x-hidden font-sans">
+        <main className="min-h-screen bg-[#FAFAF8] text-gray-900 selection:bg-gv-gold selection:text-black flex flex-col overflow-x-hidden font-sans">
             <Navigation lang={lang} setLang={setLang} />
 
             {/* --- HERO SECTION --- */}
-            <section className="relative flex flex-col items-center justify-center min-h-[90vh] pt-32 pb-20 px-6 text-center">
+            <section className="relative flex flex-col items-center justify-center min-h-[90vh] pt-32 pb-20 px-6 text-center bg-[#FAFAF8]">
                 {/* Background Decor */}
                 <div className="absolute top-1/2 left-1/2 -z-10 h-[400px] w-[400px] sm:h-[600px] sm:w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gv-gold/10 blur-[100px] sm:blur-[150px]"></div>
                 <div className="absolute top-1/4 right-1/4 -z-10 h-[300px] w-[300px] rounded-full bg-blue-500/5 blur-[100px]"></div>
@@ -215,7 +215,7 @@ export default function HomeClient() {
             </section>
 
             {/* --- CORE OFFERINGS --- */}
-            <section className="py-24 relative z-10">
+            <section className="py-24 relative z-10 bg-[#FAFAF8]">
                 <div className="max-w-7xl mx-auto px-6 lg:px-12 text-center">
                     <h2 className="text-2xl sm:text-3xl font-black mb-12">{t.services.title}</h2>
                     
@@ -282,7 +282,7 @@ export default function HomeClient() {
             </section>
 
             <GlobalFooter />
-        </div>
+        </main>
     );
 }
 

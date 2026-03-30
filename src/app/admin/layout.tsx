@@ -45,7 +45,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     return (
         <AuthGuard requireAdmin={true}>
             <AdminProvider>
-                <div className="min-h-screen bg-white text-gray-900 flex font-sans overflow-hidden">
+                <div className="min-h-screen bg-[#FAFAF8] text-gray-900 flex font-sans overflow-hidden">
                     <AdminSidebar 
                         lang={lang} 
                         isCollapsed={isSidebarCollapsed} 
@@ -56,7 +56,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                     
                     <main className="flex-1 flex flex-col h-screen overflow-hidden ring-1 ring-gray-200 shadow-sm">
                         {/* Header/Navbar */}
-                        <header className="h-16 border-b border-gray-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 shrink-0 relative z-20">
+                        <header className="h-16 border-b border-gray-200 bg-[#FAFAF8]/80 backdrop-blur-md flex items-center justify-between px-8 shrink-0 relative z-20">
                             <div className="flex items-center gap-4">
                                 <div className="h-2 w-2 rounded-full bg-gv-gold animate-pulse shadow-[0_0_10px_rgba(184,134,11,0.3)]"></div>
                                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">GV Management Node</span>
@@ -89,7 +89,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-white flex items-center justify-center">
+            <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
                 <div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div>
             </div>
         }>

@@ -110,14 +110,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 
                 // Fetch forex rate for conversion
                 const { data: settings } = await supabase.from('platform_settings').select('value').eq('key', 'usd_to_myr_rate').single();
-                const rate = Number(settings?.value || 4.4);
+                const rawRate = Number(settings?.value || 4.4);
+                const rate = rawRate > 0 ? rawRate : 4.4;
                 
                 // Fetch transactions for stable USD profit calculation
                 const { data: txs } = await supabase
                     .from('transactions')
                     .select('type, amount, status, metadata, original_currency_amount')
                     .eq('user_id', uid)
-                    .eq('status', 'Approved');
+                    .in('status', ['Approved', 'Completed', 'Pending Release']);
 
                 const totalProfitUSD = (txs || []).filter((t: any) => {
                     const type = (t.type || "").toLowerCase();
@@ -127,8 +128,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         type === 'bonus' ||
                         category === 'dividend' || 
                         category === 'bonus';
-                    return isDividendOrBonus;
-                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount || (Number(t.amount || 0) / rate)), 0);
+                    return isDividendOrBonus && t.status !== 'Pending Release';
+                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Number(t.amount || 0) / rate)), 0);
 
                 const currentBalanceUSD = profile.balance_usd ?? (Number(profile.balance || 0) / rate);
                 setBalanceUSD(currentBalanceUSD);

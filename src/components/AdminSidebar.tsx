@@ -74,7 +74,7 @@ export default function AdminSidebar({
     };
 
     return (
-        <aside className={`border-r border-gray-200 flex flex-col justify-between hidden lg:flex bg-white transition-all duration-500 ease-in-out relative group/sidebar ${isCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
+        <aside className={`border-r border-gray-200 flex flex-col justify-between hidden lg:flex bg-[#FAFAF8] transition-all duration-500 ease-in-out relative group/sidebar ${isCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
             <button 
                 onClick={onToggleCollapse}
                 className="absolute -right-3 top-24 z-10 h-6 w-6 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:bg-gv-gold hover:text-white transition-all shadow-lg opacity-0 group-hover/sidebar:opacity-100"
@@ -96,7 +96,7 @@ export default function AdminSidebar({
                                 href={`${item.path}?lang=${lang}`}
                                 className={`w-full flex items-center transition-all duration-300 relative group/item ${
                                     isCollapsed ? "justify-center p-3 rounded-xl" : "gap-4 px-4 py-2.5 rounded-2xl"
-                                } ${isActive ? "bg-gv-gold text-white shadow-lg shadow-gv-gold/20" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"}`}
+                                } ${isActive ? "bg-gv-gold/10 text-gv-gold border border-gv-gold/20" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"}`}
                                 title={isCollapsed ? item.label : ""}
                             >
                                 {item.icon}

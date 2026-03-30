@@ -90,6 +90,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             docSubmittedDesc: "Your verification request has been updated. Our team will review it within 24-48 hours.",
             totalWithdraw: "Total Withdrawals",
             walletBalance: "Wallet Balance",
+            lifetimeDeposit: "Lifetime Deposits",
+            totalPrincipal: "Total Principal Capital",
             member: "Member",
         },
         zh: {
@@ -139,6 +141,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             docSubmittedDesc: "您的验证请求已更新。我们的团队将在 24-48 小时内进行审核。",
             totalWithdraw: "总提款额",
             walletBalance: "钱包余额",
+            lifetimeDeposit: "累计充值",
+            totalPrincipal: "总本金",
             member: "会员",
         }
     }[lang];
@@ -368,54 +372,74 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                 )
             ) : (
                 <>
-                    <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="bg-zinc-900 border border-zinc-800 p-10 rounded-[40px] shadow-2xl hover:border-gv-gold/30 transition-all group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none group-hover:opacity-20 transition-opacity">
+                    <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Total Investment Card */}
+                        <div className="bg-white border border-gray-200 p-10 rounded-[40px] shadow-sm hover:shadow-lg hover:border-gv-gold/30 transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
                             <div className="relative z-10">
-                                <p className="text-gv-gold/60 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
-                                <h2 className="text-5xl font-black tracking-tighter text-emerald-500 tabular-nums whitespace-nowrap">$ {(user?.profit_usd || (Number(user?.profit || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalEquity}</p>
+                                <h2 className="text-5xl font-black tracking-tighter text-gray-900 tabular-nums whitespace-nowrap">$ {(user?.total_investment_usd ?? (Number(user?.total_investment || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.lifetimeDeposit}</span>
+                                    <span className="text-xs font-black text-gray-900">$ {(user?.total_deposited_usd ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="bg-zinc-900 border border-zinc-800 p-10 rounded-[40px] shadow-2xl hover:border-gv-gold/30 transition-all group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none group-hover:opacity-20 transition-opacity">
+                        {/* Total Dividends Card */}
+                        <div className="bg-white border border-gray-200 p-10 rounded-[40px] shadow-sm hover:shadow-lg hover:border-gv-gold/30 transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                             </div>
-                                {Number(user?.total_investment || 0) > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10 w-full">
-                                        <div>
-                                            <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">{t.totalWithdraw}</p>
-                            <h2 className="text-4xl font-black tracking-tighter text-red-500 tabular-nums">$ {(user?.total_withdrawn_usd || (Math.abs(Number(user?.total_withdrawals || 0)) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                                        </div>
-                                        <div className="sm:border-l border-zinc-800 sm:pl-8 flex flex-col justify-center">
-                                            <p className="text-gv-gold/60 text-[10px] font-black uppercase tracking-[0.3em] mb-4">{t.currentPackage}</p>
-                                            <div className="flex justify-between items-center group/tier">
-                                                <div className="flex flex-col gap-1">
-                                                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
-                                                        {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
-                                                    </h2>
-                                                </div>
-                                                <TierMedal 
-                                                    tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
-                                                    size="md" 
-                                                    className="shrink-0 md:scale-110 origin-right drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]" 
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="relative z-10 w-full flex flex-col items-center justify-center text-center py-2">
-                                        <div className="h-14 w-14 bg-gv-gold/20 text-gv-gold rounded-full flex items-center justify-center mb-4 ring-1 ring-gv-gold/40">
-                                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                                        </div>
-                                        <h2 className="text-3xl font-black tracking-tighter text-white mb-2 uppercase">{lang === 'en' ? 'Start Investing Now' : '立即开始投资'}</h2>
-                                        <p className="text-zinc-500 text-xs font-medium mb-6 max-w-[250px]">{lang === 'en' ? 'Choose from our tier packages to start earning daily dividends.' : '探索我们专业的理财产品，开启您的财富增长之旅。'}</p>
-                                        <a href="/dashboard/products" className="bg-gv-gold text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-2xl shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/40 transition-all border border-gv-gold/50">{lang === 'en' ? 'View Products' : '查看产品'}</a>
-                                    </div>
-                                )}
+                            <div className="relative z-10">
+                                <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
+                                <h2 className="text-5xl font-black tracking-tighter text-emerald-600 tabular-nums whitespace-nowrap">$ {(user?.profit_usd ?? (Number(user?.profit || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                            </div>
                         </div>
+
+                        {/* Total Withdrawals Card */}
+                        <div className="bg-white border border-gray-200 p-10 rounded-[40px] shadow-sm hover:shadow-lg hover:border-gv-gold/30 transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
+                                <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                            </div>
+                            <div className="relative z-10">
+                                <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalWithdraw}</p>
+                                <h2 className="text-5xl font-black tracking-tighter text-red-500 tabular-nums whitespace-nowrap">$ {(user?.total_withdrawn_usd ?? (Math.abs(Number(user?.total_withdrawals || 0)) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Tier and CTA Section */}
+                    <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="bg-white border border-gray-200 p-10 rounded-[40px] shadow-sm flex flex-col justify-center">
+                            <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4">{t.currentPackage}</p>
+                            <div className="flex justify-between items-center group/tier">
+                                <div className="flex flex-col gap-1">
+                                    <h2 className="text-4xl font-black text-gray-900 uppercase tracking-tighter">
+                                        {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
+                                    </h2>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.activeStatus}</p>
+                                </div>
+                                <TierMedal 
+                                    tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
+                                    size="lg" 
+                                    className="shrink-0 md:scale-125 origin-right drop-shadow-[0_0_20px_rgba(212,175,55,0.4)]" 
+                                />
+                            </div>
+                        </div>
+
+                        {Number(user?.total_investment || 0) === 0 && (
+                            <div className="bg-gv-gold/5 border border-gv-gold/20 p-10 rounded-[40px] flex flex-col items-center justify-center text-center">
+                                <div className="h-14 w-14 bg-gv-gold/20 text-gv-gold rounded-full flex items-center justify-center mb-4 ring-1 ring-gv-gold/30">
+                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                </div>
+                                <h2 className="text-2xl font-black tracking-tighter text-gray-900 mb-2 uppercase">{lang === 'en' ? 'Start Investing Now' : '立即开始投资'}</h2>
+                                <p className="text-gray-500 text-[10px] font-medium mb-6 max-w-[250px] uppercase tracking-wider">{lang === 'en' ? 'Choose from our tier packages to start earning daily dividends.' : '探索我们专业的理财产品，开启您的财富增长之旅。'}</p>
+                                <a href="/dashboard/products" className="bg-gv-gold text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-2xl shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/40 transition-all border border-gv-gold/50">{lang === 'en' ? 'View Products' : '查看产品'}</a>
+                            </div>
+                        )}
                     </section>
 
                     <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -489,7 +513,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         </Link>
                         <button
                             onClick={(e) => handleProtectedAction(e, () => setIsWithdrawModalOpen(true))}
-                            className="flex-1 bg-[#222] text-white font-black text-xl py-6 rounded-[28px] hover:bg-[#333] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 border border-gray-200"
+                            className="flex-1 bg-gray-100 text-gray-900 font-black text-xl py-6 rounded-[28px] hover:bg-gray-200 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 border border-gray-300"
                         >
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                             {t.withdraw}

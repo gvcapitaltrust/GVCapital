@@ -111,7 +111,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-white text-gray-900 flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
+        <div className="min-h-screen bg-[#FAFAF8] flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
             <title>{`Login | GV Capital Trust`}</title>
 
             <div className="absolute top-8 right-8">

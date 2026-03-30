@@ -29,7 +29,7 @@ export default function GlobalFooter() {
     const t = content[lang];
 
     return (
-        <footer className="w-full border-t border-gray-200 bg-white/80 backdrop-blur-sm py-12 px-6 mt-auto">
+        <footer className="w-full bg-[#FAFAF8]/80 backdrop-blur-sm border-t border-gray-200 py-12 px-6 mt-auto">
             <div className="mx-auto max-w-7xl">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-8">
                     <div className="space-y-4">

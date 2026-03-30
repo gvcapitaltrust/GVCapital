@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsProvider";
@@ -27,9 +27,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [referredCount, setReferredCount] = useState(0);
     const [loading, setLoading] = useState(true);
 
-    const { forexRate } = useSettings();
+    const { forexRate: rawForexRate } = useSettings();
+    const forexRate = rawForexRate > 0 ? rawForexRate : 4.4;
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         if (!user?.id) return;
         
         setLoading(true);
@@ -112,22 +113,29 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                         type === 'bonus' ||
                         category === 'dividend' || 
                         category === 'bonus';
-                    return isDividendOrBonus && t.status === 'Approved';
-                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount || (Number(t.amount || 0) / forexRate)), 0);
+                    return isDividendOrBonus && (t.status === 'Approved' || t.status === 'Completed');
+                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate)), 0);
 
                 const lockedCapitalUSD = approvedDeposits.reduce((acc, tx) => {
                     const rawDate = tx.transfer_date || tx.created_at;
                     const txDate = new Date(rawDate);
                     if (isNaN(txDate.getTime())) return acc;
                     const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
-                    return diffDays < lockPeriodDays ? acc + Number(tx.original_currency_amount || (Number(tx.amount || 0) / forexRate)) : acc;
+                    return diffDays < lockPeriodDays ? acc + Number(tx.original_currency_amount ?? (Number(tx.amount || 0) / forexRate)) : acc;
                 }, 0);
 
                 // balanceUSD is already defined above
                 const withdrawableBalanceUSD = Math.max(0, (balanceUSD - lockedCapitalUSD) + totalProfitUSD);
 
-                const totalDepositedUSD = approvedDeposits.filter((t: any) => t.metadata?.adjustment_category !== 'Dividend').reduce((acc: number, t: any) => acc + Number(t.original_currency_amount || (Number(t.amount || 0) / forexRate)), 0);
-                const totalWithdrawnUSD = txs.filter((t: any) => t.type === 'Withdrawal' && t.status === 'Approved').reduce((acc: number, t: any) => acc + Number(t.original_currency_amount || (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
+                const totalDepositedUSD = approvedDeposits.filter((t: any) => {
+                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                    return category !== 'dividend' && category !== 'bonus';
+                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate)), 0);
+
+                const totalWithdrawnUSD = txs.filter((t: any) => 
+                    t.type === 'Withdrawal' && 
+                    (t.status === 'Approved' || t.status === 'Completed' || t.status === 'Pending Release')
+                ).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
                 const profitUSD = totalProfitUSD;
 
                 const fullProfile = {
@@ -178,7 +186,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user?.id, forexRate]);
 
     useEffect(() => {
         fetchData();

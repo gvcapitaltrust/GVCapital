@@ -76,7 +76,7 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                 onClick={onClose}
             />
             <aside
-                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-white border-r border-gray-200 p-8 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden ${
+                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#FAFAF8] border-r border-gray-200 p-8 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden ${
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
@@ -100,7 +100,7 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                                         key={item.id}
                                         onClick={() => { router.push(`${item.path}?lang=${lang}`); onClose(); }}
                                         className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                                            currentTab === item.id ? "bg-gv-gold text-black shadow-lg" : "text-gray-400 hover:text-gray-900 hover:bg-white"
+                                            currentTab === item.id ? "bg-gv-gold/10 text-gv-gold border border-gv-gold/20" : "text-gray-400 hover:text-gray-900 hover:bg-white"
                                         }`}
                                     >
                                         {item.icon}
@@ -136,7 +136,7 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                                     </p>
                                 </div>
                             </div>
-                            <button onClick={handleLogout} className="w-full bg-red-600 hover:bg-red-700 text-gray-900 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-red-900/20 active:scale-[0.98]">
+                            <button onClick={handleLogout} className="w-full bg-red-50 hover:bg-red-100 text-red-600 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border border-red-200 active:scale-[0.98]">
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
                                 {t.logout}
                             </button>

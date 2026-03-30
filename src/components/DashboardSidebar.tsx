@@ -71,7 +71,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 p-6 flex flex-col justify-between transition-all duration-500 ease-in-out hidden md:flex ${isCollapsed ? "w-20" : "w-64"}`}>
+            <aside className={`fixed inset-y-0 left-0 z-50 bg-[#FAFAF8] border-r border-gray-200 p-6 flex flex-col justify-between transition-all duration-500 ease-in-out hidden md:flex ${isCollapsed ? "w-20" : "w-64"}`}>
                 <div className="space-y-12">
                     <div className={`flex items-center gap-4 px-2 transition-all duration-500 ${isCollapsed ? "justify-center" : ""}`}>
                         {isCollapsed ? (
@@ -109,7 +109,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                 <Link
                                     key={item.id}
                                     href={`${item.path}?lang=${lang}`}
-                                    className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isActive ? "bg-gv-gold text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"}`}
+                                    className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isActive ? "bg-gv-gold/10 text-gv-gold border border-gv-gold/20" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"}`}
                                     title={isCollapsed ? item.label : ""}
                                 >
                                     <span className={`shrink-0 ${isCollapsed ? "mx-auto" : ""}`}>{item.icon}</span>
@@ -122,7 +122,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
 
                 <div className="space-y-4">
                     {user && !isCollapsed && (
-                        <div className="mx-2 p-4 bg-gray-50 rounded-2xl border border-gray-200 animate-in fade-in duration-500">
+                        <div className="mx-2 p-4 bg-white rounded-2xl border border-gray-200 animate-in fade-in duration-500">
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-white text-sm shrink-0 border border-gv-gold/30">
                                     {(user.full_name?.[0] || user.fullName?.[0] || user.email?.[0] || "U").toUpperCase()}
@@ -155,7 +155,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
             </aside>
 
             {/* Premium Bottom Navigation (Mobile Only) */}
-            <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-white/90 backdrop-blur-2xl border-t border-gray-200 flex items-center justify-around px-2 md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+            <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-[#FAFAF8]/90 backdrop-blur-2xl border-t border-gray-200 flex items-center justify-around px-2 md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
                 {[
                     { id: "overview", path: "/dashboard", label: "Home", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> },
                     { id: "products", path: "/dashboard/products", label: "Trade", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> },

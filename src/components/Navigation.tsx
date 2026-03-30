@@ -36,7 +36,7 @@ export default function Navigation({ lang, setLang }: NavigationProps) {
 
   return (
     <>
-      <nav className="fixed top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md transition-all duration-300">
+      <nav className="fixed top-0 w-full z-50 bg-[#FAFAF8]/80 backdrop-blur-xl border-b border-gray-200 transition-all duration-500">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <Link href={`/?lang=${lang}`} className="flex items-center transition-transform hover:scale-105">
