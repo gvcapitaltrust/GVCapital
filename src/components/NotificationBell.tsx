@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useSettings } from "@/providers/SettingsProvider";
 
 interface Notification {
     id: string;
@@ -34,7 +35,19 @@ export default function NotificationBell({ userId, lang = "en" }: NotificationBe
 
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isOpen, setIsOpen] = useState(false);
+    const { forexRate } = useSettings();
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    const formatNotificationMessage = (message: string) => {
+        if (!message) return message;
+        // Find RM [Amount] patterns and convert them (handles commas and decimals)
+        return message.replace(/RM\s?([\d,]+(\.\d{1,2})?)/g, (match, amountStr) => {
+            const amountRM = parseFloat(amountStr.replace(/,/g, ''));
+            if (isNaN(amountRM)) return match;
+            const amountUSD = amountRM / (forexRate || 4.0);
+            return `$ ${amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        });
+    };
 
     const unreadCount = notifications.filter(n => !n.is_read).length;
 
@@ -141,7 +154,7 @@ export default function NotificationBell({ userId, lang = "en" }: NotificationBe
                                         {new Date(notification.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>
-                                <p className="text-xs text-gray-500 font-medium leading-relaxed">{notification.message}</p>
+                                <p className="text-xs text-gray-500 font-medium leading-relaxed">{formatNotificationMessage(notification.message)}</p>
                             </div>
                         )) : (
                             <div className="p-10 text-center text-gray-500 font-bold uppercase tracking-widest text-[10px]">
