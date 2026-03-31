@@ -17,30 +17,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
     const { forexRate } = useSettings();
     const router = useRouter();
 
-    const [isComparisonOpen, setIsComparisonOpen] = useState(false);
-    const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-    const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
-    const [isPinModalOpen, setIsPinModalOpen] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [successRefId, setSuccessRefId] = useState("");
     const [actionToast, setActionToast] = useState<{message: string, actionUrl?: string, actionText?: string} | null>(null);
-    const [depositReceipt, setDepositReceipt] = useState<File | null>(null);
-    const [depositAmount, setDepositAmount] = useState("");
-    const [depositDate, setDepositDate] = useState("");
-    const [withdrawAmount, setWithdrawAmount] = useState("");
-    const [withdrawPIN, setWithdrawPIN] = useState("");
-    const [isPinVisible, setIsPinVisible] = useState(false);
-    const [showPenaltyConfirm, setShowPenaltyConfirm] = useState(false);
-    const [penaltyInfo, setPenaltyInfo] = useState<{
-        penalty: number;
-        payout: number;
-        lockedPortion: number;
-        penalty_usd: number;
-        payout_usd: number;
-        lockedPortion_usd: number;
-        isApplied: boolean;
-    } | null>(null);
 
     const t = {
         en: {
@@ -88,9 +65,6 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             successDesc: "Your request has been received and is now being processed by our finance team.",
             docSubmitted: "Documents Received",
             docSubmittedDesc: "Your verification request has been updated. Our team will review it within 24-48 hours.",
-            totalWithdraw: "Total Withdrawals",
-            walletBalance: "Wallet Balance",
-            lifetimeDeposit: "Lifetime Deposits",
             totalPrincipal: "Total Principal Capital",
             member: "Member",
         },
@@ -164,163 +138,6 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
         }
     };
 
-    const handleDepositSubmit = async () => {
-        if (!depositAmount || !depositReceipt || !user) return;
-        setIsSubmitting(true);
-        const fileName = `${user.id}_${Date.now()}_${depositReceipt.name}`;
-        try {
-            const { data: uploadData, error: uploadError } = await supabase.storage
-                .from('agreements')
-                .upload(fileName, depositReceipt);
-            if (uploadError) throw uploadError;
-
-            const refId = `TXN-${Math.floor(1000 + Math.random() * 9000)}`;
-            const { error: insertError } = await supabase
-                .from('transactions')
-                .insert([{
-                    user_id: user.id,
-                    type: 'Deposit',
-                    amount: parseFloat(depositAmount),
-                    transfer_date: depositDate ? new Date(depositDate).toISOString() : new Date().toISOString(),
-                    status: 'Pending',
-                    receipt_url: uploadData.path,
-                    ref_id: refId
-                }]);
-            if (insertError) throw insertError;
-
-            setIsDepositModalOpen(false);
-            setDepositAmount("");
-            setDepositReceipt(null);
-            setSuccessRefId(refId);
-            setShowSuccess(true);
-            refreshData();
-        } catch (err: any) {
-            alert(err.message);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleWithdrawInitiate = () => {
-        const amountUSD = parseFloat(withdrawAmount);
-        if (!amountUSD || amountUSD <= 0) return;
-        
-        const amountRM = amountUSD * forexRate;
-
-        if (amountRM > (user?.total_assets || 0)) {
-            alert("Requested amount exceeds total assets.");
-            return;
-        }
-
-        const lockedCapital = user?.locked_capital || 0;
-        const profit = Number(user?.profit || 0);
-        const maturedCapital = Math.max(0, Number(user?.balance || 0) - lockedCapital);
-        const userWithdrawable = profit + maturedCapital;
-        
-        let lockedPortion = 0;
-        if (amountRM > userWithdrawable) {
-            // New Rule: If touching locked capital, must withdraw everything
-            if (amountRM < (user?.total_assets || 0)) {
-                alert(lang === 'zh' ? "不允许部分提取锁定资金。要提取锁定资金，您必须提取全部余额。" : "Partial withdrawal of locked capital is not permitted. To withdraw from your locked capital, you must withdraw your entire balance.");
-                return;
-            }
-            lockedPortion = amountRM - userWithdrawable;
-        }
-
-        if (lockedPortion > 0) {
-            const penalty = lockedPortion * 0.4;
-            const finalPayout = amountRM - penalty;
-            setPenaltyInfo({
-                penalty,
-                payout: finalPayout,
-                lockedPortion,
-                penalty_usd: penalty / forexRate,
-                payout_usd: finalPayout / forexRate,
-                lockedPortion_usd: lockedPortion / forexRate,
-                isApplied: true
-            });
-            setShowPenaltyConfirm(true);
-            return;
-        } else {
-            setPenaltyInfo({
-                penalty: 0,
-                payout: amountRM,
-                lockedPortion: 0,
-                penalty_usd: 0,
-                payout_usd: amountUSD,
-                lockedPortion_usd: 0,
-                isApplied: false
-            });
-        }
-
-        setIsPinModalOpen(true);
-    };
-
-    const handleWithdrawConfirm = async () => {
-        if (!user || withdrawPIN.trim().length !== 6) {
-            alert("Please enter a 6-digit Security PIN.");
-            return;
-        }
-        setIsSubmitting(true);
-        try {
-            // 1. Verify Security PIN
-            const { data: p, error: pinError } = await supabase
-                .from('profiles')
-                .select('security_pin')
-                .eq('id', user.id)
-                .single();
-            
-            if (pinError) throw pinError;
-
-            const storedPin = (p?.security_pin || "").toString().trim();
-            const enteredPin = withdrawPIN.trim();
-
-            if (storedPin !== enteredPin) {
-                throw new Error("Invalid security PIN. Please try again or contact support if you forgot it.");
-            }
-
-            // 2. Insert Transaction
-            const refId = `WDL-${Math.floor(1000 + Math.random() * 9000)}`;
-            const amountUSD = parseFloat(withdrawAmount);
-            const amountRM = amountUSD * forexRate;
-            
-            const { error } = await supabase.from('transactions').insert([{
-                user_id: user.id,
-                type: 'Withdrawal',
-                amount: Math.abs(amountRM),
-                status: 'Pending',
-                ref_id: refId,
-                original_currency_amount: amountUSD,
-                original_currency: 'USD',
-                metadata: {
-                    original_usd_amount: withdrawAmount,
-                    forex_rate: forexRate,
-                    ...(penaltyInfo?.isApplied ? {
-                        penalty_applied: true,
-                        penalty_amount: penaltyInfo.penalty,
-                        expected_payout: penaltyInfo.payout,
-                        locked_portion: penaltyInfo.lockedPortion,
-                        penalty_rate: "40%"
-                    } : {})
-                }
-            }]);
-            
-            if (error) throw error;
-
-            setIsPinModalOpen(false);
-            setIsWithdrawModalOpen(false);
-            setWithdrawAmount("");
-            setWithdrawPIN("");
-            setSuccessRefId(refId);
-            setShowSuccess(true);
-            refreshData();
-        } catch (err: any) {
-            alert(err.message);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
     if (isCheckingAuth && !user) {
         return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
     }
@@ -372,7 +189,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                 )
             ) : (
                 <>
-                    <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Total Investment Card */}
                         <div className="bg-white border border-gray-200 p-10 rounded-[40px] shadow-sm hover:shadow-lg hover:border-gv-gold/30 transition-all group relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
@@ -396,17 +213,6 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             <div className="relative z-10">
                                 <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
                                 <h2 className="text-5xl font-black tracking-tighter text-emerald-600 tabular-nums whitespace-nowrap">$ {(user?.profit_usd ?? (Number(user?.profit || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                            </div>
-                        </div>
-
-                        {/* Total Withdrawals Card */}
-                        <div className="bg-white border border-gray-200 p-10 rounded-[40px] shadow-sm hover:shadow-lg hover:border-gv-gold/30 transition-all group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
-                                <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
-                            </div>
-                            <div className="relative z-10">
-                                <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalWithdraw}</p>
-                                <h2 className="text-5xl font-black tracking-tighter text-red-500 tabular-nums whitespace-nowrap">$ {(user?.total_withdrawn_usd ?? (Math.abs(Number(user?.total_withdrawals || 0)) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                             </div>
                         </div>
                     </section>
@@ -505,182 +311,21 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
                     <section className="flex flex-col sm:flex-row gap-6">
                         <Link
-                            href={`/deposit?lang=${lang}`}
+                            href={`/dashboard/deposit?lang=${lang}`}
                             className="flex-1 bg-gv-gold text-black font-black text-xl py-6 rounded-[28px] hover:bg-gv-gold/90 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 shadow-[0_15px_30px_rgba(212,175,55,0.2)]"
                         >
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4v16m8-8H4" /></svg>
                             {t.deposit}
                         </Link>
-                        <button
-                            onClick={(e) => handleProtectedAction(e, () => setIsWithdrawModalOpen(true))}
+                        <Link
+                            href={`/dashboard/withdraw?lang=${lang}`}
                             className="flex-1 bg-gray-100 text-gray-900 font-black text-xl py-6 rounded-[28px] hover:bg-gray-200 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 border border-gray-300"
                         >
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                             {t.withdraw}
-                        </button>
+                        </Link>
                     </section>
                 </>
-            )}
-
-            {/* Deposit Modal */}
-            {isDepositModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm">
-                    <div className="bg-gray-50 border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-3xl font-black text-gv-gold tracking-tighter uppercase">{t.depositTitle}</h2>
-                            <button onClick={() => setIsDepositModalOpen(false)} className="text-gray-500 hover:text-gray-900 transition-colors">
-                                <X className="h-6 w-6" />
-                            </button>
-                        </div>
-                        <div className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
-                                <input type="number" value={depositAmount} onChange={(e) => setDepositAmount(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.transferDate}</label>
-                                <input type="date" value={depositDate} onChange={(e) => setDepositDate(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-xl font-black focus:outline-none focus:border-gv-gold transition-all text-gray-900" />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.bankReceipt}</label>
-                                <div className="border border-gray-200 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-white hover:bg-gray-100 transition-colors cursor-pointer relative group">
-                                    <svg className="h-10 w-10 text-gray-500 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{depositReceipt ? depositReceipt.name : t.selectDocument}</span>
-                                    <input type="file" onChange={(e) => setDepositReceipt(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,.pdf" />
-                                </div>
-                            </div>
-                            <button onClick={handleDepositSubmit} disabled={isSubmitting || !depositAmount || !depositReceipt} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:-translate-y-1">
-                                {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.confirmDeposit}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Withdraw Modal */}
-            {isWithdrawModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm">
-                    <div className="bg-gray-50 border border-gray-200 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-3xl font-black text-gray-900 tracking-tighter uppercase">{t.withdrawTitle}</h2>
-                            <button onClick={() => setIsWithdrawModalOpen(false)} className="text-gray-500 hover:text-gray-900 transition-colors"><X className="h-6 w-6" /></button>
-                        </div>
-                        <div className="space-y-6">
-                            <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm group hover:border-gv-gold/30 transition-all">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-4">{t.currentPackage}</span>
-                                <div className="flex items-center gap-4">
-                                    <TierMedal 
-                                        tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
-                                        size="lg" 
-                                    />
-                                    <div className="flex flex-col">
-                                        <span className="text-xl font-black text-gray-900 uppercase tracking-tighter">
-                                            {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
-                                        </span>
-                                        <span className="text-[10px] font-bold text-gv-gold uppercase tracking-widest">{t.member}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
-                                <input type="number" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
-                                {withdrawAmount && (
-                                    <p className="mt-2 text-[10px] text-gv-gold font-bold px-1 uppercase tracking-tighter">
-                                        ≈ RM {(parseFloat(withdrawAmount) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                    </p>
-                                )}
-                                <div className="flex justify-between px-1 text-[10px] font-black uppercase tracking-widest text-gray-400 mt-4">
-                                    <span>Withdrawable</span>
-                                    <span className="text-emerald-500 whitespace-nowrap">$ {(user?.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-gray-500 ml-1">(≈ RM {user?.withdrawable_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span></span>
-                                </div>
-                            </div>
-                            <button onClick={handleWithdrawInitiate} disabled={!withdrawAmount} className="w-full bg-white text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:bg-gv-gold">
-                                {t.requestWithdraw}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Penalty Confirmation Modal */}
-            {showPenaltyConfirm && penaltyInfo && (
-                <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-gray-900/50 backdrop-blur-md">
-                    <div className="bg-white border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-                        <div className="h-20 w-20 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto border border-amber-500/20">
-                            <svg className="h-10 w-10 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                        </div>
-                        <div className="text-center space-y-4">
-                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">Penalty Confirmation</h3>
-                            <p className="text-gray-400 font-bold text-sm leading-relaxed px-4">
-                                Your withdrawal of <span className="text-gray-900">$ {parseFloat(withdrawAmount).toLocaleString()}</span> includes capital protected by our 6/12-month lock-in period.
-                            </p>
-                            <div className="bg-white rounded-3xl p-6 border border-gray-200 space-y-4">
-                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
-                                    <span>Locked Portion</span>
-                                     <span>$ {(penaltyInfo.lockedPortion_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-red-500">
-                                    <span>Penalty (40%)</span>
-                                     <span>- $ {(penaltyInfo.penalty_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                </div>
-                                <div className="h-px bg-white"></div>
-                                <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-emerald-500">
-                                    <span>Estimated Payout</span>
-                                     <span>$ {(penaltyInfo.payout_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-4">
-                            <button 
-                                onClick={() => { setShowPenaltyConfirm(false); setIsPinModalOpen(true); }}
-                                className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all"
-                            >
-                                I Accept & Continue
-                            </button>
-                            <button onClick={() => setShowPenaltyConfirm(false)} className="w-full text-gray-500 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-[10px]">Back to Edit</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* PIN Modal */}
-            {isPinModalOpen && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-gray-900/60 backdrop-blur-xl">
-                    <div className="bg-white border border-gv-gold/50 rounded-[40px] p-12 max-w-md w-full text-center space-y-10 shadow-[0_0_100px_rgba(212,175,55,0.15)] animate-in fade-in zoom-in-90 duration-300">
-                        <div>
-                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-2">{t.securityPin}</h3>
-                            <p className="text-gray-400 font-medium text-sm px-4">{t.enterPin}</p>
-                        </div>
-                        <div className="relative flex justify-center items-center group">
-                            <input
-                                type={isPinVisible ? "text" : "password"}
-                                maxLength={6}
-                                value={withdrawPIN}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value.replace(/\D/g, ''))}
-                                className="w-full bg-white border border-gray-200 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold placeholder:opacity-20 flex-1"
-                                autoFocus
-                                placeholder="000000"
-                            />
-                            <button 
-                                type="button"
-                                onClick={() => setIsPinVisible(!isPinVisible)}
-                                className="absolute right-4 p-2 text-gray-500 hover:text-gv-gold transition-colors"
-                            >
-                                {isPinVisible ? (
-                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                ) : (
-                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057-5.064-7-9.542-7 1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057-5.064-7-9.542-7 1.274 4.057-5.064 7 9.542 7-4.477 0-8.268-2.943-9.542-7z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3l18 18" /></svg>
-                                )}
-                            </button>
-                        </div>
-                        <div className="space-y-4">
-                            <button onClick={handleWithdrawConfirm} disabled={isSubmitting || withdrawPIN.length !== 6} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all">
-                                {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.confirmWithdraw}
-                            </button>
-                            <button onClick={() => setIsPinModalOpen(false)} className="w-full text-gray-500 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-[10px]">{t.cancelTx}</button>
-                        </div>
-                    </div>
-                </div>
             )}
 
             {/* Action Toast */}
@@ -692,21 +337,6 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             <button onClick={() => { setActionToast(null); router.push(actionToast.actionUrl!); }} className="bg-gv-gold text-black font-black py-3 rounded-xl uppercase tracking-widest text-xs">{actionToast.actionText}</button>
                         )}
                         <button onClick={() => setActionToast(null)} className="text-gray-400 hover:text-gray-900 text-[10px] font-bold uppercase tracking-widest">Dismiss</button>
-                    </div>
-                </div>
-            )}
-
-            {/* Success Overlay */}
-            {showSuccess && (
-                <div className="fixed inset-0 z-[500] bg-gray-900/40 backdrop-blur-md flex items-center justify-center p-6">
-                    <div className="bg-gray-50 border border-gv-gold/30 rounded-[40px] p-10 max-w-md w-full text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
-                        <div className="h-20 w-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_50px_rgba(16,185,129,0.2)]">
-                            <svg className="h-10 w-10 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
-                        </div>
-                        <h2 className="text-3xl font-black uppercase text-gray-900 tracking-tighter">{t.successTitle}</h2>
-                        <p className="text-gray-500 font-medium">{t.successDesc}</p>
-                        {successRefId && <div className="bg-white py-3 rounded-2xl border border-emerald-500/20 text-emerald-400 font-black">Ref: {successRefId}</div>}
-                        <button onClick={() => setShowSuccess(false)} className="w-full bg-gv-gold text-black font-black py-4 rounded-2xl uppercase tracking-widest">Dismiss</button>
                     </div>
                 </div>
             )}

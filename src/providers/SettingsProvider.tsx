@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabaseClient";
 
 interface SettingsContextType {
     forexRate: number;
+    depositRate: number;
+    withdrawalRate: number;
     monthlyRate: number;
     yearlyRate: number;
     maintenanceMode: boolean;
@@ -101,8 +103,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
+    const depositRate = forexRate;
+    const withdrawalRate = Math.max(0, forexRate - 0.4);
+
     return (
-        <SettingsContext.Provider value={{ forexRate, monthlyRate, yearlyRate, maintenanceMode, loading, refresh: fetchSettings }}>
+        <SettingsContext.Provider value={{ forexRate, depositRate, withdrawalRate, monthlyRate, yearlyRate, maintenanceMode, loading, refresh: fetchSettings }}>
             {children}
         </SettingsContext.Provider>
     );

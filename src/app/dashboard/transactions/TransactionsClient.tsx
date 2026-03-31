@@ -246,8 +246,14 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                 )}
                                                                 <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2">
                                                                     <span className="text-emerald-500 uppercase">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : 'Final Payout (Net)'}</span>
-                                                                    <span className="text-emerald-500 underline decoration-gv-gold">$ {(Number(tx.metadata?.original_usd_payout || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toFixed(2)}</span>
+                                                                    <span className="text-emerald-500 underline decoration-gv-gold">$ {(Number(tx.metadata?.original_usd_payout || (Number(tx.metadata?.finalized_payout || tx.amount) / (tx.original_currency_amount ? 1 : forexRate)))).toFixed(2)}</span>
                                                                 </div>
+                                                                {tx.metadata?.remark && (
+                                                                    <div className="mt-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">User Remark</p>
+                                                                        <p className="text-[11px] font-bold text-gray-600 italic">"{tx.metadata.remark}"</p>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
 
@@ -279,12 +285,12 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                         </div>
                                                                     </div>
                                                                 )}
-                                                                {tx.metadata?.released_at && (
+                                                                {['Approved', 'Completed'].includes(tx.status) && (
                                                                     <div className="flex items-center gap-3 pl-6 relative">
                                                                         <div className="h-2 w-2 rounded-full bg-emerald-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
                                                                         <div className="flex flex-col">
-                                                                            <span className="text-[10px] font-black text-emerald-400 uppercase">Released for Distribution</span>
-                                                                            <span className="text-[9px] text-gray-500 font-bold">{new Date(tx.metadata.released_at).toLocaleString()}</span>
+                                                                            <span className="text-[10px] font-black text-emerald-500 uppercase">Successful</span>
+                                                                            <span className="text-[9px] text-gray-500 font-bold">{new Date(tx.metadata?.approved_at || tx.updated_at || tx.created_at).toLocaleString()}</span>
                                                                         </div>
                                                                     </div>
                                                                 )}
