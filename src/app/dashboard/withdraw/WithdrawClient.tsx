@@ -88,8 +88,9 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
         if (!amountUSD || amountUSD <= 0) return;
         
         const amountRM = amountUSD * withdrawalRate;
+        const totalAssetsUSD = Number(user?.total_assets_usd || 0);
 
-        if (amountRM > (user?.total_assets || 0)) {
+        if (amountUSD > (totalAssetsUSD + 0.01)) {
             alert(lang === 'zh' ? "金额超过总资产。" : "Requested amount exceeds total assets.");
             return;
         }
@@ -101,7 +102,9 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
         
         let lockedPortion = 0;
         if (amountRM > userWithdrawable) {
-            if (amountRM < (user?.total_assets || 0)) {
+            // Check for total withdrawal using USD to avoid -0.4 rate issues
+            const isTotalWithdrawal = amountUSD >= (totalAssetsUSD - 0.01);
+            if (!isTotalWithdrawal) {
                 alert(lang === 'zh' ? "不允许部分提取锁定资金。要提取锁定资金，您必须提取全部余额。" : "Partial withdrawal of locked capital is not permitted. To withdraw from your locked capital, you must withdraw your entire balance.");
                 return;
             }
