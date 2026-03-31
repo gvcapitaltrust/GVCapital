@@ -117,8 +117,8 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
                                         <td className="px-8 py-6 font-bold text-gray-400">{agent.total_referrals} Clients</td>
                                         <td className="px-8 py-6 text-right">
                                             <div className="flex flex-col">
-                                                <span className="font-black text-emerald-400 tabular-nums">RM {Number(agent.total_referred_capital || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(agent.total_referred_capital_usd || (Number(agent.total_referred_capital || 0) / forexRate))).toFixed(2)})</span>
+                                                <span className="font-black text-emerald-400 tabular-nums">$ {(Number(agent.total_referred_capital_usd || (Number(agent.total_referred_capital || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">RM {Number(agent.total_referred_capital || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -136,30 +136,42 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="absolute top-0 right-0 p-8 opacity-5 select-none text-9xl font-black">GV</div>
                     {selectedAgent ? (
                         <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500 relative z-10">
-                            <div>
-                                <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold mb-2">{t.detailTitle}</h4>
-                                <div className="text-4xl font-black text-gray-900 uppercase tracking-tighter">@{selectedAgent}</div>
-                            </div>
-                            
-                            <div className="space-y-6">
-                                <h5 className="text-[10px] font-black uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-2">{t.referredClients} ({agentReferrals.length})</h5>
-                                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                                    {isLoadingReferrals ? (
-                                        <div className="py-20 flex justify-center"><div className="h-6 w-6 border-2 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>
-                                    ) : agentReferrals.map((ref, i) => (
-                                        <div key={i} className="bg-white border border-gray-200 p-5 rounded-3xl flex items-center justify-between group hover:border-gray-200 transition-all">
-                                            <div>
-                                                <div className="text-xs font-black text-gray-900 uppercase tracking-tight">{ref.full_name || ref.username}</div>
-                                                <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">@{ref.username}</div>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="flex flex-col">
-                                                    <span className="text-xs font-black text-emerald-400">RM {Number(ref.balance || 0).toFixed(0)}</span>
-                                                    <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(ref.balance_usd || (Number(ref.balance || 0) / forexRate))).toFixed(2)})</span>
+                                <div>
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold mb-2">{t.detailTitle}</h4>
+                                    <div className="text-4xl font-black text-gray-900 uppercase tracking-tighter">@{selectedAgent}</div>
+                                    <div className="mt-4 flex flex-col">
+                                        {(() => {
+                                            const totalUSD = agentReferrals.reduce((sum, ref) => sum + Number(ref.balance_usd || 0), 0);
+                                            const totalRM = agentReferrals.reduce((sum, ref) => sum + Number(ref.balance || 0), 0);
+                                            return (
+                                                <>
+                                                    <span className="text-2xl font-black text-emerald-500 tabular-nums">$ {totalUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                    <span className="text-[11px] text-gray-400 font-black uppercase tracking-widest">RM {totalRM.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                </div>
+                                
+                                <div className="space-y-6">
+                                    <h5 className="text-[10px] font-black uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-2">{t.referredClients} ({agentReferrals.length})</h5>
+                                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                        {isLoadingReferrals ? (
+                                            <div className="py-20 flex justify-center"><div className="h-6 w-6 border-2 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>
+                                        ) : agentReferrals.map((ref, i) => (
+                                            <div key={i} className="bg-white border border-gray-200 p-5 rounded-3xl flex items-center justify-between group hover:border-gray-200 transition-all">
+                                                <div>
+                                                    <div className="text-xs font-black text-gray-900 uppercase tracking-tight">{ref.full_name || ref.username}</div>
+                                                    <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">@{ref.username}</div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs font-black text-emerald-400">$ {(Number(ref.balance_usd || (Number(ref.balance || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                        <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">RM {Number(ref.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
                                     {agentReferrals.length === 0 && !isLoadingReferrals && (
                                         <div className="text-center py-20 text-gray-400 text-[10px] font-black uppercase tracking-widest">{t.noReferrals}</div>
                                     )}
