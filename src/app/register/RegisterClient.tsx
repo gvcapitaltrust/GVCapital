@@ -23,6 +23,7 @@ export default function RegisterPage() {
     const [isReferralValid, setIsReferralValid] = useState(false); // Default to false as it's required
     const [isValidatingReferral, setIsValidatingReferral] = useState(false);
     const [referralCheckMsg, setReferralCheckMsg] = useState("");
+    const [inviterId, setInviterId] = useState<string | null>(null);
     const [securityPin, setSecurityPin] = useState("");
     const [ownUsername, setOwnUsername] = useState("");
     const [isUsernameValid, setIsUsernameValid] = useState(false);
@@ -54,17 +55,19 @@ export default function RegisterPage() {
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('username')
+                .select('id, username')
                 .eq('username', cleanCode)
                 .single();
 
             if (error || !data) {
                 setIsReferralValid(false);
                 setInviterUsername("");
+                setInviterId(null);
                 setReferralCheckMsg(lang === "en" ? "Invalid Referral Code. Access to GV Capital is by invitation only." : "无效的推荐码。GV资本的访问仅限受邀。");
             } else {
                 setIsReferralValid(true);
                 setInviterUsername(data.username);
+                setInviterId(data.id);
                 setReferralCheckMsg(lang === "en" ? `You have been successfully invited by ${data.username}.` : `您已成功受 ${data.username} 邀请。`);
             }
         } catch (err) {
@@ -248,15 +251,7 @@ export default function RegisterPage() {
 
             if (user) {
                 // Safely resolve referral ID if exists
-                let resolvedReferralId = null;
-                if (inviterUsername) {
-                    const { data: refData } = await supabase
-                        .from('profiles')
-                        .select('id')
-                        .eq('username', inviterUsername.toLowerCase())
-                        .single();
-                    resolvedReferralId = refData?.id || null;
-                }
+                let resolvedReferralId = inviterId || null;
 
                 const profileData: any = {
                     id: user.id,
