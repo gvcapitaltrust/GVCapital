@@ -311,12 +311,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             const currentProfit = Number(profile?.profit || 0);
             const currentBalance = Number(profile?.balance || 0);
 
-            // 2. Fetch User Deposits to verify lock-in period
+            // 2. Fetch User Capital Inflows to verify lock-in period
             const { data: deposits, error: depositsError } = await supabase
                 .from('transactions')
                 .select('*')
                 .eq('user_id', tx.user_id)
-                .eq('type', 'Deposit')
+                .in('type', ['Deposit', 'Bonus', 'Adjustment'])
                 .in('status', ['Approved', 'Completed']);
 
             if (depositsError) throw depositsError;
@@ -326,6 +326,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             const lockPeriodDays = currentTier.lockInDays || 180;
 
             const lockedCapital = deposits?.reduce((acc: number, d: any) => {
+                const category = (d.metadata?.adjustment_category || "").toLowerCase();
+                if (category === 'dividend' || category === 'profit') return acc;
+
                 const rawDate = d.transfer_date || d.created_at;
                 const txDate = new Date(rawDate);
                 if (isNaN(txDate.getTime())) return acc;

@@ -53,12 +53,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             if (profile && txs) {
                 const now = new Date();
                 const approvedDeposits = txs.filter((tx: any) => 
-                    tx.type === 'Deposit' && ['Approved', 'Completed'].includes(tx.status)
+                    (tx.type === 'Deposit' || tx.type === 'Bonus' || tx.type === 'Adjustment') && 
+                    ['Approved', 'Completed'].includes(tx.status) &&
+                    (tx.metadata?.adjustment_category !== 'Dividend' && tx.metadata?.adjustment_category !== 'Profit')
                 );
                 const totalDepositedRaw = txs.filter((t: any) => {
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                    const isCapital = t.type === 'Deposit' && 
+                    const isCapital = (t.type === 'Deposit' || t.type === 'Bonus' || t.type === 'Adjustment') && 
                                      category !== 'dividend' && 
+                                     category !== 'profit' &&
                                      category !== 'bonus';
                     return isCapital && ['Approved', 'Completed'].includes(t.status);
                 }).reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
@@ -91,8 +94,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 
                 const totalDeposited = txs.filter((t: any) => {
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                    const isCapital = t.type === 'Deposit' && 
+                    const isCapital = (t.type === 'Deposit' || t.type === 'Bonus' || t.type === 'Adjustment') && 
                                      category !== 'dividend' && 
+                                     category !== 'profit' &&
                                      category !== 'bonus';
                     return isCapital && ['Approved', 'Completed'].includes(t.status);
                 }).reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
@@ -129,7 +133,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
                 const totalDepositedUSD = approvedDeposits.filter((t: any) => {
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                    return category !== 'dividend' && category !== 'bonus';
+                    return category !== 'dividend' && category !== 'profit' && category !== 'bonus';
                 }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate)), 0);
 
                 const totalWithdrawnUSD = txs.filter((t: any) => 
