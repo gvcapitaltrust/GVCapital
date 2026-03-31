@@ -214,17 +214,13 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <div className="flex flex-col gap-0.5">
-                                                <div className="flex items-baseline gap-1">
-                                                    <span className="text-xs font-black text-emerald-600 tabular-nums font-mono">$ {(user.total_investment_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-xs font-black text-emerald-600 tabular-nums whitespace-nowrap">$ {(user.total_investment_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <div className="flex flex-col gap-0.5">
-                                                <div className="flex items-baseline gap-1">
-                                                    <span className="text-xs font-black text-gv-gold tabular-nums font-mono">$ {(user.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                                </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-xs font-black text-gv-gold tabular-nums whitespace-nowrap">$ {(user.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
