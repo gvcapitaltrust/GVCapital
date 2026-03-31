@@ -144,6 +144,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     fullName: profile.full_name || user.user_metadata?.full_name,
                     total_assets: totalAssetsRM,
                     withdrawable_balance_usd: withdrawableBalanceUSD,
+                    locked_capital: lockedCapital,
                     locked_capital_usd: lockedCapitalUSD,
                     total_deposited: totalDeposited,
                     total_deposited_usd: totalDepositedUSD,

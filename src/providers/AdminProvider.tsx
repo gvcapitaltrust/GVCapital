@@ -226,8 +226,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             });
             if (rpcError) throw rpcError;
 
+            const amountUSD = Number(tx.original_currency_amount || (Number(tx.amount || 0) / forexRate));
             await supabase.from('profiles').update({
-                balance_usd: (tx.profiles?.balance_usd || (Number(tx.profiles?.balance || 0) / forexRate)) + Number(tx.original_currency_amount || 0)
+                balance_usd: (tx.profiles?.balance_usd ?? (Number(tx.profiles?.balance || 0) / forexRate)) + amountUSD
             }).eq('id', tx.user_id);
 
             await supabase.from('transactions').update({

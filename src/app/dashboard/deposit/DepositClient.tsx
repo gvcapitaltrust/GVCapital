@@ -64,19 +64,25 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
             if (uploadError) throw uploadError;
 
             const refId = `DEP-${Math.floor(100000 + Math.random() * 900000)}`;
+            const amountUSD = parseFloat(depositAmount);
+            const amountRM = amountUSD * depositRate;
+
             const { error: insertError } = await supabase
                 .from('transactions')
                 .insert([{
                     user_id: user.id,
                     type: 'Deposit',
-                    amount: parseFloat(depositAmount),
+                    amount: amountRM,
                     transfer_date: depositDate ? new Date(depositDate).toISOString() : new Date().toISOString(),
                     status: 'Pending',
                     receipt_url: uploadData.path,
                     ref_id: refId,
+                    original_currency_amount: amountUSD,
+                    original_currency: 'USD',
                     metadata: {
                         remark: remark,
-                        forex_rate: depositRate
+                        forex_rate: depositRate,
+                        original_usd_amount: depositAmount
                     }
                 }]);
             if (insertError) throw insertError;

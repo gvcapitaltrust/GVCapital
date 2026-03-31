@@ -171,7 +171,9 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                     ...(penaltyInfo?.isApplied ? {
                         penalty_applied: true,
                         penalty_amount: penaltyInfo.penalty,
+                        original_usd_penalty: penaltyInfo.penalty_usd,
                         expected_payout: penaltyInfo.payout,
+                        original_usd_payout: penaltyInfo.payout_usd,
                         locked_portion: penaltyInfo.lockedPortion,
                         penalty_rate: "40%"
                     } : {})
