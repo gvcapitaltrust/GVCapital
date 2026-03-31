@@ -245,7 +245,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                     </div>
                                                                 )}
                                                                 <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2">
-                                                                    <span className="text-emerald-500 uppercase">Final Payout (Net)</span>
+                                                                    <span className="text-emerald-500 uppercase">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : 'Final Payout (Net)'}</span>
                                                                     <span className="text-emerald-500 underline decoration-gv-gold">$ {(Number(tx.metadata?.original_usd_payout || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toFixed(2)}</span>
                                                                 </div>
                                                             </div>
