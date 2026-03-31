@@ -22,7 +22,7 @@ export default function GlobalFooter() {
             terms: "服务条款",
             risk: "风险披露",
             disclaimer: "GV 资本信托并非持牌银行。我们作为私人投资机构运营。投资涉及损失风险。参与前请阅读我们的披露声明。",
-            location: "马来西亚，吉隆坡"
+            location: ""
         }
     };
 
@@ -52,13 +52,15 @@ export default function GlobalFooter() {
                             <Link href={`/terms?lang=${lang}`} className="hover:text-gv-gold transition-colors">{t.terms}</Link>
                             <Link href={`/risk?lang=${lang}`} className="hover:text-gv-gold transition-colors">{t.risk}</Link>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-500">
-                            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t.location}</span>
-                        </div>
+                        {t.location && (
+                            <div className="flex items-center gap-2 text-gray-500">
+                                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t.location}</span>
+                            </div>
+                        )}
                         <p className="text-[8px] text-gray-400 max-w-xs text-left md:text-right leading-tight font-bold uppercase tracking-widest mt-2 border-t border-gray-200 pt-4">
                             {lang === "en"
                                 ? "Personal Data Protection Act 2010 (PDPA) Compliance: By using this site, you consent to the collection and processing of your personal data."

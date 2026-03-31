@@ -49,11 +49,10 @@ export default function Navigation({ lang, setLang }: NavigationProps) {
           </div>
 
           <div className="flex items-center gap-4 sm:gap-8">
-            {/* Desktop Full Menu */}
             <div className="hidden items-center gap-6 text-sm font-black uppercase tracking-widest text-gray-500 md:flex">
-              <Link href="#" className="hover:text-gv-gold transition-colors">{t.services}</Link>
-              <Link href="#" className="hover:text-gv-gold transition-colors">{t.about}</Link>
-              <Link href="#" className="hover:text-gv-gold transition-colors">{t.contact}</Link>
+              <Link href={`/services?lang=${lang}`} className="hover:text-gv-gold transition-colors">{t.services}</Link>
+              <Link href={`/about?lang=${lang}`} className="hover:text-gv-gold transition-colors">{t.about}</Link>
+              <Link href={`/contact?lang=${lang}`} className="hover:text-gv-gold transition-colors">{t.contact}</Link>
             </div>
 
             <div className="flex items-center gap-4">
