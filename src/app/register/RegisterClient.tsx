@@ -172,7 +172,7 @@ export default function RegisterPage() {
             pdpaNote: "By submitting, you consent to GV Capital Trust processing your personal data in accordance with the Personal Data Protection Act 2010 (PDPA) for the purposes of identity verification and investment management.",
             agreementBody: `
                 GV CAPITAL TRUST
-                MASTER PRIVATE WEALTH & INVESTMENT AGREEMENT (V.2024.02)
+                MASTER PRIVATE WEALTH & INVESTMENT AGREEMENT (V.2026.02)
 
                 This Master Private Wealth & Investment Agreement ("Agreement") governs the relationship between GV Capital Trust ("The Trust") and the registered user ("The Client"). By acknowledging this agreement, The Client enters into a binding fiduciary arrangement under the following distinct terms:
 
@@ -221,7 +221,7 @@ export default function RegisterPage() {
             pdpaNote: "提交即表示您同意 GV 资本信托根据 2010 年个人数据保护法 (PDPA) 处理您的个人数据，用于身份验证和投资管理目的。",
             agreementBody: `
                 GV 资本信托
-                主私人财富与投资协议 (V.2024.02)
+                主私人财富与投资协议 (V.2026.02)
 
                 本主私人财富与投资协议（“协议”）约束 GV 资本信托（“信托”）与注册用户（“客户”）之间的关系。通过确认本协议，客户将在以下明确条款下签订具有约束力的受托安排：
 
