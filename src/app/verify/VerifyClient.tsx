@@ -414,7 +414,7 @@ export default function VerifyPage() {
                     {currentStep === 1 && (
                         <div className="space-y-8 animate-in fade-in duration-300">
                             <div className="space-y-2">
-                                <h2 className="text-xl font-bold text-gray-900 tracking-tight">{t.step1Title}</h2>
+                                <h2 className="text-xl font-bold text-white tracking-tight">{t.step1Title}</h2>
                                 <p className="text-xs text-gray-400 font-medium">{t.step1Desc}</p>
                             </div>
 
@@ -458,9 +458,9 @@ export default function VerifyPage() {
                                 </div>
                             </div>
 
-                            <label className="flex items-center gap-3 p-5 bg-gray-50 border border-gray-200 rounded-3xl cursor-pointer group hover:bg-white/[0.04] transition-all">
-                                <input type="checkbox" checked={formData.nationality_match} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, nationality_match: e.target.checked})} className="h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
-                                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tight">{t.localityCheck}</span>
+                            <label className="flex items-center gap-3 p-5 bg-white border border-gray-200 rounded-3xl cursor-pointer group hover:bg-gray-50 transition-all">
+                                <input type="checkbox" checked={formData.nationality_match} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, nationality_match: e.target.checked})} className="h-5 w-5 rounded border-gray-300 bg-white text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
+                                <span className="text-[11px] font-bold text-gray-600 uppercase tracking-tight">{t.localityCheck}</span>
                             </label>
 
                             <div className="flex gap-4 pt-4">
@@ -484,7 +484,7 @@ export default function VerifyPage() {
                     {currentStep === 2 && (
                         <div className="space-y-8 animate-in fade-in duration-300">
                             <div className="space-y-2">
-                                <h2 className="text-xl font-bold text-gray-900 tracking-tight">{t.step2Title}</h2>
+                                <h2 className="text-xl font-bold text-white tracking-tight">{t.step2Title}</h2>
                                 <p className="text-xs text-gray-400 font-medium">{t.step2Desc}</p>
                             </div>
 
@@ -546,25 +546,25 @@ export default function VerifyPage() {
                             </div>
 
                             <div className="space-y-4 pt-4">
-                                <label className="flex items-start gap-4 p-5 bg-gray-50 border border-gray-200 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
-                                    <input type="checkbox" checked={formData.accuracy_confirmed} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, accuracy_confirmed: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
+                                <label className="flex items-start gap-4 p-5 bg-white border border-gray-200 rounded-[28px] cursor-pointer group hover:bg-gray-50 transition-all">
+                                    <input type="checkbox" checked={formData.accuracy_confirmed} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, accuracy_confirmed: e.target.checked})} className="mt-1 h-5 w-5 rounded border-gray-300 bg-white text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-gray-900 uppercase tracking-tighter">{t.accuracyTitle}</p>
-                                        <p className="text-[9px] text-gray-400 font-bold leading-normal">{t.accuracyDesc}</p>
+                                        <p className="text-[9px] text-gray-500 font-bold leading-normal">{t.accuracyDesc}</p>
                                     </div>
                                 </label>
-                                <label className="flex items-start gap-4 p-5 bg-gray-50 border border-gray-200 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
-                                    <input type="checkbox" checked={formData.risk_acknowledged} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, risk_acknowledged: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
+                                <label className="flex items-start gap-4 p-5 bg-white border border-gray-200 rounded-[28px] cursor-pointer group hover:bg-gray-50 transition-all">
+                                    <input type="checkbox" checked={formData.risk_acknowledged} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, risk_acknowledged: e.target.checked})} className="mt-1 h-5 w-5 rounded border-gray-300 bg-white text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-gray-900 uppercase tracking-tighter">{t.riskTitle}</p>
-                                        <p className="text-[9px] text-gray-400 font-bold leading-normal">{t.riskDesc}</p>
+                                        <p className="text-[9px] text-gray-500 font-bold leading-normal">{t.riskDesc}</p>
                                     </div>
                                 </label>
-                                <label className="flex items-start gap-4 p-5 bg-gray-50 border border-gray-200 rounded-[28px] cursor-pointer group hover:bg-white/[0.04] transition-all">
-                                    <input type="checkbox" checked={formData.is_not_pep} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, is_not_pep: e.target.checked})} className="mt-1 h-5 w-5 rounded border-white/20 bg-transparent text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
+                                <label className="flex items-start gap-4 p-5 bg-white border border-gray-200 rounded-[28px] cursor-pointer group hover:bg-gray-50 transition-all">
+                                    <input type="checkbox" checked={formData.is_not_pep} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, is_not_pep: e.target.checked})} className="mt-1 h-5 w-5 rounded border-gray-300 bg-white text-gv-gold focus:ring-gv-gold/50 cursor-pointer" />
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-gray-900 uppercase tracking-tighter">{t.pepTitle}</p>
-                                        <p className="text-[9px] text-gray-400 font-bold leading-normal">{t.pepDesc}</p>
+                                        <p className="text-[9px] text-gray-500 font-bold leading-normal">{t.pepDesc}</p>
                                     </div>
                                 </label>
                             </div>
@@ -586,7 +586,7 @@ export default function VerifyPage() {
                     {currentStep === 3 && (
                         <div className="space-y-10 animate-in fade-in duration-300">
                             <div className="space-y-2">
-                                <h2 className="text-xl font-bold text-gray-900 tracking-tight">{t.step3Title}</h2>
+                                <h2 className="text-xl font-bold text-white tracking-tight">{t.step3Title}</h2>
                                 <p className="text-xs text-gray-400 font-medium">{t.step3Desc}</p>
                             </div>
 
@@ -611,7 +611,7 @@ export default function VerifyPage() {
                                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 inline-block">{t.docTypeTitle}</label>
                                 <div className="flex flex-wrap justify-center gap-3">
                                     {t.docTypes.map((type: string, i: number) => (
-                                        <button key={type} onClick={() => setFormData({...formData, id_type: content.en.docTypes[i]})} className={`px-6 py-3 rounded-2xl text-[10px] font-black tracking-widest border transition-all ${formData.id_type === content.en.docTypes[i] ? 'bg-gv-gold border-gv-gold text-black' : 'bg-gray-50 border-gray-200 text-gray-400 hover:border-white/20'}`}>
+                                        <button key={type} onClick={() => setFormData({...formData, id_type: content.en.docTypes[i]})} className={`px-6 py-3 rounded-2xl text-[10px] font-black tracking-widest border transition-all ${formData.id_type === content.en.docTypes[i] ? 'bg-gv-gold border-gv-gold text-black' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}>
                                             {type}
                                         </button>
                                     ))}
@@ -632,7 +632,7 @@ export default function VerifyPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t.frontDoc}</label>
-                                    <div className="relative group border-2 border-gray-200 border-dashed rounded-[32px] overflow-hidden bg-gray-50 aspect-[3/2] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all border-dashed-2">
+                                    <div className="relative group border-2 border-gray-200 border-dashed rounded-[32px] overflow-hidden bg-white aspect-[3/2] flex flex-col items-center justify-center hover:bg-gray-50 transition-all border-dashed-2">
                                         {idFront ? (
                                             <div className="absolute inset-0 p-4">
                                                 <img src={URL.createObjectURL(idFront)} className="w-full h-full object-cover rounded-2xl opacity-50" />
@@ -655,7 +655,7 @@ export default function VerifyPage() {
                                 {formData.id_type !== "Passport" && (
                                     <div className="space-y-4">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t.backDoc}</label>
-                                        <div className="relative group border-2 border-gray-200 border-dashed rounded-[32px] overflow-hidden bg-gray-50 aspect-[3/2] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all border-dashed-2">
+                                        <div className="relative group border-2 border-gray-200 border-dashed rounded-[32px] overflow-hidden bg-white aspect-[3/2] flex flex-col items-center justify-center hover:bg-gray-50 transition-all border-dashed-2">
                                             {idBack ? (
                                                 <div className="absolute inset-0 p-4">
                                                     <img src={URL.createObjectURL(idBack)} className="w-full h-full object-cover rounded-2xl opacity-50" />
@@ -678,9 +678,9 @@ export default function VerifyPage() {
                                 )}
                             </div>
 
-                            <div id="bank-info-section" className="pt-8 border-t border-gray-200 space-y-6">
+                            <div id="bank-info-section" className="pt-8 border-t border-white/10 space-y-6">
                                 <div>
-                                    <h3 className="text-sm font-black text-gray-900 tracking-widest uppercase">{t.bankDetails}</h3>
+                                    <h3 className="text-sm font-black text-white tracking-widest uppercase">{t.bankDetails}</h3>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
@@ -700,7 +700,7 @@ export default function VerifyPage() {
 
                             <div className="space-y-4">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t.bankStatement}</label>
-                                <div className="relative group border-2 border-gray-200 border-dashed rounded-[32px] overflow-hidden bg-gray-50 min-h-[160px] flex flex-col items-center justify-center hover:bg-white/[0.04] transition-all border-dashed-2">
+                                <div className="relative group border-2 border-gray-200 border-dashed rounded-[32px] overflow-hidden bg-white min-h-[160px] flex flex-col items-center justify-center hover:bg-gray-50 transition-all border-dashed-2">
                                     {bankStatement ? (
                                         <div className="flex flex-col items-center justify-center space-y-2 p-6">
                                             <svg className="h-12 w-12 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
