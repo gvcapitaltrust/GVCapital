@@ -147,6 +147,37 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 setPlatformStats(stats as any);
             }
 
+            // 6. Fetch Sales Data & Synchronize USD Totals
+            const { data: sales } = await supabase
+                .from('sales_leaderboard')
+                .select('*')
+                .order('total_referred_capital', { ascending: false });
+
+            if (sales && profileList && txList) {
+                // We use the same enrichment logic or the existing enrichedUsers if we restructure
+                // Better approach: Calculate preciseSalesData here where we have the fresh data
+                const now = new Date();
+                const enrichedUsers = profileList.map((p: any) => {
+                    const userTxs = txList.filter((t: any) => t.user_id === p.id && ['Approved', 'Completed'].includes(t.status));
+                    const totalInvUSD = p.balance_usd ?? (Number(p.balance || 0) / forexRate);
+                    return { ...p, balance_usd: totalInvUSD };
+                });
+
+                const preciseSalesData = sales.map(agent => {
+                    const referredUsers = enrichedUsers.filter(u => u.referred_by_username === agent.agent_username);
+                    const totalUSD = referredUsers.reduce((sum, u) => sum + Number(u.balance_usd || 0), 0);
+                    const totalRM = referredUsers.reduce((sum, u) => sum + Number(u.balance || 0), 0);
+                    return {
+                        ...agent,
+                        total_referred_capital: totalRM,
+                        total_referred_capital_usd: totalUSD
+                    };
+                });
+                setSalesData(preciseSalesData);
+            } else if (sales) {
+                setSalesData(sales);
+            }
+
             if (txList) {
                 setDeposits(txList.filter((t: any) => t.type?.toLowerCase() === 'deposit'));
                 setWithdrawals(txList.filter((t: any) => t.type?.toLowerCase() === 'withdrawal'));
@@ -187,29 +218,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
             setCombinedAuditLogs(mergedLogs);
 
-            // 6. Fetch Sales Data & Synchronize USD Totals
-            const { data: sales } = await supabase
-                .from('sales_leaderboard')
-                .select('*')
-                .order('total_referred_capital', { ascending: false });
 
-            if (sales && users) {
-                const preciseSalesData = sales.map(agent => {
-                    // Sum the actual balance_usd of all users referred by this agent
-                    const referredUsers = users.filter(u => u.referred_by_username === agent.agent_username);
-                    const totalUSD = referredUsers.reduce((sum, u) => sum + Number(u.balance_usd || 0), 0);
-                    const totalRM = referredUsers.reduce((sum, u) => sum + Number(u.balance || 0), 0);
-                    
-                    return {
-                        ...agent,
-                        total_referred_capital: totalRM,
-                        total_referred_capital_usd: totalUSD
-                    };
-                });
-                setSalesData(preciseSalesData);
-            } else if (sales) {
-                setSalesData(sales);
-            }
 
             // 7. Fetch Forex History
             const { data: fHistory } = await supabase
@@ -523,10 +532,18 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             const targetField = isDividendOrBonus ? 'profit' : 'balance';
 
             const amountRM = amountUSD * forexRate;
-            const updatePayload: any = { [targetField]: Number(user[targetField] || 0) + amountRM };
+            const newRM = Number(user[targetField] || 0) + amountRM;
+            const updatePayload: any = { [targetField]: newRM };
             if (targetField === 'balance') {
                 const currentBalanceUSD = user.balance_usd || (Number(user.balance || 0) / forexRate);
-                updatePayload.balance_usd = currentBalanceUSD + amountUSD;
+                let newBalanceUSD = currentBalanceUSD + amountUSD;
+                
+                // Final safety guard: If RM balance is 0, USD balance MUST be 0
+                if (Math.abs(newRM) < 0.01) {
+                    newBalanceUSD = 0;
+                }
+                
+                updatePayload.balance_usd = newBalanceUSD;
             }
 
             const { error: profileError } = await supabase
