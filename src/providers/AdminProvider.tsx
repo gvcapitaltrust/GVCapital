@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "./AuthProvider";
+import { getTierByAmount } from "@/lib/tierUtils";
 
 interface AdminContextType {
     users: any[];
@@ -92,18 +93,20 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 const now = new Date();
                 const enrichedUsers = profileList.map((p: any) => {
                     const userTxs = txList.filter((t: any) => t.user_id === p.id && ['Approved', 'Completed'].includes(t.status));
+                    const totalInvestment = Number(p.balance || 0);
+                    const totalInvestmentUSD = p.balance_usd ?? (totalInvestment / forexRate);
+                    const currentTier = getTierByAmount(totalInvestmentUSD);
+                    const lockPeriodDays = currentTier.lockInDays || 180;
                     
                     // Locked Capital Logic (same as UserProvider)
-                    const lockedCapital = userTxs.filter((t: any) => t.type === 'Deposit').reduce((acc, tx) => {
+                    const lockedCapital = userTxs.filter((t: any) => t.type === 'Deposit').reduce((acc: number, tx: any) => {
                         const rawDate = tx.transfer_date || tx.created_at;
                         const txDate = new Date(rawDate);
                         if (isNaN(txDate.getTime())) return acc;
                         const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
-                        return diffDays < 180 ? acc + Number(tx.amount) : acc;
+                        return diffDays < lockPeriodDays ? acc + Number(tx.amount) : acc;
                     }, 0);
 
-                    const totalInvestment = Number(p.balance || 0);
-                    const totalInvestmentUSD = p.balance_usd ?? (totalInvestment / forexRate);
                     const withdrawableBalance = Math.max(0, (Number(p.balance || 0) - lockedCapital) + Number(p.profit || 0));
                     
                     // Stabilize Profit and Withdrawable USD
@@ -292,7 +295,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             if (depositsError) throw depositsError;
 
             const now = new Date();
-            const lockPeriodDays = 180;
+            const currentTier = getTierByAmount(profile?.balance_usd || (currentBalance / forexRate));
+            const lockPeriodDays = currentTier.lockInDays || 180;
+
             const lockedCapital = deposits?.reduce((acc: number, d: any) => {
                 const rawDate = d.transfer_date || d.created_at;
                 const txDate = new Date(rawDate);
