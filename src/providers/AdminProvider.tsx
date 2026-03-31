@@ -380,80 +380,30 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             
             if (profileUpdateError) throw profileUpdateError;
 
-            // 5. Mark transaction as Pending Release (if penalty, split it)
-            if (penaltyApplied) {
-                // Update original to reflect final payout (Capital)
-                const { error: txUpdateError } = await supabase
-                    .from('transactions')
-                    .update({ 
-                        status: 'Pending Release',
-                        amount: -Math.abs(finalPayout),
-                        metadata: {
-                            ...tx.metadata,
-                            description: "Capital Withdrawal (Net)",
-                            processed_by_name: authUser?.user_metadata?.full_name || "Admin",
-                            processed_by_id: authUser?.id,
-                            processed_by_email: authUser?.email,
-                            finalized_penalty: penalty,
-                            finalized_payout: finalPayout,
-                            penalty_applied: true,
-                            original_request_amount: withdrawAmount,
-                            approved_at: new Date().toISOString(),
-                            bank_name: profile.bank_name || profile.kyc_data?.bank_name || tx.metadata?.bank_name,
-                            account_number: profile.account_number || profile.kyc_data?.account_number || tx.metadata?.account_number,
-                            bank_account_holder: profile.bank_account_holder || profile.kyc_data?.bank_account_holder || tx.metadata?.bank_account_holder
-                        }
-                    })
-                    .eq('id', tx.id);
-                
-                if (txUpdateError) throw txUpdateError;
-
-                // Insert Penalty Transaction
-                const { error: penaltyTxError } = await supabase
-                    .from('transactions')
-                    .insert({
-                        user_id: tx.user_id,
-                        type: 'Penalty',
-                        amount: -Math.abs(penalty),
-                        status: 'Pending Release', // Keep it in the queue for visibility
-                        ref_id: `PEN-${tx.ref_id || Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-                        metadata: {
-                            description: "Early Withdrawal Penalty (40%)",
-                            is_penalty: true,
-                            parent_withdrawal_id: tx.id,
-                            processed_by_name: authUser?.user_metadata?.full_name || "Admin",
-                            processed_by_id: authUser?.id,
-                            processed_by_email: authUser?.email,
-                            approved_at: new Date().toISOString()
-                        }
-                    });
-                
-                if (penaltyTxError) throw penaltyTxError;
-            } else {
-                const { error: txError } = await supabase
-                    .from('transactions')
-                    .update({ 
-                        status: 'Pending Release',
-                        amount: -Math.abs(withdrawAmount),
-                        metadata: {
-                            ...tx.metadata,
-                            description: "Capital Withdrawal",
-                            processed_by_name: authUser?.user_metadata?.full_name || "Admin",
-                            processed_by_id: authUser?.id,
-                            processed_by_email: authUser?.email,
-                            finalized_penalty: 0,
-                            finalized_payout: withdrawAmount,
-                            penalty_applied: false,
-                            approved_at: new Date().toISOString(),
-                            bank_name: profile.bank_name || profile.kyc_data?.bank_name || tx.metadata?.bank_name,
-                            account_number: profile.account_number || profile.kyc_data?.account_number || tx.metadata?.account_number,
-                            bank_account_holder: profile.bank_account_holder || profile.kyc_data?.bank_account_holder || tx.metadata?.bank_account_holder
-                        }
-                    })
-                    .eq('id', tx.id);
-                
-                if (txError) throw txError;
-            }
+            // 5. Mark transaction as Pending Release
+            // We maintain ONE single transaction for the full requested amount (Gross)
+            // But we add penalty/payout details to the metadata for the admin/user to see.
+            const { error: txUpdateError } = await supabase
+                .from('transactions')
+                .update({ 
+                    status: 'Pending Release',
+                    amount: -Math.abs(Number(withdrawAmount)), // Keep Gross amount
+                    metadata: {
+                        ...tx.metadata,
+                        description: penaltyApplied ? "Capital Withdrawal (Penalized)" : "Capital Withdrawal",
+                        penalty_applied: penaltyApplied,
+                        penalty_amount: penalty,
+                        final_payout: finalPayout,
+                        original_request_amount: withdrawAmount,
+                        approved_at: new Date().toISOString(),
+                        bank_name: profile.bank_name || profile.kyc_data?.bank_name || tx.metadata?.bank_name,
+                        account_number: profile.account_number || profile.kyc_data?.account_number || tx.metadata?.account_number,
+                        bank_account_holder: profile.bank_account_holder || profile.kyc_data?.bank_account_holder || tx.metadata?.bank_account_holder
+                    }
+                })
+                .eq('id', tx.id);
+            
+            if (txUpdateError) throw txUpdateError;
             
             showToast("Withdrawal accepted. Awaiting final release.");
             fetchData();
