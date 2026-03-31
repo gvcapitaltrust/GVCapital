@@ -107,48 +107,45 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                         <tbody className="divide-y divide-gray-100">
                             {filteredWithdrawals.map((tx, idx) => (
                                 <tr key={idx} className="text-sm group hover:bg-gray-50 transition-all">
-                                    <td className="px-4 py-3">
+                                    <td className="px-4 py-1.5 min-w-[140px]">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-gray-900 uppercase tracking-tight">{tx.profiles?.full_name}</span>
-                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
+                                            <span className="font-black text-gray-900 uppercase tracking-tight whitespace-nowrap">{tx.profiles?.full_name}</span>
+                                            <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-none">@{tx.profiles?.username}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3">
+                                    <td className="px-4 py-1.5">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-red-500 tabular-nums text-lg whitespace-nowrap">$ {(Number(tx.original_currency_amount || (Math.abs(Number(tx.amount)) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="font-black text-red-500 tabular-nums text-md whitespace-nowrap">$ {(Number(tx.original_currency_amount || (Math.abs(Number(tx.amount)) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3">
+                                    <td className="px-4 py-1.5">
                                         {tx.metadata?.penalty_applied || tx.metadata?.penalty_amount ? (
                                             <div className="flex flex-col">
-                                                <span className="font-black text-red-400 tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty || tx.metadata?.penalty_amount || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none">40% Early</span>
+                                                <span className="font-bold text-red-400 tabular-nums text-xs whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty || tx.metadata?.penalty_amount || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest leading-none">40% Early</span>
                                             </div>
                                         ) : (
-                                            <span className="text-gray-400 font-bold uppercase text-[10px]">-</span>
+                                            <span className="text-gray-400 font-bold uppercase text-[9px] leading-none">-</span>
                                         )}
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex flex-col max-w-[150px]">
-                                            <span className="text-[10px] font-black text-gray-900 truncate uppercase tracking-tighter">
+                                    <td className="px-4 py-1.5">
+                                        <div className="flex flex-col leading-tight">
+                                            <span className="text-[9px] font-black text-gray-900 truncate uppercase tracking-tighter">
                                                 {tx.profiles?.bank_name || tx.profiles?.kyc_data?.bank_name || "N/A"}
                                             </span>
-                                            <span className="text-[10px] font-mono text-gv-gold font-bold">
+                                            <span className="text-[9px] font-mono text-gv-gold font-bold">
                                                 {tx.profiles?.account_number || tx.profiles?.kyc_data?.account_number || "-"}
                                             </span>
-                                            <span className="text-[9px] text-gray-400 font-bold truncate uppercase tracking-widest">
-                                                {tx.profiles?.bank_account_holder || tx.profiles?.kyc_data?.bank_account_holder || "Unknown"}
-                                            </span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3">
+                                    <td className="px-4 py-1.5">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-emerald-500 tabular-nums text-md whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="font-black text-emerald-500 tabular-nums text-xs whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3 text-gray-400 font-mono text-xs">{new Date(tx.created_at).toLocaleDateString()}</td>
-                                    <td className="px-4 py-3">
-                                        <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${
+                                    <td className="px-4 py-1.5 text-gray-400 font-mono text-[10px] whitespace-nowrap">{new Date(tx.created_at).toLocaleDateString()}</td>
+                                    <td className="px-4 py-1.5">
+                                        <span className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${
                                             tx.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500' :
                                             tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500' :
                                             tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
@@ -156,7 +153,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                             'bg-amber-500/10 text-amber-500'
                                         }`}>{tx.status}</span>
                                     </td>
-                                    <td className="px-4 py-3 text-right">
+                                    <td className="px-4 py-1.5 text-right">
                                         <div className="flex items-center justify-end gap-3">
                                             {tx.status === 'Pending' && (
                                                 <>
