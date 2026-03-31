@@ -187,12 +187,29 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
             setCombinedAuditLogs(mergedLogs);
 
-            // 6. Fetch Sales Data
+            // 6. Fetch Sales Data & Synchronize USD Totals
             const { data: sales } = await supabase
                 .from('sales_leaderboard')
                 .select('*')
                 .order('total_referred_capital', { ascending: false });
-            if (sales) setSalesData(sales);
+
+            if (sales && users) {
+                const preciseSalesData = sales.map(agent => {
+                    // Sum the actual balance_usd of all users referred by this agent
+                    const referredUsers = users.filter(u => u.referred_by_username === agent.agent_username);
+                    const totalUSD = referredUsers.reduce((sum, u) => sum + Number(u.balance_usd || 0), 0);
+                    const totalRM = referredUsers.reduce((sum, u) => sum + Number(u.balance || 0), 0);
+                    
+                    return {
+                        ...agent,
+                        total_referred_capital: totalRM,
+                        total_referred_capital_usd: totalUSD
+                    };
+                });
+                setSalesData(preciseSalesData);
+            } else if (sales) {
+                setSalesData(sales);
+            }
 
             // 7. Fetch Forex History
             const { data: fHistory } = await supabase
