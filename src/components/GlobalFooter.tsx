@@ -81,7 +81,7 @@ export default function GlobalFooter() {
             </div>
             {/* Floating WhatsApp Support */}
             <a
-                href="https://wa.me/60162737286?text=Hi%20GV%20Capital,%20I%20need%20assistance%20with%20my%20account."
+                href="https://wa.me/?text=Hi%20GV%20Capital,%20I%20need%20assistance%20with%20my%20account."
                 target="_blank"
                 className="fixed bottom-10 right-10 h-16 w-16 bg-[#25D366] rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(37,211,102,0.4)] hover:scale-110 active:scale-95 transition-all z-[90] group"
                 aria-label="Contact Support via WhatsApp"
