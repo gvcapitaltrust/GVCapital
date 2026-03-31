@@ -71,15 +71,13 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
     return (
         <>
             <div
-                className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
-                    isOpen ? "opacity-100" : "pointer-events-none opacity-0"
-                }`}
+                className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${isOpen ? "opacity-100" : "pointer-events-none opacity-0"
+                    }`}
                 onClick={onClose}
             />
             <aside
-                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#FAFAF8] border-r border-gray-200 p-8 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden ${
-                    isOpen ? "translate-x-0" : "-translate-x-full"
-                }`}
+                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#FAFAF8] border-r border-gray-200 p-8 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden ${isOpen ? "translate-x-0" : "-translate-x-full"
+                    }`}
             >
                 <div className="space-y-12">
                     <div className="flex items-center justify-between">
@@ -100,9 +98,8 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                                     <button
                                         key={item.id}
                                         onClick={() => { router.push(`${item.path}?lang=${lang}`); onClose(); }}
-                                        className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                                            currentTab === item.id ? "bg-gv-gold/10 text-gv-gold border border-gv-gold/20" : "text-gray-400 hover:text-gray-900 hover:bg-white"
-                                        }`}
+                                        className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${currentTab === item.id ? "bg-gv-gold/10 text-gv-gold border border-gv-gold/20" : "text-gray-400 hover:text-gray-900 hover:bg-white"
+                                            }`}
                                     >
                                         {item.icon}
                                         {item.label}
@@ -125,8 +122,20 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                     {isReallyLoggedIn ? (
                         <div className="p-6 bg-white rounded-[32px] border border-gray-200 space-y-4">
                             <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-lg">
-                                    {(user?.fullName?.[0] || user?.email?.[0] || "U").toUpperCase()}
+                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-lg border border-gv-gold/30 shadow-lg overflow-hidden">
+                                    {user?.gender === "Male" ? (
+                                        <svg className="h-8 w-8 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                        </svg>
+                                    ) : user?.gender === "Female" ? (
+                                        <svg className="h-8 w-8 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                        </svg>
+                                    ) : (
+                                        <span className="uppercase">
+                                            {(user?.fullName?.[0] || user?.email?.[0] || "U")}
+                                        </span>
+                                    )}
                                 </div>
                                 <div>
                                     <p className="text-xs font-black text-gray-900 truncate w-32">
@@ -143,7 +152,7 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                             </button>
                         </div>
                     ) : (
-                        <button 
+                        <button
                             disabled={authLoading}
                             onClick={() => { router.push(`/login?lang=${lang}`); onClose(); }}
                             className="w-full bg-gv-gold text-black py-5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:bg-gv-gold/90 shadow-[0_10px_20px_rgba(212,175,55,0.2)] active:scale-95 disabled:opacity-50"

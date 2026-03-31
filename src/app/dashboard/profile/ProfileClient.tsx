@@ -13,6 +13,9 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
             personalInfo: "Personal Information",
             fullName: "Full Name",
             username: "Username",
+            gender: "Gender",
+            male: "Male",
+            female: "Female",
             email: "Email Address",
             phone: "Phone Number",
             country: "Country",
@@ -32,6 +35,9 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
             personalInfo: "个人信息",
             fullName: "姓名",
             username: "用户名",
+            gender: "性别",
+            male: "男",
+            female: "女",
             email: "电子邮件",
             phone: "电话号码",
             country: "国家",
@@ -73,6 +79,7 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                             {[
                                 { label: t.fullName, value: user?.fullName },
                                 { label: t.username, value: `@${user?.username}` },
+                                { label: t.gender, value: user?.gender === "Male" ? t.male : user?.gender === "Female" ? t.female : user?.gender },
                                 { label: t.email, value: user?.email },
                             ].map((item, i) => (
                                 <div key={i} className="space-y-1">

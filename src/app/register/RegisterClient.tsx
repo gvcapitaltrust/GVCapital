@@ -11,6 +11,7 @@ export default function RegisterPage() {
     const searchParams = useSearchParams();
     const [lang, setLang] = useState<"en" | "zh">("en");
     const [fullName, setFullName] = useState("");
+    const [gender, setGender] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isAgreed, setIsAgreed] = useState(false);
@@ -122,6 +123,9 @@ export default function RegisterPage() {
         title: string;
         subtitle: string;
         name: string;
+        genderLabel: string;
+        male: string;
+        female: string;
         emailLabel: string;
         passwordLabel: string;
         usernameLabel: string;
@@ -149,8 +153,11 @@ export default function RegisterPage() {
     const content: Record<"en" | "zh", ContentItem> = {
         en: {
             title: "Open Account",
-            subtitle: "Join GV Capital Trust network",
+            subtitle: "Join the GV Capital Trust Network",
             name: "Full Name",
+            genderLabel: "Gender",
+            male: "Male",
+            female: "Female",
             emailLabel: "Email Address",
             passwordLabel: "Password",
             usernameLabel: "Create Your Unique Username",
@@ -200,6 +207,9 @@ export default function RegisterPage() {
             title: "开通账户",
             subtitle: "加入 GV 资本信托网络",
             name: "全名",
+            genderLabel: "性别",
+            male: "男",
+            female: "女",
             emailLabel: "电子邮件地址",
             passwordLabel: "密码",
             usernameLabel: "创建您的唯一用户名",
@@ -251,7 +261,10 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isAgreed || !isReferralValid || !isUsernameValid) return;
+        if (!isAgreed || !isReferralValid || !isUsernameValid || !gender) {
+            setErrorMsg("Please complete all required fields including Gender.");
+            return;
+        }
         setIsLoading(true);
         setErrorMsg("");
 
@@ -285,7 +298,8 @@ export default function RegisterPage() {
                     kyc_completed: false,
                     referred_by: resolvedReferralId,
                     referred_by_username: inviterUsername || null,
-                    security_pin: securityPin
+                    security_pin: securityPin,
+                    gender: gender
                 };
 
                 const { error: profileError } = await supabase
@@ -350,6 +364,20 @@ export default function RegisterPage() {
                             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
                             placeholder={t.placeholder_name}
                         />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.genderLabel}</label>
+                        <div className="flex gap-4">
+                            <label className={`flex-1 flex items-center justify-center gap-2 border px-4 py-3 rounded-xl cursor-pointer transition-all ${gender === "Male" ? "border-gv-gold bg-gv-gold/10 text-gv-gold" : "border-gray-200 bg-gray-50 text-gray-500 hover:bg-gray-100"}`}>
+                                <input type="radio" name="gender" value="Male" required onChange={(e) => setGender(e.target.value)} className="hidden" />
+                                <span className="font-bold text-sm">{t.male}</span>
+                            </label>
+                            <label className={`flex-1 flex items-center justify-center gap-2 border px-4 py-3 rounded-xl cursor-pointer transition-all ${gender === "Female" ? "border-gv-gold bg-gv-gold/10 text-gv-gold" : "border-gray-200 bg-gray-50 text-gray-500 hover:bg-gray-100"}`}>
+                                <input type="radio" name="gender" value="Female" required onChange={(e) => setGender(e.target.value)} className="hidden" />
+                                <span className="font-bold text-sm">{t.female}</span>
+                            </label>
+                        </div>
                     </div>
 
                     <div className="space-y-2">

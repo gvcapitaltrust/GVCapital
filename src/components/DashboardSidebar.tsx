@@ -124,8 +124,20 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                     {user && !isCollapsed && (
                         <div className="mx-2 p-4 bg-white rounded-2xl border border-gray-200 animate-in fade-in duration-500">
                             <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-white text-sm shrink-0 border border-gv-gold/30">
-                                    {(user.full_name?.[0] || user.fullName?.[0] || user.email?.[0] || "U").toUpperCase()}
+                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-white text-sm shrink-0 border border-gv-gold/30 shadow-lg overflow-hidden">
+                                    {user?.gender === "Male" ? (
+                                        <svg className="h-8 w-8 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                        </svg>
+                                    ) : user?.gender === "Female" ? (
+                                        <svg className="h-8 w-8 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                        </svg>
+                                    ) : (
+                                        <span className="uppercase">
+                                            {(user.full_name?.[0] || user.fullName?.[0] || user.email?.[0] || "U")}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <p className="text-[10px] font-black text-gray-900 uppercase tracking-tight truncate">

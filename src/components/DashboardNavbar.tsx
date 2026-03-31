@@ -64,11 +64,26 @@ export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNav
             <div className="flex items-center gap-4 hidden sm:flex">
                 {user && <NotificationBell userId={user.id} lang={lang} />}
                 <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl p-1.5 backdrop-blur-md">
-                    <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-xs border border-gv-gold/30 shadow-lg capitalize">
-                        {user ? (user.fullName?.[0] || user.email?.[0] || "U") : (
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-xs border border-gv-gold/30 shadow-lg overflow-hidden">
+                        {user?.gender === "Male" ? (
+                            <svg className="h-6 w-6 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                             </svg>
+                        ) : user?.gender === "Female" ? (
+                            <svg className="h-6 w-6 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v1.1c0 .5-.4.9-.9.9H4.9c-.5 0-.9-.4-.9-.9V18c0-2.66 5.33-4 8-4zm0 0c2.67 0 8 1.34 8 4v1.1c0 .5-.4.9-.9.9H12.9c-.5 0-.9-.4-.9-.9V18z" />
+                                <circle cx="12" cy="8" r="4" />
+                                <path d="M12 14c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                            </svg>
+                        ) : (
+                            <span className="capitalize">
+                                {user ? (user.fullName?.[0] || user.full_name?.[0] || user.email?.[0] || "U") : (
+                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                )}
+                            </span>
                         )}
                     </div>
                     <button 
