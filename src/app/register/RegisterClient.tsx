@@ -172,15 +172,26 @@ export default function RegisterPage() {
             pdpaNote: "By submitting, you consent to GV Capital Trust processing your personal data in accordance with the Personal Data Protection Act 2010 (PDPA) for the purposes of identity verification and investment management.",
             agreementBody: `
                 GV CAPITAL TRUST
-                PRIVATE INVESTMENT AGREEMENT (V.2024.01)
+                MASTER PRIVATE WEALTH & INVESTMENT AGREEMENT (V.2024.02)
 
-                1. INVESTMENT NATURE: The Client acknowledges that investments managed by the Trust involve private equity and high-yield instruments which carry inherent market risks. Past performance does not guarantee future results.
+                This Master Private Wealth & Investment Agreement ("Agreement") governs the relationship between GV Capital Trust ("The Trust") and the registered user ("The Client"). By acknowledging this agreement, The Client enters into a binding fiduciary arrangement under the following distinct terms:
 
-                2. CONFIDENTIALITY: The Client agrees to maintain strict confidentiality regarding the Trust's investment strategies, portfolio compositions, and internal financial data. Any disclosure without written consent is prohibited.
+                1. SCOPE OF WEALTH MANAGEMENT
+                The Client acknowledges that The Trust actively manages capital through global high-yield instruments, private equity distributions, and strategic forex positioning. The Trust targets specified monthly dividend benchmarks but does not legally guarantee absolute, fixed-rate yields against global market volatility.
 
-                3. REPRESENTATIONS: The Client represents that they are an accredited investor with the financial knowledge to evaluate the risks and merits of private investments. 
+                2. CAPITAL LOCK-IN & WITHDRAWAL PROTOCOLS
+                To maintain systemic liquidity and secure high-yield global positions, all deposits are subject to a mandatory 6-month capital lock-in period from the date of respective deposit clearance, or 12-months for VVIP Tier clients. Any emergency premature withdrawal requests submitted prior to the completion of the respective lock-in period will incur an automatic forty percent (40%) liquidation penalty against the principal amount. Profits and dividends are excluded from this lock-in and remain eligible for regular withdrawal.
 
-                4. ASSET PROTECTION: GV Capital Trust employs rigorous risk management protocols and global diversification to mitigate asset volatility. 
+                3. CONFIDENTIALITY & NON-DISCLOSURE
+                The Trust operates an exclusive, invitation-only architecture. The Client agrees to maintain strict confidentiality regarding The Trust's proprietary investment strategies, internal financial data, client dashboards, and tiered privileges. Unauthorized external disclosure, publishing, or syndication of The Trust's materials is strictly prohibited and grounds for immediate account termination without prejudice.
+
+                4. REPRESENTATIONS & WARRANTIES
+                The Client represents that they are acting as a principal and not as an agent on behalf of any third party. The Client affirms they possess adequate financial resources and understanding to engage in private wealth management. Furthermore, The Client certifies that all funds deposited derive from legitimate sources strictly compliant with international Anti-Money Laundering (AML) regulations.
+
+                5. SECURITY & KYC COMPLIANCE
+                The Client is solely responsible for maintaining the absolute security of their account credentials and 6-digit Security PIN. The Trust reserves the right to suspend or lock accounts pending mandatory Know Your Customer (KYC) verification procedures to protect the integrity of the platform ecosystem.
+
+                By clicking "I Agree", The Client executes this binding digital contract, acknowledging full comprehension and unconditional acceptance of all terms herein.
             `,
             securityPinLabel: "Security PIN (6 Digits)",
             securityPinPlaceholder: "Used for withdrawals"
@@ -210,15 +221,26 @@ export default function RegisterPage() {
             pdpaNote: "提交即表示您同意 GV 资本信托根据 2010 年个人数据保护法 (PDPA) 处理您的个人数据，用于身份验证和投资管理目的。",
             agreementBody: `
                 GV 资本信托
-                私人投资协议 (V.2024.01)
+                主私人财富与投资协议 (V.2024.02)
 
-                1. 投资性质：客户承认，由信托管理的投资涉及私募股权和高收益工具，这些工具具有固有的市场风险。过往业绩不保证未来结果。
+                本主私人财富与投资协议（“协议”）约束 GV 资本信托（“信托”）与注册用户（“客户”）之间的关系。通过确认本协议，客户将在以下明确条款下签订具有约束力的受托安排：
 
-                2. 保密性：客户同意对信托的投资策略、投资组合构成和内部财务数据严格保密。未经书面同意，禁止进行任何披露。
+                1. 财富管理范围
+                客户了解，信托通过全球高收益工具、私募股权分配及战略外汇定位进行主动的资本管理。信托以特定的月度派息作为基准目标，但在面临全球市场波动时，不构成对绝对固定收益的法律保证。
 
-                3. 陈述：客户陈述并保证他们是合格投资者，具备评估私人投资风险和优点的财务知识。
+                2. 资本锁定期与提款协议
+                为维持系统的流动性并保障高收益的全球头寸，所有入金笔数自清算之日起，自动受到 6 个月（或 VVIP 客户的 12 个月）的强制资本锁定期限制。若在相应的锁定期完成前提交紧急提前提款申请，将对提取本金自动扣除百分之四十（40%）的清算违约金。账户利润及派息分红不受此锁定期限制，可随时进行常规提款。
 
-                4. 资产保护：GV 资本信托采用严格的风险管理协议和全球化多元配置，以减轻资产波动。
+                3. 保密规定与反披露
+                信托实行专属的仅限受邀访问架构。客户同意对信托的专有投资策略、内部财务数据、客户终端以及等级特权保持绝对的保密。严禁未经授权向外部披露、发布或分发信托材料，违者将导致账户立即终止而无法追溯。
+
+                4. 声明与保证
+                客户声明，其作为本金所有人行事，而非任何第三方的代理。客户确认其拥有足够的财务资源和认知来参与私人财富管理。此外，客户保证所有入金资金均来源合法，并严格遵守国际反洗钱（AML）法规。
+
+                5. 安全与 KYC 合规
+                客户对维护其账户凭证及 6 位数安全免密验证码的绝对安全负全责。为了保护平台生态系统的完整性，信托保留在等待强制性的了解您的客户（KYC）验证程序完成期间暂停或锁定账户的权利。
+
+                点击“我同意”，即表示客户签署此具有约束力的数字合同，确认全面理解并无条件接受此处的全部条款。
             `,
             securityPinLabel: "安全密码 (6 位数字)",
             securityPinPlaceholder: "用于提款验证"
