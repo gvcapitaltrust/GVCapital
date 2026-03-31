@@ -144,8 +144,8 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                         </div>
                                     </td>
                                     <td className="px-4 py-1.5 text-gray-400 font-mono text-[10px] whitespace-nowrap">{new Date(tx.created_at).toLocaleDateString()}</td>
-                                    <td className="px-4 py-1.5">
-                                        <span className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${
+                                    <td className="px-4 py-1.5 align-middle">
+                                        <span className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest whitespace-nowrap ${
                                             tx.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500' :
                                             tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500' :
                                             tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
@@ -162,7 +162,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                 </>
                                             )}
                                             {tx.status === 'Pending Release' && (
-                                                <button onClick={() => handleCompleteWithdrawal(tx)} className="bg-gv-gold text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-gv-gold/20 hover:-translate-y-0.5 transition-all">Complete Release</button>
+                                                <button onClick={() => handleCompleteWithdrawal(tx)} className="bg-gv-gold text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-gv-gold/20 hover:-translate-y-0.5 transition-all whitespace-nowrap">Final Release</button>
                                             )}
                                             {tx.status === 'Completed' && <span className="text-[10px] text-gray-400 font-black uppercase italic">Processed</span>}
                                             {tx.status === 'Approved' && <span className="text-[10px] text-gray-400 font-black uppercase italic">Legacy Success</span>}
