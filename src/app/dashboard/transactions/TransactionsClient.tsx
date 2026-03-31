@@ -234,19 +234,19 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                         <div className="space-y-4">
                                                             <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Financial Breakdown</h4>
                                                             <div className="space-y-2">
-                                                                <div className="flex justify-between text-xs font-bold">
-                                                                    <span className="text-gray-400 uppercase">Gross Amount</span>
-                                                                    <span className="text-gray-900">$ {Number(tx.original_currency_amount || (Number(tx.amount) / forexRate)).toFixed(2)}</span>
+                                                                <div className="flex justify-between text-xs font-bold gap-4">
+                                                                    <span className="text-gray-400 uppercase whitespace-nowrap">Gross Amount</span>
+                                                                    <span className="text-gray-900 tabular-nums whitespace-nowrap">$ {Number(tx.original_currency_amount || (Number(tx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                                 {tx.metadata?.penalty_applied && (
-                                                                    <div className="flex justify-between text-xs font-bold">
-                                                                        <span className="text-red-500 uppercase italic">Early Withdrawal Penalty (40%)</span>
-                                                                        <span className="text-red-500">-$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toFixed(2)}</span>
+                                                                    <div className="flex justify-between text-xs font-bold gap-4">
+                                                                        <span className="text-red-500 uppercase italic whitespace-nowrap">Penalty (40%)</span>
+                                                                        <span className="text-red-500 tabular-nums whitespace-nowrap">-$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                     </div>
                                                                 )}
-                                                                <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2">
-                                                                    <span className="text-emerald-500 uppercase">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : 'Final Payout (Net)'}</span>
-                                                                    <span className="text-emerald-500 underline decoration-gv-gold">$ {(Number(tx.metadata?.original_usd_payout || tx.metadata?.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toFixed(2)}</span>
+                                                                <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2 gap-4">
+                                                                    <span className="text-emerald-500 uppercase whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : 'Final Payout (Net)'}</span>
+                                                                    <span className="text-emerald-500 underline decoration-gv-gold tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || tx.metadata?.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                                 {tx.metadata?.remark && (
                                                                     <div className="mt-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
