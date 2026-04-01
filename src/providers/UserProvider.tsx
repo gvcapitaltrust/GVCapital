@@ -109,17 +109,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     return isCapitalWithdrawal && ['Approved', 'Completed', 'Pending Release'].includes(t.status);
                 }).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
 
-                const totalProfitUSD = txs.filter((t: any) => {
-                    const type = (t.type || "").toLowerCase();
-                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                    const isDividendOrBonus = 
-                        type === 'dividend' || 
-                        type === 'bonus' ||
-                        category === 'dividend' || 
-                        category === 'bonus';
-                    return isDividendOrBonus && (t.status === 'Approved' || t.status === 'Completed');
-                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate)), 0);
-
                 const lockedCapitalUSD = approvedDeposits.reduce((acc, tx) => {
                     const rawDate = tx.transfer_date || tx.created_at;
                     const txDate = new Date(rawDate);
@@ -128,8 +117,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     return diffDays < lockPeriodDays ? acc + Number(tx.original_currency_amount ?? (Number(tx.amount || 0) / forexRate)) : acc;
                 }, 0);
 
-                // balanceUSD is already defined above
-                const withdrawableBalanceUSD = Math.max(0, (balanceUSD - lockedCapitalUSD) + totalProfitUSD);
+                const profitUSD = Number(profile.profit || 0) / forexRate;
+                const withdrawableBalanceUSD = Math.max(0, (balanceUSD - lockedCapitalUSD) + profitUSD);
 
                 const totalDepositedUSD = approvedDeposits.filter((t: any) => {
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
@@ -140,7 +129,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     t.type === 'Withdrawal' && 
                     (t.status === 'Approved' || t.status === 'Completed' || t.status === 'Pending Release')
                 ).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
-                const profitUSD = totalProfitUSD;
 
                 const fullProfile = {
                     ...user,
@@ -157,7 +145,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     total_investment: totalInvestmentRM,
                     total_investment_usd: balanceUSD,
                     totalEquity: totalAssetsRM,
-                    total_assets_usd: balanceUSD + totalProfitUSD,
+                    total_assets_usd: balanceUSD + profitUSD,
                     balanceUSD: balanceUSD,
                     profit_usd: profitUSD
                 };

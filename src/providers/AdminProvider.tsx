@@ -372,12 +372,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             const usdDeducted = rmDeductedFromBalance / withdrawalRate;
             const currentBalanceUSD = profile?.balance_usd || (currentBalance / forexRate);
 
+            let finalBalanceUSD = Math.max(0, currentBalanceUSD - usdDeducted);
+            if (newBalance <= 0) finalBalanceUSD = 0; // Force zero for full capital withdrawals
+
             const { error: profileUpdateError } = await supabase
                 .from('profiles')
                 .update({ 
                     balance: newBalance, 
                     profit: newProfit,
-                    balance_usd: Math.max(0, currentBalanceUSD - usdDeducted)
+                    balance_usd: finalBalanceUSD
                 })
                 .eq('id', tx.user_id);
             
