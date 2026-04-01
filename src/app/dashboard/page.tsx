@@ -10,17 +10,7 @@ export default async function DashboardPage({
     const lang = langParam === "zh" ? "zh" : "en";
 
     return (
-        <div className="max-w-7xl mx-auto space-y-12">
-            <header className="space-y-4">
-                <div className="hidden md:flex items-center gap-3">
-                    <div className="h-1 w-12 bg-gv-gold rounded-full"></div>
-                    <span className="text-gv-gold text-sm font-semibold tracking-wider">Institutional Access</span>
-                </div>
-                <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-gray-900">
-                    {lang === "en" ? "Overview" : "概览"}
-                </h1>
-            </header>
-            
+        <div className="max-w-7xl mx-auto">
             <OverviewClient lang={lang} />
         </div>
     );
