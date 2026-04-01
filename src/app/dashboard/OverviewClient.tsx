@@ -248,25 +248,6 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                         </section>
 
-                        {/* Transaction Controls (Main View) */}
-                        <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <Link href={`/dashboard/deposit?lang=${lang}`} className="bg-gv-gold text-black p-10 rounded-[40px] flex flex-col justify-center items-center gap-4 shadow-xl hover:shadow-gv-gold/30 hover:-translate-y-1.5 transition-all text-center group border border-gv-gold/50">
-                                <div className="h-14 w-14 bg-black/10 rounded-full flex items-center justify-center group-hover:bg-black/20 transition-colors">
-                                    <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
-                                </div>
-                                <h2 className="text-2xl font-black uppercase tracking-tighter">{t.deposit}</h2>
-                                <p className="text-[10px] font-bold uppercase tracking-widest opacity-60">Instant USD Funding</p>
-                            </Link>
-
-                            <Link href={`/dashboard/withdraw?lang=${lang}`} className="bg-white border-2 border-gray-200 p-10 rounded-[40px] flex flex-col justify-center items-center gap-4 hover:border-gv-gold/50 hover:bg-gray-50/50 hover:-translate-y-1.5 shadow-sm hover:shadow-xl transition-all text-center group">
-                                <div className="h-14 w-14 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gv-gold/10 transition-colors">
-                                    <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                </div>
-                                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">{t.withdraw}</h2>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Secure Capital Release</p>
-                            </Link>
-                        </section>
-
                         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] relative overflow-hidden group">
                                 <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
