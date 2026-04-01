@@ -145,7 +145,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 console.warn("[AUTH] Profile missing for active session. Signing out...");
                 document.cookie = `gv-auth-v1=; path=/; max-age=0;`;
                 await supabase.auth.signOut();
-                router.push("/login?error=account_deleted");
+                // Force a hard reload to the login page to fully clear all local states and break any redirect loops
+                window.location.href = "/login?error=account_deleted";
             }
         } catch (err) {
             console.error("[AUTH] Fetch failed:", err);

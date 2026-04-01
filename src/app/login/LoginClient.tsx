@@ -23,7 +23,11 @@ export default function LoginPage() {
 
         // Use onAuthStateChange for more stable session detection
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (session) {
+            // Break the flashing loop: Don't auto-redirect if there's an account error in the URL
+            // This happens when a session exists but the user profile was deleted
+            const hasError = searchParams?.get('error') === 'account_deleted';
+            
+            if (session && !hasError) {
                 // Sync session to cookie so Next.js middleware can read it before redirecting
                 document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(session))}; path=/; max-age=31536000; SameSite=Lax;`;
                 const user = session.user;
