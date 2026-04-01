@@ -87,7 +87,7 @@ export default function AdminSidebar({
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className={`border-r border-gray-200 flex flex-col justify-between hidden lg:flex bg-[#FAFAF8] transition-all duration-500 ease-in-out relative group/sidebar z-50 ${isCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
+            <aside className={`border-r border-gray-200 flex flex-col justify-between hidden lg:flex bg-[#FAFAF8] transition-all duration-500 ease-in-out relative group/sidebar z-50 overflow-y-auto ${isCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
                 <button 
                     onClick={onToggleCollapse}
                     className="absolute -right-3 top-24 z-10 h-6 w-6 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:bg-gv-gold hover:text-white transition-all shadow-lg opacity-0 group-hover/sidebar:opacity-100"
@@ -127,9 +127,12 @@ export default function AdminSidebar({
                     </nav>
                 </div>
                 
-                <div className="space-y-4 pt-4 border-t border-gray-200 overflow-hidden">
+                <div className="space-y-4 pt-4 border-t border-gray-200 shrink-0">
                     <div className={`flex items-center px-4 pb-2 transition-all duration-500 ${isCollapsed ? "justify-center" : "justify-between"}`}>
-                        {!isCollapsed && <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t.maintenance}</span>}
+                        <div className="flex items-center gap-4">
+                            <svg className="h-5 w-5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            {!isCollapsed && <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t.maintenance}</span>}
+                        </div>
                         <button onClick={onToggleMaintenance} className={`h-5 rounded-full relative transition-all ${isCollapsed ? "w-8" : "w-10"} ${maintenanceMode ? "bg-red-500" : "bg-gray-200"}`}>
                             <div className={`h-3.5 w-3.5 bg-white rounded-full absolute top-[3px] transition-all shadow-sm ${maintenanceMode ? (isCollapsed ? "right-0.5" : "right-1") : (isCollapsed ? "left-0.5" : "left-1")}`}></div>
                         </button>

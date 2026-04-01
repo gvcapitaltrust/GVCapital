@@ -100,6 +100,14 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
                             <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">{t.verifiedRatio}</p>
                             <p className="text-2xl font-black text-emerald-600">{userCount > 0 ? ((verifiedCount / userCount) * 100).toFixed(0) : 0}%</p>
                         </div>
+                        <div className="space-y-1">
+                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Platform Assets</p>
+                            <p className="text-2xl font-black text-gray-900 tabular-nums italic">$ {platformStats.totalAssetsUSD.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Total Profit</p>
+                            <p className="text-2xl font-black text-gv-gold tabular-nums">$ {platformStats.totalProfitUSD.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                        </div>
                     </div>
                 </div>
 
