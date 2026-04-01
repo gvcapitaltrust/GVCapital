@@ -101,20 +101,20 @@ export default function ApprovalsClient() {
         try {
             const { data: users, error: fetchError } = await supabase
                 .from('profiles')
-                .select('id, balance, total_equity, profit');
+                .select('id, balance_usd, profit'); // balance_usd is the new truth
 
             if (fetchError) throw fetchError;
 
             for (const user of users) {
-                // Basis for dividend is the RM balance (Investment)
-                const dividend = (user.balance || 0) * 0.01;
-                if (dividend <= 0) continue;
+                // Basis for dividend is now the USD balance (Investment)
+                const dividendUSD = (user.balance_usd || 0) * 0.01;
+                if (dividendUSD <= 0) continue;
 
-                // Update Profile: Credits go to withdrawable profit
+                // Update Profile: Credits go to withdrawable profit (which is now USD-primary)
                 await supabase
                     .from('profiles')
                     .update({
-                        profit: (user.profit || 0) + dividend
+                        profit: (user.profit || 0) + dividendUSD
                     })
                     .eq('id', user.id);
 
@@ -122,11 +122,11 @@ export default function ApprovalsClient() {
                         .from('transactions')
                         .insert({
                             user_id: user.id,
-                            type: 'Deposit',
-                            amount: dividend,
+                            type: 'Dividend', // Changed from Deposit to Dividend for clarity
+                            amount: dividendUSD, // Record USD value
                             status: 'Approved',
                             original_currency: 'USD',
-                            original_currency_amount: dividend / forexRate,
+                            original_currency_amount: dividendUSD,
                             ref_id: `DIV-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
                             metadata: {
                                 is_adjustment: true,

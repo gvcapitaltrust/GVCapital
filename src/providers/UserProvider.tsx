@@ -74,40 +74,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     return isCapitalWithdrawal && ['Approved', 'Completed', 'Pending Release'].includes(t.status);
                 }).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
 
-                const totalInvestmentRM = Number(profile.balance || 0);
-                const balanceUSD = profile.balance_usd ?? (totalInvestmentRM / forexRate);
-                
+                const balanceUSD = Number(profile.balance_usd || 0);
                 const currentTier = getTierByAmount(balanceUSD);
                 const lockPeriodDays = currentTier.lockInDays || 180;
-
-                const lockedCapital = approvedDeposits.reduce((acc, tx) => {
-                    const rawDate = tx.transfer_date || tx.created_at;
-                    const txDate = new Date(rawDate);
-                    if (isNaN(txDate.getTime())) return acc;
-                    
-                    const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
-                    return diffDays < lockPeriodDays ? acc + Number(tx.amount) : acc;
-                }, 0);
-
-                const totalAssetsRM = Number(profile.balance || 0) + Number(profile.profit || 0);
-                const withdrawableBalance = Math.max(0, (Number(profile.balance || 0) - lockedCapital) + Number(profile.profit || 0));
-                
-                const totalDeposited = txs.filter((t: any) => {
-                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                    const isCapital = (t.type === 'Deposit' || t.type === 'Bonus' || t.type === 'Adjustment') && 
-                                     category !== 'dividend' && 
-                                     category !== 'profit' &&
-                                     category !== 'bonus';
-                    return isCapital && ['Approved', 'Completed'].includes(t.status);
-                }).reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
-
-                const totalWithdrawn = txs.filter((t: any) => {
-                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                    const isCapitalWithdrawal = t.type === 'Withdrawal' && 
-                                               category !== 'dividend' && 
-                                               category !== 'bonus';
-                    return isCapitalWithdrawal && ['Approved', 'Completed', 'Pending Release'].includes(t.status);
-                }).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
 
                 const lockedCapitalUSD = approvedDeposits.reduce((acc, tx) => {
                     const rawDate = tx.transfer_date || tx.created_at;
@@ -117,9 +86,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     return diffDays < lockPeriodDays ? acc + Number(tx.original_currency_amount ?? (Number(tx.amount || 0) / forexRate)) : acc;
                 }, 0);
 
-                const profitUSD = Number(profile.profit || 0) / forexRate;
+                const profitUSD = Number(profile.profit || 0);
+                const totalAssetsUSD = balanceUSD + profitUSD;
                 const withdrawableBalanceUSD = Math.max(0, (balanceUSD - lockedCapitalUSD) + profitUSD);
-
+                
                 const totalDepositedUSD = approvedDeposits.filter((t: any) => {
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
                     return category !== 'dividend' && category !== 'profit' && category !== 'bonus';
@@ -134,18 +104,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     ...user,
                     ...profile,
                     fullName: profile.full_name || user.user_metadata?.full_name,
-                    total_assets: totalAssetsRM,
+                    total_assets: totalAssetsUSD * forexRate, // RM value for legacy display only
+                    total_assets_usd: totalAssetsUSD,
                     withdrawable_balance_usd: withdrawableBalanceUSD,
-                    locked_capital: lockedCapital,
+                    locked_capital: lockedCapitalUSD * forexRate, // RM value for legacy display
                     locked_capital_usd: lockedCapitalUSD,
-                    total_deposited: totalDeposited,
+                    total_deposited: totalDepositedUSD * forexRate,
                     total_deposited_usd: totalDepositedUSD,
-                    total_withdrawn: totalWithdrawn,
+                    total_withdrawn: totalWithdrawnUSD * forexRate,
                     total_withdrawn_usd: totalWithdrawnUSD,
-                    total_investment: totalInvestmentRM,
+                    total_investment: balanceUSD * forexRate,
                     total_investment_usd: balanceUSD,
-                    totalEquity: totalAssetsRM,
-                    total_assets_usd: balanceUSD + profitUSD,
+                    totalEquity: totalAssetsUSD,
                     balanceUSD: balanceUSD,
                     profit_usd: profitUSD
                 };

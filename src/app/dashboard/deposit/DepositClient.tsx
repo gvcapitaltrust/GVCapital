@@ -72,7 +72,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                 .insert([{
                     user_id: user.id,
                     type: 'Deposit',
-                    amount: amountRM,
+                    amount: amountUSD, // Records USD as primary source of truth
                     transfer_date: depositDate ? new Date(depositDate).toISOString() : new Date().toISOString(),
                     status: 'Pending',
                     receipt_url: uploadData.path,

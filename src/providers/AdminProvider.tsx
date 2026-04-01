@@ -252,9 +252,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             });
             if (rpcError) throw rpcError;
 
-            const amountUSD = Number(tx.original_currency_amount || (Number(tx.amount || 0) / forexRate));
+            const amountUSD = Number(tx.original_currency_amount ?? (Number(tx.amount || 0) / forexRate));
+            const currentUSD = tx.profiles?.balance_usd ?? (Number(tx.profiles?.balance || 0) / forexRate);
+
             await supabase.from('profiles').update({
-                balance_usd: (tx.profiles?.balance_usd ?? (Number(tx.profiles?.balance || 0) / forexRate)) + amountUSD
+                balance_usd: currentUSD + amountUSD,
+                balance: 0 // Record only in USD from now on
             }).eq('id', tx.user_id);
 
             await supabase.from('transactions').update({
@@ -307,11 +310,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             
             if (profileFetchError) throw profileFetchError;
 
-            const withdrawAmount = Math.abs(Number(tx.amount || 0));
-            const currentProfit = Number(profile?.profit || 0);
-            const currentBalance = Number(profile?.balance || 0);
+            const withdrawAmountUSD = Number(tx.original_currency_amount ?? (Math.abs(Number(tx.amount || 0)) / forexRate));
+            const currentProfitUSD = Number(profile?.profit || 0); // Profit is now USD
+            const currentBalanceUSD = Number(profile?.balance_usd || 0);
 
-            // 2. Fetch User Capital Inflows to verify lock-in period
+            // 2. Fetch User Capital Inflows to verify lock-in period (USD basis)
             const { data: deposits, error: depositsError } = await supabase
                 .from('transactions')
                 .select('*')
@@ -322,10 +325,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             if (depositsError) throw depositsError;
 
             const now = new Date();
-            const currentTier = getTierByAmount(profile?.balance_usd || (currentBalance / forexRate));
+            const currentTier = getTierByAmount(currentBalanceUSD);
             const lockPeriodDays = currentTier.lockInDays || 180;
 
-            const lockedCapital = deposits?.reduce((acc: number, d: any) => {
+            const lockedCapitalUSD = deposits?.reduce((acc: number, d: any) => {
                 const category = (d.metadata?.adjustment_category || "").toLowerCase();
                 if (category === 'dividend' || category === 'profit') return acc;
 
@@ -334,53 +337,44 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 if (isNaN(txDate.getTime())) return acc;
                 
                 const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
-                return diffDays < lockPeriodDays ? acc + Number(d.amount) : acc;
+                return diffDays < lockPeriodDays ? acc + Number(d.original_currency_amount ?? (Number(d.amount || 0) / forexRate)) : acc;
             }, 0) || 0;
 
-            const withdrawableCapital = Math.max(0, currentBalance - lockedCapital);
-            const totalWithdrawable = currentProfit + withdrawableCapital;
+            const withdrawableCapitalUSD = Math.max(0, currentBalanceUSD - lockedCapitalUSD);
+            const totalWithdrawableUSD = currentProfitUSD + withdrawableCapitalUSD;
 
-            let penalty = 0;
-            let finalPayout = withdrawAmount;
+            let penaltyUSD = 0;
+            let finalPayoutUSD = withdrawAmountUSD;
             let penaltyApplied = false;
 
-            if (withdrawAmount > totalWithdrawable) {
-                const penalizedPortion = withdrawAmount - totalWithdrawable;
-                penalty = penalizedPortion * 0.4;
-                finalPayout = withdrawAmount - penalty;
+            if (withdrawAmountUSD > totalWithdrawableUSD) {
+                const penalizedPortionUSD = withdrawAmountUSD - totalWithdrawableUSD;
+                penaltyUSD = penalizedPortionUSD * 0.4;
+                finalPayoutUSD = withdrawAmountUSD - penaltyUSD;
                 penaltyApplied = true;
             }
 
-            // 3. Deduct: first from profit (dividends), then from balance (capital)
-            let newProfit = currentProfit;
-            let newBalance = currentBalance;
-            let remaining = withdrawAmount;
+            // 3. Deduct: first from profit (dividends), then from balance (capital) - ALL USD
+            let newProfitUSD = currentProfitUSD;
+            let newBalanceUSD = currentBalanceUSD;
+            let remainingUSD = withdrawAmountUSD;
 
-            if (remaining <= newProfit) {
-                newProfit -= remaining;
-                remaining = 0;
+            if (remainingUSD <= newProfitUSD) {
+                newProfitUSD -= remainingUSD;
+                remainingUSD = 0;
             } else {
-                remaining -= newProfit;
-                newProfit = 0;
-                newBalance = Math.max(0, newBalance - remaining);
+                remainingUSD -= newProfitUSD;
+                newProfitUSD = 0;
+                newBalanceUSD = Math.max(0, newBalanceUSD - remainingUSD);
             }
 
-            // 4. Update profile with new balance/profit
-            // Calculate USD deduction for balance_usd sync
-            const withdrawalRate = forexRate - 0.4;
-            const rmDeductedFromBalance = currentBalance - newBalance;
-            const usdDeducted = rmDeductedFromBalance / withdrawalRate;
-            const currentBalanceUSD = profile?.balance_usd || (currentBalance / forexRate);
-
-            let finalBalanceUSD = Math.max(0, currentBalanceUSD - usdDeducted);
-            if (newBalance <= 0) finalBalanceUSD = 0; // Force zero for full capital withdrawals
-
+            // 4. Update profile with new balances (USD-Primary)
             const { error: profileUpdateError } = await supabase
                 .from('profiles')
                 .update({ 
-                    balance: newBalance, 
-                    profit: newProfit,
-                    balance_usd: finalBalanceUSD
+                    balance: 0, // RM balance is now legacy 0
+                    profit: newProfitUSD, // profit field repurposed to USD
+                    balance_usd: newBalanceUSD
                 })
                 .eq('id', tx.user_id);
             
@@ -393,14 +387,17 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .from('transactions')
                 .update({ 
                     status: 'Pending Release',
-                    amount: -Math.abs(Number(withdrawAmount)), // Keep Gross amount
+                    amount: -Math.abs(Number(withdrawAmountUSD)), // Keep Gross amount in USD
                     metadata: {
                         ...tx.metadata,
                         description: penaltyApplied ? "Capital Withdrawal (Penalized)" : "Capital Withdrawal",
                         penalty_applied: penaltyApplied,
-                        penalty_amount: penalty,
-                        final_payout: finalPayout,
-                        original_request_amount: withdrawAmount,
+                        penalty_amount: penaltyUSD * (forexRate - 0.4), // RM value for audit
+                        penalty_amount_usd: penaltyUSD,
+                        final_payout_usd: finalPayoutUSD,
+                        final_payout_rm: finalPayoutUSD * (forexRate - 0.4), // RM value for payment
+                        original_request_amount_usd: withdrawAmountUSD,
+                        original_request_amount_rm: withdrawAmountUSD * (forexRate - 0.4),
                         approved_at: new Date().toISOString(),
                         bank_name: profile.bank_name || profile.kyc_data?.bank_name || tx.metadata?.bank_name,
                         account_number: profile.account_number || profile.kyc_data?.account_number || tx.metadata?.account_number,
@@ -514,7 +511,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .insert({
                     user_id: user.id,
                     type: txType,
-                    amount: Math.abs(amountRM),
+                    amount: amountUSD, // Records USD value as main amount
                     status: 'Approved',
                     original_currency: 'USD',
                     original_currency_amount: amountUSD,

@@ -95,39 +95,40 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             return;
         }
 
-        const lockedCapital = user?.locked_capital || 0;
-        const profit = Number(user?.profit || 0);
-        const maturedCapital = Math.max(0, Number(user?.balance || 0) - lockedCapital);
-        const userWithdrawable = profit + maturedCapital;
+        const lockedCapitalUSD = user?.locked_capital_usd || 0;
+        const profitUSD = Number(user?.profit_usd || user?.profit || 0); // profit is now USD-primary
+        const currentBalanceUSD = Number(user?.balance_usd || 0);
+        const maturedCapitalUSD = Math.max(0, currentBalanceUSD - lockedCapitalUSD);
+        const userWithdrawableUSD = profitUSD + maturedCapitalUSD;
         
-        let lockedPortion = 0;
-        if (amountRM > userWithdrawable) {
-            // Check for total withdrawal using USD to avoid -0.4 rate issues
+        let lockedPortionUSD = 0;
+        if (amountUSD > userWithdrawableUSD) {
+            // Check for total withdrawal using USD to avoid rate issues
             const isTotalWithdrawal = amountUSD >= (totalAssetsUSD - 0.01);
             if (!isTotalWithdrawal) {
                 alert(lang === 'zh' ? "不允许部分提取锁定资金。要提取锁定资金，您必须提取全部余额。" : "Partial withdrawal of locked capital is not permitted. To withdraw from your locked capital, you must withdraw your entire balance.");
                 return;
             }
-            lockedPortion = amountRM - userWithdrawable;
+            lockedPortionUSD = amountUSD - userWithdrawableUSD;
         }
 
-        if (lockedPortion > 0) {
-            const penalty = lockedPortion * 0.4;
-            const finalPayout = amountRM - penalty;
+        if (lockedPortionUSD > 0) {
+            const penaltyUSD = lockedPortionUSD * 0.4;
+            const finalPayoutUSD = amountUSD - penaltyUSD;
             setPenaltyInfo({
-                penalty,
-                payout: finalPayout,
-                lockedPortion,
-                penalty_usd: penalty / withdrawalRate,
-                payout_usd: finalPayout / withdrawalRate,
-                lockedPortion_usd: lockedPortion / withdrawalRate,
+                penalty: penaltyUSD * withdrawalRate,
+                payout: finalPayoutUSD * withdrawalRate,
+                lockedPortion: lockedPortionUSD * withdrawalRate,
+                penalty_usd: penaltyUSD,
+                payout_usd: finalPayoutUSD,
+                lockedPortion_usd: lockedPortionUSD,
                 isApplied: true
             });
             setShowPenaltyConfirm(true);
         } else {
             setPenaltyInfo({
                 penalty: 0,
-                payout: amountRM,
+                payout: amountUSD * withdrawalRate,
                 lockedPortion: 0,
                 penalty_usd: 0,
                 payout_usd: amountUSD,
@@ -163,7 +164,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             const { error } = await supabase.from('transactions').insert([{
                 user_id: user.id,
                 type: 'Withdrawal',
-                amount: Math.abs(amountRM),
+                amount: Math.abs(amountUSD), // Record USD value primary truth
                 status: 'Pending',
                 ref_id: refId,
                 original_currency_amount: amountUSD,
