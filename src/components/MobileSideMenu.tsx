@@ -82,7 +82,7 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
                 onClick={onClose}
             />
             <aside
-                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#FAFAF8] border-r border-gray-200 p-8 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden ${isOpen ? "translate-x-0" : "-translate-x-full"
+                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#FAFAF8] border-r border-gray-200 p-8 flex flex-col justify-between transition-transform duration-500 ease-out md:hidden overflow-y-auto ${isOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
             >
                 <div className="space-y-12">
