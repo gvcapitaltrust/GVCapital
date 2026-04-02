@@ -23,8 +23,7 @@ export default function VerifyPage() {
             complianceReview: "Compliance review in progress.",
             step1Title: "Personal Information",
             step1Desc: "Please provide your details exactly as they appear on your legal ID.",
-            firstName: "First Name",
-            lastName: "Last Name",
+            fullName: "Full Name",
             dob: "Date of Birth",
             gender: "Gender",
             selectGender: "Select Gender",
@@ -85,8 +84,7 @@ export default function VerifyPage() {
             complianceReview: "合规审核正在进行中。",
             step1Title: "个人信息",
             step1Desc: "请提供与您的法定身份证件完全一致的详细信息。",
-            firstName: "名字",
-            lastName: "姓氏",
+            fullName: "全名",
             dob: "出生日期",
             gender: "性别",
             selectGender: "选择性别",
@@ -151,8 +149,7 @@ export default function VerifyPage() {
     const [currentStep, setCurrentStep] = useState(1);
 
     interface KYCFormData {
-        first_name: string;
-        last_name: string;
+        full_name: string;
         dob: string;
         gender: string;
         address: string;
@@ -179,8 +176,7 @@ export default function VerifyPage() {
 
     // Form State
     const [formData, setFormData] = useState<KYCFormData>({
-        first_name: "",
-        last_name: "",
+        full_name: "",
         dob: "",
         gender: "",
         address: "",
@@ -238,8 +234,7 @@ export default function VerifyPage() {
                     } else {
                         setFormData((prev: KYCFormData) => ({
                             ...prev,
-                            first_name: profile.first_name || "",
-                            last_name: profile.last_name || "",
+                            full_name: profile.full_name || (profile.kyc_data?.full_name) || (profile.kyc_data?.first_name ? `${profile.kyc_data.first_name} ${profile.kyc_data.last_name || ""}`.trim() : ""),
                             country: profile.country || "Malaysia"
                         }));
                     }
@@ -273,7 +268,7 @@ export default function VerifyPage() {
                     kyc_step: step,
                     kyc_data: data,
                     kyc_status: 'Draft', // Ensure dashboard knows it's a draft
-                    full_name: `${data.first_name} ${data.last_name}`.trim(),
+                    full_name: data.full_name.trim(),
                     bank_name: data.bank_name,
                     account_number: data.account_number,
                     bank_account_holder: data.bank_account_holder
@@ -331,7 +326,7 @@ export default function VerifyPage() {
                 bank_account_holder: formData.bank_account_holder,
                 kyc_status: status,
                 kyc_completed: status === 'Pending',
-                full_name: `${formData.first_name} ${formData.last_name}`,
+                full_name: formData.full_name,
                 kyc_step: status === 'Pending' ? 3 : Math.max(0, currentStep - 1),
                 kyc_data: formData
             };
@@ -419,13 +414,9 @@ export default function VerifyPage() {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t.firstName}</label>
-                                    <input type="text" value={formData.first_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, first_name: e.target.value})} className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder={t.firstName} />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t.lastName}</label>
-                                    <input type="text" value={formData.last_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, last_name: e.target.value})} className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder={t.lastName} />
+                                <div className="md:col-span-2 space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t.fullName}</label>
+                                    <input type="text" value={formData.full_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, full_name: e.target.value})} className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder={t.fullName} />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t.dob}</label>
@@ -596,13 +587,9 @@ export default function VerifyPage() {
                                         <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{t.country}</p>
                                         <p className="text-sm font-black text-gray-900 uppercase">{formData.country}</p>
                                     </div>
-                                    <div>
-                                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{t.firstName}</p>
-                                        <p className="text-sm font-black text-gray-900 uppercase">{formData.first_name || "N/A"}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{t.lastName}</p>
-                                        <p className="text-sm font-black text-gray-900 uppercase">{formData.last_name || "N/A"}</p>
+                                    <div className="md:col-span-2">
+                                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{t.fullName}</p>
+                                        <p className="text-sm font-black text-gray-900 uppercase">{formData.full_name || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>

@@ -166,9 +166,7 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                     </h4>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         {[
-                                            { label: "Full Name", value: selectedUser?.full_name },
-                                            { label: "First Name", value: selectedUser?.kyc_data?.first_name },
-                                            { label: "Last Name", value: selectedUser?.kyc_data?.last_name },
+                                            { label: "Full Name", value: selectedUser?.full_name || selectedUser?.kyc_data?.full_name },
                                             { label: "Date of Birth", value: selectedUser?.kyc_data?.dob },
                                             { label: "Gender", value: selectedUser?.kyc_data?.gender },
                                             { label: "Phone", value: selectedUser?.phone || selectedUser?.kyc_data?.phone },
