@@ -17,6 +17,7 @@ import { TIERS, getTierByAmount, formatUSD } from "@/lib/tierUtils";
 import TierMedal from "@/components/TierMedal";
 import MobileSideMenu from "@/components/MobileSideMenu";
 import { MASTER_ADMIN_EMAIL } from "@/lib/supabaseClient";
+import PremiumLoader from "@/components/PremiumLoader";
 
 export default function DashboardClient() {
     const { user: authUser, role: authRole, isVerified: authVerified, refresh: refreshAuth, loading: authLoading } = useAuth();
@@ -1863,7 +1864,7 @@ export default function DashboardClient() {
                                 disabled={isSubmitting || withdrawPIN.length !== 6} 
                                 className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl disabled:opacity-50 transition-all hover:-translate-y-1"
                             >
-                                {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.confirmWithdraw}
+                                {isSubmitting ? <PremiumLoader size="sm" color="black" /> : t.confirmWithdraw}
                             </button>
                             
                             <button onClick={() => setIsPinModalOpen(false)} className="w-full text-gray-500 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-[10px]">

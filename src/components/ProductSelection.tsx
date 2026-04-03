@@ -57,33 +57,34 @@ export default function ProductSelection({
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-700">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="space-y-0.5">
-          <h2 className="text-base md:text-lg font-bold uppercase tracking-tight text-gray-900">{t.title}</h2>
-          <p className="text-gray-400 text-xs">{t.subtitle}</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-1">
+          <h2 className="text-lg md:text-xl font-black uppercase tracking-tighter text-white">{t.title}</h2>
+          <p className="text-gray-500 text-xs font-semibold uppercase tracking-widest opacity-80">{t.subtitle}</p>
         </div>
         <button 
           onClick={onOpenComparison}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all"
+          className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-white hover:bg-white/10 hover:border-gv-gold/30 hover:-translate-y-1 transition-all shadow-sm"
         >
-          <Info className="h-3.5 w-3.5" />
+          <Info className="h-4 w-4" />
           {t.compare}
         </button>
       </div>
 
       {/* Slider Section */}
-      <div className="bg-gray-50 border border-gray-200 p-6 sm:p-8 rounded-2xl shadow-xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
-          <TrendingUp className="h-40 w-40 text-gv-gold" />
+      <div className="premium-glass bg-black/40 border-gv-gold/10 p-8 sm:p-12 rounded-[48px] shadow-[0_30px_60px_rgba(0,0,0,0.4)] relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gv-gold/5 blur-[120px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
+        <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity rotate-12 group-hover:rotate-0 duration-1000">
+          <TrendingUp className="h-48 w-48 text-gv-gold" />
         </div>
 
         <div className="flex flex-col xl:grid xl:grid-cols-2 gap-8 relative z-10">
-          <div className="space-y-5">
-            <div className="space-y-3">
-              <div className="flex justify-between items-end">
-                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500">{t.sliderLabel}</label>
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div className="flex justify-between items-end px-1">
+                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-gv-gold/60">{t.sliderLabel}</label>
                 <div className="flex flex-col items-end">
-                  <span className="text-2xl font-black text-gv-gold tracking-tighter">
+                  <span className="text-3xl font-black text-white tracking-tighter animate-in fade-in zoom-in-95 duration-300">
                     {formatUSD(amount)}
                   </span>
                 </div>
@@ -95,24 +96,25 @@ export default function ProductSelection({
                 step="100"
                 value={amount}
                 onChange={(e) => setAmount(parseInt(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gv-gold hover:accent-gv-gold/80 transition-all"
+                className="w-full h-2.5 bg-white/5 rounded-full appearance-none cursor-pointer accent-gv-gold hover:accent-gv-gold/80 transition-all shadow-inner"
               />
-              <div className="flex justify-between text-[8px] font-black text-gray-400 uppercase tracking-widest pt-1">
+              <div className="flex justify-between text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] pt-2 px-1">
                 <span>$0</span>
-                <span>$7,500</span>
+                <span className="text-gv-gold/40">$7,500</span>
                 <span>$15,000+</span>
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 p-4 rounded-xl flex items-center gap-4">
-              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
-                <TrendingUp className="h-5 w-5" />
+            <div className="bg-emerald-500/5 border border-emerald-500/10 p-6 rounded-[28px] flex items-center gap-6 backdrop-blur-md shadow-inner group/return overflow-hidden relative">
+              <div className="absolute inset-0 bg-emerald-500/5 blur-3xl opacity-0 group-hover/return:opacity-100 transition-opacity"></div>
+              <div className="h-14 w-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 shrink-0 border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)] relative z-10 transition-transform group-hover/return:scale-110">
+                <TrendingUp className="h-7 w-7" />
               </div>
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-0.5">{t.monthlyReturn}</p>
+              <div className="relative z-10">
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/60 mb-1">{t.monthlyReturn}</p>
                 <div className="flex flex-col">
-                  <p className="text-lg font-black text-emerald-500 tracking-tight">
-                    <span className="text-xs font-normal opacity-60 mr-1">up to</span>
+                  <p className="text-2xl font-black text-emerald-400 tracking-tighter">
+                    <span className="text-xs font-normal normal-case opacity-60 mr-2 tracking-normal">up to</span>
                     {formatUSD(dividendRange.max)}
                   </p>
                 </div>
@@ -121,28 +123,30 @@ export default function ProductSelection({
           </div>
 
           <div className="flex items-center justify-center">
-            <div className="bg-gv-gold/10 border border-gv-gold/20 p-5 rounded-xl space-y-3 w-full flex flex-col items-center text-center">
-              <div className="flex items-center gap-3 text-gv-gold">
-                <Wallet className="h-4 w-4" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Investment Summary</span>
+            <div className="premium-glass bg-gv-gold/[0.02] border-gv-gold/20 p-8 rounded-[40px] space-y-6 w-full flex flex-col items-center text-center shadow-2xl relative overflow-hidden group/summary">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] group-hover/summary:bg-gv-gold/10 transition-all duration-700"></div>
+              <div className="flex items-center gap-4 text-gv-gold relative z-10">
+                <div className="h-0.5 w-6 bg-gv-gold/40 rounded-full"></div>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em]">{lang === 'en' ? 'Investment Intelligence' : '投资情报'}</span>
+                <div className="h-0.5 w-6 bg-gv-gold/40 rounded-full"></div>
               </div>
-              <div className="space-y-1">
-                <p className="text-gray-500 text-[9px] font-medium uppercase tracking-widest">{t.currentTier}</p>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center justify-center gap-2">
-                    <TierMedal tierId={currentInvestment > 0 ? qualifiedTier.id : "none"} size="sm" />
-                    <span className="text-gray-900 text-xs font-black uppercase tracking-tight">
+              <div className="space-y-4 relative z-10 w-full px-4">
+                <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em]">{t.currentTier}</p>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex items-center justify-center gap-4 bg-white/5 border border-white/5 p-4 rounded-3xl w-full group-hover/summary:border-gv-gold/20 transition-all">
+                    <TierMedal tierId={currentInvestment > 0 ? qualifiedTier.id : "none"} size="md" className="drop-shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-transform group-hover/summary:rotate-12" />
+                    <span className="text-white text-xl font-black uppercase tracking-tight">
                       {currentInvestment > 0 ? qualifiedTier.name.replace(/ package/gi, '') : t.noTier}
                     </span>
                   </div>
                   {currentInvestment > 0 && qualifiedTier.yearlyBonus && (
-                    <div className="flex flex-col items-center gap-1">
-                      <div className="bg-gv-gold/10 border border-gv-gold/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
-                        <span className="text-gv-gold text-[8px] font-black">+{ (qualifiedTier.yearlyBonus * 100).toFixed(0) }% Yearly Bonus</span>
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="bg-gv-gold/10 border border-gv-gold/30 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-[0_0_20px_rgba(212,175,55,0.1)]">
+                        <span className="text-gv-gold text-[10px] font-black tracking-widest">+{ (qualifiedTier.yearlyBonus * 100).toFixed(0) }% YEARLY BONUS APPLIED</span>
                       </div>
                       {qualifiedTier.id === 'platinum' && (
-                        <p className="text-[7px] font-bold text-gv-gold/60 uppercase tracking-tighter italic whitespace-nowrap leading-none mt-0.5">
-                          * 12 months lock-in period is required
+                        <p className="text-[8px] font-black text-gv-gold/60 uppercase tracking-[0.2em] italic leading-none pt-1">
+                          * 12 months lock-in period requirement met
                         </p>
                       )}
                     </div>
@@ -150,10 +154,12 @@ export default function ProductSelection({
                 </div>
               </div>
               {amount > currentInvestment && (
-                <div className="pt-2 border-t border-gv-gold/10 w-full">
-                  <p className="text-[9px] text-gv-gold/60 font-black uppercase">{t.potentialUpgrade}</p>
-                  <p className="text-gray-900 text-xs font-bold italic">
-                    {t.increaseBy} {formatUSD(amount - currentInvestment)} {t.toReach} {activeTier.name.replace(/ package/gi, '')}
+                <div className="pt-6 border-t border-white/5 w-full relative z-10">
+                  <p className="text-[10px] text-gv-gold font-black uppercase tracking-[0.3em] mb-2">{t.potentialUpgrade}</p>
+                  <p className="text-gray-200 text-sm font-bold leading-relaxed">
+                    <span className="text-gray-500 font-medium normal-case block mb-1">{t.increaseBy}</span>
+                    <span className="text-white font-black">{formatUSD(amount - currentInvestment)}</span>
+                    <span className="text-gray-500 font-medium normal-case block mt-1">{t.toReach} <span className="text-gv-gold uppercase tracking-widest font-black inline-block ml-1">{activeTier.name.replace(/ package/gi, '')}</span></span>
                   </p>
                 </div>
               )}

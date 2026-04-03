@@ -10,6 +10,7 @@ import TierMedal from "@/components/TierMedal";
 import { getTierByAmount, TIERS } from "@/lib/tierUtils";
 import ComparisonTable from "@/components/ComparisonTable";
 import ProductSelection from "@/components/ProductSelection";
+import PremiumLoader from "@/components/PremiumLoader";
 import { X } from "lucide-react";
 
 export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
@@ -139,7 +140,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
     };
 
     if (isCheckingAuth && !user) {
-        return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
+        return <div className="flex items-center justify-center p-20"><PremiumLoader /></div>;
     }
 
     return (
@@ -154,6 +155,14 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-gray-900 leading-none">
                             {lang === "en" ? "Overview" : "概览"}
                         </h1>
+
+                        <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-institutional-pulse absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            </span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Global Network Live</span>
+                        </div>
                         
                         {user?.is_verified && (
                             <div className="flex items-center gap-3 bg-white border border-gray-200 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow-xl hover:border-gv-gold/30 transition-all group scale-90 origin-left">
@@ -177,52 +186,53 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             <div className="space-y-10">
                 {(!user?.is_verified && user?.email !== "thenja96@gmail.com") ? (
                     (user?.kyc_status === 'Pending' || user?.kyc_status === 'pending') ? (
-                        <div className="bg-amber-400/10 border border-amber-400/20 p-6 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-4 animate-in fade-in duration-700 max-w-4xl mx-auto">
-                            <div className="h-12 w-12 bg-amber-400/20 rounded-full flex items-center justify-center shrink-0">
-                                <svg className="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <div className="premium-glass border-amber-500/20 p-8 rounded-[32px] flex flex-col sm:flex-row items-center gap-6 animate-in fade-in duration-700 max-w-4xl mx-auto shadow-2xl relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-amber-500/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div className="h-16 w-16 bg-amber-500/10 rounded-2xl flex items-center justify-center shrink-0 border border-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.1)] relative z-10">
+                                <svg className="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
-                            <div className="space-y-1">
-                                <h2 className="text-xl font-bold text-amber-500">{t.verificationInProgress}</h2>
-                                <p className="text-gray-500 text-sm leading-relaxed">{t.verificationInProgressDesc}</p>
+                            <div className="space-y-2 relative z-10 text-center sm:text-left flex-1">
+                                <h2 className="text-2xl font-black text-amber-500 uppercase tracking-tight">{t.verificationInProgress}</h2>
+                                <p className="text-gray-400 text-sm font-semibold leading-relaxed max-w-xl">{t.verificationInProgressDesc}</p>
                             </div>
                         </div>
                     ) : (user?.kyc_status === 'Rejected' || user?.kyc_status === 'rejected') ? (
-                        <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center gap-6 animate-in fade-in duration-700 justify-between max-w-4xl mx-auto">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                <div className="h-12 w-12 bg-red-500/20 rounded-full flex items-center justify-center shrink-0">
-                                    <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <div className="premium-glass border-red-500/20 p-8 rounded-[32px] flex flex-col md:flex-row items-center gap-8 animate-in fade-in duration-700 justify-between max-w-4xl mx-auto shadow-2xl group">
+                            <div className="flex flex-col sm:flex-row items-center gap-6 flex-1">
+                                <div className="h-16 w-16 bg-red-500/10 rounded-2xl flex items-center justify-center shrink-0 border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
+                                    <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 </div>
-                                <div className="space-y-1">
-                                    <h2 className="text-xl font-bold text-red-500">{t.verificationUnsuccessful}</h2>
-                                    <p className="text-gray-500 text-sm leading-relaxed">
-                                        {t.verificationUnsuccessfulDesc} <span className="text-gray-900 font-medium ml-1 bg-red-500/20 px-2 py-0.5 rounded-md">{user?.rejection_reason || t.rejectionReasonLabel}</span>
+                                <div className="space-y-2 text-center sm:text-left">
+                                    <h2 className="text-2xl font-black text-red-500 uppercase tracking-tight">{t.verificationUnsuccessful}</h2>
+                                    <p className="text-gray-400 text-sm font-semibold leading-relaxed">
+                                        {t.verificationUnsuccessfulDesc} <span className="text-red-400 font-black ml-1 bg-red-500/10 px-3 py-1 rounded-lg uppercase tracking-widest text-[10px] border border-red-500/20">{user?.rejection_reason || t.rejectionReasonLabel}</span>
                                     </p>
                                 </div>
                             </div>
-                            <Link href={`/verify?lang=${lang}`} className="shrink-0 bg-red-500/20 text-red-500 hover:bg-red-500/30 font-bold px-6 py-3 rounded-xl transition-all text-sm">{t.reuploadBtn}</Link>
+                            <Link href={`/verify?lang=${lang}`} className="shrink-0 bg-red-500 text-white hover:bg-red-600 font-black uppercase tracking-[0.2em] px-8 py-4 rounded-2xl transition-all text-xs shadow-[0_10px_30px_rgba(239,68,68,0.2)] hover:-translate-y-1">{t.reuploadBtn}</Link>
                         </div>
                     ) : (
-                        <div className="bg-gv-gold/5 border border-gv-gold/20 p-8 rounded-[32px] flex flex-col md:flex-row items-center gap-8 animate-in fade-in duration-700 justify-between relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-8 opacity-5">
-                                <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 d9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        <div className="premium-glass bg-gv-gold/[0.03] border-gv-gold/20 p-10 md:p-14 rounded-[48px] flex flex-col lg:flex-row items-center gap-10 animate-in fade-in duration-700 justify-between relative overflow-hidden group shadow-2xl">
+                            <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:opacity-10 transition-all duration-1000 rotate-12 group-hover:rotate-0">
+                                <svg className="h-48 w-48 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 d9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                             </div>
-                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10 text-center sm:text-left">
-                                <div className="h-16 w-16 bg-gv-gold/20 rounded-full flex items-center justify-center shrink-0 text-gv-gold">
-                                    <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            <div className="flex flex-col sm:flex-row items-center gap-8 relative z-10 text-center sm:text-left flex-1">
+                                <div className="h-20 w-20 bg-gv-gold/10 rounded-3xl flex items-center justify-center shrink-0 text-gv-gold border border-gv-gold/20 shadow-[0_0_30px_rgba(212,175,55,0.15)] ring-4 ring-gv-gold/5">
+                                    <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                 </div>
-                                <div className="space-y-2">
-                                    <h2 className="text-3xl font-black uppercase tracking-tighter text-gv-gold">{t.completeProfile}</h2>
-                                    <p className="text-gray-500 text-sm leading-relaxed max-w-lg">{t.completeProfileDesc}</p>
+                                <div className="space-y-3">
+                                    <h2 className="text-4xl font-black uppercase tracking-tighter text-white leading-none">{t.completeProfile}</h2>
+                                    <p className="text-gray-400 text-sm font-semibold leading-relaxed max-w-xl opacity-80">{t.completeProfileDesc}</p>
                                 </div>
                             </div>
-                            <Link href={`/verify?lang=${lang}`} className="relative z-10 shrink-0 bg-gv-gold text-black hover:bg-gv-gold/90 font-black uppercase tracking-widest px-8 py-4 rounded-2xl transition-all shadow-[0_10px_20px_rgba(212,175,55,0.15)]">{t.startVerification}</Link>
+                            <Link href={`/verify?lang=${lang}`} className="relative z-10 shrink-0 bg-gv-gold text-black hover:bg-gv-gold/90 font-black uppercase tracking-[0.25em] px-10 py-5 rounded-2xl transition-all shadow-[0_15px_40px_rgba(212,175,55,0.25)] hover:shadow-[0_20px_50px_rgba(212,175,55,0.35)] hover:-translate-y-1 text-sm">{t.startVerification}</Link>
                         </div>
                     )
                 ) : (
                     <>
                         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* Total Investment Card */}
-                            <div className="bg-white border border-gray-200 p-10 rounded-[40px] shadow-sm hover:shadow-lg hover:border-gv-gold/30 transition-all group relative overflow-hidden">
+                            <div className="premium-glass p-10 rounded-[40px] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                     <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 </div>
@@ -237,7 +247,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
 
                             {/* Total Dividends Card */}
-                            <div className="bg-white border border-gray-200 p-10 rounded-[40px] shadow-sm hover:shadow-lg hover:border-gv-gold/30 transition-all group relative overflow-hidden">
+                            <div className="premium-glass p-10 rounded-[40px] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                     <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                 </div>
@@ -249,7 +259,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         </section>
 
                         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] relative overflow-hidden group">
+                            <div className="premium-glass p-10 rounded-[40px] relative overflow-hidden group">
                                 <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
                                 {(() => {
                                     const tier = (user?.tier && user?.tier !== "Standard") 
@@ -259,12 +269,12 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     return (
                                         <>
                                             <h3 className="text-3xl font-black text-gray-900 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
-                                            <p className="text-[10px] text-gray-500 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
+                                            <p className="text-[10px] text-gray-500 font-bold uppercase mt-4 border-t border-gray-100 pt-4 inline-block">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                         </>
                                     );
                                 })()}
                             </div>
-                            <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] relative overflow-hidden group">
+                            <div className="premium-glass p-10 rounded-[40px] relative overflow-hidden group">
                                 <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
                                 {(() => {
                                     const tier = (user?.tier && user?.tier !== "Standard") 
@@ -299,19 +309,23 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                         )}
                         
-                        <section className="flex flex-col sm:flex-row gap-6 mt-10">
+                        <section className="flex flex-col sm:flex-row gap-8 mt-12">
                             <Link
                                 href={`/dashboard/deposit?lang=${lang}`}
-                                className="flex-1 bg-gv-gold text-black font-black text-xl py-6 rounded-[28px] hover:bg-gv-gold/90 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 shadow-[0_15px_30px_rgba(212,175,55,0.2)]"
+                                className="flex-1 bg-gv-gold text-black font-black text-xs py-7 rounded-[32px] hover:bg-gv-gold/90 hover:-translate-y-1.5 transition-all flex items-center justify-center gap-4 shadow-[0_15px_40px_rgba(212,175,55,0.25)] uppercase tracking-[0.3em] group"
                             >
-                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4v16m8-8H4" /></svg>
+                                <div className="h-8 w-8 bg-black/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 4v16m8-8H4" /></svg>
+                                </div>
                                 {t.deposit}
                             </Link>
                             <Link
                                 href={`/dashboard/withdraw?lang=${lang}`}
-                                className="flex-1 bg-gray-100 text-gray-900 font-black text-xl py-6 rounded-[28px] hover:bg-gray-200 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 border border-gray-300"
+                                className="flex-1 bg-[#1a1a1a] text-white font-black text-xs py-7 rounded-[32px] hover:bg-[#222] hover:-translate-y-1.5 transition-all flex items-center justify-center gap-4 border border-white/5 shadow-2xl uppercase tracking-[0.3em] group"
                             >
-                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                                <div className="h-8 w-8 bg-white/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform text-gv-gold">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                                </div>
                                 {t.withdraw}
                             </Link>
                         </section>

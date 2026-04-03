@@ -79,3 +79,49 @@ body {
 .animate-gold-glow {
   animation: gold-glow 3s infinite ease-in-out;
 }
+
+/* Institutional Circular Loader Animations */
+@keyframes premium-rotate {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes premium-dash {
+  0% {
+     stroke-dasharray: 1, 200;
+     stroke-dashoffset: 0;
+  }
+  50% {
+     stroke-dasharray: 89, 200;
+     stroke-dashoffset: -35px;
+  }
+  100% {
+     stroke-dasharray: 89, 200;
+     stroke-dashoffset: -124px;
+  }
+}
+
+.animate-premium-rotate {
+  animation: premium-rotate 2s linear infinite;
+}
+
+.animate-premium-dash {
+  animation: premium-dash 1.5s ease-in-out infinite;
+}
+
+/* Institutional Aesthetics */
+.premium-glass {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+@keyframes institutional-pulse {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
+
+.animate-institutional-pulse {
+  animation: institutional-pulse 2s infinite ease-in-out;
+}

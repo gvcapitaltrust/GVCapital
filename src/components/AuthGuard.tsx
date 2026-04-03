@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import { MASTER_ADMIN_EMAIL } from "@/lib/supabaseClient";
+import PremiumLoader from "@/components/PremiumLoader";
 
 interface AuthGuardProps {
     children: React.ReactNode;
@@ -28,7 +29,7 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
     if (!isClient || loading) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="h-12 w-12 border-4 border-gv-gold border-t-transparent rounded-full animate-spin"></div>
+                <PremiumLoader />
             </div>
         );
     }

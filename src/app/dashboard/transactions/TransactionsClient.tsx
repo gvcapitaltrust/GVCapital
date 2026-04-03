@@ -5,6 +5,7 @@ import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import PremiumLoader from "@/components/PremiumLoader";
 
 export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, transactions, dividendHistory, loading } = useUser();
@@ -150,19 +151,21 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         doc.save(`GV_Statement_${monthName}_${selectedYear}.pdf`);
     };
 
-    if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
+    if (loading) return <div className="flex items-center justify-center p-20"><PremiumLoader /></div>;
 
     return (
         <div className="space-y-12 pb-20">
             <section className="space-y-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div className="flex bg-white p-1 rounded-2xl border border-gray-200">
+                    <div className="flex bg-black/40 p-1.5 rounded-[22px] border border-white/5 backdrop-blur-3xl shadow-inner scrollbar-hide overflow-x-auto">
                         {(['All', 'Capital', 'Dividends'] as const).map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setActiveFilter(f)}
-                                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                                    activeFilter === f ? 'bg-gv-gold text-black shadow-lg' : 'text-gray-400 hover:text-gray-900'
+                                className={`px-8 py-3 rounded-[18px] text-[10px] font-black uppercase tracking-[0.25em] transition-all whitespace-nowrap ${
+                                    activeFilter === f 
+                                        ? 'bg-gv-gold text-black shadow-[0_10px_20px_rgba(212,175,55,0.2)] scale-105 relative z-10' 
+                                        : 'text-gray-500 hover:text-white hover:bg-white/5'
                                 }`}
                             >
                                 {f}
@@ -170,49 +173,51 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                         ))}
                     </div>
                 </div>
+            </section>
 
+            <section className="space-y-6">
                 <div className="flex items-center gap-4 px-2">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.totalInView}:</span>
-                    <span className={`text-sm font-black tabular-nums ${filteredTotalUSD >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{t.totalInView}:</span>
+                    <span className={`text-sm font-black tabular-nums transition-colors ${filteredTotalUSD >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
                         {filteredTotalUSD >= 0 ? '+' : '-'}$ {Math.abs(filteredTotalUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                     </span>
                 </div>
 
-                <div className="border border-gray-200 rounded-[40px] overflow-hidden bg-white backdrop-blur-md shadow-2xl">
-                    <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
+                <div className="premium-glass rounded-[40px] overflow-hidden shadow-2xl border border-gv-gold/10">
+                    <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-600">
                         <table className="w-full text-left min-w-[700px] border-collapse">
-                            <thead className="bg-white border-b border-gray-200 sticky top-0 z-10 backdrop-blur-md">
-                                <tr className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">
-                                    <th className="px-6 py-4">{t.date}</th>
-                                    <th className="px-6 py-4">{t.refId}</th>
-                                    <th className="px-6 py-4">{t.type}</th>
-                                    <th className="px-6 py-4">{t.status}</th>
-                                    <th className="px-6 py-4 text-right">{t.amount}</th>
+                            <thead className="sticky top-0 z-10 backdrop-blur-3xl bg-black/40 border-b border-gv-gold/10">
+                                <tr className="text-[10px] text-gray-400 font-semibold uppercase tracking-[0.22em]">
+                                    <th className="px-8 py-5">{t.date}</th>
+                                    <th className="px-8 py-5">{t.refId}</th>
+                                    <th className="px-8 py-5">{t.type}</th>
+                                    <th className="px-8 py-5">{t.status}</th>
+                                    <th className="px-8 py-5 text-right">{t.amount}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gv-gold/5">
                                 {filteredTransactions.map((tx, idx) => (
                                     <React.Fragment key={idx}>
                                         <tr 
                                             onClick={() => setExpandedId(expandedId === tx.id ? null : tx.id)}
-                                            className="text-sm font-medium group hover:bg-gray-50 transition-colors border-t border-gray-100 cursor-pointer"
+                                            className="text-sm border-b border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer group/row"
                                         >
-                                            <td className="px-6 py-4 text-gray-500 font-mono text-xs">{new Date(tx.created_at || tx.transfer_date).toLocaleDateString()}</td>
-                                            <td className="px-6 py-4 text-gray-400 font-mono text-[11px] opacity-70">{tx.ref_id || "-"}</td>
-                                            <td className="px-6 py-4 uppercase tracking-widest text-[10px] font-bold text-gray-900">
+                                            <td className="px-8 py-5 text-gray-500 font-mono text-[11px] font-medium">{new Date(tx.created_at || tx.transfer_date).toLocaleDateString()}</td>
+                                            <td className="px-8 py-5 text-gray-400 font-mono text-[10px] opacity-70 tracking-widest uppercase">{tx.ref_id || "-"}</td>
+                                            <td className="px-8 py-5 uppercase tracking-[0.2em] text-[10px] font-bold text-gray-200">
                                                 <div className="flex items-center gap-2">
                                                     {tx.metadata?.description || tx.type}
                                                     {(tx.type === 'Withdrawal' || tx.metadata?.is_adjustment) && (
-                                                        <svg className={`h-3 w-3 text-gray-500 transition-transform ${expandedId === tx.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+                                                        <svg className={`h-3 w-3 text-gv-gold transition-transform ${expandedId === tx.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M19 9l-7 7-7-7" /></svg>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <span className={`px-3 py-1.5 rounded-lg text-[9px] uppercase font-bold tracking-widest ${
-                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                                                    tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
-                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
-                                                    'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                            <td className="px-8 py-5">
+                                                <span className={`px-4 py-1.5 rounded-full text-[9px] uppercase font-black tracking-[0.15em] border ${
+                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' :
+                                                    tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' :
+                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-400 border-red-500/30' :
+                                                    'bg-gv-gold/10 text-gv-gold/80 border-gv-gold/30 shadow-[0_0_15px_rgba(212,175,55,0.05)]'
                                                 }`}>{tx.status}</span>
                                             </td>
                                             {(() => {
@@ -221,76 +226,85 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                 const displayAmount = isWithdrawal ? -Math.abs(amountUSD) : amountUSD;
                                                 
                                                 return (
-                                                    <td className={`px-6 py-4 text-right font-black tabular-nums ${displayAmount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                        {displayAmount >= 0 ? '+' : '-'}{Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                    </td>
+                                                        <td className={`px-8 py-5 text-right font-black tabular-nums transition-colors ${displayAmount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                            {displayAmount >= 0 ? '+' : '-'}{Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        </td>
                                                 );
                                             })()}
                                         </tr>
                                         {expandedId === tx.id && (
                                             <tr>
-                                                <td colSpan={5} className="px-6 py-6 bg-white/[0.01] animate-in slide-in-from-top-2 duration-300">
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                                        <div className="space-y-4">
-                                                            <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Financial Breakdown</h4>
-                                                            <div className="space-y-2">
-                                                                <div className="flex justify-between text-xs font-bold gap-4">
-                                                                    <span className="text-gray-400 uppercase whitespace-nowrap">Gross Amount</span>
-                                                                    <span className="text-gray-900 tabular-nums whitespace-nowrap">$ {Number(tx.original_currency_amount || (Number(tx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <td colSpan={5} className="px-10 py-10 bg-gv-gold/[0.02] border-t border-gv-gold/5 animate-in slide-in-from-top-2 duration-300">
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                                                        <div className="space-y-6">
+                                                            <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-[0.3em] opacity-80 mb-2">Financial Breakdown</h4>
+                                                            <div className="space-y-3">
+                                                                <div className="flex justify-between text-xs font-bold gap-4 px-1">
+                                                                    <span className="text-gray-400 uppercase tracking-widest whitespace-nowrap">Gross Amount</span>
+                                                                    <span className="text-gray-200 tabular-nums whitespace-nowrap">$ {Number(tx.original_currency_amount || (Number(tx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                                 {tx.metadata?.penalty_applied && (
-                                                                    <div className="flex justify-between text-xs font-bold gap-4">
-                                                                        <span className="text-red-500 uppercase italic whitespace-nowrap">Penalty (40%)</span>
-                                                                        <span className="text-red-500 tabular-nums whitespace-nowrap">-$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                    <div className="flex justify-between text-xs font-bold gap-4 px-1">
+                                                                        <span className="text-red-500/80 uppercase italic tracking-widest whitespace-nowrap">Penalty (40%)</span>
+                                                                        <span className="text-red-400 tabular-nums whitespace-nowrap">-$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                     </div>
                                                                 )}
-                                                                <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2 gap-4">
-                                                                    <span className="text-emerald-500 uppercase whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : 'Final Payout (Net)'}</span>
-                                                                    <span className="text-emerald-500 underline decoration-gv-gold tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || tx.metadata?.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                <div className="flex justify-between text-xs font-black border-t border-gv-gold/10 pt-4 px-2 bg-emerald-500/5 rounded-xl py-3 border-x border-emerald-500/10 gap-4 shadow-[0_0_20px_rgba(16,185,129,0.03)]">
+                                                                    <span className="text-emerald-400 uppercase tracking-[0.15em] whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : 'Final Payout (Net)'}</span>
+                                                                    <span className="text-emerald-400 tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || tx.metadata?.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                                 {tx.metadata?.remark && (
-                                                                    <div className="mt-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">User Remark</p>
-                                                                        <p className="text-[11px] font-bold text-gray-600 italic">"{tx.metadata.remark}"</p>
+                                                                    <div className="mt-6 p-4 bg-white/[0.02] rounded-2xl border border-gv-gold/5 backdrop-blur-md">
+                                                                        <p className="text-[9px] font-black text-gv-gold/60 uppercase tracking-[0.3em] mb-2">User Remark</p>
+                                                                        <p className="text-[11px] font-medium text-gray-400 italic leading-relaxed">"{tx.metadata.remark}"</p>
                                                                     </div>
                                                                 )}
                                                             </div>
                                                         </div>
 
-                                                        <div className="space-y-4">
-                                                            <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Target Account</h4>
-                                                            <div className="bg-white border border-gray-200 p-4 rounded-2xl space-y-2">
-                                                                <p className="text-[10px] font-black text-gv-gold uppercase">{tx.metadata?.bank_name || user?.bank_name || "Institutional Account"}</p>
-                                                                <p className="text-sm font-mono text-gray-900 select-all">{tx.metadata?.account_number || user?.account_number || "Verified on File"}</p>
-                                                                <p className="text-[9px] font-bold text-gray-400 uppercase">{tx.metadata?.bank_account_holder || user?.full_name}</p>
+                                                        <div className="space-y-6">
+                                                            <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-[0.3em] opacity-80 mb-2">Target Account</h4>
+                                                            <div className="premium-glass p-5 rounded-3xl space-y-4 border-gv-gold/10">
+                                                                <div className="flex flex-col gap-1">
+                                                                    <p className="text-[9px] font-black text-gv-gold/60 uppercase tracking-widest">Bank Entity</p>
+                                                                    <p className="text-xs font-black text-white uppercase tracking-tight">{tx.metadata?.bank_name || user?.bank_name || "Institutional Account"}</p>
+                                                                </div>
+                                                                <div className="flex flex-col gap-1">
+                                                                    <p className="text-[9px] font-black text-gv-gold/60 uppercase tracking-widest">Identification</p>
+                                                                    <p className="text-sm font-mono text-gv-gold font-bold select-all tracking-tighter">{tx.metadata?.account_number || user?.account_number || "Verified on File"}</p>
+                                                                </div>
+                                                                <div className="flex flex-col gap-1">
+                                                                    <p className="text-[9px] font-black text-gv-gold/60 uppercase tracking-widest">Beneficiary</p>
+                                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{tx.metadata?.bank_account_holder || user?.full_name}</p>
+                                                                </div>
                                                             </div>
                                                         </div>
 
-                                                        <div className="space-y-4">
-                                                            <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Processing Timeline</h4>
-                                                            <div className="space-y-3 relative before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[1px] before:bg-gray-100">
-                                                                <div className="flex items-center gap-3 pl-6 relative">
-                                                                    <div className="h-2 w-2 rounded-full bg-zinc-500 absolute left-[3.5px]"></div>
+                                                        <div className="space-y-6">
+                                                            <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-[0.3em] opacity-80 mb-2">Processing Timeline</h4>
+                                                            <div className="space-y-4 relative before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[1.5px] before:bg-gv-gold/10">
+                                                                <div className="flex items-center gap-4 pl-8 relative">
+                                                                    <div className="h-2 w-2 rounded-full bg-zinc-600 absolute left-[3.5px] shadow-[0_0_8px_rgba(82,82,91,0.3)]"></div>
                                                                     <div className="flex flex-col">
-                                                                        <span className="text-[10px] font-black text-gray-900 uppercase">Submitted</span>
-                                                                        <span className="text-[9px] text-gray-500 font-bold">{new Date(tx.created_at).toLocaleString()}</span>
+                                                                        <span className="text-[10px] font-black text-gray-200 uppercase tracking-widest">Submitted</span>
+                                                                        <span className="text-[9px] text-gray-500 font-bold tabular-nums">{new Date(tx.created_at).toLocaleString()}</span>
                                                                     </div>
                                                                 </div>
                                                                 {tx.metadata?.approved_at && (
-                                                                    <div className="flex items-center gap-3 pl-6 relative">
-                                                                        <div className="h-2 w-2 rounded-full bg-blue-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                                                    <div className="flex items-center gap-4 pl-8 relative">
+                                                                        <div className="h-2.5 w-2.5 rounded-full bg-blue-500/80 absolute left-[2.5px] shadow-[0_0_12px_rgba(59,130,246,0.5)]"></div>
                                                                         <div className="flex flex-col">
-                                                                            <span className="text-[10px] font-black text-blue-400 uppercase">Accepted by {tx.metadata?.processed_by_name || 'Admin'}</span>
-                                                                            <span className="text-[9px] text-gray-500 font-bold">{new Date(tx.metadata.approved_at).toLocaleString()}</span>
+                                                                            <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Accepted by {tx.metadata?.processed_by_name || 'Admin'}</span>
+                                                                            <span className="text-[9px] text-gray-500 font-bold tabular-nums">{new Date(tx.metadata.approved_at).toLocaleString()}</span>
                                                                         </div>
                                                                     </div>
                                                                 )}
                                                                 {['Approved', 'Completed'].includes(tx.status) && (
-                                                                    <div className="flex items-center gap-3 pl-6 relative">
-                                                                        <div className="h-2 w-2 rounded-full bg-emerald-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                                                                    <div className="flex items-center gap-4 pl-8 relative">
+                                                                        <div className="h-3 w-3 rounded-full bg-emerald-500 absolute left-[1.5px] shadow-[0_0_15px_rgba(16,185,129,0.6)] ring-4 ring-emerald-500/20"></div>
                                                                         <div className="flex flex-col">
-                                                                            <span className="text-[10px] font-black text-emerald-500 uppercase">Successful</span>
-                                                                            <span className="text-[9px] text-gray-500 font-bold">{new Date(tx.metadata?.approved_at || tx.updated_at || tx.created_at).toLocaleString()}</span>
+                                                                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Successful</span>
+                                                                            <span className="text-[9px] text-gray-500 font-bold tabular-nums">{new Date(tx.metadata?.approved_at || tx.updated_at || tx.created_at).toLocaleString()}</span>
                                                                         </div>
                                                                     </div>
                                                                 )}
@@ -303,7 +317,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                     </React.Fragment>
                                 ))}
                                 {filteredTransactions.length === 0 && (
-                                    <tr><td colSpan={5} className="px-8 py-20 text-center text-gray-500 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
+                                    <tr><td colSpan={5} className="px-8 py-32 text-center text-gray-600 font-bold uppercase tracking-[0.3em] opacity-60 text-sm">{t.noTxFound}</td></tr>
                                 )}
                             </tbody>
                         </table>
@@ -311,28 +325,33 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </section>
 
-            <section className="bg-gray-50 border border-gray-200 p-8 rounded-[32px] shadow-2xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
+            <section className="premium-glass p-8 md:p-12 rounded-[40px] shadow-2xl relative overflow-hidden group border border-gv-gold/10">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-gv-gold/5 blur-[120px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                 <div className="relative z-10 max-w-2xl">
-                    <h2 className="text-2xl font-bold uppercase tracking-tight mb-3">{t.statementCenter}</h2>
-                    <p className="text-gray-400 text-sm font-medium mb-8">{t.statementCenterDesc}</p>
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="h-0.5 w-8 bg-gv-gold/60 rounded-full"></div>
+                        <h2 className="text-3xl font-black uppercase tracking-tighter text-white leading-none">{t.statementCenter}</h2>
+                    </div>
+                    <p className="text-gray-400 text-sm font-medium mb-12 opacity-80 leading-relaxed font-semibold">{t.statementCenterDesc}</p>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-                        <div className="space-y-3">
-                            <label className="text-gray-400 text-[10px] font-bold uppercase tracking-widest px-1">{t.selectMonth}</label>
-                            <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))} className="w-full bg-white border border-gray-200 rounded-xl p-4 text-base font-semibold focus:outline-none focus:border-gv-gold transition-all text-gray-900">
-                                {t.months.map((m, i) => <option key={i} value={i} className="bg-white">{m}</option>)}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12">
+                        <div className="space-y-4">
+                            <label className="text-gv-gold/60 text-[9px] font-black uppercase tracking-[0.3em] px-1">{t.selectMonth}</label>
+                            <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))} className="w-full bg-black/40 border border-gv-gold/20 rounded-2xl p-4 md:p-5 text-sm font-bold focus:outline-none focus:border-gv-gold transition-all text-white backdrop-blur-md appearance-none cursor-pointer hover:bg-black/60 shadow-inner">
+                                {t.months.map((m, i) => <option key={i} value={i} className="bg-[#1a1a1a]">{m}</option>)}
                             </select>
                         </div>
-                        <div className="space-y-3">
-                            <label className="text-gray-400 text-[10px] font-bold uppercase tracking-widest px-1">{t.selectYear}</label>
-                            <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="w-full bg-white border border-gray-200 rounded-xl p-4 text-base font-semibold focus:outline-none focus:border-gv-gold transition-all text-gray-900">
-                                {[2024, 2025, 2026].map(y => <option key={y} value={y} className="bg-white">{y}</option>)}
+                        <div className="space-y-4">
+                            <label className="text-gv-gold/60 text-[9px] font-black uppercase tracking-[0.3em] px-1">{t.selectYear}</label>
+                            <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="w-full bg-black/40 border border-gv-gold/20 rounded-2xl p-4 md:p-5 text-sm font-bold focus:outline-none focus:border-gv-gold transition-all text-white backdrop-blur-md appearance-none cursor-pointer hover:bg-black/60 shadow-inner">
+                                {[2024, 2025, 2026].map(y => <option key={y} value={y} className="bg-[#1a1a1a]">{y}</option>)}
                             </select>
                         </div>
                     </div>
 
-                    <button onClick={generateStatement} className="bg-gv-gold text-black font-bold py-4 px-8 rounded-2xl text-sm uppercase tracking-widest shadow-xl hover:-translate-y-0.5 transition-all">{t.generateDownload}</button>
+                    <button onClick={generateStatement} className="bg-gv-gold text-black font-black py-5 px-12 rounded-2xl text-xs uppercase tracking-[0.25em] shadow-[0_15px_40px_rgba(212,175,55,0.25)] hover:shadow-[0_20px_50px_rgba(212,175,55,0.35)] hover:-translate-y-1 transition-all active:scale-95">
+                        {t.generateDownload}
+                    </button>
                 </div>
             </section>
         </div>

@@ -7,6 +7,7 @@ import AuthGuard from "@/components/AuthGuard";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardNavbar from "@/components/DashboardNavbar";
 import MobileSideMenu from "@/components/MobileSideMenu";
+import PremiumLoader from "@/components/PremiumLoader";
 import GlobalFooter from "@/components/GlobalFooter";
 
 // ─── Inner component that safely uses useSearchParams ────────────────────────
@@ -20,7 +21,12 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     return (
         <AuthGuard>
             <UserProvider>
-                <div className="min-h-screen bg-[#FAFAF8] text-gray-900 font-body selection:bg-gv-gold selection:text-white">
+                <div className="min-h-screen bg-[#080809] text-gray-400 font-body selection:bg-gv-gold selection:text-black overflow-x-hidden relative">
+                    {/* Institutional Ambient Depth */}
+                    <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gv-gold/[0.03] via-[#080809] to-[#080809] pointer-events-none"></div>
+                    <div className="fixed top-0 left-1/4 w-96 h-96 bg-gv-gold/[0.02] blur-[150px] pointer-events-none"></div>
+                    <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-gv-gold/[0.01] blur-[200px] pointer-events-none"></div>
+
                     <DashboardSidebar 
                         lang={lang} 
                         isCollapsed={isSidebarCollapsed} 
@@ -42,7 +48,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                                 onOpenMobileMenu={() => setIsMobileMenuOpen(true)} 
                             />
                             
-                            <Suspense fallback={<div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>}>
+                            <Suspense fallback={<div className="flex items-center justify-center p-20"><PremiumLoader /></div>}>
                                 {children}
                             </Suspense>
                         </div>
@@ -58,8 +64,8 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
-                <div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div>
+            <div className="min-h-screen bg-[#080809] flex items-center justify-center">
+                <PremiumLoader />
             </div>
         }>
             <DashboardLayoutInner>{children}</DashboardLayoutInner>

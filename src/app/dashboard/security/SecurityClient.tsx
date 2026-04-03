@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useUser } from "@/providers/UserProvider";
 import { supabase } from "@/lib/supabaseClient";
+import PremiumLoader from "@/components/PremiumLoader";
 
 export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user } = useUser();
@@ -52,16 +53,17 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
     };
 
     return (
-        <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
-            <div className="bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
-                <div className="relative z-10 space-y-10">
-                    <div className="mb-10 p-6 bg-gv-gold/10 border border-gv-gold/20 rounded-3xl">
-                        <h4 className="text-gv-gold font-black uppercase text-xs tracking-widest mb-2 flex items-center gap-2">
+        <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000 pb-20">
+            <div className="premium-glass bg-black/40 border-white/10 p-10 md:p-14 rounded-[48px] shadow-2xl relative overflow-hidden group max-w-2xl border border-gv-gold/5">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-gv-gold/[0.03] blur-[120px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/[0.05] transition-all duration-1000 pointer-events-none"></div>
+                <div className="relative z-10 space-y-12">
+                    <div className="mb-12 p-8 bg-gv-gold/10 border border-gv-gold/20 rounded-[32px] backdrop-blur-3xl relative overflow-hidden group/alert">
+                        <div className="absolute inset-0 bg-gv-gold/[0.03] animate-pulse"></div>
+                        <h4 className="text-gv-gold font-black uppercase text-[10px] tracking-[0.4em] mb-4 flex items-center gap-3 relative z-10 transition-transform group-hover/alert:translate-x-1">
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A3.323 3.323 0 0010.605 7.88a3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651" /></svg>
                             Active Protection
                         </h4>
-                        <p className="text-gray-500 text-xs font-medium leading-relaxed">
+                        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.15em] leading-loose opacity-80 relative z-10">
                             {lang === 'en' 
                                 ? "Withdrawals are secured by your unique 6-digit Security PIN established during account registration."
                                 : "提款由您在开户时设置的唯一 6 位安全密码保护。"}
@@ -69,8 +71,8 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                     </div>
 
                     <div className="space-y-4">
-                        <h2 className="text-2xl font-bold uppercase tracking-tight text-gray-900">{t.securityTitle}</h2>
-                        <p className="text-gray-400 font-medium leading-relaxed max-w-lg">{t.securitySubtitle}</p>
+                        <h2 className="text-3xl font-black uppercase tracking-tighter text-white underline decoration-gv-gold decoration-4 underline-offset-8 decoration-gv-gold/20">{t.securityTitle}</h2>
+                        <p className="text-gray-500 text-[10px] uppercase font-black tracking-[0.25em] opacity-60 leading-relaxed max-w-lg">{t.securitySubtitle}</p>
                     </div>
 
                     <form onSubmit={handlePasswordUpdate} className="grid gap-6">
@@ -85,7 +87,7 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                                     name={field.name}
                                     type="password"
                                     required
-                                    className="w-full bg-white border border-gray-200 rounded-xl p-4 text-base font-bold focus:outline-none focus:border-gv-gold transition-all"
+                                    className="w-full bg-black/40 border border-white/5 rounded-2xl p-6 text-base font-bold focus:outline-none focus:border-gv-gold/50 focus:bg-black/60 transition-all text-white placeholder:text-white/10 shadow-inner"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -93,9 +95,10 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full bg-gv-gold text-black font-black py-4 rounded-xl uppercase tracking-widest text-sm shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-4 mt-8"
+                            className="w-full bg-gv-gold text-black font-black py-6 rounded-[24px] uppercase tracking-[0.3em] text-xs shadow-[0_20px_40px_rgba(212,175,55,0.2)] hover:shadow-[0_25px_50px_rgba(212,175,55,0.3)] hover:-translate-y-1 transition-all flex items-center justify-center gap-4 mt-12 active:scale-95 group"
                         >
-                            {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.updateBtn}
+                            <div className="absolute inset-0 bg-white/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                            {isSubmitting ? <PremiumLoader size="sm" color="black" /> : <span className="relative z-10">{t.updateBtn}</span>}
                         </button>
                     </form>
                 </div>

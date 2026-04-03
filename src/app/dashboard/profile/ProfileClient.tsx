@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useUser } from "@/providers/UserProvider";
 import { supabase } from "@/lib/supabaseClient";
+import PremiumLoader from "@/components/PremiumLoader";
 
 export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, loading } = useUser();
@@ -62,17 +63,19 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
         else alert("Could not generate secure link.");
     };
 
-    if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
+    if (loading) return <div className="flex items-center justify-center p-20"><PremiumLoader /></div>;
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 pb-20">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
                 {/* Personal Information */}
-                <div className="bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2"></div>
-                    <div className="relative z-10 space-y-8">
-                        <h3 className="text-lg font-bold uppercase tracking-tight text-gv-gold flex items-center gap-3">
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                <div className="premium-glass bg-black/40 border-gv-gold/10 p-10 rounded-[48px] shadow-[0_40px_80px_rgba(0,0,0,0.5)] relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/[0.03] blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/5 transition-all duration-1000"></div>
+                    <div className="relative z-10 space-y-10">
+                        <h3 className="text-xl font-black uppercase tracking-[0.3em] text-gv-gold flex items-center gap-4">
+                            <div className="h-10 w-10 rounded-xl bg-gv-gold/10 flex items-center justify-center border border-gv-gold/20 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                            </div>
                             {t.personalInfo}
                         </h3>
                         <div className="grid gap-6">
@@ -82,19 +85,19 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                                 { label: t.gender, value: user?.gender === "Male" ? t.male : user?.gender === "Female" ? t.female : user?.gender },
                                 { label: t.email, value: user?.email },
                             ].map((item, i) => (
-                                <div key={i} className="space-y-1">
-                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{item.label}</p>
-                                    <p className="text-base font-semibold text-gray-900 tracking-tight">{item.value || "-"}</p>
+                                <div key={i} className="space-y-2 group/field">
+                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{item.label}</p>
+                                    <p className="text-lg font-black text-white tracking-tight">{item.value || "-"}</p>
                                 </div>
                             ))}
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-1">
-                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.phone}</p>
-                                    <p className="text-base font-semibold text-gray-900 tracking-tight">{user?.phone || "-"}</p>
+                            <div className="grid grid-cols-2 gap-10">
+                                <div className="space-y-2 group/field">
+                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{t.phone}</p>
+                                    <p className="text-lg font-black text-white tracking-tight">{user?.phone || "-"}</p>
                                 </div>
-                                <div className="space-y-1">
-                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.country}</p>
-                                    <p className="text-base font-semibold text-gray-900 tracking-tight">{user?.country || "-"}</p>
+                                <div className="space-y-2 group/field">
+                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{t.country}</p>
+                                    <p className="text-lg font-black text-white tracking-tight">{user?.country || "-"}</p>
                                 </div>
                             </div>
                         </div>
@@ -102,23 +105,25 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
 
                 {/* Compliance */}
-                <div className="bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2"></div>
-                    <div className="relative z-10 space-y-8">
-                        <h3 className="text-lg font-bold uppercase tracking-tight text-gv-gold flex items-center gap-3">
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                <div className="premium-glass bg-black/40 border-gv-gold/10 p-10 rounded-[48px] shadow-[0_40px_80px_rgba(0,0,0,0.5)] relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/[0.03] blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/5 transition-all duration-1000"></div>
+                    <div className="relative z-10 space-y-10">
+                        <h3 className="text-xl font-black uppercase tracking-[0.3em] text-gv-gold flex items-center gap-4">
+                            <div className="h-10 w-10 rounded-xl bg-gv-gold/10 flex items-center justify-center border border-gv-gold/20 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                            </div>
                             {t.compliance}
                         </h3>
-                        <div className="grid gap-6">
+                        <div className="grid gap-8">
                             {[
                                 { label: t.occupation, value: user?.occupation },
                                 { label: t.industry, value: user?.industry },
                                 { label: t.wealthSource, value: user?.source_of_wealth },
                                 { label: t.riskProfile, value: user?.risk_profile === "Moderate" ? "40%" : (user?.risk_profile || "-"), className: "text-emerald-400" },
                             ].map((item, i) => (
-                                <div key={i} className="space-y-1">
-                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{item.label}</p>
-                                    <p className={`text-base font-semibold tracking-tight ${item.className || "text-gray-900"}`}>{item.value || "-"}</p>
+                                <div key={i} className="space-y-2 group/field">
+                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{item.label}</p>
+                                    <p className={`text-lg font-black tracking-tight ${item.className || "text-white"}`}>{item.value || "-"}</p>
                                 </div>
                             ))}
                         </div>
@@ -127,37 +132,46 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
             </div>
 
             {/* Bank Details */}
-            <div className="bg-gv-gold/5 border border-gv-gold/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
-                <div className="relative z-10 space-y-8">
-                    <h3 className="text-lg font-bold uppercase tracking-tight text-gv-gold flex items-center gap-3">
-                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 00-3 3z" /></svg>
+            <div className="premium-glass bg-gv-gold/[0.02] border-gv-gold/20 p-10 sm:p-14 rounded-[56px] shadow-[0_50px_100px_rgba(0,0,0,0.6)] relative overflow-hidden group/bank">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gv-gold/[0.03] blur-[150px] -translate-y-1/2 translate-x-1/4 pointer-events-none group-hover/bank:bg-gv-gold/5 transition-all duration-1000"></div>
+                <div className="relative z-10 space-y-12">
+                    <h3 className="text-2xl font-black uppercase tracking-[0.4em] text-gv-gold flex items-center gap-6">
+                        <div className="h-14 w-14 rounded-[20px] bg-gv-gold/10 flex items-center justify-center border border-gv-gold/40 shadow-[0_0_30px_rgba(212,175,55,0.25)]">
+                            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 00-3 3z" /></svg>
+                        </div>
                         {t.bankDetails}
                     </h3>
-                    <div className="flex flex-col md:flex-row gap-12">
-                        <div className="space-y-1 flex-1">
-                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.bankName}</p>
-                            <p className="text-lg font-bold text-gray-900 tracking-widest uppercase">{user?.bank_name || "-"}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                        <div className="space-y-3 group/field">
+                            <p className="text-[11px] text-gray-500 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.bankName}</p>
+                            <p className="text-2xl font-black text-white tracking-[0.2em] uppercase">{user?.bank_name || "-"}</p>
                         </div>
-                        <div className="space-y-1 flex-1">
-                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.accNumber}</p>
-                            <p className="text-lg font-bold text-gray-900 tracking-widest font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
+                        <div className="space-y-3 group/field">
+                            <p className="text-[11px] text-gray-500 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.accNumber}</p>
+                            <p className="text-2xl font-black text-white tracking-[0.3em] font-mono shadow-inner bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                                {user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}
+                            </p>
                         </div>
                     </div>
-                    <div className="flex flex-col md:flex-row gap-12 pt-8 border-t border-gray-200">
-                        <div className="space-y-1 flex-1">
-                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.accHolder}</p>
-                            <p className="text-lg font-bold text-gray-900 tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16 pt-12 border-t border-white/5 relative">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-2 bg-[#080809] border border-white/10 rounded-full text-[8px] font-black uppercase tracking-[0.4em] text-gray-600">Secure Protocol</div>
+                        <div className="space-y-3 group/field">
+                            <p className="text-[11px] text-gray-500 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.accHolder}</p>
+                            <p className="text-2xl font-black text-white tracking-[0.1em] uppercase">{user?.bank_account_holder || "-"}</p>
                         </div>
-                        <div className="space-y-1 flex-1">
-                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.bankStatement}</p>
+                        <div className="space-y-4 group/field">
+                            <p className="text-[11px] text-gray-500 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.bankStatement}</p>
                             {user?.bank_statement_url ? (
-                                <button onClick={viewStatement} className="inline-flex items-center gap-2 bg-white hover:bg-gv-gold hover:text-black border border-gray-200 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all mt-2">
-                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                    {t.viewStatement}
+                                <button 
+                                    onClick={viewStatement} 
+                                    className="group/btn relative inline-flex items-center gap-3 bg-white/5 hover:bg-gv-gold text-white hover:text-black border border-white/10 hover:border-gv-gold px-10 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500 shadow-2xl active:scale-95 overflow-hidden"
+                                >
+                                    <div className="absolute inset-0 bg-gv-gold/20 blur-xl opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
+                                    <svg className="h-5 w-5 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                    <span className="relative z-10">{t.viewStatement}</span>
                                 </button>
                             ) : (
-                                <p className="text-gray-500 font-bold uppercase text-[10px] mt-2 italic">Not Provided</p>
+                                <p className="text-gray-600 font-black uppercase text-xs mt-3 italic opacity-40">Verification Document Pending</p>
                             )}
                         </div>
                     </div>
