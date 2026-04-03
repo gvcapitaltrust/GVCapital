@@ -116,6 +116,28 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                 );
                             }
 
+                            const isRestricted = (item.id === "deposit" || item.id === "withdraw") && !user?.is_verified;
+
+                            if (isRestricted) {
+                                return (
+                                    <div
+                                        key={item.id}
+                                        className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] text-gray-500/40 cursor-not-allowed border border-transparent relative group/locked"
+                                        title={t.verifiedRequired}
+                                    >
+                                        <span className={`shrink-0 transition-all duration-500 relative z-10 opacity-30`}>
+                                            {item.icon}
+                                        </span>
+                                        {!isCollapsed && <span className="truncate relative z-10">{item.label}</span>}
+                                        {!isCollapsed && (
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 opacity-40">
+                                                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            }
+
                             return (
                                 <Link
                                     key={item.id}

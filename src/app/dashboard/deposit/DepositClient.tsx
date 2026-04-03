@@ -234,7 +234,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                 <div className="pt-10 border-t border-gray-100">
                     <button 
                         onClick={handleSubmit} 
-                        disabled={isSubmitting || !depositAmount || !depositReceipt} 
+                        disabled={isSubmitting || !depositAmount || !depositReceipt || !user?.is_verified} 
                         className="w-full bg-gv-gold text-black font-black py-6 rounded-3xl flex justify-center items-center gap-4 text-xl uppercase tracking-widest shadow-[0_20px_40px_rgba(212,175,55,0.25)] hover:shadow-[0_25px_50px_rgba(212,175,55,0.35)] disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:-translate-y-1"
                     >
                         {isSubmitting ? <PremiumLoader size="sm" color="black" /> : t.submit}

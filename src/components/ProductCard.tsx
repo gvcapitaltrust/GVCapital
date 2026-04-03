@@ -9,9 +9,10 @@ interface ProductCardProps {
   tier: Tier;
   isActive: boolean;
   isQualified: boolean;
+  lang: "en" | "zh";
 }
 
-export default function ProductCard({ tier, isActive, isQualified }: ProductCardProps) {
+export default function ProductCard({ tier, isActive, isQualified, lang }: ProductCardProps) {
   const colorMap: Record<string, string> = {
     zinc: "border-zinc-500/30 text-zinc-400 bg-zinc-500/5",
     slate: "border-slate-400/30 text-slate-300 bg-slate-400/5",

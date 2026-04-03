@@ -176,6 +176,7 @@ export default function ProductSelection({
             tier={tier}
             isActive={activeTier.id === tier.id}
             isQualified={currentInvestment > 0 && qualifiedTier.id === tier.id}
+            lang={lang}
           />
         ))}
       </div>

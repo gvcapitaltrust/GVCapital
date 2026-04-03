@@ -310,15 +310,24 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         )}
                         
                         <section className="flex flex-col sm:flex-row gap-8 mt-12">
-                            <Link
-                                href={`/dashboard/deposit?lang=${lang}`}
-                                className="flex-1 bg-gv-gold text-black font-black text-xs py-7 rounded-[32px] hover:bg-gv-gold/90 hover:-translate-y-1.5 transition-all flex items-center justify-center gap-4 shadow-[0_15px_40px_rgba(212,175,55,0.25)] uppercase tracking-[0.3em] group"
-                            >
-                                <div className="h-8 w-8 bg-black/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 4v16m8-8H4" /></svg>
+                            {user?.is_verified ? (
+                                <Link
+                                    href={`/dashboard/deposit?lang=${lang}`}
+                                    className="flex-1 bg-gv-gold text-black font-black text-xs py-7 rounded-[32px] hover:bg-gv-gold/90 hover:-translate-y-1.5 transition-all flex items-center justify-center gap-4 shadow-[0_15px_40px_rgba(212,175,55,0.25)] uppercase tracking-[0.3em] group"
+                                >
+                                    <div className="h-8 w-8 bg-black/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 4v16m8-8H4" /></svg>
+                                    </div>
+                                    {t.deposit}
+                                </Link>
+                            ) : (
+                                <div className="flex-1 bg-white/5 text-gray-500 font-black text-xs py-7 rounded-[32px] flex items-center justify-center gap-4 border border-white/5 cursor-not-allowed opacity-50 uppercase tracking-[0.3em] relative group/locked">
+                                     <div className="h-8 w-8 bg-black/20 rounded-full flex items-center justify-center text-gray-600">
+                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                    </div>
+                                    {t.deposit}
                                 </div>
-                                {t.deposit}
-                            </Link>
+                            )}
                             <Link
                                 href={`/dashboard/withdraw?lang=${lang}`}
                                 className="flex-1 bg-[#1a1a1a] text-white font-black text-xs py-7 rounded-[32px] hover:bg-[#222] hover:-translate-y-1.5 transition-all flex items-center justify-center gap-4 border border-white/5 shadow-2xl uppercase tracking-[0.3em] group"
