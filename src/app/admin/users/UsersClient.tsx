@@ -57,7 +57,13 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             typeProfit: "Dividend Wallet",
             deleteUser: "Delete User",
             deactivateUser: "Suspend User",
-            reactivateUser: "Reactivate User"
+            reactivateUser: "Reactivate User",
+            txHistory: "Account Audit Trail",
+            txDate: "Timestamp",
+            txAction: "Action / Protocol",
+            txAmount: "Amount (USD)",
+            txProcessedBy: "Processed By",
+            noTx: "No transaction history recorded for this client."
         },
         zh: {
             title: "客户目录",
@@ -414,60 +420,73 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                 />
                                             </div>
                                         </div>
-                                        <button 
-                                            onClick={handleExecutePortfolioUpdate}
-                                            className="bg-slate-50 text-slate-900 font-black px-10 py-4 rounded-2xl uppercase tracking-widest text-[9px] hover:bg-slate-100 transition-all border border-slate-200"
-                                        >
-                                            {t.portfolioSubmit}
-                                        </button>
-                                                                day: '2-digit', 
-                                                                month: '2-digit', 
-                                                                year: 'numeric',
-                                                                hour: '2-digit',
-                                                                minute: '2-digit',
-                                                                second: '2-digit',
-                                                                hour12: false
-                                                            })}
-                                                        </td>
-                                                        <td className="px-4 py-4">
-                                                            <div className="text-slate-700 uppercase tracking-tight">{log.action === 'Adjustment' ? (log.txType === 'Deposit' ? 'Admin Add' : 'Admin Remove') : log.action}</div>
-                                                            <div className="text-[8px] text-slate-500 font-medium truncate max-w-[200px]">{log.rejection_reason}</div>
-                                                        </td>
-                                                        <td className={`px-4 py-4 tabular-nums text-right ${log.txType === 'Withdrawal' && log.action !== 'Adjustment' ? 'text-red-600' : (log.rejection_reason?.toLowerCase().includes('decrease') ? 'text-red-600' : 'text-emerald-600')}`}>
-                                                            $ {(Number(log.original_currency_amount || (Number(log.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                        </td>
-                                                        <td className="px-4 py-4 text-right text-slate-400">{log.admin_username}</td>
-                                                    </tr>
-                                                ))}
-                                            {combinedAuditLogs.filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction').length === 0 && (
-                                                <tr>
-                                                    <td colSpan={4} className="px-4 py-20 text-center text-slate-400 font-black uppercase tracking-widest text-[9px]">{t.noTx}</td>
-                                                </tr>
-                                            )}                                                   <td colSpan={4} className="px-4 py-20 text-center text-gray-400 font-black uppercase tracking-widest text-[9px]">{t.noTx}</td>
-                                                      {/* Additional Identity Fields */}
-                            <div className="mt-8 bg-slate-100/50 rounded-[32px] p-8 border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-8">
-                                <div>
-                                    <p className="text-[8px] font-black uppercase text-slate-400 mb-1">Country</p>
-                                    <p className="text-xs font-black text-slate-500">{selectedUser?.kyc_data?.country || "N/A"}</p>
-                                </div>
-                                    </div>
-                                    {/* Additional Identity Fields */}
-                                    <div className="bg-slate-100/50 rounded-[32px] p-8 border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-8">
-                                        <div>
-                                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">Country</p>
-                                            <p className="text-xs font-black text-slate-500">{selectedUser?.kyc_data?.country || "N/A"}</p>
+                                        {/* Transaction history section */}
+                                        <div className="bg-white rounded-[32px] p-8 border border-slate-200 space-y-6 shadow-sm overflow-hidden">
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold">{t.txHistory}</h4>
+                                            <div className="overflow-x-auto -mx-8">
+                                                <table className="w-full text-left border-collapse min-w-[600px]">
+                                                    <thead className="bg-slate-50 border-b border-slate-100 text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                                        <tr>
+                                                            <th className="px-8 py-4">{t.txDate}</th>
+                                                            <th className="px-8 py-4">{t.txAction}</th>
+                                                            <th className="px-8 py-4 text-right">{t.txAmount}</th>
+                                                            <th className="px-8 py-4 text-right">{t.txProcessedBy}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-slate-50">
+                                                        {combinedAuditLogs
+                                                            .filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction')
+                                                            .map((log, i) => (
+                                                                <tr key={i} className="text-[10px] hover:bg-slate-50 transition-all font-bold">
+                                                                    <td className="px-8 py-4 text-slate-400 font-mono">
+                                                                        {new Date(log.created_at).toLocaleString('en-GB', {
+                                                                            day: '2-digit', 
+                                                                            month: '2-digit', 
+                                                                            year: 'numeric',
+                                                                            hour: '2-digit',
+                                                                            minute: '2-digit',
+                                                                            second: '2-digit',
+                                                                            hour12: false
+                                                                        })}
+                                                                    </td>
+                                                                    <td className="px-8 py-4">
+                                                                        <div className="text-slate-700 uppercase tracking-tight">{log.action === 'Adjustment' ? (log.txType === 'Deposit' ? 'Admin Add' : 'Admin Remove') : log.action}</div>
+                                                                        <div className="text-[8px] text-slate-500 font-medium truncate max-w-[200px]">{log.rejection_reason}</div>
+                                                                    </td>
+                                                                    <td className={`px-8 py-4 tabular-nums text-right ${log.txType === 'Withdrawal' && log.action !== 'Adjustment' ? 'text-red-600' : (log.rejection_reason?.toLowerCase().includes('decrease') ? 'text-red-600' : 'text-emerald-600')}`}>
+                                                                        $ {(Number(log.original_currency_amount || (Number(log.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                    </td>
+                                                                    <td className="px-8 py-4 text-right text-slate-400">{log.admin_username}</td>
+                                                                </tr>
+                                                            ))}
+                                                        {combinedAuditLogs.filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction').length === 0 && (
+                                                            <tr>
+                                                                <td colSpan={4} className="px-8 py-20 text-center text-slate-400 font-black uppercase tracking-widest">{t.noTx}</td>
+                                                            </tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">State</p>
-                                            <p className="text-xs font-black text-slate-500">{selectedUser?.kyc_data?.state || "N/A"}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">ZIP Code</p>
-                                            <p className="text-xs font-black text-slate-500">{selectedUser?.kyc_data?.zip || "N/A"}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">ID Type</p>
-                                            <p className="text-xs font-black text-slate-500">{selectedUser?.kyc_data?.idType || "Passport"}</p>
+
+                                        {/* Additional Identity Fields */}
+                                        <div className="bg-slate-100/50 rounded-[32px] p-8 border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-8">
+                                            <div>
+                                                <p className="text-[8px] font-black uppercase text-slate-400 mb-1">Country</p>
+                                                <p className="text-xs font-black text-slate-500">{selectedUser?.kyc_data?.country || "N/A"}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[8px] font-black uppercase text-slate-400 mb-1">State</p>
+                                                <p className="text-xs font-black text-slate-500">{selectedUser?.kyc_data?.state || "N/A"}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[8px] font-black uppercase text-slate-400 mb-1">ZIP Code</p>
+                                                <p className="text-xs font-black text-slate-500">{selectedUser?.kyc_data?.zip || "N/A"}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[8px] font-black uppercase text-slate-400 mb-1">ID Type</p>
+                                                <p className="text-xs font-black text-slate-500">{selectedUser?.kyc_data?.idType || "Passport"}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
