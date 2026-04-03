@@ -33,11 +33,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true);
     
     const [session, setSession] = useState<any>(null);
+    const [deviceId, setDeviceId] = useState<string | null>(null);
     const router = useRouter();
     
     // Singleton Guards
     const isFetching = useRef(false);
     const currentUserId = useRef<string | null>(null);
+
+    // 0. Device ID Management
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            let id = localStorage.getItem("gv_device_session_id");
+            if (!id) {
+                id = crypto.randomUUID();
+                localStorage.setItem("gv_device_session_id", id);
+            }
+            setDeviceId(id);
+        }
+    }, []);
 
     // 1. Stable Identity Listener
     useEffect(() => {
@@ -89,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // 2. Atomic Profile Fetcher
     const fetchProfile = async () => {
-        if (!session?.user) return;
+        if (!session?.user || !deviceId) return;
         if (isFetching.current) return;
         
         isFetching.current = true;
@@ -103,6 +116,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .maybeSingle();
 
             if (profile) {
+                // MULTIPLE DEVICE CHECK (Limit 2)
+                const activeSessions: string[] = Array.isArray(profile.active_sessions) ? profile.active_sessions : [];
+                
+                // If our device ID is not in the active sessions list, we've been logged out/invalidated
+                if (!activeSessions.includes(deviceId)) {
+                    console.warn("[AUTH] Device not in active sessions list. Signing out...");
+                    document.cookie = `gv-auth-v1=; path=/; max-age=0;`;
+                    await supabase.auth.signOut();
+                    window.location.href = "/login?error=multiple_devices";
+                    return;
+                }
+
                 setRole(profile.role || "User");
                 setIsVerified(profile.is_verified === true || profile.is_verified === "Approved");
                 setKycStep(profile.kyc_step || 0);
@@ -157,10 +182,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
-        if (session?.user) {
+        if (session?.user && deviceId) {
             fetchProfile();
         }
-    }, [session]);
+    }, [session, deviceId]);
 
     // 3. Real-time Profile Sync
     useEffect(() => {
@@ -174,8 +199,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 schema: 'public', 
                 table: 'profiles', 
                 filter: `id=eq.${uid}` 
-            }, () => {
+            }, (payload) => {
                 console.log("[AUTH] Profile update detected, refreshing...");
+                
+                // Optimized check: If the update was specifically for 'active_sessions' and it's not us, logout immediately
+                const activeSessions = payload.new?.active_sessions;
+                if (Array.isArray(activeSessions) && deviceId && !activeSessions.includes(deviceId)) {
+                    console.warn("[AUTH] Session mismatch detected via REALTIME. Signing out...");
+                    supabase.auth.signOut().then(() => {
+                        window.location.href = "/login?error=multiple_devices";
+                    });
+                    return;
+                }
+                
                 fetchProfile();
             })
             .subscribe();
@@ -183,7 +219,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [session?.user?.id]);
+    }, [session?.user?.id, deviceId]);
 
     const refreshProfile = async () => {
         setLoading(true);

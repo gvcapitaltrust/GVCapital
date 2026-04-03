@@ -21,11 +21,21 @@ export default function LoginPage() {
         if (urlLang === "zh") setLang("zh");
         else if (urlLang === "en") setLang("en");
 
+        const error = searchParams?.get('error');
+        if (error === 'multiple_devices') {
+            setErrorMsg(lang === 'en' 
+                ? "You have been logged out because another device has signed in to this account." 
+                : "由于另一台设备已登录此账号，您已被登出。");
+        } else if (error === 'account_deleted') {
+            setErrorMsg(lang === 'en'
+                ? "This account no longer exists. Please contact support if you believe this is an error."
+                : "此账号已不存在。如果您认为这是错误，请联系支持人员。");
+        }
+
         // Use onAuthStateChange for more stable session detection
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             // Break the flashing loop: Don't auto-redirect if there's an account error in the URL
-            // This happens when a session exists but the user profile was deleted
-            const hasError = searchParams?.get('error') === 'account_deleted';
+            const hasError = searchParams?.get('error') === 'account_deleted' || searchParams?.get('error') === 'multiple_devices';
             
             if (session && !hasError) {
                 // Sync session to cookie so Next.js middleware can read it before redirecting
@@ -42,7 +52,7 @@ export default function LoginPage() {
         });
 
         return () => subscription.unsubscribe();
-    }, [searchParams, router]);
+    }, [searchParams, router, lang]);
 
     const content = {
         en: {
@@ -102,6 +112,34 @@ export default function LoginPage() {
             }
 
             if (data.session) {
+                // Device ID Management for multi-session enforcement (Limit 2)
+                let deviceId = localStorage.getItem("gv_device_session_id");
+                if (!deviceId) {
+                    deviceId = crypto.randomUUID();
+                    localStorage.setItem("gv_device_session_id", deviceId);
+                }
+
+                // Fetch current active sessions to update the list
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('active_sessions')
+                    .eq('id', data.session.user.id)
+                    .single();
+
+                let activeSessions: string[] = Array.isArray(profile?.active_sessions) ? profile.active_sessions : [];
+                
+                // Add current device if not present, and enforce limit of 2
+                if (!activeSessions.includes(deviceId)) {
+                    activeSessions.push(deviceId);
+                    while (activeSessions.length > 2) {
+                        activeSessions.shift(); // Remove oldest sessions until only 2 remain
+                    }
+                    await supabase
+                        .from('profiles')
+                        .update({ active_sessions: activeSessions })
+                        .eq('id', data.session.user.id);
+                }
+
                 document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(data.session))}; path=/; max-age=31536000; SameSite=Lax;`;
                 const user = data.session.user;
                 const isAdmin = user.user_metadata?.role?.toLowerCase() === "admin" || user.email === "thenja96@gmail.com";

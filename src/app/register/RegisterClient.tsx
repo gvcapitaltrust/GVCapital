@@ -288,6 +288,16 @@ export default function RegisterPage() {
                 // Safely resolve referral ID if exists
                 let resolvedReferralId = inviterId || null;
 
+                // Device ID Management for single-session enforcement
+                let deviceId = null;
+                if (typeof window !== "undefined") {
+                    deviceId = localStorage.getItem("gv_device_session_id");
+                    if (!deviceId) {
+                        deviceId = crypto.randomUUID();
+                        localStorage.setItem("gv_device_session_id", deviceId);
+                    }
+                }
+
                 const profileData: any = {
                     id: user.id,
                     email: email,
@@ -299,7 +309,8 @@ export default function RegisterPage() {
                     referred_by: resolvedReferralId,
                     referred_by_username: inviterUsername || null,
                     security_pin: securityPin,
-                    gender: gender
+                    gender: gender,
+                    active_sessions: deviceId ? [deviceId] : []
                 };
 
                 const { error: profileError } = await supabase
