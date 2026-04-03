@@ -84,22 +84,22 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h1>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
+                    <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-slate-900">{t.title}</h1>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
                 </div>
                 <input
                     type="text"
                     placeholder={t.searchPlaceholder}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs w-full md:w-64 focus:outline-none focus:border-gv-gold transition-all"
+                    className="bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs w-full md:w-64 focus:outline-none focus:border-gv-gold transition-all"
                 />
             </div>
 
-            <div className="bg-white backdrop-blur-md rounded-3xl border border-gray-200 overflow-hidden shadow-2xl">
+            <div className="bg-white backdrop-blur-md rounded-3xl border border-slate-200 overflow-hidden shadow-xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                        <thead className="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400">
                             <tr>
                                 <th className="px-8 py-6">{t.tableUser}</th>
                                 <th className="px-8 py-6">{t.tableDate}</th>
@@ -107,34 +107,34 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                 <th className="px-8 py-6 text-right">{t.tableActions}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-slate-100">
                             {filteredKyc.map((user, idx) => (
-                                <tr key={idx} className="text-sm group hover:bg-gray-50 transition-all">
+                                <tr key={idx} className="text-sm group hover:bg-slate-50 transition-all font-medium">
                                     <td className="px-8 py-6">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-gray-900 uppercase tracking-tight">{user.full_name}</span>
-                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">@{user.username}</span>
+                                            <span className="font-black text-slate-900 uppercase tracking-tight">{user.full_name}</span>
+                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">@{user.username}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6 text-gray-400 font-mono text-xs">{new Date(user.created_at).toLocaleDateString()}</td>
+                                    <td className="px-8 py-6 text-slate-400 font-mono text-xs">{new Date(user.created_at).toLocaleDateString()}</td>
                                     <td className="px-8 py-6">
                                         <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${
                                             user.kyc_status === 'Draft' 
-                                                ? 'bg-zinc-500/10 text-gray-400 border border-zinc-500/20' 
+                                                ? 'bg-zinc-500/10 text-slate-400 border border-zinc-500/20' 
                                                 : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
                                         }`}>
                                             {user.kyc_status}
                                         </span>
                                     </td>
                                     <td className="px-8 py-6 text-right">
-                                        <button onClick={() => openDetails(user)} className="bg-white hover:bg-gray-100 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all border border-gray-200">{t.viewDocs}</button>
+                                        <button onClick={() => openDetails(user)} className="bg-slate-50 hover:bg-slate-100 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all border border-slate-200 text-slate-900">{t.viewDocs}</button>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                     {filteredKyc.length === 0 && (
-                        <div className="p-20 text-center text-gray-500 font-black uppercase tracking-[0.2em]">{t.noKyc}</div>
+                        <div className="p-20 text-center text-slate-400 font-black uppercase tracking-[0.2em]">{t.noKyc}</div>
                     )}
                 </div>
             </div>
@@ -142,21 +142,20 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
             {/* KYC Detail Modal */}
             {isDetailModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-300">
-                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-xl" onClick={() => setIsDetailModalOpen(false)}></div>
-                    <div className="relative bg-white border border-gray-200 rounded-[40px] w-full max-w-6xl h-full flex flex-col overflow-hidden shadow-2xl">
-                        <div className="p-8 border-b border-gray-200 flex items-center justify-between shrink-0">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" onClick={() => setIsDetailModalOpen(false)}></div>
+                    <div className="relative bg-white border border-slate-200 rounded-[40px] w-full max-w-6xl h-full flex flex-col overflow-hidden shadow-xl">
+                        <div className="p-8 border-b border-slate-100 flex items-center justify-between shrink-0">
                             <div>
-                                <h3 className="text-2xl font-black uppercase tracking-tighter text-gray-900">Identity Verification Hub</h3>
-                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">UID: {selectedUser?.id}</p>
+                                <h3 className="text-2xl font-black uppercase tracking-tighter text-slate-900">Identity Verification Hub</h3>
+                                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">UID: {selectedUser?.id}</p>
                             </div>
-                            <button onClick={() => setIsDetailModalOpen(false)} className="h-12 w-12 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-all">
+                            <button onClick={() => setIsDetailModalOpen(false)} className="h-12 w-12 bg-slate-50 rounded-full flex items-center justify-center hover:bg-slate-100 transition-all text-slate-500">
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
                         
-                        <div className="flex-1 p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 overflow-hidden">
-                            {/* Main Content Area: Detailed Data */}
-                            <div className="lg:col-span-8 space-y-8 overflow-y-auto pr-6 scrollbar-thin scrollbar-thumb-gray-300">
+                        <div className="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            <div className="lg:col-span-8 space-y-8 overflow-y-auto pr-6 scrollbar-thin scrollbar-thumb-slate-200">
                                 
                                 {/* Personal Information Section */}
                                 <div className="space-y-4">
@@ -174,19 +173,19 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                             { label: "Country", value: selectedUser?.country || selectedUser?.kyc_data?.country },
                                             { label: "City", value: selectedUser?.kyc_data?.city },
                                         ].map((item, i) => (
-                                            <div key={i} className="bg-white border border-gray-200 p-3 rounded-2xl">
-                                                <p className="text-[8px] font-black text-gray-500 uppercase mb-1">{item.label}</p>
-                                                <p className="text-xs font-bold text-gray-900 truncate">{item.value || "-"}</p>
+                                            <div key={i} className="bg-slate-50 border border-slate-200 p-3 rounded-2xl">
+                                                <p className="text-[8px] font-black text-slate-400 uppercase mb-1">{item.label}</p>
+                                                <p className="text-xs font-bold text-slate-900 truncate">{item.value || "-"}</p>
                                             </div>
                                         ))}
-                                        <div className="bg-white border border-gray-200 p-3 rounded-2xl col-span-2">
-                                            <p className="text-[8px] font-black text-gray-500 uppercase mb-1">Residential Address</p>
-                                            <p className="text-xs font-bold text-gray-900">{selectedUser?.kyc_data?.address || "-"}</p>
+                                        <div className="bg-slate-50 border border-slate-200 p-3 rounded-2xl col-span-2">
+                                            <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Residential Address</p>
+                                            <p className="text-xs font-bold text-slate-900">{selectedUser?.kyc_data?.address || "-"}</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Investment Profile Section */}
+                                {/* Investment & Profile */}
                                 <div className="space-y-4">
                                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
                                         <span className="h-1 w-4 bg-gv-gold rounded-full"></span>
@@ -201,23 +200,23 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                             { label: "Annual Income", value: selectedUser?.kyc_data?.annual_income },
                                             { label: "Expected Deposit", value: selectedUser?.kyc_data?.yearly_deposit },
                                         ].map((item, i) => (
-                                            <div key={i} className="bg-white border border-gray-200 p-3 rounded-2xl">
-                                                <p className="text-[8px] font-black text-gray-500 uppercase mb-1">{item.label}</p>
-                                                <p className="text-xs font-bold text-gray-900">{item.value || "-"}</p>
+                                            <div key={i} className="bg-slate-50 border border-slate-200 p-3 rounded-2xl">
+                                                <p className="text-[8px] font-black text-slate-400 uppercase mb-1">{item.label}</p>
+                                                <p className="text-xs font-bold text-slate-900">{item.value || "-"}</p>
                                             </div>
                                         ))}
-                                        <div className="bg-white border border-gray-200 p-3 rounded-2xl col-span-2">
-                                            <p className="text-[8px] font-black text-gray-500 uppercase mb-1">Sources of Wealth</p>
+                                        <div className="bg-slate-50 border border-slate-200 p-3 rounded-2xl col-span-2">
+                                            <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Sources of Wealth</p>
                                             <div className="flex flex-wrap gap-2 mt-1">
                                                 {selectedUser?.kyc_data?.source_of_wealth?.map((s: string, i: number) => (
                                                     <span key={i} className="bg-gv-gold/10 text-gv-gold text-[9px] font-black px-2 py-1 rounded-lg uppercase">{s}</span>
-                                                )) || <span className="text-xs font-bold text-gray-500">-</span>}
+                                                )) || <span className="text-xs font-bold text-slate-400">-</span>}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Bank Information Section */}
+                                {/* Bank Information */}
                                 <div className="space-y-4">
                                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
                                         <span className="h-1 w-4 bg-gv-gold rounded-full"></span>
@@ -229,9 +228,9 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                             { label: "Account Number", value: selectedUser?.account_number || selectedUser?.kyc_data?.account_number },
                                             { label: "Account Holder", value: selectedUser?.bank_account_holder || selectedUser?.kyc_data?.bank_account_holder },
                                         ].map((item, i) => (
-                                            <div key={i} className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-2xl">
-                                                <p className="text-[8px] font-black text-emerald-500/50 uppercase mb-1">{item.label}</p>
-                                                <p className="text-sm font-black text-emerald-400">{item.value || "-"}</p>
+                                            <div key={i} className="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl font-medium">
+                                                <p className="text-[8px] font-black text-emerald-500/60 uppercase mb-1">{item.label}</p>
+                                                <p className="text-sm font-black text-emerald-600">{item.value || "-"}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -260,43 +259,42 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
 
                             {/* Sidebar Area: Documents & Actions */}
-                            <div className="lg:col-span-4 space-y-8 flex flex-col overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 border-l border-gray-200 pl-6">
+                            <div className="lg:col-span-4 space-y-8 flex flex-col overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 border-l border-slate-100 pl-6">
                                 
                                 {/* Document List Section */}
                                 <div className="space-y-4">
-                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Submitted Documents</h4>
                                     {isLoadingDocs ? (
                                         <div className="h-32 flex items-center justify-center"><div className="h-8 w-8 border-3 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>
                                     ) : userDocs.length > 0 ? (
                                         <div className="space-y-3">
                                             {userDocs.map((doc, i) => (
-                                                <div key={i} className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center justify-between hover:bg-gray-100 transition-all group gap-4 min-w-0">
+                                                <div key={i} className="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-center justify-between hover:bg-slate-100 transition-all group gap-4 min-w-0 font-medium">
                                                     <div className="flex items-center gap-3 min-w-0">
                                                         <div className="h-8 w-8 bg-gv-gold/20 text-gv-gold rounded-full flex items-center justify-center shrink-0">
                                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                         </div>
                                                         <div className="min-w-0">
-                                                            <p className="text-[10px] text-gray-700 font-bold uppercase truncate">{doc.name}</p>
+                                                            <p className="text-[10px] text-slate-700 font-bold uppercase truncate">{doc.name}</p>
                                                         </div>
                                                     </div>
-                                                    <button onClick={() => setViewDocumentUrl(doc.url)} className="shrink-0 bg-gray-100 text-gray-900 font-black uppercase tracking-widest text-[9px] px-3 py-1.5 rounded-lg hover:bg-gv-gold hover:text-black transition-all">View</button>
+                                                    <button onClick={() => setViewDocumentUrl(doc.url)} className="shrink-0 bg-slate-100 text-slate-900 font-black uppercase tracking-widest text-[9px] px-3 py-1.5 rounded-lg hover:bg-gv-gold hover:text-black transition-all">View</button>
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="p-10 border-2 border-dashed border-gray-200 rounded-3xl text-center text-gray-400 text-[10px] font-black uppercase tracking-widest">No Documents Found</div>
+                                        <div className="p-10 border-2 border-dashed border-slate-200 rounded-3xl text-center text-slate-400 text-[10px] font-black uppercase tracking-widest">No Documents Found</div>
                                     )}
                                 </div>
 
                                 {/* Decision Actions Section */}
-                                <div className="space-y-4 pt-4 border-t border-gray-200 mt-auto">
+                                <div className="space-y-4 pt-4 border-t border-slate-100 mt-auto">
                                     <div className="space-y-3">
-                                        <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">Rejection Reason</label>
+                                        <label className="text-[10px] text-slate-400 font-black uppercase tracking-widest px-1">Rejection Reason</label>
                                         <textarea
                                             value={rejectReason}
                                             onChange={(e) => setRejectReason(e.target.value)}
                                             placeholder={t.rejectReasonPlaceholder}
-                                            className="w-full bg-white border border-gray-200 rounded-2xl p-4 text-xs font-medium focus:outline-none focus:border-red-500/50 transition-all min-h-[100px] text-gray-900"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs font-medium focus:outline-none focus:border-red-500/50 transition-all min-h-[100px] text-slate-900"
                                         />
                                     </div>
                                     <div className="grid grid-cols-1 gap-3">
@@ -306,7 +304,7 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                                 handleRejectKyc(selectedUser.id, rejectReason);
                                                 setIsDetailModalOpen(false);
                                             }}
-                                            className="bg-red-500/10 border border-red-500/20 text-red-500 font-black py-4 rounded-xl uppercase tracking-widest text-[10px] hover:bg-red-500 hover:text-gray-900 transition-all w-full shadow-lg"
+                                            className="bg-red-50 text-red-600 border border-red-100 font-black py-4 rounded-xl uppercase tracking-widest text-[10px] hover:bg-red-500 hover:text-white transition-all w-full shadow-lg"
                                         >
                                             {t.reject}
                                         </button>
@@ -330,14 +328,14 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
             {/* In-page Document Viewer (Lightbox) */}
             {viewDocumentUrl && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-12 animate-in fade-in zoom-in-95 duration-200">
-                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-3xl" onClick={() => setViewDocumentUrl(null)}></div>
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-3xl" onClick={() => setViewDocumentUrl(null)}></div>
                     <div className="relative w-full max-w-5xl h-full flex flex-col pointer-events-none">
                         <div className="w-full flex justify-end mb-4 pointer-events-auto">
-                            <button onClick={() => setViewDocumentUrl(null)} className="h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 hover:scale-105 text-gray-900 transition-all shadow-xl backdrop-blur-md">
+                            <button onClick={() => setViewDocumentUrl(null)} className="h-12 w-12 bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center hover:bg-slate-100 hover:scale-105 text-slate-500 transition-all shadow-xl backdrop-blur-md">
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </div>
-                        <div className="w-full flex-1 relative bg-white rounded-3xl overflow-hidden border border-gray-200 pointer-events-auto shadow-[0_0_100px_rgba(0,0,0,0.5)] flex items-center justify-center p-2">
+                        <div className="w-full flex-1 relative bg-white rounded-3xl overflow-hidden border border-slate-200 pointer-events-auto shadow-2xl flex items-center justify-center p-2">
                             {viewDocumentUrl.toLowerCase().split('?')[0].endsWith('.pdf') ? (
                                 <iframe src={viewDocumentUrl} className="w-full h-full rounded-2xl bg-white" />
                             ) : (

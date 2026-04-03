@@ -152,7 +152,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         <span className="text-gv-gold text-[10px] font-black uppercase tracking-[0.4em] mb-0.5">Institutional Access</span>
                     </div>
                     <div className="flex items-center gap-6">
-                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-gray-900 leading-none">
+                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 leading-none">
                             {lang === "en" ? "Overview" : "概览"}
                         </h1>
 
@@ -165,14 +165,14 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         </div>
                         
                         {user?.is_verified && (
-                            <div className="flex items-center gap-3 bg-white border border-gray-200 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow-xl hover:border-gv-gold/30 transition-all group scale-90 origin-left">
+                            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow-xl hover:border-gv-gold/30 transition-all group scale-90 origin-left backdrop-blur-md">
                                 <TierMedal 
                                     tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
                                     size="sm" 
                                     className="group-hover:rotate-12 transition-transform"
                                 />
                                 <div className="flex flex-col">
-                                    <span className="text-xs font-black uppercase tracking-tighter text-gray-900">
+                                    <span className="text-xs font-black uppercase tracking-tighter text-slate-900">
                                         {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
                                     </span>
                                     <span className="text-[8px] font-bold text-gv-gold uppercase tracking-widest leading-none mt-0.5">{t.activeStatus}</span>
@@ -216,13 +216,13 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:opacity-10 transition-all duration-1000 rotate-12 group-hover:rotate-0">
                                 <svg className="h-48 w-48 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 d9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                             </div>
-                            <div className="flex flex-col sm:flex-row items-center gap-8 relative z-10 text-center sm:text-left flex-1">
+                             <div className="flex flex-col sm:flex-row items-center gap-8 relative z-10 text-center sm:text-left flex-1">
                                 <div className="h-20 w-20 bg-gv-gold/10 rounded-3xl flex items-center justify-center shrink-0 text-gv-gold border border-gv-gold/20 shadow-[0_0_30px_rgba(212,175,55,0.15)] ring-4 ring-gv-gold/5">
                                     <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                 </div>
                                 <div className="space-y-3">
-                                    <h2 className="text-4xl font-black uppercase tracking-tighter text-white leading-none">{t.completeProfile}</h2>
-                                    <p className="text-gray-400 text-sm font-semibold leading-relaxed max-w-xl opacity-80">{t.completeProfileDesc}</p>
+                                    <h2 className="text-4xl font-black uppercase tracking-tighter text-slate-900 leading-none">{t.completeProfile}</h2>
+                                    <p className="text-slate-500 text-sm font-semibold leading-relaxed max-w-xl opacity-80">{t.completeProfileDesc}</p>
                                 </div>
                             </div>
                             <Link href={`/verify?lang=${lang}`} className="relative z-10 shrink-0 bg-gv-gold text-black hover:bg-gv-gold/90 font-black uppercase tracking-[0.25em] px-10 py-5 rounded-2xl transition-all shadow-[0_15px_40px_rgba(212,175,55,0.25)] hover:shadow-[0_20px_50px_rgba(212,175,55,0.35)] hover:-translate-y-1 text-sm">{t.startVerification}</Link>
@@ -237,11 +237,11 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 </div>
                                 <div className="relative z-10">
-                                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalEquity}</p>
-                                    <h2 className="text-5xl font-black tracking-tighter text-gray-900 tabular-nums whitespace-nowrap">$ {(user?.total_investment_usd ?? (Number(user?.total_investment || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                                    <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.lifetimeDeposit}</span>
-                                        <span className="text-xs font-black text-gray-900">$ {(user?.total_deposited_usd ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalEquity}</p>
+                                    <h2 className="text-5xl font-black tracking-tighter text-slate-900 tabular-nums whitespace-nowrap">$ {(user?.total_investment_usd ?? (Number(user?.total_investment || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                    <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.lifetimeDeposit}</span>
+                                        <span className="text-xs font-black text-slate-900">$ {(user?.total_deposited_usd ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </div>
                                 </div>
                             </div>
@@ -252,7 +252,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                 </div>
                                 <div className="relative z-10">
-                                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
+                                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
                                     <h2 className="text-5xl font-black tracking-tighter text-emerald-600 tabular-nums whitespace-nowrap">$ {(user?.profit_usd ?? (Number(user?.profit || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                                 </div>
                             </div>
@@ -268,7 +268,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     const maxUSD = Number(user?.total_investment_usd || 0) * tier.maxDividend;
                                     return (
                                         <>
-                                            <h3 className="text-3xl font-black text-gray-900 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+                                            <h3 className="text-3xl font-black text-slate-900 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
                                             <p className="text-[10px] text-gray-500 font-bold uppercase mt-4 border-t border-gray-100 pt-4 inline-block">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                         </>
                                     );

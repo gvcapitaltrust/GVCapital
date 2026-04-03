@@ -157,7 +157,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-12 pb-20">
             <section className="space-y-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div className="flex bg-black/40 p-1.5 rounded-[22px] border border-white/5 backdrop-blur-3xl shadow-inner scrollbar-hide overflow-x-auto">
+                    <div className="flex bg-slate-100 p-1.5 rounded-[22px] border border-slate-200 backdrop-blur-3xl shadow-inner scrollbar-hide overflow-x-auto">
                         {(['All', 'Capital', 'Dividends'] as const).map((f) => (
                             <button
                                 key={f}
@@ -165,7 +165,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                 className={`px-8 py-3 rounded-[18px] text-[10px] font-black uppercase tracking-[0.25em] transition-all whitespace-nowrap ${
                                     activeFilter === f 
                                         ? 'bg-gv-gold text-black shadow-[0_10px_20px_rgba(212,175,55,0.2)] scale-105 relative z-10' 
-                                        : 'text-gray-500 hover:text-white hover:bg-white/5'
+                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/50'
                                 }`}
                             >
                                 {f}
@@ -177,17 +177,17 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
 
             <section className="space-y-6">
                 <div className="flex items-center gap-4 px-2">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{t.totalInView}:</span>
-                    <span className={`text-sm font-black tabular-nums transition-colors ${filteredTotalUSD >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t.totalInView}:</span>
+                    <span className={`text-sm font-black tabular-nums transition-colors ${filteredTotalUSD >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                         {filteredTotalUSD >= 0 ? '+' : '-'}$ {Math.abs(filteredTotalUSD).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                     </span>
                 </div>
 
-                <div className="premium-glass rounded-[40px] overflow-hidden shadow-2xl border border-gv-gold/10">
-                    <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-600">
+                <div className="premium-glass bg-white rounded-[40px] overflow-hidden shadow-xl border border-slate-200">
+                    <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-slate-200">
                         <table className="w-full text-left min-w-[700px] border-collapse">
-                            <thead className="sticky top-0 z-10 backdrop-blur-3xl bg-black/40 border-b border-gv-gold/10">
-                                <tr className="text-[10px] text-gray-400 font-semibold uppercase tracking-[0.22em]">
+                            <thead className="sticky top-0 z-10 backdrop-blur-3xl bg-slate-50 border-b border-slate-200">
+                                <tr className="text-[10px] text-slate-500 font-semibold uppercase tracking-[0.22em]">
                                     <th className="px-8 py-5">{t.date}</th>
                                     <th className="px-8 py-5">{t.refId}</th>
                                     <th className="px-8 py-5">{t.type}</th>
@@ -200,11 +200,11 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                     <React.Fragment key={idx}>
                                         <tr 
                                             onClick={() => setExpandedId(expandedId === tx.id ? null : tx.id)}
-                                            className="text-sm border-b border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer group/row"
+                                            className="text-sm border-b border-slate-100 hover:bg-slate-50/50 transition-colors cursor-pointer group/row"
                                         >
-                                            <td className="px-8 py-5 text-gray-500 font-mono text-[11px] font-medium">{new Date(tx.created_at || tx.transfer_date).toLocaleDateString()}</td>
-                                            <td className="px-8 py-5 text-gray-400 font-mono text-[10px] opacity-70 tracking-widest uppercase">{tx.ref_id || "-"}</td>
-                                            <td className="px-8 py-5 uppercase tracking-[0.2em] text-[10px] font-bold text-gray-200">
+                                            <td className="px-8 py-5 text-slate-500 font-mono text-[11px] font-medium">{new Date(tx.created_at || tx.transfer_date).toLocaleDateString()}</td>
+                                            <td className="px-8 py-5 text-slate-400 font-mono text-[10px] opacity-70 tracking-widest uppercase">{tx.ref_id || "-"}</td>
+                                            <td className="px-8 py-5 uppercase tracking-[0.2em] text-[10px] font-bold text-slate-800">
                                                 <div className="flex items-center gap-2">
                                                     {tx.metadata?.description || tx.type}
                                                     {(tx.type === 'Withdrawal' || tx.metadata?.is_adjustment) && (
@@ -214,9 +214,9 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                             </td>
                                             <td className="px-8 py-5">
                                                 <span className={`px-4 py-1.5 rounded-full text-[9px] uppercase font-black tracking-[0.15em] border ${
-                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' :
-                                                    tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' :
-                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-400 border-red-500/30' :
+                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                                    tx.status === 'Pending Release' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                                                    tx.status === 'Rejected' ? 'bg-red-50 text-red-600 border-red-200' :
                                                     'bg-gv-gold/10 text-gv-gold/80 border-gv-gold/30 shadow-[0_0_15px_rgba(212,175,55,0.05)]'
                                                 }`}>{tx.status}</span>
                                             </td>
@@ -226,7 +226,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                 const displayAmount = isWithdrawal ? -Math.abs(amountUSD) : amountUSD;
                                                 
                                                 return (
-                                                        <td className={`px-8 py-5 text-right font-black tabular-nums transition-colors ${displayAmount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                        <td className={`px-8 py-5 text-right font-black tabular-nums transition-colors ${displayAmount >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                                                             {displayAmount >= 0 ? '+' : '-'}{Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </td>
                                                 );
@@ -240,23 +240,23 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                             <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-[0.3em] opacity-80 mb-2">Financial Breakdown</h4>
                                                             <div className="space-y-3">
                                                                 <div className="flex justify-between text-xs font-bold gap-4 px-1">
-                                                                    <span className="text-gray-400 uppercase tracking-widest whitespace-nowrap">Gross Amount</span>
-                                                                    <span className="text-gray-200 tabular-nums whitespace-nowrap">$ {Number(tx.original_currency_amount || (Number(tx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                    <span className="text-slate-400 uppercase tracking-widest whitespace-nowrap">Gross Amount</span>
+                                                                    <span className="text-slate-800 tabular-nums whitespace-nowrap">$ {Number(tx.original_currency_amount || (Number(tx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                                 {tx.metadata?.penalty_applied && (
                                                                     <div className="flex justify-between text-xs font-bold gap-4 px-1">
-                                                                        <span className="text-red-500/80 uppercase italic tracking-widest whitespace-nowrap">Penalty (40%)</span>
-                                                                        <span className="text-red-400 tabular-nums whitespace-nowrap">-$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                        <span className="text-red-500 uppercase italic tracking-widest whitespace-nowrap">Penalty (40%)</span>
+                                                                        <span className="text-red-600 tabular-nums whitespace-nowrap">-$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                     </div>
                                                                 )}
-                                                                <div className="flex justify-between text-xs font-black border-t border-gv-gold/10 pt-4 px-2 bg-emerald-500/5 rounded-xl py-3 border-x border-emerald-500/10 gap-4 shadow-[0_0_20px_rgba(16,185,129,0.03)]">
-                                                                    <span className="text-emerald-400 uppercase tracking-[0.15em] whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : 'Final Payout (Net)'}</span>
-                                                                    <span className="text-emerald-400 tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || tx.metadata?.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                <div className="flex justify-between text-xs font-black border-t border-slate-100 pt-4 px-2 bg-emerald-50 rounded-xl py-3 border border-emerald-100 gap-4 shadow-[0_0_20px_rgba(16,185,129,0.03)]">
+                                                                    <span className="text-emerald-600 uppercase tracking-[0.15em] whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : 'Final Payout (Net)'}</span>
+                                                                    <span className="text-emerald-600 tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || tx.metadata?.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                                 {tx.metadata?.remark && (
-                                                                    <div className="mt-6 p-4 bg-white/[0.02] rounded-2xl border border-gv-gold/5 backdrop-blur-md">
+                                                                    <div className="mt-6 p-4 bg-slate-50 rounded-2xl border border-slate-100 backdrop-blur-md">
                                                                         <p className="text-[9px] font-black text-gv-gold/60 uppercase tracking-[0.3em] mb-2">User Remark</p>
-                                                                        <p className="text-[11px] font-medium text-gray-400 italic leading-relaxed">"{tx.metadata.remark}"</p>
+                                                                        <p className="text-[11px] font-medium text-slate-600 italic leading-relaxed">"{tx.metadata.remark}"</p>
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -284,18 +284,18 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                             <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-[0.3em] opacity-80 mb-2">Processing Timeline</h4>
                                                             <div className="space-y-4 relative before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[1.5px] before:bg-gv-gold/10">
                                                                 <div className="flex items-center gap-4 pl-8 relative">
-                                                                    <div className="h-2 w-2 rounded-full bg-zinc-600 absolute left-[3.5px] shadow-[0_0_8px_rgba(82,82,91,0.3)]"></div>
+                                                                    <div className="h-2 w-2 rounded-full bg-slate-300 absolute left-[3.5px] shadow-[0_0_8px_rgba(82,82,91,0.1)]"></div>
                                                                     <div className="flex flex-col">
-                                                                        <span className="text-[10px] font-black text-gray-200 uppercase tracking-widest">Submitted</span>
-                                                                        <span className="text-[9px] text-gray-500 font-bold tabular-nums">{new Date(tx.created_at).toLocaleString()}</span>
+                                                                        <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Submitted</span>
+                                                                        <span className="text-[9px] text-slate-500 font-bold tabular-nums">{new Date(tx.created_at).toLocaleString()}</span>
                                                                     </div>
                                                                 </div>
                                                                 {tx.metadata?.approved_at && (
                                                                     <div className="flex items-center gap-4 pl-8 relative">
-                                                                        <div className="h-2.5 w-2.5 rounded-full bg-blue-500/80 absolute left-[2.5px] shadow-[0_0_12px_rgba(59,130,246,0.5)]"></div>
+                                                                        <div className="h-2.5 w-2.5 rounded-full bg-blue-500 absolute left-[2.5px] shadow-[0_0_12px_rgba(59,130,246,0.3)]"></div>
                                                                         <div className="flex flex-col">
-                                                                            <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Accepted by {tx.metadata?.processed_by_name || 'Admin'}</span>
-                                                                            <span className="text-[9px] text-gray-500 font-bold tabular-nums">{new Date(tx.metadata.approved_at).toLocaleString()}</span>
+                                                                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Accepted by {tx.metadata?.processed_by_name || 'Admin'}</span>
+                                                                            <span className="text-[9px] text-slate-500 font-bold tabular-nums">{new Date(tx.metadata.approved_at).toLocaleString()}</span>
                                                                         </div>
                                                                     </div>
                                                                 )}
@@ -317,7 +317,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                     </React.Fragment>
                                 ))}
                                 {filteredTransactions.length === 0 && (
-                                    <tr><td colSpan={5} className="px-8 py-32 text-center text-gray-600 font-bold uppercase tracking-[0.3em] opacity-60 text-sm">{t.noTxFound}</td></tr>
+                                    <tr><td colSpan={5} className="px-8 py-32 text-center text-slate-400 font-bold uppercase tracking-[0.3em] opacity-60 text-sm">{t.noTxFound}</td></tr>
                                 )}
                             </tbody>
                         </table>
@@ -325,26 +325,26 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </section>
 
-            <section className="premium-glass p-8 md:p-12 rounded-[40px] shadow-2xl relative overflow-hidden group border border-gv-gold/10">
+            <section className="premium-glass bg-white p-8 md:p-12 rounded-[40px] shadow-xl relative overflow-hidden group border border-slate-200">
                 <div className="absolute top-0 right-0 w-80 h-80 bg-gv-gold/5 blur-[120px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                 <div className="relative z-10 max-w-2xl">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="h-0.5 w-8 bg-gv-gold/60 rounded-full"></div>
-                        <h2 className="text-3xl font-black uppercase tracking-tighter text-white leading-none">{t.statementCenter}</h2>
+                        <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900 leading-none">{t.statementCenter}</h2>
                     </div>
-                    <p className="text-gray-400 text-sm font-medium mb-12 opacity-80 leading-relaxed font-semibold">{t.statementCenterDesc}</p>
+                    <p className="text-slate-500 text-sm font-medium mb-12 opacity-80 leading-relaxed font-semibold">{t.statementCenterDesc}</p>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12">
                         <div className="space-y-4">
                             <label className="text-gv-gold/60 text-[9px] font-black uppercase tracking-[0.3em] px-1">{t.selectMonth}</label>
-                            <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))} className="w-full bg-black/40 border border-gv-gold/20 rounded-2xl p-4 md:p-5 text-sm font-bold focus:outline-none focus:border-gv-gold transition-all text-white backdrop-blur-md appearance-none cursor-pointer hover:bg-black/60 shadow-inner">
-                                {t.months.map((m, i) => <option key={i} value={i} className="bg-[#1a1a1a]">{m}</option>)}
+                            <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))} className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 md:p-5 text-sm font-bold focus:outline-none focus:border-gv-gold transition-all text-slate-900 backdrop-blur-md appearance-none cursor-pointer hover:bg-slate-100 shadow-inner">
+                                {t.months.map((m, i) => <option key={i} value={i} className="bg-white">{m}</option>)}
                             </select>
                         </div>
                         <div className="space-y-4">
                             <label className="text-gv-gold/60 text-[9px] font-black uppercase tracking-[0.3em] px-1">{t.selectYear}</label>
-                            <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="w-full bg-black/40 border border-gv-gold/20 rounded-2xl p-4 md:p-5 text-sm font-bold focus:outline-none focus:border-gv-gold transition-all text-white backdrop-blur-md appearance-none cursor-pointer hover:bg-black/60 shadow-inner">
-                                {[2024, 2025, 2026].map(y => <option key={y} value={y} className="bg-[#1a1a1a]">{y}</option>)}
+                            <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 md:p-5 text-sm font-bold focus:outline-none focus:border-gv-gold transition-all text-slate-900 backdrop-blur-md appearance-none cursor-pointer hover:bg-slate-100 shadow-inner">
+                                {[2024, 2025, 2026].map(y => <option key={y} value={y} className="bg-white">{y}</option>)}
                             </select>
                         </div>
                     </div>

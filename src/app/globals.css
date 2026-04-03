@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FAFAF8;
-  --foreground: #1a1a1a;
-  --color-gv-gold: #9A7D2E;
-  --color-surface: #FFFFFF;
-  --color-surface-alt: #F5F5F3;
-  --color-border: #E8E6E1;
-  --color-border-light: #F0EEEA;
+  --background: #FFFFFF;
+  --foreground: #0F172A;
+  --color-gv-gold: #D4AF37;
+  --color-surface: #F8FAFC;
+  --color-surface-alt: #F1F5F9;
+  --color-border: rgba(212, 175, 55, 0.2);
+  --color-border-light: rgba(0, 0, 0, 0.05);
   color-scheme: light;
 }
 
@@ -109,11 +109,13 @@ body {
 }
 
 /* Institutional Aesthetics */
+/* Institutional Aesthetics - Light Glass */
 .premium-glass {
   background: rgba(255, 255, 255, 0.7) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  backdrop-filter: blur(25px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
   border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05) !important;
 }
 
 @keyframes institutional-pulse {

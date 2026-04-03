@@ -21,11 +21,11 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     return (
         <AuthGuard>
             <UserProvider>
-                <div className="min-h-screen bg-[#080809] text-gray-400 font-body selection:bg-gv-gold selection:text-black overflow-x-hidden relative">
-                    {/* Institutional Ambient Depth */}
-                    <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gv-gold/[0.03] via-[#080809] to-[#080809] pointer-events-none"></div>
-                    <div className="fixed top-0 left-1/4 w-96 h-96 bg-gv-gold/[0.02] blur-[150px] pointer-events-none"></div>
-                    <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-gv-gold/[0.01] blur-[200px] pointer-events-none"></div>
+                <div className="min-h-screen bg-white text-slate-600 font-body selection:bg-gv-gold selection:text-white overflow-x-hidden relative">
+                    {/* Institutional Ambient Clarity */}
+                    <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gv-gold/[0.05] via-white to-white pointer-events-none"></div>
+                    <div className="fixed top-0 left-1/4 w-96 h-96 bg-blue-500/[0.02] blur-[150px] pointer-events-none"></div>
+                    <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-500/[0.02] blur-[200px] pointer-events-none"></div>
 
                     <DashboardSidebar 
                         lang={lang} 

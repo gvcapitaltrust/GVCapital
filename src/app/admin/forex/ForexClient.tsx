@@ -56,32 +56,32 @@ export default function ForexClient({ lang }: { lang: "en" | "zh" }) {
     return (
         <div className="space-y-12 animate-in fade-in duration-500">
             <div>
-                <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h2>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
+                <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900">{t.title}</h2>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
             </div>
 
-            <div className="max-w-xl bg-white border border-gray-200 rounded-[40px] p-10 space-y-8 backdrop-blur-md shadow-2xl">
+            <div className="max-w-xl bg-white border border-slate-200 rounded-[40px] p-10 space-y-8 backdrop-blur-md shadow-xl">
                 <div className="space-y-2">
-                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">{t.currentRate}</p>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest px-1">{t.currentRate}</p>
                     <div className="text-5xl font-black text-gv-gold tabular-nums tracking-tighter">1 USD = RM {forexRate.toFixed(4)}</div>
                 </div>
 
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">{t.newRateLabel}</label>
+                        <label className="text-[10px] text-slate-400 font-black uppercase tracking-widest px-1">{t.newRateLabel}</label>
                         <input
                             type="number"
                             step="0.001"
                             value={newRate}
                             onChange={(e) => setNewRate(e.target.value)}
                             placeholder="4.500"
-                            className="w-full bg-gray-100 border border-gray-200 rounded-3xl p-6 text-3xl font-black text-gray-900 focus:outline-none focus:border-gv-gold transition-all"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-3xl p-6 text-3xl font-black text-slate-900 focus:outline-none focus:border-gv-gold transition-all"
                         />
                     </div>
                     <button
                         onClick={handleSubmit}
                         disabled={isUpdating || !newRate}
-                        className="w-full bg-gv-gold text-black font-black py-6 rounded-3xl uppercase tracking-widest text-xs shadow-2xl shadow-gv-gold/20 hover:-translate-y-1 transition-all disabled:opacity-50"
+                        className="w-full bg-gv-gold text-black font-black py-6 rounded-3xl uppercase tracking-widest text-xs shadow-xl shadow-gv-gold/20 hover:-translate-y-1 transition-all disabled:opacity-50"
                     >
                         {isUpdating ? t.updatingBtn : t.updateBtn}
                     </button>
@@ -90,14 +90,14 @@ export default function ForexClient({ lang }: { lang: "en" | "zh" }) {
 
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-black uppercase tracking-tighter text-gray-900">{t.historyTitle}</h3>
-                    <div className="h-[1px] flex-1 bg-white mx-8"></div>
+                    <h3 className="text-xl font-black uppercase tracking-tighter text-slate-900">{t.historyTitle}</h3>
+                    <div className="h-[1px] flex-1 bg-slate-200 mx-8"></div>
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-[40px] overflow-hidden backdrop-blur-md">
+                <div className="bg-white border border-slate-200 rounded-[40px] overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                            <thead className="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400">
                                 <tr>
                                     <th className="px-8 py-6">{t.tableDate}</th>
                                     <th className="px-8 py-6">{t.tableOld}</th>
@@ -106,27 +106,27 @@ export default function ForexClient({ lang }: { lang: "en" | "zh" }) {
                                     <th className="px-8 py-6 text-right">{t.tableAdmin}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-slate-100">
                                 {forexHistory.map((h, i) => {
                                     const change = ((h.new_rate - h.old_rate) / h.old_rate) * 100;
                                     return (
-                                        <tr key={i} className="text-sm group hover:bg-gray-50 transition-colors">
-                                            <td className="px-8 py-6 text-gray-500 font-mono text-xs">{new Date(h.created_at).toLocaleString()}</td>
-                                            <td className="px-8 py-6 text-gray-400 tabular-nums">RM {h.old_rate.toFixed(4)}</td>
-                                            <td className="px-8 py-6 text-gray-900 font-black tabular-nums">RM {h.new_rate.toFixed(4)}</td>
+                                        <tr key={i} className="text-sm group hover:bg-slate-50 transition-colors font-medium">
+                                            <td className="px-8 py-6 text-slate-400 font-mono text-xs">{new Date(h.created_at).toLocaleString()}</td>
+                                            <td className="px-8 py-6 text-slate-400 tabular-nums">RM {h.old_rate.toFixed(4)}</td>
+                                            <td className="px-8 py-6 text-slate-900 font-black tabular-nums">RM {h.new_rate.toFixed(4)}</td>
                                             <td className="px-8 py-6">
-                                                <span className={`font-bold tabular-nums ${change >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                <span className={`font-bold tabular-nums ${change >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                                                     {change >= 0 ? '+' : ''}{change.toFixed(2)}%
                                                 </span>
                                             </td>
                                             <td className="px-8 py-6 text-right">
-                                                <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">{h.admin_username}</div>
+                                                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">{h.admin_username}</div>
                                             </td>
                                         </tr>
                                     );
                                 })}
                                 {forexHistory.length === 0 && (
-                                    <tr><td colSpan={5} className="p-20 text-center text-gray-400 font-black uppercase tracking-widest">{t.noHistory}</td></tr>
+                                    <tr><td colSpan={5} className="p-20 text-center text-slate-400 font-black uppercase tracking-widest">{t.noHistory}</td></tr>
                                 )}
                             </tbody>
                         </table>

@@ -78,7 +78,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
         <>
             {/* Desktop Sidebar */}
             <aside className={`fixed inset-y-0 left-0 z-50 bg-transparent p-6 flex flex-col justify-between transition-all duration-700 ease-in-out hidden md:flex ${isCollapsed ? "w-28" : "w-80"}`}>
-                <div className="premium-glass bg-black/40 h-full rounded-[48px] flex flex-col justify-between py-10 px-4 border border-white/10 shadow-[0_40px_80px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                <div className="premium-glass bg-white/70 h-full rounded-[48px] flex flex-col justify-between py-10 px-4 border border-slate-200/50 shadow-[0_40px_80px_rgba(0,0,0,0.05)] relative overflow-hidden">
                     {/* Background Detail */}
                     <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-gv-gold/5 to-transparent pointer-events-none opacity-50"></div>
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-gv-gold/5 blur-[60px] pointer-events-none"></div>
@@ -144,8 +144,8 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                     href={`${item.path}?lang=${lang}`}
                                     className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500 relative group/item overflow-hidden ${
                                         isActive 
-                                            ? "bg-gv-gold/10 text-white border border-gv-gold/30 shadow-[0_10px_30px_rgba(212,175,55,0.15)]" 
-                                            : "text-gray-500 hover:text-white hover:bg-white/5 border border-transparent"
+                                            ? "bg-gv-gold/10 text-slate-900 border border-gv-gold/30 shadow-[0_10px_30px_rgba(212,175,55,0.1)]" 
+                                            : "text-slate-400 hover:text-slate-900 hover:bg-slate-50 border border-transparent"
                                     }`}
                                     title={isCollapsed ? item.label : ""}
                                 >
@@ -167,7 +167,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
 
                 <div className="space-y-4 relative z-10">
                     {user && !isCollapsed && (
-                        <div className="mx-0 p-5 bg-black/40 backdrop-blur-2xl rounded-[32px] border border-white/5 animate-in fade-in duration-700 group/profile hover:bg-gv-gold/[0.03] hover:border-gv-gold/20 transition-all cursor-pointer relative overflow-hidden group">
+                        <div className="mx-0 p-5 bg-slate-50/50 backdrop-blur-2xl rounded-[32px] border border-slate-100 animate-in fade-in duration-700 group/profile hover:bg-gv-gold/[0.03] hover:border-gv-gold/20 transition-all cursor-pointer relative overflow-hidden group">
                             <div className="absolute inset-0 bg-gv-gold/5 blur-[20px] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div className="flex items-center gap-4 relative z-10">
                                 <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-sm shrink-0 border border-gv-gold/40 shadow-[0_10px_20px_rgba(212,175,55,0.2)] overflow-hidden transition-transform group-hover:scale-110">
@@ -186,10 +186,10 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                     )}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-[11px] font-black text-white uppercase tracking-tight truncate group-hover:text-gv-gold transition-colors">
+                                    <p className="text-[11px] font-black text-slate-900 uppercase tracking-tight truncate group-hover:text-gv-gold transition-colors">
                                         {user.full_name || user.fullName || user.email?.split('@')[0] || "User"}
                                     </p>
-                                    <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.25em] mt-1 opacity-60">
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em] mt-1 opacity-60">
                                         {getTierByAmount(Number(balanceUSD || 0)).name}
                                     </p>
                                 </div>
@@ -214,7 +214,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
             </aside>
 
             {/* Premium Bottom Navigation (Mobile Only) */}
-            <nav className="fixed bottom-6 left-6 right-6 z-[100] h-20 premium-glass bg-black/80 backdrop-blur-3xl border border-white/10 flex items-center justify-around px-4 md:hidden rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-gv-gold/10 overflow-hidden">
+            <nav className="fixed bottom-6 left-6 right-6 z-[100] h-20 premium-glass bg-white/90 backdrop-blur-3xl border border-slate-200 flex items-center justify-around px-4 md:hidden rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border-gv-gold/5 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-gv-gold/[0.03] to-transparent pointer-events-none"></div>
                 {[
                     { id: "overview", path: "/dashboard", label: "Home", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> },

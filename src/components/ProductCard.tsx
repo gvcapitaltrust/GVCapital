@@ -32,7 +32,7 @@ export default function ProductCard({ tier, isActive, isQualified, lang }: Produ
       className={`relative flex flex-col p-6 rounded-[32px] border transition-all duration-700 premium-glass ${
         isActive
           ? `${colorMap[tier.color]} scale-[1.05] ${glowMap[tier.color]} z-10 border-opacity-100`
-          : "border-white/5 bg-white/5 opacity-50 hover:opacity-80 grayscale hover:grayscale-0"
+          : "border-slate-200/60 bg-white/40 opacity-50 hover:opacity-80 grayscale hover:grayscale-0"
       }`}
     >
       {isQualified && isActive && (
@@ -43,7 +43,7 @@ export default function ProductCard({ tier, isActive, isQualified, lang }: Produ
 
       <div className="flex justify-between items-start mb-6 gap-3">
         <div className="min-w-0 flex-1">
-          <h3 className={`text-base xl:text-lg font-black mb-1 uppercase tracking-tight break-words ${isActive ? 'text-white' : 'text-gray-400'}`}>{tier.name}</h3>
+          <h3 className={`text-base xl:text-lg font-black mb-1 uppercase tracking-tight break-words ${isActive ? 'text-slate-900' : 'text-slate-400'}`}>{tier.name}</h3>
           <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
             {tier.id === 'vvip' 
               ? `> ${formatUSD(tier.minAmount)}` 
@@ -55,7 +55,7 @@ export default function ProductCard({ tier, isActive, isQualified, lang }: Produ
 
       <div className="mb-6 flex flex-col gap-3">
         <div className="flex items-baseline gap-2">
-          <span className={`text-2xl font-black shrink-0 flex items-baseline ${isActive ? 'text-white' : 'text-gray-500'}`}>
+          <span className={`text-2xl font-black shrink-0 flex items-baseline ${isActive ? 'text-slate-900' : 'text-slate-400'}`}>
             <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mr-2 whitespace-nowrap">
               {tier.id === "silver" ? "min" : "up to"}
             </span>
@@ -67,15 +67,15 @@ export default function ProductCard({ tier, isActive, isQualified, lang }: Produ
         </div>
         
         <div className="flex items-center gap-2">
-          <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-lg border shadow-inner ${isActive ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' : 'bg-white/5 border-white/10 text-gray-500'}`}>
+          <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-lg border shadow-inner ${isActive ? 'bg-amber-500/10 border-amber-500/20 text-amber-600' : 'bg-slate-50 border-slate-100 text-slate-400'}`}>
             {tier.lockInDays === 365 ? '12-Month' : '6-Month'} Lock-in
           </span>
         </div>
         
         {tier.yearlyBonus && (
           <div className="flex flex-col gap-1 items-start mt-2">
-            <div className={`border px-3 py-1.5 rounded-full flex items-center gap-2 shadow-inner ${isActive ? 'bg-gv-gold/10 border-gv-gold/30 animate-pulse' : 'bg-white/5 border-white/5 opacity-40'}`}>
-              <span className={`text-[11px] font-black tracking-widest ${isActive ? 'text-gv-gold' : 'text-gray-500'}`}>
+            <div className={`border px-3 py-1.5 rounded-full flex items-center gap-2 shadow-inner ${isActive ? 'bg-gv-gold/10 border-gv-gold/30 animate-pulse' : 'bg-slate-50 border-slate-100 opacity-40'}`}>
+              <span className={`text-[11px] font-black tracking-widest ${isActive ? 'text-gv-gold' : 'text-slate-400'}`}>
                 +{ (tier.yearlyBonus * 100).toFixed(0) }% 
                 {tier.id === 'platinum' && '*'}
               </span>
@@ -87,7 +87,7 @@ export default function ProductCard({ tier, isActive, isQualified, lang }: Produ
 
       <ul className="space-y-3 flex-1">
         {tier.id === 'platinum' && (
-          <li className="flex items-start gap-2 pb-3 border-b border-white/5 mb-3">
+          <li className="flex items-start gap-2 pb-3 border-b border-slate-100 mb-3">
             <div className="h-4 w-4 rounded-md bg-gv-gold/20 flex items-center justify-center shrink-0 border border-gv-gold/40">
               <Check className="h-2.5 w-2.5 text-gv-gold" strokeWidth={4} />
             </div>
@@ -98,10 +98,10 @@ export default function ProductCard({ tier, isActive, isQualified, lang }: Produ
         )}
         {tier.benefits.map((benefit, idx) => (
           <li key={idx} className="flex items-start gap-3 group/benefit">
-            <div className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors ${isActive ? 'bg-white/10 text-gv-gold' : 'bg-white/5 text-gray-600 group-hover/benefit:text-gray-400'}`}>
+            <div className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors ${isActive ? 'bg-slate-900/5 text-gv-gold' : 'bg-slate-50 text-slate-400 group-hover/benefit:text-slate-500'}`}>
               <Check className="h-2.5 w-2.5" strokeWidth={4} />
             </div>
-            <span className={`text-[11px] font-semibold leading-snug transition-colors ${isActive ? 'text-gray-300' : 'text-gray-500 group-hover/benefit:text-gray-400'}`}>{benefit}</span>
+            <span className={`text-[11px] font-semibold leading-snug transition-colors ${isActive ? 'text-slate-700' : 'text-slate-500 group-hover/benefit:text-slate-600'}`}>{benefit}</span>
           </li>
         ))}
       </ul>

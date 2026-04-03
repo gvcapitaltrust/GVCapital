@@ -69,7 +69,7 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 pb-20">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
                 {/* Personal Information */}
-                <div className="premium-glass bg-black/40 border-gv-gold/10 p-10 rounded-[48px] shadow-[0_40px_80px_rgba(0,0,0,0.5)] relative overflow-hidden group">
+                <div className="premium-glass bg-white border border-slate-200 p-10 rounded-[48px] shadow-xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/[0.03] blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/5 transition-all duration-1000"></div>
                     <div className="relative z-10 space-y-10">
                         <h3 className="text-xl font-black uppercase tracking-[0.3em] text-gv-gold flex items-center gap-4">
@@ -86,18 +86,18 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                                 { label: t.email, value: user?.email },
                             ].map((item, i) => (
                                 <div key={i} className="space-y-2 group/field">
-                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{item.label}</p>
-                                    <p className="text-lg font-black text-white tracking-tight">{item.value || "-"}</p>
+                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{item.label}</p>
+                                    <p className="text-lg font-black text-slate-900 tracking-tight">{item.value || "-"}</p>
                                 </div>
                             ))}
                             <div className="grid grid-cols-2 gap-10">
                                 <div className="space-y-2 group/field">
-                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{t.phone}</p>
-                                    <p className="text-lg font-black text-white tracking-tight">{user?.phone || "-"}</p>
+                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{t.phone}</p>
+                                    <p className="text-lg font-black text-slate-900 tracking-tight">{user?.phone || "-"}</p>
                                 </div>
                                 <div className="space-y-2 group/field">
-                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{t.country}</p>
-                                    <p className="text-lg font-black text-white tracking-tight">{user?.country || "-"}</p>
+                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{t.country}</p>
+                                    <p className="text-lg font-black text-slate-900 tracking-tight">{user?.country || "-"}</p>
                                 </div>
                             </div>
                         </div>
@@ -105,7 +105,7 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
 
                 {/* Compliance */}
-                <div className="premium-glass bg-black/40 border-gv-gold/10 p-10 rounded-[48px] shadow-[0_40px_80px_rgba(0,0,0,0.5)] relative overflow-hidden group">
+                <div className="premium-glass bg-white border border-slate-200 p-10 rounded-[48px] shadow-xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/[0.03] blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/5 transition-all duration-1000"></div>
                     <div className="relative z-10 space-y-10">
                         <h3 className="text-xl font-black uppercase tracking-[0.3em] text-gv-gold flex items-center gap-4">
@@ -119,11 +119,11 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                                 { label: t.occupation, value: user?.occupation },
                                 { label: t.industry, value: user?.industry },
                                 { label: t.wealthSource, value: user?.source_of_wealth },
-                                { label: t.riskProfile, value: user?.risk_profile === "Moderate" ? "40%" : (user?.risk_profile || "-"), className: "text-emerald-400" },
+                                { label: t.riskProfile, value: user?.risk_profile === "Moderate" ? "40%" : (user?.risk_profile || "-"), className: "text-emerald-600" },
                             ].map((item, i) => (
                                 <div key={i} className="space-y-2 group/field">
-                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{item.label}</p>
-                                    <p className={`text-lg font-black tracking-tight ${item.className || "text-white"}`}>{item.value || "-"}</p>
+                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] group-hover:text-gv-gold/60 transition-colors">{item.label}</p>
+                                    <p className={`text-lg font-black tracking-tight ${item.className || "text-slate-900"}`}>{item.value || "-"}</p>
                                 </div>
                             ))}
                         </div>
@@ -132,7 +132,7 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
             </div>
 
             {/* Bank Details */}
-            <div className="premium-glass bg-gv-gold/[0.02] border-gv-gold/20 p-10 sm:p-14 rounded-[56px] shadow-[0_50px_100px_rgba(0,0,0,0.6)] relative overflow-hidden group/bank">
+            <div className="premium-glass bg-slate-50 border border-slate-200 p-10 sm:p-14 rounded-[56px] shadow-xl relative overflow-hidden group/bank">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gv-gold/[0.03] blur-[150px] -translate-y-1/2 translate-x-1/4 pointer-events-none group-hover/bank:bg-gv-gold/5 transition-all duration-1000"></div>
                 <div className="relative z-10 space-y-12">
                     <h3 className="text-2xl font-black uppercase tracking-[0.4em] text-gv-gold flex items-center gap-6">
@@ -143,28 +143,28 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
                         <div className="space-y-3 group/field">
-                            <p className="text-[11px] text-gray-500 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.bankName}</p>
-                            <p className="text-2xl font-black text-white tracking-[0.2em] uppercase">{user?.bank_name || "-"}</p>
+                            <p className="text-[11px] text-slate-400 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.bankName}</p>
+                            <p className="text-2xl font-black text-slate-900 tracking-[0.2em] uppercase">{user?.bank_name || "-"}</p>
                         </div>
                         <div className="space-y-3 group/field">
-                            <p className="text-[11px] text-gray-500 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.accNumber}</p>
-                            <p className="text-2xl font-black text-white tracking-[0.3em] font-mono shadow-inner bg-white/5 px-6 py-3 rounded-2xl border border-white/5">
+                            <p className="text-[11px] text-slate-400 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.accNumber}</p>
+                            <p className="text-2xl font-black text-slate-900 tracking-[0.3em] font-mono shadow-inner bg-slate-100 px-6 py-3 rounded-2xl border border-slate-200">
                                 {user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}
                             </p>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16 pt-12 border-t border-white/5 relative">
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-2 bg-[#080809] border border-white/10 rounded-full text-[8px] font-black uppercase tracking-[0.4em] text-gray-600">Secure Protocol</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16 pt-12 border-t border-slate-200 relative">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-2 bg-slate-100 border border-slate-200 rounded-full text-[8px] font-black uppercase tracking-[0.4em] text-slate-400">Secure Protocol</div>
                         <div className="space-y-3 group/field">
-                            <p className="text-[11px] text-gray-500 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.accHolder}</p>
-                            <p className="text-2xl font-black text-white tracking-[0.1em] uppercase">{user?.bank_account_holder || "-"}</p>
+                            <p className="text-[11px] text-slate-400 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.accHolder}</p>
+                            <p className="text-2xl font-black text-slate-900 tracking-[0.1em] uppercase">{user?.bank_account_holder || "-"}</p>
                         </div>
                         <div className="space-y-4 group/field">
-                            <p className="text-[11px] text-gray-500 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.bankStatement}</p>
+                            <p className="text-[11px] text-slate-400 font-black uppercase tracking-[0.5em] group-hover:text-gv-gold/60 transition-colors">{t.bankStatement}</p>
                             {user?.bank_statement_url ? (
                                 <button 
                                     onClick={viewStatement} 
-                                    className="group/btn relative inline-flex items-center gap-3 bg-white/5 hover:bg-gv-gold text-white hover:text-black border border-white/10 hover:border-gv-gold px-10 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500 shadow-2xl active:scale-95 overflow-hidden"
+                                    className="group/btn relative inline-flex items-center gap-3 bg-slate-100 hover:bg-gv-gold text-slate-900 hover:text-black border border-slate-200 hover:border-gv-gold px-10 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500 shadow-xl active:scale-95 overflow-hidden"
                                 >
                                     <div className="absolute inset-0 bg-gv-gold/20 blur-xl opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
                                     <svg className="h-5 w-5 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -190,8 +190,8 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                         </svg>
                     </button>
                     <div className="w-full h-full max-w-6xl relative overflow-hidden rounded-[32px] border border-white/10 bg-[#0A0A0A] shadow-2xl flex flex-col">
-                        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-zinc-900/50">
-                            <h3 className="text-white font-black uppercase tracking-widest text-xs flex items-center gap-2">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h3 className="text-slate-900 font-black uppercase tracking-widest text-xs flex items-center gap-2">
                                 <div className="h-1.5 w-1.5 rounded-full bg-gv-gold animate-pulse"></div>
                                 {t.bankStatement}
                             </h3>

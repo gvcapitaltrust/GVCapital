@@ -50,18 +50,18 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
   }[lang];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 bg-black/60 backdrop-blur-2xl animate-in fade-in duration-500">
-      <div className="premium-glass bg-black/60 border-gv-gold/10 rounded-[48px] p-8 sm:p-14 max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-[0_40px_100px_rgba(0,0,0,0.6)] relative overflow-x-hidden group">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 bg-white/60 backdrop-blur-2xl animate-in fade-in duration-500">
+      <div className="premium-glass bg-white border-slate-200 rounded-[48px] p-8 sm:p-14 max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-[0_40px_100px_rgba(0,0,0,0.08)] relative overflow-x-hidden group">
         <div className="absolute top-0 right-0 w-full h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 pointer-events-none"></div>
         <button
           onClick={onClose}
-          className="absolute top-8 right-8 p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-gv-gold/40 transition-all text-gray-400 hover:text-white z-20 group/close"
+          className="absolute top-8 right-8 p-3 rounded-2xl bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:border-gv-gold/40 transition-all text-slate-400 hover:text-slate-900 z-20 group/close"
         >
           <X className="h-6 w-6 group-hover/close:rotate-90 transition-transform duration-500" />
         </button>
 
         <div className="relative z-10 mb-12">
-          <h2 className="text-4xl font-black text-white uppercase tracking-tighter leading-none mb-3">{t.title}</h2>
+          <h2 className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none mb-3">{t.title}</h2>
           <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.4em] opacity-60">Package Analysis & Yield Comparison</p>
         </div>
 
@@ -69,10 +69,10 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="border-b border-gv-gold/10">
-                <th className="py-8 px-6 text-[10px] font-black uppercase tracking-[0.4em] text-gv-gold/60 bg-black/40 rounded-tl-3xl">{t.feature}</th>
+                <th className="py-8 px-6 text-[10px] font-black uppercase tracking-[0.4em] text-gv-gold/60 bg-slate-50 rounded-tl-3xl">{t.feature}</th>
                 {TIERS.map((tier, idx) => (
-                  <th key={tier.id} className={`py-8 px-6 text-center bg-black/40 ${idx === TIERS.length - 1 ? 'rounded-tr-3xl' : ''}`}>
-                    <span className={`text-[11px] font-black uppercase tracking-[0.3em] ${tier.id === 'gold' ? 'text-gv-gold' : tier.id === 'platinum' ? 'text-zinc-200' : tier.id === 'vvip' ? 'text-cyan-400' : 'text-slate-300'}`}>
+                  <th key={tier.id} className={`py-8 px-6 text-center bg-slate-50 ${idx === TIERS.length - 1 ? 'rounded-tr-3xl' : ''}`}>
+                    <span className={`text-[11px] font-black uppercase tracking-[0.3em] ${tier.id === 'gold' ? 'text-gv-gold' : tier.id === 'platinum' ? 'text-slate-600' : tier.id === 'vvip' ? 'text-cyan-600' : 'text-slate-400'}`}>
                       {tier.name}
                     </span>
                   </th>
@@ -80,27 +80,27 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
               </tr>
             </thead>
             <tbody className="text-sm font-medium">
-              <tr className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group/row">
-                <td className="py-8 px-6 text-gray-400 font-black uppercase tracking-[0.2em] text-[10px]">{t.range}</td>
+              <tr className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors group/row">
+                <td className="py-8 px-6 text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">{t.range}</td>
                 {TIERS.map((tier) => (
-                  <td key={tier.id} className="py-8 px-6 text-center text-white font-black whitespace-nowrap tracking-tight tabular-nums group-hover/row:text-gv-gold transition-colors">
+                  <td key={tier.id} className="py-8 px-6 text-center text-slate-900 font-black whitespace-nowrap tracking-tight tabular-nums group-hover/row:text-gv-gold transition-colors">
                     {tier.id === 'vvip' 
                       ? `> ${formatUSD(tier.minAmount)}` 
                       : `${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
                   </td>
                 ))}
               </tr>
-              <tr className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group/row">
-                <td className="py-8 px-6 text-gray-400 font-black uppercase tracking-[0.2em] text-[10px]">{t.dividend}</td>
+              <tr className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors group/row">
+                <td className="py-8 px-6 text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">{t.dividend}</td>
                 {TIERS.map((tier) => (
-                  <td key={tier.id} className="py-8 px-6 text-center text-emerald-400 font-black tabular-nums group-hover/row:scale-110 transition-transform">
+                  <td key={tier.id} className="py-8 px-6 text-center text-emerald-600 font-black tabular-nums group-hover/row:scale-110 transition-transform">
                     <span className="text-[10px] font-normal normal-case opacity-40 mr-2 italic tracking-normal">up to</span>
                     {(tier.maxDividend * 100).toFixed(0)}%
                   </td>
                 ))}
               </tr>
-              <tr className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                <td className="py-8 px-6 text-gray-400 font-black uppercase tracking-[0.2em] text-[10px]">{t.yearlyBonus}</td>
+              <tr className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                <td className="py-8 px-6 text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">{t.yearlyBonus}</td>
                 {TIERS.map((tier) => (
                   <td key={tier.id} className="py-8 px-6 text-center">
                     {tier.yearlyBonus ? (
@@ -123,10 +123,10 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                   </td>
                 ))}
               </tr>
-              <tr className="hover:bg-white/[0.02] transition-colors">
-                <td className="py-8 px-6 text-gray-400 font-black uppercase tracking-[0.2em] text-[10px] rounded-bl-3xl">{t.lockIn}</td>
+              <tr className="hover:bg-slate-50/50 transition-colors">
+                <td className="py-8 px-6 text-slate-400 font-black uppercase tracking-[0.2em] text-[10px] rounded-bl-3xl">{t.lockIn}</td>
                 {TIERS.map((tier, idx) => (
-                  <td key={tier.id} className={`py-8 px-6 text-center text-gray-200 font-black tracking-widest text-[11px] ${idx === TIERS.length - 1 ? 'rounded-br-3xl' : ''}`}>
+                  <td key={tier.id} className={`py-8 px-6 text-center text-slate-700 font-black tracking-widest text-[11px] ${idx === TIERS.length - 1 ? 'rounded-br-3xl' : ''}`}>
                     {tier.id === 'vvip' 
                       ? `12 ${t.months}` 
                       : tier.id === 'platinum'
@@ -139,7 +139,7 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
           </table>
         </div>
 
-        <div className="mt-12 p-8 bg-white/5 rounded-[32px] border border-white/10 shadow-inner relative overflow-hidden">
+        <div className="mt-12 p-8 bg-slate-50 rounded-[32px] border border-slate-100 shadow-inner relative overflow-hidden">
           <div className="absolute inset-0 bg-gv-gold/[0.02] blur-3xl pointer-events-none"></div>
           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.3em] text-center leading-relaxed relative z-10">
             {t.footnote}
