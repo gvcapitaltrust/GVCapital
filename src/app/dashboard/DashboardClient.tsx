@@ -868,145 +868,33 @@ export default function DashboardClient() {
     // Instead, we will conditionally render the content inside the main area.
 
     return (
-        <div className="min-h-screen bg-[#FAFAF8] text-gray-900 flex font-sans overflow-hidden">
-            <title>{`Dashboard | GV Capital Trust`}</title>
-
-            <aside className={`border-r border-gray-200 flex flex-col justify-between hidden md:flex bg-[#FAFAF8] transition-all duration-500 ease-in-out relative group/sidebar ${isSidebarCollapsed ? "w-[84px] p-4" : "w-64 p-6"}`}>
-                {/* Collapse Toggle */}
-                <button 
-                    onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                    className="absolute -right-3 top-24 z-10 h-6 w-6 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center text-gray-900 hover:bg-gv-gold hover:text-black transition-all shadow-xl opacity-0 group-hover/sidebar:opacity-100"
-                >
-                    <svg className={`h-3 w-3 transition-transform duration-500 ${isSidebarCollapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M15 19l-7-7 7-7" /></svg>
-                </button>
-
-                <div className="space-y-12">
-                    <div className={`flex items-center gap-2 transition-all duration-500 ${isSidebarCollapsed ? "justify-center" : ""}`}>
-                        <img src="/logo.png" alt="GV Capital" className={`object-contain  transition-all duration-500 ${isSidebarCollapsed ? "h-[30px]" : "h-[60px]"}`} />
-                    </div>
-
-                    <nav className="space-y-2">
-                        {[
-                            { id: "overview", label: t.nav, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> },
-                            { id: "products", label: t.products, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg> },
-                            { id: "transactions", label: t.transactions, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
-                            { id: "referrals", label: t.referrals, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg> },
-                            { id: "statements", label: t.statements, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> },
-                            { id: "profile", label: t.profile, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
-                            { id: "security", label: t.securityTitle, icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg> },
-                        ].map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => setActiveTab(item.id as any)}
-                                className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeTab === item.id ? "bg-gv-gold/10 text-gv-gold border border-gv-gold/20" : "text-gray-400 hover:text-gray-900"}`}
-                                title={isSidebarCollapsed ? item.label : ""}
-                            >
-                                <span className={`shrink-0 ${isSidebarCollapsed ? "mx-auto" : ""}`}>{item.icon}</span>
-                                {!isSidebarCollapsed && <span className="truncate">{item.label}</span>}
-                            </button>
-                        ))}
-                    </nav>
-                </div>
-                <div className={`space-y-4 pt-4 border-t border-gray-200 transition-all duration-500 ${isSidebarCollapsed ? "items-center" : ""}`}>
-                    <button onClick={handleLogout} className={`w-full text-gray-400 hover:text-red-400 transition-colors text-[10px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-2 ${isSidebarCollapsed ? "justify-center" : ""}`}>
-                        <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
-                        {!isSidebarCollapsed && <span>{t.logout}</span>}
-                    </button>
-                </div>
-            </aside>
-
-            <MobileSideMenu 
-                lang={lang}
-                isOpen={isSidebarOpen}
-                onClose={() => setIsSidebarOpen(false)}
-                currentTab={activeTab}
-            />
-
-            {/* Premium Bottom Navigation (Mobile Only) */}
-            <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-[#FAFAF8]/90 backdrop-blur-2xl border-t border-gray-200 flex items-center justify-around px-2 md:hidden">
-                {[
-                    { id: "overview", label: "Home", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> },
-                    { id: "products", label: "Trade", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> },
-                    { id: "transactions", label: "Activity", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> },
-                    { id: "profile", label: "Account", icon: <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
-                ].map((item) => (
-                    <button
-                        key={item.id}
-                        onClick={() => setActiveTab(item.id as any)}
-                        className={`group relative flex flex-col items-center justify-center w-16 h-16 transition-all duration-300 ${
-                            activeTab === item.id ? "text-gv-gold" : "text-gray-400"
-                        }`}
-                    >
-                        {activeTab === item.id && (
-                            <div className="absolute -top-px left-1/2 -translate-x-1/2 w-8 h-0.5 bg-gv-gold shadow-[0_0_15px_rgba(201,168,76,0.8)] rounded-full"></div>
-                        )}
-                        <span className={`transition-transform duration-300 ${activeTab === item.id ? "scale-110 -translate-y-1" : "group-hover:scale-110"}`}>
-                            {item.icon}
+        <div className="space-y-12 flex-1">
+            <CurrencyExchangeTicker />
+            
+            {/* Header section with welcome message */}
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 px-4">
+                <div>
+                    <p className="text-slate-500 text-[10px] sm:text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
+                    <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-slate-900 flex flex-wrap items-center gap-2 sm:gap-4">
+                        <span>{t.welcome}</span>
+                        <span className="text-gv-gold tracking-tighter truncate max-w-[200px] sm:max-w-none">
+                            {(user && (user.fullName || user.full_name)) ? (user.fullName || user.full_name) : (authLoading ? "..." : "Guest")}
                         </span>
-                        <span className={`text-[8px] font-black uppercase tracking-widest mt-1 transition-all duration-300 ${activeTab === item.id ? "opacity-100" : "opacity-0"}`}>
-                            {item.label}
-                        </span>
-                    </button>
-                ))}
-                <button
-                    onClick={() => setIsSidebarOpen(true)}
-                    className={`flex flex-col items-center justify-center w-16 h-16 text-gray-400`}
-                >
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
-                    <span className="text-[8px] font-black uppercase tracking-widest mt-1">Menu</span>
-                </button>
-            </nav>
-
-            <main className="flex-1 overflow-y-auto bg-[#FAFAF8] relative flex flex-col">
-                <div className="flex items-center justify-between px-6 py-6 border-b border-gray-200 md:hidden bg-white">
-                    <img src="/logo.png" alt="GV Capital" className="h-8 w-auto " />
-                    <div className="flex items-center gap-4">
-                        {user && <NotificationBell userId={user.id} lang={lang} />}
-                        <div className="h-10 w-10 rounded-xl bg-gv-gold flex items-center justify-center font-black text-black shadow-lg">
-                            {user ? (user.fullName?.[0] || "U") : (
-                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                <CurrencyExchangeTicker />
-                <div className="max-w-7xl mx-auto w-full space-y-12 flex-1 pb-32 p-4 sm:p-6 md:p-12">
-                    <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                        <div>
-                            <p className="text-gray-400 text-[10px] sm:text-sm font-black uppercase tracking-[0.3em] mb-2">{t.nav}</p>
-                            <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-gray-900 flex flex-wrap items-center gap-2 sm:gap-4">
-                                <span>{t.welcome}</span>
-                                <span className="text-gv-gold tracking-tighter truncate max-w-[200px] sm:max-w-none">
-                                    {(user && (user.fullName || user.full_name)) ? (user.fullName || user.full_name) : (authLoading ? "..." : "Guest")}
+                        {Number(user?.total_investment || 0) > 0 && (
+                            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur-md hover:bg-slate-50 transition-all cursor-default group/tier-badge ml-0 sm:ml-2">
+                                <TierMedal 
+                                    tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
+                                    size="sm" 
+                                    className="group-hover/tier-badge:scale-110 transition-transform"
+                                />
+                                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold/80 group-hover/tier-badge:text-gv-gold transition-colors">
+                                    {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
                                 </span>
-                                {Number(user?.total_investment || 0) > 0 && (
-                                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-2xl px-3 py-1.5 sm:px-4 sm:py-2 backdrop-blur-md hover:bg-gray-100 transition-all cursor-default group/tier-badge ml-0 sm:ml-2">
-                                        <TierMedal 
-                                            tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
-                                            size="sm" 
-                                            className="group-hover/tier-badge:scale-110 transition-transform"
-                                        />
-                                        <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold/80 group-hover/tier-badge:text-gv-gold transition-colors">
-                                            {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
-                                        </span>
-                                    </div>
-                                )}
-                            </h1>
-                        </div>
-                        <div className="flex items-center gap-6 hidden sm:flex">
-                            {user && <NotificationBell userId={user.id} lang={lang} />}
-                            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-xl border border-gv-gold/30 shadow-lg capitalize">
-                                {user ? (user.fullName?.[0] || user.email?.[0] || "U") : (
-                                    <svg className="h-8 w-8 text-black/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                )}
                             </div>
-                        </div>
-                    </header>
+                        )}
+                    </h1>
+                </div>
+            </header>
 
                     {activeTab === "overview" ? (
                             (!user?.is_verified && user?.email !== "thenja96@gmail.com") ? (
@@ -1599,24 +1487,23 @@ export default function DashboardClient() {
                                                 className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
                                                 placeholder="••••••••"
                                             />
-                                        </div>
                                         <div className="space-y-2">
-                                            <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.newPass}</label>
+                                            <label className="text-slate-400 text-[10px] font-black uppercase tracking-widest px-1">{t.newPass}</label>
                                             <input
                                                 name="newPassword"
                                                 type="password"
                                                 required
-                                                className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
+                                                className="w-full bg-white border border-slate-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
                                                 placeholder="••••••••"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.confirmPass}</label>
+                                            <label className="text-slate-400 text-[10px] font-black uppercase tracking-widest px-1">{t.confirmPass}</label>
                                             <input
                                                 name="confirmPassword"
                                                 type="password"
                                                 required
-                                                className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
+                                                className="w-full bg-white border border-slate-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
                                                 placeholder="••••••••"
                                             />
                                         </div>
@@ -1633,7 +1520,6 @@ export default function DashboardClient() {
                         </section>
                     )}
                 </div>
-                <GlobalFooter />
 
             {/* Document Viewer Modal */}
             {viewDocumentUrl && (
@@ -1670,32 +1556,31 @@ export default function DashboardClient() {
                     </div>
                 </div>
             )}
-        </main>
 
             {/* Deposit Modal */}
             {isDepositModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm">
-                    <div className="bg-gray-50 border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm">
+                    <div className="bg-slate-50 border border-gv-gold/30 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-black text-gv-gold tracking-tight uppercase">{t.depositTitle}</h2>
-                            <button onClick={() => setIsDepositModalOpen(false)} className="text-gray-500 hover:text-gray-900 transition-colors">
+                            <button onClick={() => setIsDepositModalOpen(false)} className="text-slate-500 hover:text-slate-900 transition-colors">
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
-                                <input type="number" value={depositAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositAmount(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                                <label className="text-slate-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
+                                <input type="number" value={depositAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositAmount(e.target.value)} className="w-full bg-white border border-slate-200 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.transferDate}</label>
-                                <input type="date" value={depositDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositDate(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-xl font-black focus:outline-none focus:border-gv-gold transition-all text-gray-900 inverted-scheme-date-picker" />
+                                <label className="text-slate-400 text-[10px] font-black uppercase tracking-widest px-1">{t.transferDate}</label>
+                                <input type="date" value={depositDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositDate(e.target.value)} className="w-full bg-white border border-slate-200 rounded-2xl p-5 text-xl font-black focus:outline-none focus:border-gv-gold transition-all text-slate-900 inverted-scheme-date-picker" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.bankReceipt}</label>
-                                <div className="border border-gray-200 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-white hover:bg-gray-100 transition-colors cursor-pointer relative group">
-                                    <svg className="h-10 w-10 text-gray-500 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{depositReceipt ? (depositReceipt as File).name : t.selectDocument}</span>
+                                <label className="text-slate-400 text-[10px] font-black uppercase tracking-widest px-1">{t.bankReceipt}</label>
+                                <div className="border border-slate-200 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center bg-white hover:bg-slate-100 transition-colors cursor-pointer relative group">
+                                    <svg className="h-10 w-10 text-slate-500 mb-4 group-hover:text-gv-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{depositReceipt ? (depositReceipt as File).name : t.selectDocument}</span>
                                     <input type="file" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepositReceipt(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,.pdf" />
                                 </div>
                             </div>
@@ -1709,29 +1594,29 @@ export default function DashboardClient() {
 
             {/* Penalty Confirmation Modal */}
             {showPenaltyConfirm && penaltyInfo && (
-                <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-gray-900/50 backdrop-blur-md">
-                    <div className="bg-gray-50 border border-red-500/50 rounded-[40px] p-10 max-w-lg w-full text-center space-y-8 shadow-[0_0_50px_rgba(239,68,68,0.2)] animate-in fade-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-slate-900/50 backdrop-blur-md">
+                    <div className="bg-slate-50 border border-red-500/50 rounded-[40px] p-10 max-w-lg w-full text-center space-y-8 shadow-[0_0_50px_rgba(239,68,68,0.2)] animate-in fade-in zoom-in-95 duration-300">
                         <div className="h-20 w-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
                             <svg className="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                         </div>
                         <div>
-                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-4">
+                            <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4">
                                 {lang === 'en' ? "Penalty Warning" : "违约处罚提示"}
                             </h3>
-                            <div className="space-y-4 text-left bg-white p-6 rounded-2xl border border-gray-200">
-                                <p className="text-gray-500 text-sm font-medium leading-relaxed">
+                            <div className="space-y-4 text-left bg-white p-6 rounded-2xl border border-slate-200">
+                                <p className="text-slate-500 text-sm font-medium leading-relaxed">
                                     {lang === 'en' 
-                                        ? `Part of your withdrawal (RM ${penaltyInfo.lockedPortion.toLocaleString(undefined, { minimumFractionDigits: 2 })}) is still within the 6-month capital lock-in period. An early withdrawal penalty of 40% applies to this portion.`
-                                        : `您的提款中有一部分 (RM ${penaltyInfo.lockedPortion.toLocaleString(undefined, { minimumFractionDigits: 2 })}) 仍处于 6 个月的资金锁定期内。根据协议，该部分将收取 40% 的提前提款违约金。`}
+                                        ? `Part of your withdrawal (RM ${penaltyInfo?.lockedPortion?.toLocaleString(undefined, { minimumFractionDigits: 2 })}) is still within the 6-month capital lock-in period. An early withdrawal penalty of 40% applies to this portion.`
+                                        : `您的提款中有一部分 (RM ${penaltyInfo?.lockedPortion?.toLocaleString(undefined, { minimumFractionDigits: 2 })}) 仍处于 6 个月的资金锁定期内。根据协议，该部分将收取 40% 的提前提款违约金。`}
                                 </p>
-                                <div className="pt-4 border-t border-gray-200 space-y-2">
+                                <div className="pt-4 border-t border-slate-200 space-y-2">
                                     <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                                        <span className="text-gray-400">{lang === 'en' ? "Penalty Amount" : "处罚金额"}</span>
-                                        <span className="text-red-500">- RM {penaltyInfo.penalty.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        <span className="text-slate-400">{lang === 'en' ? "Penalty Amount" : "处罚金额"}</span>
+                                        <span className="text-red-500">- RM {penaltyInfo?.penalty?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                     </div>
                                     <div className="flex justify-between text-base font-black uppercase tracking-tight">
-                                        <span className="text-gray-700">{lang === 'en' ? "Estimated Payout" : "预计到账金额"}</span>
-                                        <span className="text-gv-gold">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        <span className="text-slate-700">{lang === 'en' ? "Estimated Payout" : "预计到账金额"}</span>
+                                        <span className="text-gv-gold">RM {penaltyInfo?.payout?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                     </div>
                                 </div>
                             </div>
@@ -1742,7 +1627,7 @@ export default function DashboardClient() {
                                     setShowPenaltyConfirm(false);
                                     setIsPinModalOpen(true);
                                 }} 
-                                className="w-full bg-red-500 text-gray-900 font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl hover:bg-red-600 transition-all hover:-translate-y-1"
+                                className="w-full bg-red-500 text-slate-900 font-black py-5 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl hover:bg-red-600 transition-all hover:-translate-y-1"
                             >
                                 {lang === 'en' ? "I Accept Penalty" : "我接受并继续"}
                             </button>
@@ -1751,7 +1636,7 @@ export default function DashboardClient() {
                                     setShowPenaltyConfirm(false);
                                     setPenaltyInfo(null);
                                 }} 
-                                className="w-full text-gray-400 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-[10px]"
+                                className="w-full text-slate-400 font-bold hover:text-slate-900 transition-colors uppercase tracking-widest text-[10px]"
                             >
                                 {lang === 'en' ? "Cancel & Re-adjust Amount" : "取消并重新调整金额"}
                             </button>
@@ -1762,34 +1647,32 @@ export default function DashboardClient() {
 
             {/* Withdraw Modal */}
             {isWithdrawModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-900/40 backdrop-blur-sm">
-                    <div className="bg-gray-50 border border-gray-200 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm">
+                    <div className="bg-slate-50 border border-slate-200 rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                          <div className="flex justify-between items-center">
-                            <h2 className="text-xl font-black text-gray-900 tracking-tight uppercase">{t.withdrawTitle}</h2>
-                            <button onClick={() => setIsWithdrawModalOpen(false)} className="text-gray-500 hover:text-gray-900 transition-colors">
+                            <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase">{t.withdrawTitle}</h2>
+                            <button onClick={() => setIsWithdrawModalOpen(false)} className="text-slate-500 hover:text-slate-900 transition-colors">
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
-                                    <input type="number" value={withdrawAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawAmount(e.target.value)} className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
+                                    <label className="text-slate-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amountMYR}</label>
+                                    <input type="number" value={withdrawAmount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawAmount(e.target.value)} className="w-full bg-white border border-slate-200 rounded-2xl p-5 text-2xl font-black focus:outline-none focus:border-gv-gold transition-all" placeholder="0.00" />
                                 </div>
                                 
                                 <div className="px-1 space-y-4">
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                                            <span className="text-gray-400">Withdrawable Balance</span>
-                                            <span className="text-emerald-500">RM {withdrawalMetrics.withdrawable.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
-                                        </div>
-                                        {withdrawalMetrics.lockedCapital > 0 && (
-                                            <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-tighter">
-                                                <span className="text-gray-500">Locked (6-month term)</span>
-                                                <span className="text-amber-500/70">RM {withdrawalMetrics.lockedCapital.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
-                                            </div>
-                                        )}
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                                        <span className="text-slate-400">Withdrawable Balance</span>
+                                        <span className="text-emerald-500">RM {withdrawalMetrics.withdrawable.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
                                     </div>
+                                    {withdrawalMetrics.lockedCapital > 0 && (
+                                        <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-tighter">
+                                            <span className="text-slate-500">Locked (6-month term)</span>
+                                            <span className="text-amber-500/70">RM {withdrawalMetrics.lockedCapital.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                                        </div>
+                                    )}
 
                                     {(() => {
                                         const amountValue = parseFloat(withdrawAmount) || 0;
@@ -1801,7 +1684,7 @@ export default function DashboardClient() {
                                                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                                         <span>{lang === 'en' ? "Penalty Notice" : "扣除提示"}</span>
                                                     </div>
-                                                    <p className="text-[10px] text-gray-500 font-bold leading-relaxed">
+                                                    <p className="text-[10px] text-slate-500 font-bold leading-relaxed">
                                                         {lang === 'en' 
                                                             ? "A 40% penalty will be applied to the portion of your withdrawal taken from locked capital."
                                                             : "提款金额超出可自由提取部分，超出部分将涉及 40% 的提前提取费用。"}
@@ -1827,14 +1710,14 @@ export default function DashboardClient() {
 
             {/* PIN Modal */}
             {isPinModalOpen && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-gray-900/60 backdrop-blur-xl">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-xl">
                     <div className="bg-white border border-gv-gold/50 rounded-[40px] p-12 max-w-md w-full text-center space-y-10 shadow-[0_0_100px_rgba(212,175,55,0.15)] animate-in fade-in zoom-in-90 duration-300">
                         <div className="h-20 w-20 bg-gv-gold/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-gv-gold/20">
                             <svg className="h-10 w-10 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                         </div>
                         <div>
-                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-2">{t.securityPin}</h3>
-                            <p className="text-gray-400 font-medium text-sm px-4">{t.enterPin}</p>
+                            <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2">{t.securityPin}</h3>
+                            <p className="text-slate-400 font-medium text-sm px-4">{t.enterPin}</p>
                         </div>
                         <div className="relative flex justify-center items-center group">
                             <input
@@ -1842,14 +1725,14 @@ export default function DashboardClient() {
                                 maxLength={6}
                                 value={withdrawPIN}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWithdrawPIN(e.target.value.replace(/\D/g, ''))}
-                                className="w-full bg-white border border-gray-200 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold placeholder:opacity-20 flex-1"
+                                className="w-full bg-white border border-slate-200 rounded-2xl p-6 text-4xl font-black text-center tracking-[0.5em] focus:outline-none focus:border-gv-gold transition-all text-gv-gold placeholder:opacity-20 flex-1"
                                 autoFocus
                                 placeholder="000000"
                             />
                             <button 
                                 type="button"
                                 onClick={() => setIsPinVisible(!isPinVisible)}
-                                className="absolute right-4 p-2 text-gray-500 hover:text-gv-gold transition-colors"
+                                className="absolute right-4 p-2 text-slate-500 hover:text-gv-gold transition-colors"
                             >
                                 {isPinVisible ? (
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -1867,7 +1750,7 @@ export default function DashboardClient() {
                                 {isSubmitting ? <PremiumLoader size="sm" color="black" /> : t.confirmWithdraw}
                             </button>
                             
-                            <button onClick={() => setIsPinModalOpen(false)} className="w-full text-gray-500 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-[10px]">
+                            <button onClick={() => setIsPinModalOpen(false)} className="w-full text-slate-500 font-bold hover:text-slate-900 transition-colors uppercase tracking-widest text-[10px]">
                                 {t.cancelTx}
                             </button>
                         </div>
@@ -1881,16 +1764,16 @@ export default function DashboardClient() {
 
             {/* Success Overlays */}
             {(showSuccess || kycShowSuccess) && (
-                <div className="fixed inset-0 z-[500] bg-gray-900/40 backdrop-blur-md flex items-center justify-center p-6">
-                    <div className="bg-gray-50 border border-gv-gold/30 rounded-[40px] p-10 max-w-md w-full text-center space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-500">
+                <div className="fixed inset-0 z-[500] bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-6">
+                    <div className="bg-slate-50 border border-gv-gold/30 rounded-[40px] p-10 max-w-md w-full text-center space-y-8 shadow-2xl animate-in fade-in zoom-in-95 duration-500">
                         <div className="h-20 w-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_50px_rgba(16,185,129,0.2)] animate-bounce-subtle">
-                            <svg className="h-10 w-10 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
+                            <svg className="h-10 w-10 text-slate-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
                         </div>
                         <div className="space-y-4">
-                            <h2 className="text-3xl font-black mb-2 uppercase tracking-tighter text-gray-900">
+                            <h2 className="text-3xl font-black mb-2 uppercase tracking-tighter text-slate-900">
                                 {kycShowSuccess ? t.docSubmitted : t.successTitle}
                             </h2>
-                            <p className="text-gray-500 font-medium text-base leading-relaxed">
+                            <p className="text-slate-500 font-medium text-base leading-relaxed">
                                 {kycShowSuccess ? t.docSubmittedDesc : t.successDesc}
                             </p>
                         </div>
@@ -1907,11 +1790,11 @@ export default function DashboardClient() {
             )}
             {/* Action Toast */}
             {actionToast && (
-                <div className="fixed bottom-6 right-6 z-[600] bg-gray-50 border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 max-w-sm shadow-gv-gold/10">
+                <div className="fixed bottom-6 right-6 z-[600] bg-slate-50 border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 max-w-sm shadow-gv-gold/10">
                     <div className="flex flex-col gap-5">
                         <div className="flex items-start justify-between gap-4">
-                            <p className="text-gray-900 font-black text-sm uppercase tracking-widest leading-relaxed">{actionToast.message}</p>
-                            <button onClick={() => setActionToast(null)} className="text-gray-400 hover:text-gray-900 transition-colors shrink-0">
+                            <p className="text-slate-900 font-black text-sm uppercase tracking-widest leading-relaxed">{actionToast?.message}</p>
+                            <button onClick={() => setActionToast(null)} className="text-slate-400 hover:text-slate-900 transition-colors shrink-0">
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
@@ -1936,17 +1819,12 @@ export default function DashboardClient() {
             {/* Global style tag for date pickers avoiding messy classes */}
             <style jsx>{`
                 .inverted-scheme-date-picker::-webkit-calendar-picker-indicator {
-                    filter: invert(1);
+                    filter: none;
                     cursor: pointer;
                 }
             `}</style>
 
-            <MobileSideMenu 
-                lang={lang} 
-                isOpen={isSidebarOpen} 
-                onClose={() => setIsSidebarOpen(false)} 
-                currentTab={activeTab}
-            />
+            
         </div>
     );
 }

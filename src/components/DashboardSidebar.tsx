@@ -93,7 +93,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                     </div>
 
                     <nav className="space-y-2">
-                        <p className={`text-[10px] font-semibold uppercase tracking-[0.35em] text-gray-400/80 mb-6 px-4 transition-opacity duration-300 ${isCollapsed ? "opacity-0 invisible h-0" : "opacity-100"}`}>
+                        <p className={`text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 mb-6 px-4 transition-opacity duration-300 ${isCollapsed ? "opacity-0 invisible h-0" : "opacity-100"}`}>
                             {t.nav}
                         </p>
                         {menuItems.map((item: any) => {
@@ -104,7 +104,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                 return (
                                     <div
                                         key={item.id}
-                                        className={`w-full flex items-center justify-between gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 opacity-40 cursor-not-allowed text-gray-400`}
+                                        className={`w-full flex items-center justify-between gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 opacity-30 cursor-not-allowed text-slate-400`}
                                         title={t.verifiedRequired}
                                     >
                                         <div className="flex items-center gap-4">
@@ -145,7 +145,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                     className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500 relative group/item overflow-hidden ${
                                         isActive 
                                             ? "bg-gv-gold/10 text-slate-900 border border-gv-gold/30 shadow-[0_10px_30px_rgba(212,175,55,0.1)]" 
-                                            : "text-slate-400 hover:text-slate-900 hover:bg-slate-50 border border-transparent"
+                                            : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent"
                                     }`}
                                     title={isCollapsed ? item.label : ""}
                                 >
@@ -155,7 +155,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                             <div className="absolute inset-0 bg-gv-gold/5 blur-xl pointer-events-none animate-pulse"></div>
                                         </>
                                     )}
-                                    <span className={`shrink-0 transition-all duration-500 relative z-10 ${isActive ? "text-gv-gold scale-125" : "group-hover/item:text-gray-300 group-hover/item:scale-110"}`}>
+                                    <span className={`shrink-0 transition-all duration-500 relative z-10 ${isActive ? "text-gv-gold scale-125" : "group-hover/item:text-slate-900 group-hover/item:scale-110"}`}>
                                         {item.icon}
                                     </span>
                                     {!isCollapsed && <span className="truncate relative z-10">{item.label}</span>}
@@ -189,7 +189,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                     <p className="text-[11px] font-black text-slate-900 uppercase tracking-tight truncate group-hover:text-gv-gold transition-colors">
                                         {user.full_name || user.fullName || user.email?.split('@')[0] || "User"}
                                     </p>
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em] mt-1 opacity-60">
+                                    <p className={`text-[9px] font-black text-slate-500 uppercase tracking-[0.25em] mt-1`}>
                                         {getTierByAmount(Number(balanceUSD || 0)).name}
                                     </p>
                                 </div>
@@ -200,11 +200,11 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                     <div className="flex flex-col gap-2">
                         <button 
                             onClick={onToggleCollapse} 
-                            className={`w-full text-gray-400 hover:text-gv-gold transition-colors p-2 flex items-center ${isCollapsed ? "justify-center" : "justify-end"}`}
+                            className={`w-full text-slate-500 hover:text-gv-gold transition-colors p-2 flex items-center ${isCollapsed ? "justify-center" : "justify-end"}`}
                         >
                             <svg className={`h-5 w-5 transition-transform duration-500 ${isCollapsed ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
                         </button>
-                        <button onClick={handleLogout} className={`w-full text-gray-400 hover:text-red-500 transition-colors text-[10px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-3.5 rounded-2xl ${isCollapsed ? "justify-center" : "hover:bg-red-500/10"}`}>
+                        <button onClick={handleLogout} className={`w-full text-slate-500 hover:text-red-500 transition-colors text-[10px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-3.5 rounded-2xl ${isCollapsed ? "justify-center" : "hover:bg-red-500/10"}`}>
                             <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
                             {!isCollapsed && <span>{t.logout}</span>}
                         </button>

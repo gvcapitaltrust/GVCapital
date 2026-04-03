@@ -34,7 +34,7 @@ export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNav
             <div className="flex items-center gap-4 md:hidden mb-2">
                 <button 
                    onClick={onOpenMobileMenu}
-                   className="h-10 w-10 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-all shadow-xl backdrop-blur-md"
+                   className="h-10 w-10 flex items-center justify-center rounded-2xl bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-900 transition-all shadow-sm backdrop-blur-md"
                 >
                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
@@ -44,9 +44,9 @@ export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNav
         <div className="flex-1">
           <div className="flex items-center gap-4">
             <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600 mb-1">{t.welcome}</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-1">{t.welcome}</p>
                 <h1 className="text-2xl sm:text-3xl font-black flex flex-wrap items-center gap-4">
-                    <span className="text-white tracking-tighter">
+                    <span className="text-slate-900 tracking-tighter">
                         {(user && (user.fullName || user.full_name)) ? (user.fullName || user.full_name) : (isCheckingAuth ? "..." : "Guest")}
                     </span>
                     {Number(user?.total_investment || 0) > 0 && (
@@ -67,7 +67,7 @@ export default function DashboardNavbar({ lang, onOpenMobileMenu }: DashboardNav
         </div>
             <div className="flex items-center gap-6 hidden sm:flex">
                 {user && <NotificationBell userId={user.id} lang={lang} />}
-                <div className="flex items-center gap-4 bg-black/40 border border-white/5 rounded-[24px] p-2 backdrop-blur-2xl shadow-2xl relative group/profile-nav overflow-hidden">
+                <div className="flex items-center gap-4 bg-white/70 border border-slate-200 rounded-[24px] p-2 backdrop-blur-2xl shadow-sm relative group/profile-nav overflow-hidden">
                     <div className="absolute inset-0 bg-gv-gold/[0.02] opacity-0 group-hover/profile-nav:opacity-100 transition-opacity"></div>
                     <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-gv-gold to-[#B8860B] flex items-center justify-center font-black text-black text-xs border border-gv-gold/40 shadow-[0_10px_20px_rgba(212,175,55,0.25)] overflow-hidden relative z-10 transition-transform group-hover/profile-nav:scale-105">
                         {user?.gender === "Male" ? (
