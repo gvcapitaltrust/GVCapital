@@ -355,33 +355,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 penaltyApplied = true;
             }
 
-            // 3. Deduct: first from profit (dividends), then from balance (capital) - ALL USD
-            let newProfitUSD = currentProfitUSD;
-            let newBalanceUSD = currentBalanceUSD;
-            let remainingUSD = withdrawAmountUSD;
-
-            if (remainingUSD <= newProfitUSD) {
-                newProfitUSD -= remainingUSD;
-                remainingUSD = 0;
-            } else {
-                remainingUSD -= newProfitUSD;
-                newProfitUSD = 0;
-                newBalanceUSD = Math.max(0, newBalanceUSD - remainingUSD);
-            }
-
-            // 4. Update profile with new balances (USD-Primary)
-            const { error: profileUpdateError } = await supabase
-                .from('profiles')
-                .update({ 
-                    balance: 0, // RM balance is now legacy 0
-                    profit: newProfitUSD, // profit field repurposed to USD
-                    balance_usd: newBalanceUSD
-                })
-                .eq('id', tx.user_id);
-            
-            if (profileUpdateError) throw profileUpdateError;
-
             // 5. Mark transaction as Pending Release
+            // Total deduction is ALREADY processed during user submission to lock the funds.
+            // Admin only confirms the metadata and changes status.
             // We maintain ONE single transaction for the full requested amount (Gross)
             // But we add penalty/payout details to the metadata for the admin/user to see.
             const { error: txUpdateError } = await supabase
@@ -459,6 +435,20 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
     const handleRejectWithdrawal = async (tx: any) => {
         try {
+            // 1. Calculate Refund (Withdrawal amount is recorded as negative)
+            const refundUSD = Math.abs(Number(tx.amount || 0));
+            
+            // 2. Increment Profit (Returning liquidity to the most flexible bucket)
+            const { data: profile } = await supabase.from('profiles').select('profit').eq('id', tx.user_id).single();
+            const currentProfitUSD = Number(profile?.profit || 0);
+            
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ profit: currentProfitUSD + refundUSD })
+                .eq('id', tx.user_id);
+            if (profileError) throw profileError;
+
+            // 3. Mark transaction as Rejected
             const { error: txError } = await supabase
                 .from('transactions')
                 .update({ 
@@ -467,13 +457,14 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         ...tx.metadata,
                         processed_by_name: authUser?.user_metadata?.full_name || "Admin",
                         processed_by_id: authUser?.id,
-                        processed_by_email: authUser?.email
+                        processed_by_email: authUser?.email,
+                        rejected_at: new Date().toISOString()
                     }
                 })
                 .eq('id', tx.id);
-            
             if (txError) throw txError;
-            showToast("Withdrawal rejected.");
+            
+            showToast("Withdrawal rejected and funds refunded to user dividend wallet.");
             fetchData();
         } catch (error: any) {
             alert(error.message);
