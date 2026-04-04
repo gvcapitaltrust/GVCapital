@@ -18,7 +18,6 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
     const [successRefId, setSuccessRefId] = useState("");
     
     const [depositAmount, setDepositAmount] = useState("");
-    const [depositDate, setDepositDate] = useState("");
     const [depositReceipt, setDepositReceipt] = useState<File | null>(null);
     const [remark, setRemark] = useState("");
 
@@ -27,7 +26,6 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
             title: "New Fund Deposit",
             desc: "Add capital to your investment account. All deposits are processed within 24 hours.",
             amount: "Amount (USD)",
-            date: "Transfer Date",
             receipt: "Upload Bank Receipt",
             remark: "Remark (Optional)",
             submit: "Submit Deposit",
@@ -41,7 +39,6 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
             title: "资金存款",
             desc: "为您的投资账户添加资金。所有存款将在 24 小时内处理。",
             amount: "金额 (USD)",
-            date: "转账日期",
             receipt: "上传银行收据",
             remark: "备注 (可选)",
             submit: "提交存款",
@@ -73,7 +70,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                     user_id: user.id,
                     type: 'Deposit',
                     amount: amountUSD, // Records USD as primary source of truth
-                    transfer_date: depositDate ? new Date(depositDate).toISOString() : new Date().toISOString(),
+                    transfer_date: new Date().toISOString(),
                     status: 'Pending',
                     receipt_url: uploadData.path,
                     ref_id: refId,
@@ -173,15 +170,6 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                             )}
                         </div>
 
-                        <div className="space-y-3">
-                            <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.date}</label>
-                                <input 
-                                    type="date" 
-                                    value={depositDate} 
-                                    onChange={(e) => setDepositDate(e.target.value)} 
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold focus:bg-white transition-all text-gray-900" 
-                                />
-                        </div>
 
                         <div className="space-y-3">
                             <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.remark}</label>

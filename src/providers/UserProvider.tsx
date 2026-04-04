@@ -88,7 +88,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
                 const profitUSD = Number(profile.profit || 0);
                 const totalAssetsUSD = balanceUSD + profitUSD;
-                const withdrawableBalanceUSD = Math.max(0, (balanceUSD - lockedCapitalUSD) + profitUSD);
+                const withdrawableBalanceUSD = Math.max(0, balanceUSD - lockedCapitalUSD) + profitUSD;
                 
                 const totalDepositedUSD = approvedDeposits.filter((t: any) => {
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
