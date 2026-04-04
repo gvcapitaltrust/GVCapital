@@ -14,7 +14,7 @@ export default function LoginPage() {
     const [lang, setLang] = useState<"en" | "zh">("en");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(() => {
@@ -38,7 +38,8 @@ export default function LoginPage() {
             // Break the flashing loop: Don't auto-redirect if there's an account error in the URL
             const hasError = searchParams?.get('error') === 'account_deleted' || searchParams?.get('error') === 'multiple_devices';
             
-            if (session && !hasError) {
+            if (session && !hasError && !isLoggingIn) {
+                console.log("[AUTH] Auto-redirecting via listener...");
                 // Sync session to cookie so Next.js middleware can read it before redirecting
                 document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(session))}; path=/; max-age=31536000; SameSite=Lax;`;
                 const user = session.user;
@@ -87,12 +88,12 @@ export default function LoginPage() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
+        setIsLoggingIn(true);
         setErrorMsg("");
 
         // Check Maintenance Mode (Standardized from useSettings)
         if (maintenanceMode && email.toLowerCase() !== "thenja96@gmail.com") {
-            setIsLoading(false);
+            setIsLoggingIn(false);
             router.push('/maintenance');
             return;
         }
@@ -144,12 +145,13 @@ export default function LoginPage() {
                 document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(data.session))}; path=/; max-age=31536000; SameSite=Lax;`;
                 const user = data.session.user;
                 const isAdmin = user.user_metadata?.role?.toLowerCase() === "admin" || user.email === "thenja96@gmail.com";
+                console.log("[AUTH] Handshake verified. Redirecting...");
                 window.location.href = isAdmin ? "/admin" : `/dashboard?lang=${lang}`;
             }
         } catch (error: any) {
             setErrorMsg(error.message);
         } finally {
-            setIsLoading(false);
+            setIsLoggingIn(false);
         }
     };
     
@@ -228,10 +230,10 @@ export default function LoginPage() {
 
                     <button
                         type="submit"
-                        disabled={isLoading}
+                        disabled={isLoggingIn}
                         className="w-full bg-gv-gold text-black font-black text-lg py-5 rounded-2xl hover:bg-gv-gold/90 transition-all shadow-[0_10px_30px_rgba(212,175,55,0.2)] uppercase tracking-widest flex items-center justify-center gap-3"
                     >
-                        {isLoading ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
+                        {isLoggingIn ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
                     </button>
                 </form>
 

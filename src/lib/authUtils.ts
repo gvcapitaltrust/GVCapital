@@ -19,6 +19,8 @@ export function generateUUID(): string {
     });
 }
 
+const memoryStorage: Record<string, string> = {};
+
 /**
  * Safe localStorage wrapper to prevent crashes in private/restricted browsers.
  * Includes a persistence check to help AuthProvider decide if it should enforce session limits.
@@ -44,13 +46,16 @@ export const safeStorage = {
                     const val = window.localStorage.getItem(key);
                     if (val) return val;
                 }
-                // Fallback to sessionStorage for same-tab persistence if localStorage is blocked
                 if (window.sessionStorage) {
-                    return window.sessionStorage.getItem(key);
+                    const sessionVal = window.sessionStorage.getItem(key);
+                    if (sessionVal) return sessionVal;
                 }
+                // Fallback to memory if both are blocked
+                return memoryStorage[key] || null;
             }
         } catch (e) {
             console.error("[AUTH] storage.getItem failed:", e);
+            return memoryStorage[key] || null;
         }
         return null;
     },
@@ -63,9 +68,11 @@ export const safeStorage = {
                 if (window.sessionStorage) {
                     window.sessionStorage.setItem(key, value);
                 }
+                memoryStorage[key] = value;
             }
         } catch (e) {
             console.error("[AUTH] storage.setItem failed:", e);
+            memoryStorage[key] = value;
         }
     }
 };

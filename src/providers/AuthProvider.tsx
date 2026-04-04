@@ -34,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true);
     
     const [session, setSession] = useState<any>(null);
+    const [lastLoginTime, setLastLoginTime] = useState<number | null>(null);
     const [deviceId, setDeviceId] = useState<string | null>(null);
     const router = useRouter();
     
@@ -93,6 +94,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Stable Identity Check: Only trigger if the user ID changed or explicitly signed in
             if (s && (s.user.id !== currentUserId.current || event === 'SIGNED_IN')) {
                 document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(s))}; path=/; max-age=31536000; SameSite=Lax;`;
+                if (event === 'SIGNED_IN') {
+                    setLastLoginTime(Date.now());
+                }
                 currentUserId.current = s.user.id;
                 setSession(s);
             }
@@ -124,9 +128,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 // If storage is disabled (e.g. Private Mode), every reload generates a new UUID. 
                 // We shouldn't lock users out just because their browser blocks storage.
                 const isPersistent = safeStorage.isPersistent();
+                const isWithinGracePeriod = lastLoginTime && (Date.now() - lastLoginTime < 3000); // 3-second grace period for mobile handshakes
 
-                if (isPersistent && !activeSessions.includes(deviceId)) {
-                    console.warn("[AUTH] Device not in active sessions list. Signing out...");
+                if (isPersistent && !activeSessions.includes(deviceId) && !isWithinGracePeriod) {
+                    console.warn("[AUTH] Device not in active sessions list. Signing out...", {
+                        deviceId,
+                        activeSessions,
+                        isWithinGracePeriod
+                    });
                     document.cookie = `gv-auth-v1=; path=/; max-age=0;`;
                     await supabase.auth.signOut();
                     window.location.href = "/login?error=multiple_devices";
