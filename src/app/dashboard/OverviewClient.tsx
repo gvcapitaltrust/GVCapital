@@ -245,7 +245,11 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                 </div>
                                 <div className="relative z-10">
                                     <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
-                                    <h2 className="text-4xl font-black tracking-tighter text-emerald-600 tabular-nums whitespace-nowrap">$ {(user?.profit_usd ?? (Number(user?.profit || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                    <h2 className="text-4xl font-black tracking-tighter text-emerald-600 tabular-nums whitespace-nowrap">$ {(user?.lifetime_dividends_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                    <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{lang === 'en' ? 'Dividend Wallet' : t.walletBalance}</span>
+                                        <span className="text-xs font-black text-gv-gold tabular-nums">$ {(user?.profit_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    </div>
                                 </div>
                             </div>
                         </section>

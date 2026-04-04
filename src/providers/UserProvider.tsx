@@ -100,6 +100,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     (t.status === 'Approved' || t.status === 'Completed' || t.status === 'Pending Release')
                 ).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
 
+                const lifetimeDividendsUSD = txs.filter((t: any) => {
+                    const type = (t.type || "").toLowerCase();
+                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                    const isDivOrBonus = type === 'dividend' || type === 'bonus' || category === 'dividend' || category === 'bonus';
+                    return isDivOrBonus && t.status === 'Approved';
+                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate)), 0);
+
                 const fullProfile = {
                     ...user,
                     ...profile,
@@ -117,7 +124,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     total_investment_usd: balanceUSD,
                     totalEquity: totalAssetsUSD,
                     balanceUSD: balanceUSD,
-                    profit_usd: profitUSD
+                    profit_usd: profitUSD,
+                    lifetime_dividends_usd: lifetimeDividendsUSD
                 };
 
                 setUserProfile(fullProfile);
