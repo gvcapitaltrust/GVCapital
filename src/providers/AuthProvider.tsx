@@ -120,8 +120,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 // MULTIPLE DEVICE CHECK (Limit 2)
                 const activeSessions: string[] = Array.isArray(profile.active_sessions) ? profile.active_sessions : [];
                 
-                // If our device ID is not in the active sessions list, we've been logged out/invalidated
-                if (!activeSessions.includes(deviceId)) {
+                // CRITICAL: Only enforce the logout loop if we are reasonably sure the storage is persistent.
+                // If storage is disabled (e.g. Private Mode), every reload generates a new UUID. 
+                // We shouldn't lock users out just because their browser blocks storage.
+                const isPersistent = safeStorage.isPersistent();
+
+                if (isPersistent && !activeSessions.includes(deviceId)) {
                     console.warn("[AUTH] Device not in active sessions list. Signing out...");
                     document.cookie = `gv-auth-v1=; path=/; max-age=0;`;
                     await supabase.auth.signOut();

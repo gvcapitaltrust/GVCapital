@@ -152,6 +152,8 @@ export default function LoginPage() {
             setIsLoading(false);
         }
     };
+    
+    const isMultipleDevicesError = searchParams?.get('error') === 'multiple_devices';
 
     return (
         <div className="min-h-screen bg-[#FAFAF8] flex flex-col items-center p-6 selection:bg-gv-gold selection:text-black">
@@ -179,7 +181,25 @@ export default function LoginPage() {
                     <p className="text-gray-400 font-medium">{t.subtitle}</p>
                 </div>
 
-                {errorMsg && <div className="w-full bg-red-500/20 border border-red-500/50 p-4 rounded-xl text-red-500 text-sm mb-6">{errorMsg}</div>}
+                {errorMsg && (
+                    <div className="w-full space-y-4 mb-6">
+                        <div className="bg-red-500/20 border border-red-500/50 p-4 rounded-xl text-red-500 text-sm font-medium">
+                            {errorMsg}
+                        </div>
+                        {isMultipleDevicesError && (
+                            <div className="bg-gv-gold/5 border border-gv-gold/20 p-6 rounded-2xl text-center space-y-3">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">
+                                    {lang === 'en' ? "Having trouble with multiple sessions?" : "多个会话登录遇到问题？"}
+                                </p>
+                                <p className="text-[9px] text-gray-400 font-medium leading-relaxed">
+                                    {lang === 'en' 
+                                        ? "Our security policy allows 2 active sessions. If you've hit this limit, please ensure you've logged out from other devices." 
+                                        : "我们的安全政策允许2个活动会话。如果您已达到此限制，请确保您已从其他设备登出。"}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 <form onSubmit={handleLogin} className="w-full space-y-6">
                     <div className="space-y-2">
