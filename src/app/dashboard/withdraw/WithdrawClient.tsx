@@ -235,7 +235,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2 space-y-8">
-                    <div className="bg-white border border-gray-200 rounded-[40px] p-8 md:p-12 shadow-2xl space-y-10">
+                    <div className="bg-white border border-gray-200 rounded-[32px] p-8 md:p-10 shadow-2xl space-y-10">
                         <div className="space-y-6">
                             <div className="space-y-3">
                                 <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amount}</label>
@@ -245,7 +245,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                         type="number" 
                                         value={withdrawAmount} 
                                         onChange={(e) => setWithdrawAmount(e.target.value)} 
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-6 pl-12 text-3xl font-black focus:outline-none focus:border-gv-gold focus:bg-white transition-all tabular-nums" 
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-5 pl-12 text-2xl font-black focus:outline-none focus:border-gv-gold focus:bg-white transition-all tabular-nums" 
                                         placeholder="0.00" 
                                     />
                                 </div>
@@ -259,7 +259,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                             <div className="flex items-center justify-between p-6 bg-gray-50 rounded-3xl border border-gray-200">
                                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t.withdrawable}</span>
                                 <div className="text-right">
-                                    <p className="text-xl font-black text-emerald-500 tabular-nums">$ {(user?.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                    <p className="text-lg font-black text-emerald-500 tabular-nums">$ {(user?.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">≈ RM {user?.withdrawable_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                 </div>
                             </div>
@@ -267,7 +267,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                             <button 
                                 onClick={handleWithdrawInitiate} 
                                 disabled={!withdrawAmount || isSubmitting} 
-                                className="w-full bg-black text-white font-black py-6 rounded-3xl flex justify-center items-center gap-4 text-xl uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
+                                className="w-full bg-black text-white font-black py-5 rounded-2xl flex justify-center items-center gap-4 text-lg uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
                             >
                                 {t.continueToPin}
                             </button>
@@ -284,7 +284,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 size="lg" 
                             />
                             <div className="flex flex-col">
-                                <span className="text-xl font-black text-gray-900 uppercase tracking-tighter">
+                                <span className="text-lg font-black text-gray-900 uppercase tracking-tighter">
                                     {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
                                 </span>
                                 <span className="text-[10px] font-bold text-gv-gold uppercase tracking-widest">{t.member}</span>
@@ -379,8 +379,8 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                             </button>
                         </div>
                         <div className="space-y-4">
-                            <button onClick={handleWithdrawConfirm} disabled={isSubmitting || withdrawPIN.length !== 6} className="w-full bg-black text-white font-black py-6 rounded-3xl flex justify-center items-center gap-4 uppercase tracking-widest shadow-xl transition-all hover:bg-gv-gold hover:text-black">
-                                {isSubmitting ? <div className="h-6 w-6 border-4 border-white border-t-transparent animate-spin rounded-full"></div> : t.submit}
+                            <button onClick={handleWithdrawConfirm} disabled={isSubmitting || withdrawPIN.length !== 6} className="w-full bg-black text-white font-black py-5 rounded-2xl flex justify-center items-center gap-4 uppercase tracking-widest shadow-xl transition-all hover:bg-gv-gold hover:text-black text-lg">
+                                {isSubmitting ? <div className="h-5 w-5 border-4 border-white border-t-transparent animate-spin rounded-full"></div> : t.submit}
                             </button>
                             <button onClick={() => setIsPinModalOpen(false)} className="w-full text-gray-400 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-[10px]">Cancel Transaction</button>
                         </div>

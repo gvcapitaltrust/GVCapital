@@ -151,7 +151,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             )}
 
-            <div className={`bg-white border border-gray-200 rounded-[40px] p-8 md:p-12 shadow-2xl space-y-10 transition-all duration-500 ${!user?.is_verified ? 'opacity-40 grayscale pointer-events-none select-none' : ''}`}>
+            <div className={`bg-white border border-gray-200 rounded-[32px] p-8 md:p-10 shadow-2xl space-y-8 transition-all duration-500 ${!user?.is_verified ? 'opacity-40 grayscale pointer-events-none select-none' : ''}`}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div className="space-y-8">
                         <div className="space-y-3">
@@ -162,7 +162,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                                     type="number" 
                                     value={depositAmount} 
                                     onChange={(e) => setDepositAmount(e.target.value)} 
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-6 pl-12 text-3xl font-black focus:outline-none focus:border-gv-gold focus:bg-white transition-all tabular-nums" 
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-5 pl-12 text-2xl font-black focus:outline-none focus:border-gv-gold focus:bg-white transition-all tabular-nums" 
                                     placeholder="0.00" 
                                 />
                             </div>
@@ -175,12 +175,12 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
 
                         <div className="space-y-3">
                             <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.date}</label>
-                            <input 
-                                type="date" 
-                                value={depositDate} 
-                                onChange={(e) => setDepositDate(e.target.value)} 
-                                className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-6 text-xl font-black focus:outline-none focus:border-gv-gold focus:bg-white transition-all text-gray-900" 
-                            />
+                                <input 
+                                    type="date" 
+                                    value={depositDate} 
+                                    onChange={(e) => setDepositDate(e.target.value)} 
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold focus:bg-white transition-all text-gray-900" 
+                                />
                         </div>
 
                         <div className="space-y-3">
@@ -224,13 +224,13 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                     </div>
                 </div>
 
-                <div className="pt-10 border-t border-gray-100">
+                <div className="pt-8 border-t border-gray-100">
                     <button 
                         onClick={handleSubmit} 
                         disabled={isSubmitting || !depositAmount || !depositReceipt} 
-                        className="w-full bg-gv-gold text-black font-black py-6 rounded-3xl flex justify-center items-center gap-4 text-xl uppercase tracking-widest shadow-[0_20px_40px_rgba(212,175,55,0.25)] hover:shadow-[0_25px_50px_rgba(212,175,55,0.35)] disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:-translate-y-1"
+                        className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl flex justify-center items-center gap-4 text-lg uppercase tracking-widest shadow-[0_20px_40px_rgba(212,175,55,0.25)] hover:shadow-[0_25px_50px_rgba(212,175,55,0.35)] disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:-translate-y-1"
                     >
-                        {isSubmitting ? <div className="h-6 w-6 border-4 border-black border-t-transparent animate-spin rounded-full"></div> : t.submit}
+                        {isSubmitting ? <div className="h-5 w-5 border-4 border-black border-t-transparent animate-spin rounded-full"></div> : t.submit}
                     </button>
                 </div>
             </div>

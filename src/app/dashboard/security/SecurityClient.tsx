@@ -69,8 +69,8 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                     </div>
 
                     <div className="space-y-4">
-                        <h2 className="text-2xl font-bold uppercase tracking-tight text-gray-900">{t.securityTitle}</h2>
-                        <p className="text-gray-400 font-medium leading-relaxed max-w-lg">{t.securitySubtitle}</p>
+                        <h2 className="text-xl font-bold uppercase tracking-tight text-gray-900">{t.securityTitle}</h2>
+                        <p className="text-gray-400 font-medium text-sm leading-relaxed max-w-lg">{t.securitySubtitle}</p>
                     </div>
 
                     <form onSubmit={handlePasswordUpdate} className="grid gap-6">
@@ -93,7 +93,7 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full bg-gv-gold text-black font-black py-4 rounded-xl uppercase tracking-widest text-sm shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-4 mt-8"
+                            className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl uppercase tracking-widest text-lg shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-4 mt-8"
                         >
                             {isSubmitting ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.updateBtn}
                         </button>

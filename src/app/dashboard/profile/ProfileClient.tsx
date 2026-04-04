@@ -137,17 +137,17 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="flex flex-col md:flex-row gap-12">
                         <div className="space-y-1 flex-1">
                             <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.bankName}</p>
-                            <p className="text-lg font-bold text-gray-900 tracking-widest uppercase">{user?.bank_name || "-"}</p>
+                            <p className="text-base font-bold text-gray-900 tracking-widest uppercase">{user?.bank_name || "-"}</p>
                         </div>
                         <div className="space-y-1 flex-1">
                             <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.accNumber}</p>
-                            <p className="text-lg font-bold text-gray-900 tracking-widest font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
+                            <p className="text-base font-bold text-gray-900 tracking-widest font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-12 pt-8 border-t border-gray-200">
                         <div className="space-y-1 flex-1">
                             <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.accHolder}</p>
-                            <p className="text-lg font-bold text-gray-900 tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
+                            <p className="text-base font-bold text-gray-900 tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
                         </div>
                         <div className="space-y-1 flex-1">
                             <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.bankStatement}</p>

@@ -178,7 +178,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                     </span>
                 </div>
 
-                <div className="border border-gray-200 rounded-[40px] overflow-hidden bg-white backdrop-blur-md shadow-2xl">
+                <div className="border border-gray-200 rounded-[32px] overflow-hidden bg-white backdrop-blur-md shadow-2xl">
                     <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
                         <table className="w-full text-left min-w-[700px] border-collapse">
                             <thead className="bg-white border-b border-gray-200 sticky top-0 z-10 backdrop-blur-md">
@@ -314,7 +314,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             <section className="bg-gray-50 border border-gray-200 p-8 rounded-[32px] shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                 <div className="relative z-10 max-w-2xl">
-                    <h2 className="text-2xl font-bold uppercase tracking-tight mb-3">{t.statementCenter}</h2>
+                    <h2 className="text-xl font-bold uppercase tracking-tight mb-3">{t.statementCenter}</h2>
                     <p className="text-gray-400 text-sm font-medium mb-8">{t.statementCenterDesc}</p>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">

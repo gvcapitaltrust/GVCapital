@@ -60,14 +60,14 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
     return (
         <div className="space-y-12 pb-20">
             {/* Header / Share Section */}
-            <div className="bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
+            <div className="bg-gray-50 border border-gray-200 p-6 md:p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                 <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div className="space-y-6">
-                        <h2 className="text-2xl font-bold uppercase tracking-tight text-gray-900">{t.referTitle}</h2>
-                        <p className="text-gray-400 font-medium text-base leading-relaxed">{t.referSubtitle}</p>
+                        <h2 className="text-xl font-bold uppercase tracking-tight text-gray-900">{t.referTitle}</h2>
+                        <p className="text-gray-400 font-medium text-sm leading-relaxed">{t.referSubtitle}</p>
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <div className="bg-white border border-gray-200 rounded-2xl p-5 flex-1 flex items-center justify-between">
+                            <div className="bg-white border border-gray-200 rounded-2xl p-4 flex-1 flex items-center justify-between">
                                 <span className="text-gv-gold font-black tracking-widest uppercase">{user?.username}</span>
                                 <button onClick={copyToClipboard} className="text-gray-900 hover:text-gv-gold transition-colors text-xs font-black uppercase tracking-widest pl-4 border-l border-gray-200">{t.copyCode}</button>
                             </div>
@@ -80,16 +80,16 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                             </button>
                         </div>
                     </div>
-                    <div className="flex flex-col items-center justify-center bg-white border border-gray-200 rounded-3xl p-8 text-center group-hover:bg-gray-100 transition-all">
-                        <p className="text-gray-400 font-black uppercase tracking-[0.3em] mb-4 text-xs">{t.totalReferred}</p>
-                        <h3 className="text-5xl font-bold tracking-tight text-gv-gold tabular-nums">{referredCount}</h3>
+                    <div className="flex flex-col items-center justify-center bg-white border border-gray-200 rounded-3xl p-6 text-center group-hover:bg-gray-100 transition-all">
+                        <p className="text-gray-400 font-black uppercase tracking-[0.3em] mb-4 text-[10px]">{t.totalReferred}</p>
+                        <h3 className="text-4xl font-bold tracking-tight text-gv-gold tabular-nums">{referredCount}</h3>
                     </div>
                 </div>
             </div>
 
             {/* List Section */}
             <div className="space-y-6">
-                <h3 className="text-xl font-bold uppercase tracking-tight">{t.referredUsersList}</h3>
+                <h3 className="text-lg font-bold uppercase tracking-tight">{t.referredUsersList}</h3>
                 <div className="border border-gray-200 rounded-3xl overflow-hidden bg-white backdrop-blur-md shadow-2xl">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left min-w-[800px]">
