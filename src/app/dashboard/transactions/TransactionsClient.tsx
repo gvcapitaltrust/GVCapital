@@ -15,6 +15,8 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [activeFilter, setActiveFilter] = useState<'All' | 'Capital' | 'Dividends'>('All');
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     const t = {
         en: {
@@ -80,10 +82,15 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         // Institutional Header
         doc.setFillColor(15, 23, 42); // slate-900
         doc.rect(0, 0, 210, 45, 'F');
-        doc.setTextColor(212, 175, 55); // gv-gold
-        doc.setFontSize(24);
-        doc.setFont("helvetica", "bold");
-        doc.text("GV CAPITAL TRUST", 20, 28);
+        
+        try {
+            doc.addImage("/logo.png", "PNG", 20, 10, 25, 25);
+        } catch (e) {
+            doc.setTextColor(212, 175, 55); // gv-gold fallback
+            doc.setFontSize(24);
+            doc.setFont("helvetica", "bold");
+            doc.text("GV CAPITAL TRUST", 20, 28);
+        }
         
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(9);
@@ -202,7 +209,17 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         doc.text("This statement is electronically generated and verified by GV Capital Trust Fiduciary Systems. No physical signature required.", 20, finalY + 15);
         doc.text("For support, please contact your account manager directly via the secure portal.", 20, finalY + 20);
 
-        doc.save(`GV_Institutional_Statement_${monthName}_${selectedYear}.pdf`);
+        const pdfBlobUrl = doc.output("bloburl").toString();
+        setPreviewUrl(pdfBlobUrl);
+        setIsPreviewOpen(true);
+    };
+
+    const downloadPdf = () => {
+        if (!previewUrl) return;
+        const link = document.createElement("a");
+        link.href = previewUrl;
+        link.download = `GV_Institutional_Statement_${t.months[selectedMonth]}_${selectedYear}.pdf`;
+        link.click();
     };
 
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
@@ -390,6 +407,62 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                     <button onClick={generateStatement} className="bg-gv-gold text-black font-bold py-4 px-8 rounded-2xl text-sm uppercase tracking-widest shadow-xl hover:-translate-y-0.5 transition-all">{t.generateDownload}</button>
                 </div>
             </section>
+
+            {/* Institutional Preview Modal */}
+            {isPreviewOpen && previewUrl && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-5xl h-full max-h-[90vh] rounded-[2rem] overflow-hidden flex flex-col shadow-2xl border border-white/20 animate-in zoom-in-95 duration-500">
+                        {/* Modal Header */}
+                        <div className="bg-slate-900 px-8 py-6 flex items-center justify-between border-b border-slate-800">
+                            <div className="flex items-center gap-4">
+                                <img src="/logo.png" alt="GV Capital" className="h-10 w-auto object-contain" />
+                                <div className="h-8 w-px bg-slate-800 mx-2 hidden sm:block"></div>
+                                <div>
+                                    <h3 className="text-gv-gold font-bold uppercase tracking-widest text-sm">Statement Preview</h3>
+                                    <p className="text-slate-400 text-[10px] uppercase font-black tracking-tight">{t.months[selectedMonth]} {selectedYear}</p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => setIsPreviewOpen(false)}
+                                className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-800 text-white hover:bg-slate-700 transition-colors"
+                            >
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+
+                        {/* Modal Body (PDF Preview) */}
+                        <div className="flex-1 bg-slate-100 p-4 md:p-8 overflow-hidden">
+                            <iframe 
+                                src={previewUrl} 
+                                className="w-full h-full rounded-2xl shadow-inner border border-gray-200 bg-white"
+                                title="Fiduciary Statement Preview"
+                            />
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="bg-white px-8 py-6 flex items-center justify-between border-t border-gray-100">
+                            <div className="hidden md:flex items-center gap-3 text-[10px] text-gray-400 font-bold uppercase tracking-tight">
+                                <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                <span>Fiduciary Hash Verified Statement</span>
+                            </div>
+                            <div className="flex items-center gap-4 w-full md:w-auto">
+                                <button 
+                                    onClick={() => setIsPreviewOpen(false)}
+                                    className="flex-1 md:flex-none px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-all duration-300"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={downloadPdf}
+                                    className="flex-1 md:flex-none px-10 py-4 bg-gv-gold rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-[0_10px_30px_rgba(212,175,55,0.3)] hover:shadow-[0_15px_40px_rgba(212,175,55,0.4)] transition-all duration-500 transform hover:-translate-y-1"
+                                >
+                                    Download Final PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
