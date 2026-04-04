@@ -326,7 +326,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
                         <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Total Capital Assets' : '总资产'}</span>
                         <p className="text-lg font-black text-slate-900 tabular-nums leading-none tracking-tighter">
-                            $ {((user?.balance_usd || 0) + (user?.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            $ {(user?.balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                     </div>
                 </div>
