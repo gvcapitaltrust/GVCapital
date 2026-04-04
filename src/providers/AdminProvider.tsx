@@ -93,13 +93,23 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 const now = new Date();
                 const enrichedUsers = profileList.map((p: any) => {
                     const userTxs = txList.filter((t: any) => t.user_id === p.id && ['Approved', 'Completed'].includes(t.status));
-                    const totalInvestment = Number(p.balance || 0);
-                    const totalInvestmentUSD = p.balance_usd ?? (totalInvestment / forexRate);
+                    // 1. Core Financial Markers (USD Primary)
+                    const balanceUSD = Number(p.balance_usd ?? 0);
+                    const profitUSD = Number(p.profit || 0); 
+                    const totalInvestmentUSD = balanceUSD; // Investment is strictly the Capital Balance
+                    const totalAssetsUSD = balanceUSD + profitUSD;
+                    
                     const currentTier = getTierByAmount(totalInvestmentUSD);
                     const lockPeriodDays = currentTier.lockInDays || 180;
                     
-                    // Locked Capital Logic (standardized to USD-primary)
-                    const lockedCapitalUSD = userTxs.filter((t: any) => t.type === 'Deposit').reduce((acc: number, tx: any) => {
+                    // 2. Locked Capital Logic (standardized to USD-primary)
+                    const lockedCapitalUSD = userTxs.filter((t: any) => {
+                        const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                        const isCapital = (t.type === 'Deposit' || t.type === 'Bonus' || t.type === 'Adjustment') && 
+                                         category !== 'dividend' && 
+                                         category !== 'profit';
+                        return isCapital;
+                    }).reduce((acc: number, tx: any) => {
                         const rawDate = tx.transfer_date || tx.created_at;
                         const txDate = new Date(rawDate);
                         if (isNaN(txDate.getTime())) return acc;
@@ -107,31 +117,36 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         return diffDays < lockPeriodDays ? acc + Number(tx.original_currency_amount ?? (Number(tx.amount || 0) / forexRate)) : acc;
                     }, 0);
 
-                    const profitUSD = Number(p.profit || 0); // Profit field is USD-primary
-                    const withdrawableBalanceUSD = Math.max(0, (totalInvestmentUSD - lockedCapitalUSD) + profitUSD);
-                    const withdrawableBalance = withdrawableBalanceUSD * forexRate;
-                    const lockedCapital = lockedCapitalUSD * forexRate;
-                    const totalAssetsUSD = totalInvestmentUSD + profitUSD;
+                    // 3. Liquidity Distribution
+                    const matureCapitalUSD = Math.max(0, balanceUSD - lockedCapitalUSD);
+                    const withdrawableBalanceUSD = matureCapitalUSD + profitUSD;
+                    
+                    const withdrawableBalanceRM = withdrawableBalanceUSD * (forexRate - 0.4);
+                    const lockedCapitalRM = lockedCapitalUSD * forexRate;
+                    const totalInvestmentRM = balanceUSD * forexRate;
 
                     return {
                         ...p,
-                        total_investment: totalInvestment,
+                        total_investment: totalInvestmentRM,
                         total_investment_usd: totalInvestmentUSD,
-                        withdrawable_balance: withdrawableBalance,
+                        withdrawable_balance: withdrawableBalanceRM,
                         withdrawable_balance_usd: withdrawableBalanceUSD,
-                        locked_capital: lockedCapital,
+                        locked_capital: lockedCapitalRM,
+                        locked_capital_usd: lockedCapitalUSD,
                         profit_usd: profitUSD,
-                        total_assets_usd: totalAssetsUSD
+                        total_assets_usd: totalAssetsUSD,
+                        mature_capital_usd: matureCapitalUSD,
+                        dividend_wallet_usd: profitUSD
                     };
                 });
 
                 setUsers(enrichedUsers);
                 setKycQueue(kycPendingList || []);
 
-                // Calculate Global Platform Stats (Both RM and USD)
-                const stats = profileList.reduce((acc, p) => {
-                    const currentBalanceUSD = p.balance_usd ?? (Number(p.balance || 0) / forexRate);
-                    const currentProfitUSD = Number(p.profit || 0); // Profit is USD-primary
+                // Calculate Global Platform Stats using Unified enrichedUsers
+                const stats = enrichedUsers.reduce((acc: any, p: any) => {
+                    const currentBalanceUSD = p.total_investment_usd;
+                    const currentProfitUSD = p.profit_usd;
                     return {
                         totalBalance: acc.totalBalance + (currentBalanceUSD * forexRate),
                         totalBalanceUSD: acc.totalBalanceUSD + currentBalanceUSD,
@@ -144,42 +159,31 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     };
                 }, { totalBalance: 0, totalBalanceUSD: 0, totalProfit: 0, totalProfitUSD: 0, totalAssets: 0, totalAssetsUSD: 0, userCount: 0, verifiedCount: 0 });
                 setPlatformStats(stats as any);
-            }
 
-            // 6. Fetch Sales Data & Synchronize USD Totals
-            const { data: sales } = await supabase
-                .from('sales_leaderboard')
-                .select('*')
-                .order('total_referred_capital', { ascending: false });
+                // 6. Fetch Sales Data & Synchronize USD Totals using Unified enrichedUsers
+                const { data: sales } = await supabase
+                    .from('sales_leaderboard')
+                    .select('*')
+                    .order('total_referred_capital', { ascending: false });
 
-            if (sales && profileList && txList) {
-                // We use the same enrichment logic or the existing enrichedUsers if we restructure
-                // Better approach: Calculate preciseSalesData here where we have the fresh data
-                const now = new Date();
-                const enrichedUsers = profileList.map((p: any) => {
-                    const userTxs = txList.filter((t: any) => t.user_id === p.id && ['Approved', 'Completed'].includes(t.status));
-                    const totalInvUSD = p.balance_usd ?? (Number(p.balance || 0) / forexRate);
-                    return { ...p, balance_usd: totalInvUSD };
-                });
+                if (sales) {
+                    const preciseSalesData = sales.map(agent => {
+                        const referredUsers = enrichedUsers.filter((u: any) => u.referred_by_username === agent.agent_username);
+                        const totalUSD = referredUsers.reduce((sum: number, u: any) => sum + Number(u.total_investment_usd || 0), 0);
+                        const totalRM = referredUsers.reduce((sum: number, u: any) => sum + Number(u.total_investment || 0), 0);
+                        return {
+                            ...agent,
+                            total_referred_capital: totalRM,
+                            total_referred_capital_usd: totalUSD
+                        };
+                    });
+                    setSalesData(preciseSalesData);
+                }
 
-                const preciseSalesData = sales.map(agent => {
-                    const referredUsers = enrichedUsers.filter(u => u.referred_by_username === agent.agent_username);
-                    const totalUSD = referredUsers.reduce((sum, u) => sum + Number(u.balance_usd || 0), 0);
-                    const totalRM = referredUsers.reduce((sum, u) => sum + Number(u.balance || 0), 0);
-                    return {
-                        ...agent,
-                        total_referred_capital: totalRM,
-                        total_referred_capital_usd: totalUSD
-                    };
-                });
-                setSalesData(preciseSalesData);
-            } else if (sales) {
-                setSalesData(sales);
-            }
-
-            if (txList) {
-                setDeposits(txList.filter((t: any) => t.type?.toLowerCase() === 'deposit'));
-                setWithdrawals(txList.filter((t: any) => t.type?.toLowerCase() === 'withdrawal'));
+                if (txList) {
+                    setDeposits(txList.filter((t: any) => t.type?.toLowerCase() === 'deposit'));
+                    setWithdrawals(txList.filter((t: any) => t.type?.toLowerCase() === 'withdrawal'));
+                }
             }
 
             // 4. Fetch Verification Logs
