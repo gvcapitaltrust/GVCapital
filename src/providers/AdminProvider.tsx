@@ -43,6 +43,7 @@ interface AdminContextType {
     handleSetAdminRole: (userId: string, makeAdmin: boolean) => Promise<void>;
     handleDeleteUser: (userId: string) => Promise<void>;
     handleToggleUserStatus: (userId: string, isDeactivated: boolean) => Promise<void>;
+    getUserWithdrawalMethods: (userId: string) => Promise<any[]>;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -744,6 +745,22 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const getUserWithdrawalMethods = async (userId: string) => {
+        try {
+            const { data, error } = await supabase
+                .from('withdrawal_methods')
+                .select('*')
+                .eq('user_id', userId)
+                .order('is_default', { ascending: false });
+            
+            if (error) throw error;
+            return data || [];
+        } catch (err: any) {
+            console.error("Error fetching withdrawal methods:", err);
+            return [];
+        }
+    };
+
     useEffect(() => {
         fetchData();
 
@@ -803,7 +820,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             handleUpdatePassword,
             handleSetAdminRole,
             handleDeleteUser,
-            handleToggleUserStatus
+            handleToggleUserStatus,
+            getUserWithdrawalMethods
         }}>
             {children}
             

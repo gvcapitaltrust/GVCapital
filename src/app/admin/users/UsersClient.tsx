@@ -8,11 +8,13 @@ import TierMedal from "@/components/TierMedal";
 import { formatDateTime } from "@/lib/dateUtils";
 
 export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
-    const { users, combinedAuditLogs, loading, handleAdjustBalance, handleResetUserPassword, handleSetAdminRole, handleDeleteUser, handleToggleUserStatus } = useAdmin();
+    const { users, combinedAuditLogs, loading, handleAdjustBalance, handleResetUserPassword, handleSetAdminRole, handleDeleteUser, handleToggleUserStatus, getUserWithdrawalMethods } = useAdmin();
     const { forexRate } = useSettings();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [userMethods, setUserMethods] = useState<any[]>([]);
+    const [isLoadingMethods, setIsLoadingMethods] = useState(false);
     
     // Adjustment State
     const [adjustmentAmount, setAdjustmentAmount] = useState("");
@@ -87,9 +89,18 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
         }
     }[lang];
 
-    const openDetails = (user: any) => {
+    const openDetails = async (user: any) => {
         setSelectedUser(user);
         setIsDetailModalOpen(true);
+        setIsLoadingMethods(true);
+        try {
+            const methods = await getUserWithdrawalMethods(user.id);
+            setUserMethods(methods || []);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsLoadingMethods(false);
+        }
     };
 
     const handleExecuteAdjustment = async () => {
@@ -390,7 +401,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                         <div className="flex items-center justify-between">
                                             <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold">{t.txHistory}</h4>
                                         </div>
-                                        <div className="overflow-x-auto overflow-y-auto max-h-[500px] custom-scrollbar scrollbar-thin scrollbar-thumb-gray-200">
+                                        <div className="overflow-x-auto overflow-y-auto max-h-[500px] custom-scrollbar scrollbar-thin scrollbar-thumb-gray-300">
                                             {/* Desktop View */}
                                             <table className="w-full text-left hidden md:table">
                                                 <thead className="bg-gray-50 text-[7px] md:text-[8px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200 sticky top-0 z-10">
@@ -424,14 +435,14 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className="md:hidden divide-y divide-gray-100">
                                                 {combinedAuditLogs
                                                     .filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction')
-                                                    .map((log, i) => {
-                                                        const isExpanded = expandedLogId === `${log.created_at}-${i}`;
+                                                    .map((log, j) => {
+                                                        const isExpanded = expandedLogId === `${log.created_at}-${j}`;
                                                         const isNegative = log.txType === 'Withdrawal' && log.action !== 'Adjustment' || log.rejection_reason?.toLowerCase().includes('decrease');
                                                         
                                                         return (
-                                                            <div key={i} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
+                                                            <div key={j} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
                                                                 <div 
-                                                                    onClick={() => setExpandedLogId(isExpanded ? null : `${log.created_at}-${i}`)}
+                                                                    onClick={() => setExpandedLogId(isExpanded ? null : `${log.created_at}-${j}`)}
                                                                     className="px-4 py-4 space-y-3 hover:bg-gray-50 transition-colors"
                                                                 >
                                                                     <div className="flex justify-between items-center">
@@ -477,6 +488,60 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                     <p className="text-[7px] md:text-[8px] font-black uppercase text-gray-500 mb-1">ID Type</p>
                                     <p className="text-[10px] md:text-xs font-black text-gray-500">{selectedUser?.kyc_data?.idType || "Passport"}</p>
                                 </div>
+                            </div>
+
+                            {/* New Withdrawal Methods Section */}
+                            <div className="mt-8 space-y-6">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
+                                    <span className="h-1 w-4 bg-gv-gold rounded-full"></span>
+                                    Payout Destinations
+                                </h4>
+                                
+                                {isLoadingMethods ? (
+                                    <div className="flex items-center justify-center py-10"><div className="h-8 w-8 border-2 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>
+                                ) : userMethods.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {userMethods.map((method: any) => (
+                                            <div key={method.id} className="bg-white border border-gray-100 p-6 rounded-3xl shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+                                                <div className="absolute top-0 right-0 w-16 h-16 bg-gv-gold/5 blur-2xl group-hover:bg-gv-gold/10 transition-all"></div>
+                                                <div className="flex justify-between items-start mb-6">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${method.type === 'BANK' ? 'bg-blue-100 text-blue-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                                                            {method.type === 'BANK' ? (
+                                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 00-3 3z" /></svg>
+                                                            ) : (
+                                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] font-black text-gray-900 uppercase">{method.type === 'BANK' ? method.bank_name : 'USDT TRC20'}</p>
+                                                            <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">{method.type === 'BANK' ? 'Bank Payout' : 'Crypto Payout'}</p>
+                                                        </div>
+                                                    </div>
+                                                    {method.is_default && (
+                                                        <span className="bg-gv-gold/10 text-gv-gold text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter shadow-sm">Default</span>
+                                                    )}
+                                                </div>
+                                                <div className="space-y-4">
+                                                    <div className="space-y-1">
+                                                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">{method.type === 'BANK' ? 'Account Number' : 'Wallet Address'}</p>
+                                                        <p className="text-xs font-bold text-gray-900 break-all font-mono tracking-tight leading-relaxed">{method.type === 'BANK' ? method.account_number : method.usdt_address}</p>
+                                                    </div>
+                                                    {method.type === 'BANK' && (
+                                                        <div className="space-y-1">
+                                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Account Holder</p>
+                                                            <p className="text-xs font-bold text-gray-900 uppercase tracking-tight">{method.bank_account_holder}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="bg-gray-50 border border-dashed border-gray-200 rounded-[32px] p-12 text-center">
+                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">No saved payout destinations found for this client.</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
