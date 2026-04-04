@@ -344,13 +344,18 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                         <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Capital Status' : '资金状态'}</span>
                         {user?.next_maturity_date ? (
                             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                                <p className="text-base font-black text-slate-900 uppercase tracking-tighter">
+                                <p className="text-base font-black text-slate-900 uppercase tracking-tighter flex items-baseline gap-1">
                                     {(() => {
                                         const now = new Date();
                                         const maturityDate = new Date(user.next_maturity_date);
                                         const diffMs = maturityDate.getTime() - now.getTime();
                                         const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-                                        return lang === 'en' ? `${diffDays} Days to Maturity` : `距到期还剩 ${diffDays} 天`;
+                                        if (lang === 'zh') return `距到期还剩 ${diffDays} 天`;
+                                        return (
+                                            <>
+                                                {diffDays} Days <span className="text-[10px] opacity-60 font-medium lowercase">left</span>
+                                            </>
+                                        );
                                     })()}
                                 </p>
                                 <span className="text-[10px] font-bold text-gv-gold bg-gv-gold/10 px-2 py-0.5 rounded-md uppercase tracking-tight">
