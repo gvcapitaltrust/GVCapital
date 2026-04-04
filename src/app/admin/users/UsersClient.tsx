@@ -8,7 +8,7 @@ import TierMedal from "@/components/TierMedal";
 import { formatDateTime } from "@/lib/dateUtils";
 
 export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
-    const { users, combinedAuditLogs, loading, handleAdjustBalance, handleUpdatePortfolio, handleResetUserPassword, handleSetAdminRole, handleDeleteUser, handleToggleUserStatus } = useAdmin();
+    const { users, combinedAuditLogs, loading, handleAdjustBalance, handleResetUserPassword, handleSetAdminRole, handleDeleteUser, handleToggleUserStatus } = useAdmin();
     const { forexRate } = useSettings();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -21,14 +21,6 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
     const [isAdjusting, setIsAdjusting] = useState(false);
     const [isRoleChanging, setIsRoleChanging] = useState(false);
     const [isProcessingAction, setIsProcessingAction] = useState(false);
-
-    // Portfolio State
-    const [portfolioData, setPortfolioData] = useState({
-        platform: "",
-        account_id: "",
-        password: "",
-        remarks: ""
-    });
 
     const t = {
         en: {
@@ -48,18 +40,18 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             adjustType: "Allocation Type",
             adjustReason: "Reference / Reasoning",
             adjustSubmit: "Execute Adjustment",
-            portfolioHeader: "External Portfolio Mapping",
-            portfolioPlatform: "Fund Management Platform",
-            portfolioAccount: "Account ID",
-            portfolioPassword: "Password",
-            portfolioRemarks: "Internal Remarks",
-            portfolioSubmit: "Update Mapping",
             resetPassword: "Reset Password",
             typeBalance: "Main Wallet",
             typeProfit: "Dividend Wallet",
             deleteUser: "Delete User",
             deactivateUser: "Suspend User",
-            reactivateUser: "Reactivate User"
+            reactivateUser: "Reactivate User",
+            txHistory: "Transaction Audit History",
+            txDate: "Date",
+            txAction: "Action / Category",
+            txAmount: "Amount",
+            txProcessedBy: "Processed By",
+            noTx: "No transaction history recorded for this client."
         },
         zh: {
             title: "客户目录",
@@ -78,12 +70,6 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             adjustType: "分配类型",
             adjustReason: "参考 / 理由",
             adjustSubmit: "执行分配",
-            portfolioHeader: "外部投资组合映射",
-            portfolioPlatform: "基金管理平台",
-            portfolioAccount: "账户 ID",
-            portfolioPassword: "密码",
-            portfolioRemarks: "内部备注",
-            portfolioSubmit: "更新映射",
             resetPassword: "重置密码",
             typeBalance: "主钱包",
             typeProfit: "红利钱包",
@@ -94,7 +80,6 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             txDate: "Date",
             txAction: "Action / Category",
             txAmount: "Amount",
-            txRef: "Reference",
             txProcessedBy: "Processed By",
             noTx: "No transaction history recorded for this client."
         }
@@ -102,12 +87,6 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
 
     const openDetails = (user: any) => {
         setSelectedUser(user);
-        setPortfolioData({
-            platform: user.portfolio_platform_name || "",
-            account_id: user.portfolio_account_id || "",
-            password: user.portfolio_account_password || "",
-            remarks: user.internal_remarks || ""
-        });
         setIsDetailModalOpen(true);
     };
 
@@ -128,7 +107,6 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
         if (!confirmed) return;
         setIsRoleChanging(true);
         await handleSetAdminRole(selectedUser.id, !isCurrentlyAdmin);
-        // Update local state immediately for UI feedback
         setSelectedUser((prev: any) => ({ ...prev, role: isCurrentlyAdmin ? 'User' : 'admin' }));
         setIsRoleChanging(false);
     };
@@ -148,10 +126,6 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
         setIsProcessingAction(false);
     };
 
-    const handleExecutePortfolioUpdate = async () => {
-        await handleUpdatePortfolio(selectedUser.id, portfolioData);
-    };
-
     const filteredUsers = users.filter(u => {
         const query = searchQuery.toLowerCase();
         return (u.full_name || "").toLowerCase().includes(query) || 
@@ -165,8 +139,8 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h1>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
+                    <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h1>
+                    <p className="text-[9px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
                 </div>
                 <input
                     type="text"
@@ -180,57 +154,57 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             <div className="bg-white backdrop-blur-md rounded-3xl border border-gray-200 overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                        <thead className="bg-white border-b border-gray-200 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-400">
                             <tr>
-                                <th className="px-8 py-6">{t.tableUser}</th>
-                                <th className="px-8 py-6">{t.tableAssets}</th>
-                                <th className="px-8 py-6">{t.tableInvestment}</th>
-                                <th className="px-8 py-6">{t.tableWithdrawable}</th>
-                                <th className="px-8 py-6">{t.tableStatus}</th>
-                                <th className="px-8 py-6 text-right">{t.tableActions}</th>
+                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableUser}</th>
+                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableAssets}</th>
+                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableInvestment}</th>
+                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableWithdrawable}</th>
+                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableStatus}</th>
+                                <th className="px-4 py-4 md:px-8 md:py-6 text-right">{t.tableActions}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {filteredUsers.map((user, idx) => (
                                 <tr key={idx} className="text-sm group hover:bg-gray-50 transition-all">
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-4">
+                                    <td className="px-4 py-4 md:px-8 md:py-6">
+                                        <div className="flex items-center gap-3 md:gap-4">
                                             <TierMedal 
                                                 tierId={(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(user.total_investment_usd || 0).name} 
-                                                size="md" 
+                                                size="xs" 
                                             />
                                             <div className="flex flex-col">
-                                                <span className="font-extrabold text-gray-900 uppercase tracking-tight text-xs">{user.full_name || user.username}</span>
-                                                <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">{user.email}</span>
+                                                <span className="font-extrabold text-gray-900 uppercase tracking-tight text-[10px] md:text-xs">{user.full_name || user.username}</span>
+                                                <span className="text-[8px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest truncate max-w-[100px] md:max-w-none">{user.email}</span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
+                                    <td className="px-4 py-4 md:px-8 md:py-6">
                                         <div className="flex flex-col gap-0.5">
-                                            <div className="flex items-baseline gap-1.5">
-                                                <span className="text-[14px] font-black text-gray-900 tabular-nums">$</span>
-                                                <span className="text-[16px] font-black text-gray-900 tabular-nums">{(user.total_assets_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-[11px] md:text-[14px] font-black text-gray-900 tabular-nums">$</span>
+                                                <span className="text-[12px] md:text-[16px] font-black text-gray-900 tabular-nums">{(user.total_assets_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
+                                    <td className="px-4 py-4 md:px-8 md:py-6">
                                         <div className="flex flex-col">
-                                            <span className="text-xs font-black text-emerald-600 tabular-nums whitespace-nowrap">$ {(user.total_investment_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="text-[10px] md:text-xs font-black text-emerald-600 tabular-nums whitespace-nowrap">$ {(user.total_investment_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
+                                    <td className="px-4 py-4 md:px-8 md:py-6">
                                         <div className="flex flex-col">
-                                            <span className="text-xs font-black text-gv-gold tabular-nums whitespace-nowrap">$ {(user.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="text-[10px] md:text-xs font-black text-gv-gold tabular-nums whitespace-nowrap">$ {(user.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
-                                        <span className={`px-2 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest ${
+                                    <td className="px-4 py-4 md:px-8 md:py-6">
+                                        <span className={`px-1.5 py-1 rounded-lg text-[7px] md:text-[8px] font-black uppercase tracking-widest ${
                                             user.kyc_status === 'Verified' ? 'bg-emerald-500/10 text-emerald-500' :
                                             'bg-gray-200 text-gray-400'
                                         }`}>{user.kyc_status}</span>
                                     </td>
-                                    <td className="px-8 py-6 text-right">
-                                        <button onClick={() => openDetails(user)} className="bg-gv-gold/10 text-gv-gold hover:bg-gv-gold hover:text-black text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg transition-all border border-gv-gold/20">{t.tableActions}</button>
+                                    <td className="px-4 py-4 md:px-8 md:py-6 text-right">
+                                        <button onClick={() => openDetails(user)} className="bg-gv-gold/10 text-gv-gold hover:bg-gv-gold hover:text-black text-[7px] md:text-[8px] font-black uppercase tracking-widest px-2 md:px-3 py-1.5 rounded-lg transition-all border border-gv-gold/20">{t.tableActions}</button>
                                     </td>
                                 </tr>
                             ))}
@@ -239,74 +213,63 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </div>
 
-            {/* Profile Detail Modal */}
             {isDetailModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-500">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-2xl" onClick={() => setIsDetailModalOpen(false)}></div>
                     <div className="relative bg-white border border-gray-200 rounded-[40px] w-full max-w-7xl h-full flex flex-col overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)]">
-                        <div className="p-8 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-                            <div className="flex items-center gap-6">
+                        <div className="p-4 md:p-8 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between bg-gray-50 gap-4">
+                            <div className="flex items-center gap-4 md:gap-6">
                                 <TierMedal 
                                     tierId={(selectedUser?.tier && selectedUser?.tier !== "Standard") ? selectedUser.tier : getTierByAmount(selectedUser?.total_investment_usd || 0).name} 
-                                    size="lg" 
+                                    size="md" 
                                 />
                                 <div>
-                                    <h3 className="text-2xl font-black uppercase tracking-tighter text-gray-900">{selectedUser?.full_name}</h3>
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-[9px] text-gv-gold font-black uppercase tracking-[0.2em]">
+                                    <h3 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-gray-900">{selectedUser?.full_name}</h3>
+                                    <div className="flex items-center gap-2 md:gap-3">
+                                        <span className="text-[8px] md:text-[9px] text-gv-gold font-black uppercase tracking-[0.2em]">
                                             {(selectedUser?.tier && selectedUser?.tier !== "Standard") ? selectedUser?.tier : getTierByAmount(selectedUser?.total_investment_usd || 0).name} Class
                                         </span>
                                         <span className="h-1 w-1 rounded-full bg-zinc-700"></span>
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">@{selectedUser?.username}</span>
+                                        <span className="text-[9px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate max-w-[80px] md:max-w-none">@{selectedUser?.username}</span>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4">
-                                {/* Admin Role Badge */}
-                                {selectedUser?.role?.toLowerCase() === 'admin' && (
-                                    <span className="flex items-center gap-1.5 px-3 py-1.5 bg-gv-gold/10 border border-gv-gold/30 rounded-xl text-[9px] font-black uppercase tracking-widest text-gv-gold">
-                                        <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm2 3h10v1a1 1 0 01-1 1H8a1 1 0 01-1-1v-1z"/></svg>
-                                        Admin
-                                    </span>
-                                )}
-                                {/* Set / Remove Admin Button */}
+                            <div className="flex flex-wrap items-center gap-2 md:gap-4">
                                 <button
-                                    onClick={handleToggleAdmin}
-                                    disabled={isRoleChanging}
-                                    className={`text-[9px] font-black uppercase tracking-widest px-5 py-3 rounded-2xl transition-all border disabled:opacity-50 ${
-                                        selectedUser?.role?.toLowerCase() === 'admin'
-                                            ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20'
-                                            : 'bg-gv-gold/10 text-gv-gold border-gv-gold/20 hover:bg-gv-gold hover:text-black'
-                                    }`}
+                                    onClick={() => {
+                                        setIsDetailModalOpen(false);
+                                        window.location.href = `/admin/users/${selectedUser.id}/portfolio?lang=${lang}`;
+                                    }}
+                                    className="bg-black text-white text-[8px] md:text-[9px] font-black uppercase tracking-widest px-4 md:px-6 py-2.5 md:py-3 rounded-2xl transition-all shadow-xl hover:bg-gv-gold hover:text-black flex items-center gap-2"
                                 >
-                                    {isRoleChanging ? '...' : selectedUser?.role?.toLowerCase() === 'admin' ? '⬇ Remove Admin' : '⬆ Set as Admin'}
+                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+                                    Manage Portfolio
                                 </button>
                                 <button 
                                     onClick={executeToggleStatus} 
                                     disabled={isProcessingAction}
-                                    className="bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-gray-900 text-[9px] font-black uppercase tracking-widest px-6 py-3 rounded-2xl transition-all border border-orange-500/20 disabled:opacity-50"
+                                    className="bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-gray-900 text-[8px] md:text-[9px] font-black uppercase tracking-widest px-4 md:px-6 py-2.5 md:py-3 rounded-2xl transition-all border border-orange-500/20 disabled:opacity-50"
                                 >
                                     {isProcessingAction ? "..." : (selectedUser?.kyc_status === 'Suspended' ? t.reactivateUser : t.deactivateUser)}
                                 </button>
                                 <button 
                                     onClick={executeDeleteUser} 
                                     disabled={isProcessingAction}
-                                    className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-gray-900 text-[9px] font-black uppercase tracking-widest px-6 py-3 rounded-2xl transition-all border border-red-500/20 disabled:opacity-50"
+                                    className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-gray-900 text-[8px] md:text-[9px] font-black uppercase tracking-widest px-4 md:px-6 py-2.5 md:py-3 rounded-2xl transition-all border border-red-500/20 disabled:opacity-50"
                                 >
                                     {isProcessingAction ? "..." : t.deleteUser}
                                 </button>
-                                <button onClick={() => handleResetUserPassword(selectedUser.email)} className="bg-white hover:bg-gray-100 text-[9px] font-black uppercase tracking-widest px-6 py-3 rounded-2xl transition-all border border-gray-200">{t.resetPassword}</button>
-                                <button onClick={() => setIsDetailModalOpen(false)} className="h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all">
-                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                                <button onClick={() => handleResetUserPassword(selectedUser.email)} className="bg-white hover:bg-gray-100 text-[8px] md:text-[9px] font-black uppercase tracking-widest px-4 md:px-6 py-2.5 md:py-3 rounded-2xl transition-all border border-gray-200">{t.resetPassword}</button>
+                                <button onClick={() => setIsDetailModalOpen(false)} className="h-10 w-10 md:h-12 md:w-12 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-all">
+                                    <svg className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                {/* Column 1: Capital Management */}
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                 <div className="space-y-8">
-                                    <div className="bg-white rounded-[32px] p-8 border border-gray-200 space-y-8">
+                                    <div className="bg-white rounded-[32px] p-6 md:p-8 border border-gray-200 space-y-8">
                                         <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold">{t.adjustHeader}</h4>
                                         <div className="space-y-6">
                                             <div className="space-y-2">
@@ -346,14 +309,14 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                 <textarea 
                                                     value={adjustmentReason}
                                                     onChange={(e) => setAdjustmentReason(e.target.value)}
-                                                    className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 text-gray-900 text-xs font-medium focus:outline-none focus:border-gv-gold transition-all min-h-[100px]"
+                                                    className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 text-gray-900 text-[10px] md:text-xs font-medium focus:outline-none focus:border-gv-gold transition-all min-h-[100px]"
                                                     placeholder="..."
                                                 />
                                             </div>
                                             <button 
                                                 onClick={handleExecuteAdjustment}
                                                 disabled={isAdjusting}
-                                                className="w-full bg-gv-gold text-black font-black py-4 rounded-2xl uppercase tracking-widest text-[10px] shadow-2xl shadow-gv-gold/20 hover:-translate-y-1 transition-all disabled:opacity-50"
+                                                className="w-full bg-gv-gold text-black font-black py-4 rounded-2xl uppercase tracking-widest text-[9px] md:text-[10px] shadow-2xl shadow-gv-gold/20 hover:-translate-y-1 transition-all disabled:opacity-50"
                                             >
                                                 {isAdjusting ? "Executing..." : t.adjustSubmit}
                                             </button>
@@ -361,124 +324,65 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                     </div>
                                 </div>
 
-                                {/* Column 2: Portfolio & Remarks */}
-                                <div className="space-y-8 lg:col-span-2">
-                                    <div className="bg-white rounded-[32px] p-8 border border-gray-200 space-y-8">
-                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold">{t.portfolioHeader}</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase text-gray-400 px-1">{t.portfolioPlatform}</label>
-                                                <input 
-                                                    value={portfolioData.platform}
-                                                    onChange={(e) => setPortfolioData(prev => ({ ...prev, platform: e.target.value }))}
-                                                    className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 text-gray-900 text-xs font-bold focus:outline-none"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase text-gray-400 px-1">{t.portfolioAccount}</label>
-                                                <input 
-                                                    value={portfolioData.account_id}
-                                                    onChange={(e) => setPortfolioData(prev => ({ ...prev, account_id: e.target.value }))}
-                                                    className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 text-gray-900 text-xs font-bold focus:outline-none"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase text-gray-400 px-1">{t.portfolioPassword}</label>
-                                                <input 
-                                                    type="password"
-                                                    value={portfolioData.password}
-                                                    onChange={(e) => setPortfolioData(prev => ({ ...prev, password: e.target.value }))}
-                                                    className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 text-gray-900 text-xs font-bold focus:outline-none"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase text-gray-400 px-1">Internal Reference</label>
-                                                <input 
-                                                    className="w-full bg-gray-100 border border-zinc-700/50 rounded-2xl p-4 text-gray-400 text-xs font-bold"
-                                                    readOnly
-                                                    value={selectedUser?.id}
-                                                />
-                                            </div>
-                                            <div className="md:col-span-2 space-y-2">
-                                                <label className="text-[9px] font-black uppercase text-gray-400 px-1">{t.portfolioRemarks}</label>
-                                                <textarea 
-                                                    value={portfolioData.remarks}
-                                                    onChange={(e) => setPortfolioData(prev => ({ ...prev, remarks: e.target.value }))}
-                                                    className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 text-gray-900 text-xs font-medium focus:outline-none min-h-[100px]"
-                                                />
-                                            </div>
+                                <div className="space-y-8">
+                                    <div className="bg-white rounded-[32px] p-6 md:p-8 border border-gray-200 space-y-6">
+                                        <div className="flex items-center justify-between">
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold">{t.txHistory}</h4>
                                         </div>
-                                        <button 
-                                            onClick={handleExecutePortfolioUpdate}
-                                            className="bg-white text-black font-black px-10 py-4 rounded-2xl uppercase tracking-widest text-[9px] hover:-translate-y-1 transition-all"
-                                        >
-                                            {t.portfolioSubmit}
-                                        </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Column 3: Transaction History (Full Width) */}
-                            <div className="mt-8 bg-white rounded-[32px] p-8 border border-gray-200 space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold">{t.txHistory}</h4>
-                                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{selectedUser?.email}</span>
-                                </div>
-                                <div className="overflow-x-auto overflow-y-auto max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300">
-                                    <table className="w-full text-left">
-                                        <thead className="bg-gray-50 text-[8px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200">
-                                            <tr>
-                                                <th className="px-4 py-3">{t.txDate}</th>
-                                                <th className="px-4 py-3">{t.txAction}</th>
-                                                <th className="px-4 py-3 text-right">{t.txAmount}</th>
-                                                <th className="px-4 py-3 text-right">{t.txProcessedBy}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100">
-                                            {combinedAuditLogs
-                                                .filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction')
-                                                .map((log, i) => (
-                                                    <tr key={i} className="text-[10px] font-bold hover:bg-gray-50 transition-colors">
-                                                        <td className="px-4 py-4 text-gray-400 whitespace-nowrap">
-                                                            {formatDateTime(log.created_at)}
-                                                        </td>
-                                                        <td className="px-4 py-4">
-                                                            <div className="text-gray-700 uppercase tracking-tight">{log.action === 'Adjustment' ? (log.txType === 'Deposit' ? 'Admin Add' : 'Admin Remove') : log.action}</div>
-                                                            <div className="text-[8px] text-gray-500 font-medium truncate max-w-[200px]">{log.rejection_reason}</div>
-                                                        </td>
-                                                        <td className={`px-4 py-4 tabular-nums text-right ${log.txType === 'Withdrawal' && log.action !== 'Adjustment' ? 'text-red-400' : (log.rejection_reason?.toLowerCase().includes('decrease') ? 'text-red-400' : 'text-emerald-400')}`}>
-                                                            $ {(Number(log.original_currency_amount || (Number(log.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                        </td>
-                                                        <td className="px-4 py-4 text-right text-gray-400">{log.admin_username}</td>
+                                        <div className="overflow-x-auto overflow-y-auto max-h-[500px] custom-scrollbar">
+                                            <table className="w-full text-left">
+                                                <thead className="bg-gray-50 text-[7px] md:text-[8px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200">
+                                                    <tr>
+                                                        <th className="px-3 py-3 md:px-4">{t.txDate}</th>
+                                                        <th className="px-3 py-3 md:px-4">{t.txAction}</th>
+                                                        <th className="px-3 py-3 md:px-4 text-right">{t.txAmount}</th>
                                                     </tr>
-                                                ))}
-                                            {combinedAuditLogs.filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction').length === 0 && (
-                                                <tr>
-                                                    <td colSpan={4} className="px-4 py-20 text-center text-gray-400 font-black uppercase tracking-widest text-[9px]">{t.noTx}</td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
+                                                </thead>
+                                                <tbody className="divide-y divide-gray-100">
+                                                    {combinedAuditLogs
+                                                        .filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction')
+                                                        .map((log, i) => (
+                                                            <tr key={i} className="text-[9px] md:text-[10px] font-bold hover:bg-gray-50 transition-colors">
+                                                                <td className="px-3 py-4 md:px-4 text-gray-400 whitespace-nowrap">
+                                                                    {formatDateTime(log.created_at)}
+                                                                </td>
+                                                                <td className="px-3 py-4 md:px-4">
+                                                                    <div className="text-gray-700 uppercase tracking-tight">{log.action === 'Adjustment' ? (log.txType === 'Deposit' ? 'Admin Add' : 'Admin Remove') : log.action}</div>
+                                                                    <div className="text-[7px] md:text-[8px] text-gray-500 font-medium truncate max-w-[100px] md:max-w-none">{log.rejection_reason}</div>
+                                                                </td>
+                                                                <td className={`px-3 py-4 md:px-4 tabular-nums text-right ${log.txType === 'Withdrawal' && log.action !== 'Adjustment' ? 'text-red-400' : (log.rejection_reason?.toLowerCase().includes('decrease') ? 'text-red-400' : 'text-emerald-400')}`}>
+                                                                    $ {(Number(log.original_currency_amount || (Number(log.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    {combinedAuditLogs.filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction').length === 0 && (
+                                                        <tr>
+                                                            <td colSpan={3} className="px-4 py-20 text-center text-gray-400 font-black uppercase tracking-widest text-[9px]">{t.noTx}</td>
+                                                        </tr>
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            {/* Additional Identity Fields */}
-                            <div className="mt-8 bg-gray-50 rounded-[32px] p-8 border border-gray-100 grid grid-cols-2 md:grid-cols-4 gap-8">
+                            <div className="mt-8 bg-gray-50 rounded-[32px] p-6 md:p-8 border border-gray-100 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                                 <div>
-                                    <p className="text-[8px] font-black uppercase text-gray-500 mb-1">Country</p>
-                                    <p className="text-xs font-black text-gray-500">{selectedUser?.kyc_data?.country || "N/A"}</p>
+                                    <p className="text-[7px] md:text-[8px] font-black uppercase text-gray-500 mb-1">Country</p>
+                                    <p className="text-[10px] md:text-xs font-black text-gray-500">{selectedUser?.kyc_data?.country || "N/A"}</p>
                                 </div>
                                 <div>
-                                    <p className="text-[8px] font-black uppercase text-gray-500 mb-1">State</p>
-                                    <p className="text-xs font-black text-gray-500">{selectedUser?.kyc_data?.state || "N/A"}</p>
+                                    <p className="text-[7px] md:text-[8px] font-black uppercase text-gray-500 mb-1">State</p>
+                                    <p className="text-[10px] md:text-xs font-black text-gray-500">{selectedUser?.kyc_data?.state || "N/A"}</p>
                                 </div>
                                 <div>
-                                    <p className="text-[8px] font-black uppercase text-gray-500 mb-1">ZIP Code</p>
-                                    <p className="text-xs font-black text-gray-500">{selectedUser?.kyc_data?.zip || "N/A"}</p>
+                                    <p className="text-[7px] md:text-[8px] font-black uppercase text-gray-500 mb-1">ZIP Code</p>
+                                    <p className="text-[10px] md:text-xs font-black text-gray-500">{selectedUser?.kyc_data?.zip || "N/A"}</p>
                                 </div>
                                 <div>
-                                    <p className="text-[8px] font-black uppercase text-gray-500 mb-1">ID Type</p>
-                                    <p className="text-xs font-black text-gray-500">{selectedUser?.kyc_data?.idType || "Passport"}</p>
+                                    <p className="text-[7px] md:text-[8px] font-black uppercase text-gray-500 mb-1">ID Type</p>
+                                    <p className="text-[10px] md:text-xs font-black text-gray-500">{selectedUser?.kyc_data?.idType || "Passport"}</p>
                                 </div>
                             </div>
                         </div>
