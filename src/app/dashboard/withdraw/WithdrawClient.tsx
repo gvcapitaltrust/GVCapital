@@ -54,7 +54,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             estPayout: "Estimated Payout",
             acceptBtn: "I Accept & Continue",
             cancelBtn: "Cancel and Edit",
-            continueToPin: "Continue to Security PIN",
+            continueToPin: "Continue",
             currentTier: "Current Tier",
             member: "Member",
         },
@@ -77,7 +77,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             estPayout: "预计到账金额",
             acceptBtn: "我接受并继续",
             cancelBtn: "取消并编辑",
-            continueToPin: "继续输入安全密码",
+            continueToPin: "继续",
             currentTier: "当前等级",
             member: "会员",
         }
@@ -259,6 +259,71 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </div>
 
+            {/* Capital Status & Lock-in Countdown Section */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in slide-in-from-top-4 duration-700">
+                <div className="bg-slate-900 p-8 rounded-[32px] border border-slate-800 shadow-2xl flex flex-col justify-between">
+                    <div>
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gv-gold/60 mb-2 block">Total Capital Assets</span>
+                        <p className="text-4xl font-black text-white">$ {((user?.balance_usd || 0) + (user?.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    </div>
+                    <div className="mt-6 flex items-center gap-2 group">
+                        <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Institutional Fiduciary Trust</span>
+                    </div>
+                </div>
+
+                <div className="bg-white p-8 rounded-[32px] border border-gray-200 shadow-xl flex flex-col justify-between relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
+                    <div>
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 mb-2 block">Capital Lock-in Status</span>
+                        {user?.next_maturity_date ? (
+                            <div className="space-y-1">
+                                <p className="text-2xl font-black text-gray-900 uppercase tracking-tighter">
+                                    {(() => {
+                                        const now = new Date();
+                                        const maturityDate = new Date(user.next_maturity_date);
+                                        const diffMs = maturityDate.getTime() - now.getTime();
+                                        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                                        return lang === 'en' ? `${diffDays} Days Remaining` : `剩余 ${diffDays} 天`;
+                                    })()}
+                                </p>
+                                <p className="text-[10px] font-bold text-gv-gold uppercase tracking-widest">
+                                    {lang === 'en' ? 'Maturity Date: ' : '到期日期: '}
+                                    {new Date(user.next_maturity_date).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-1">
+                                <p className="text-2xl font-black text-emerald-500 uppercase tracking-tighter">
+                                    {lang === 'en' ? 'Fully Matured' : '资金已完全到期'}
+                                </p>
+                                <p className="text-[10px] font-bold text-emerald-600/50 uppercase tracking-widest">
+                                    {lang === 'en' ? 'No lock-in penalty applied' : '提款无锁定期罚金'}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                    {(user?.locked_capital_usd || 0) > 0 && (
+                        <div className="mt-6">
+                            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                {(() => {
+                                    const total = (user?.balance_usd || 0) + (user?.profit || 0);
+                                    const locked = user?.locked_capital_usd || 0;
+                                    const percentage = Math.min(100, ( (total - locked) / total) * 100);
+                                    return <div className="h-full bg-gv-gold transition-all duration-1000" style={{ width: `${percentage}%` }}></div>;
+                                })()}
+                            </div>
+                            <div className="flex justify-between mt-2">
+                                <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest">{lang === 'en' ? 'Liquid Position' : '流动资金'}</span>
+                                <span className="text-[8px] font-black text-gv-gold uppercase tracking-widest">
+                                    {Math.round((( ( (user?.balance_usd || 0) + (user?.profit || 0)) - (user?.locked_capital_usd || 0)) / ( (user?.balance_usd || 0) + (user?.profit || 0))) * 100)}%
+                                </span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2 space-y-8">
                     <div className="bg-white border border-gray-200 rounded-[32px] p-8 md:p-10 shadow-2xl space-y-10">
@@ -288,7 +353,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                     <p className="text-xl font-black text-emerald-600 tabular-nums">$ {(user?.dividend_withdrawable_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                 </div>
                                 <div className="p-6 bg-blue-50/50 rounded-3xl border border-blue-500/10">
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-blue-600/60 block mb-1">Withdrawable Capital</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-blue-600/60 block mb-1">Available Capital</span>
                                     <p className="text-xl font-black text-blue-600 tabular-nums">$ {(user?.mature_capital_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                 </div>
                             </div>

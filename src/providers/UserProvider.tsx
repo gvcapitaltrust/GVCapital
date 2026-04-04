@@ -78,12 +78,22 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 const currentTier = getTierByAmount(balanceUSD);
                 const lockPeriodDays = currentTier.lockInDays || 180;
 
+                let nextMaturityDate: Date | null = null;
                 const lockedCapitalUSD = approvedDeposits.reduce((acc, tx) => {
                     const rawDate = tx.transfer_date || tx.created_at;
                     const txDate = new Date(rawDate);
                     if (isNaN(txDate.getTime())) return acc;
+                    
+                    const maturityDate = new Date(txDate.getTime() + lockPeriodDays * 24 * 60 * 60 * 1000);
                     const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
-                    return diffDays < lockPeriodDays ? acc + Number(tx.original_currency_amount ?? (Number(tx.amount || 0) / forexRate)) : acc;
+                    
+                    if (diffDays < lockPeriodDays) {
+                        if (!nextMaturityDate || maturityDate < nextMaturityDate) {
+                            nextMaturityDate = maturityDate;
+                        }
+                        return acc + Number(tx.original_currency_amount ?? (Number(tx.amount || 0) / forexRate));
+                    }
+                    return acc;
                 }, 0);
 
                 const profitUSD = Number(profile.profit || 0);
@@ -134,7 +144,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     profit_rm: profitUSD * forexRate,
                     profit_usd: profitUSD,
                     lifetime_dividends_usd: lifetimeDividendsUSD,
-                    accumulated_dividend_rm: lifetimeDividendsUSD * forexRate // Accumulated is historical gross
+                    accumulated_dividend_rm: lifetimeDividendsUSD * forexRate, // Accumulated is historical gross
+                    next_maturity_date: nextMaturityDate
                 };
 
                 setUserProfile(fullProfile);
