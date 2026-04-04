@@ -41,7 +41,9 @@ export default function LoginPage() {
             if (session && !hasError && !isLoggingIn) {
                 console.log("[AUTH] Auto-redirecting via listener...");
                 // Sync session to cookie so Next.js middleware can read it before redirecting
-                document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(session))}; path=/; max-age=31536000; SameSite=Lax;`;
+                // Storing only access_token to keep cookie size under the 4KB browser limit (especially on mobile)
+                const isSecure = window.location.protocol === "https:";
+                document.cookie = `gv-auth-v1=${encodeURIComponent(session.access_token)}; path=/; max-age=31536000; SameSite=Lax;${isSecure ? " Secure;" : ""}`;
                 const user = session.user;
                 const isAdmin = user.user_metadata?.role?.toLowerCase() === "admin" || user.email === "thenja96@gmail.com";
                 const redirectPath = isAdmin ? "/admin" : `/dashboard?lang=${urlLang || lang}`;
@@ -142,7 +144,8 @@ export default function LoginPage() {
                         .eq('id', data.session.user.id);
                 }
 
-                document.cookie = `gv-auth-v1=${encodeURIComponent(JSON.stringify(data.session))}; path=/; max-age=31536000; SameSite=Lax;`;
+                const isSecure = window.location.protocol === "https:";
+                document.cookie = `gv-auth-v1=${encodeURIComponent(data.session.access_token)}; path=/; max-age=31536000; SameSite=Lax;${isSecure ? " Secure;" : ""}`;
                 const user = data.session.user;
                 const isAdmin = user.user_metadata?.role?.toLowerCase() === "admin" || user.email === "thenja96@gmail.com";
                 console.log("[AUTH] Handshake verified. Redirecting...");
