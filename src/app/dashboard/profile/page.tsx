@@ -16,7 +16,7 @@ export default async function ProfilePage({
                     <div className="h-1 w-12 bg-gv-gold rounded-full"></div>
                     <span className="text-gv-gold text-sm font-semibold tracking-wider">Account Identity</span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-slate-900">
+                <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-gray-900">
                     {lang === "en" ? "Profile" : "个人资料"}
                 </h1>
             </header>

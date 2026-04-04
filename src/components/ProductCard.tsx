@@ -9,99 +9,96 @@ interface ProductCardProps {
   tier: Tier;
   isActive: boolean;
   isQualified: boolean;
-  lang: "en" | "zh";
 }
 
-export default function ProductCard({ tier, isActive, isQualified, lang }: ProductCardProps) {
+export default function ProductCard({ tier, isActive, isQualified }: ProductCardProps) {
   const colorMap: Record<string, string> = {
-    zinc: "border-zinc-500/30 text-zinc-400 bg-zinc-500/5",
-    slate: "border-slate-400/30 text-slate-300 bg-slate-400/5",
-    "gv-gold": "border-gv-gold/50 text-gv-gold bg-gv-gold/5",
-    amber: "border-amber-500/50 text-amber-500 bg-amber-500/5",
+    zinc: "border-zinc-500/30 text-gray-500",
+    slate: "border-slate-400/30 text-slate-300",
+    "gv-gold": "border-gv-gold/50 text-gv-gold",
+    amber: "border-amber-500/50 text-amber-500",
   };
 
   const glowMap: Record<string, string> = {
-    zinc: "shadow-[0_0_30px_rgba(161,161,170,0.15)]",
-    slate: "shadow-[0_0_30px_rgba(148,163,184,0.15)]",
-    "gv-gold": "shadow-[0_0_50px_rgba(212,175,55,0.25)]",
-    amber: "shadow-[0_0_60px_rgba(245,158,11,0.35)]",
+    zinc: "shadow-[0_0_20px_rgba(161,161,170,0.1)]",
+    slate: "shadow-[0_0_20px_rgba(148,163,184,0.1)]",
+    "gv-gold": "shadow-[0_0_30px_rgba(212,175,55,0.2)]",
+    amber: "shadow-[0_0_40px_rgba(245,158,11,0.3)]",
   };
 
   return (
     <div
-      className={`relative flex flex-col p-6 rounded-[32px] border transition-all duration-700 premium-glass ${
+      className={`relative flex flex-col p-4 rounded-xl border transition-all duration-500 ${
         isActive
-          ? `${colorMap[tier.color]} scale-[1.05] ${glowMap[tier.color]} z-10 border-opacity-100`
-          : "border-slate-200/60 bg-white/40 opacity-50 hover:opacity-80 grayscale hover:grayscale-0"
+          ? `${colorMap[tier.color]} bg-gray-50 scale-[1.02] ${glowMap[tier.color]} z-10`
+          : "border-gray-200 bg-white opacity-60 hover:opacity-100"
       }`}
     >
       {isQualified && isActive && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gv-gold text-black text-[9px] font-black px-4 py-1 rounded-full uppercase tracking-[0.2em] shadow-[0_10px_20px_rgba(212,175,55,0.3)] text-center whitespace-nowrap z-20">
-          {lang === 'en' ? 'Active Membership' : '当前会员'}
+        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gv-gold text-black text-[8px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-widest shadow-md text-center whitespace-nowrap">
+          Current Tier
         </div>
       )}
 
-      <div className="flex justify-between items-start mb-6 gap-3">
+      <div className="flex justify-between items-start mb-3 gap-2">
         <div className="min-w-0 flex-1">
-          <h3 className={`text-base xl:text-lg font-black mb-1 uppercase tracking-tight break-words ${isActive ? 'text-slate-900' : 'text-slate-400'}`}>{tier.name}</h3>
-          <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
+          <h3 className="text-sm xl:text-base font-black mb-0.5 uppercase tracking-tight break-words">{tier.name}</h3>
+          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
             {tier.id === 'vvip' 
               ? `> ${formatUSD(tier.minAmount)}` 
               : `${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
           </p>
         </div>
-        <TierMedal tierId={tier.id} size="sm" className={`shrink-0 ${isActive ? 'drop-shadow-[0_0_10px_rgba(212,175,55,0.4)]' : 'grayscale'}`} />
+        <TierMedal tierId={tier.id} size="sm" className="shrink-0" />
       </div>
 
-      <div className="mb-6 flex flex-col gap-3">
-        <div className="flex items-baseline gap-2">
-          <span className={`text-2xl font-black shrink-0 flex items-baseline ${isActive ? 'text-slate-900' : 'text-slate-400'}`}>
-            <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mr-2 whitespace-nowrap">
+      <div className="mb-4 flex flex-col gap-1">
+        <div className="flex items-baseline gap-1">
+          <span className="text-xl font-black text-gray-900 shrink-0 flex items-baseline">
+            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-1 whitespace-nowrap">
               {tier.id === "silver" ? "min" : "up to"}
             </span>
             {tier.id === "silver" 
               ? `${(tier.minDividend * 100).toFixed(0)}%` 
               : `${(tier.maxDividend * 100).toFixed(0)}%`}
           </span>
-          <span className="text-[10px] font-black text-gray-500 uppercase tracking-tighter opacity-60">Monthly</span>
+          <span className="text-[9px] font-bold text-gray-400 ml-0.5 uppercase tracking-tighter">Monthly Dividend</span>
         </div>
         
         <div className="flex items-center gap-2">
-          <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-lg border shadow-inner ${isActive ? 'bg-amber-500/10 border-amber-500/20 text-amber-600' : 'bg-slate-50 border-slate-100 text-slate-400'}`}>
+          <span className="text-[8px] font-black text-amber-500/80 uppercase tracking-[0.2em] bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/10">
             {tier.lockInDays === 365 ? '12-Month' : '6-Month'} Lock-in
           </span>
         </div>
         
         {tier.yearlyBonus && (
-          <div className="flex flex-col gap-1 items-start mt-2">
-            <div className={`border px-3 py-1.5 rounded-full flex items-center gap-2 shadow-inner ${isActive ? 'bg-gv-gold/10 border-gv-gold/30 animate-pulse' : 'bg-slate-50 border-slate-100 opacity-40'}`}>
-              <span className={`text-[11px] font-black tracking-widest ${isActive ? 'text-gv-gold' : 'text-slate-400'}`}>
+          <div className="flex flex-col gap-1 items-start mt-1">
+            <div className="bg-gv-gold/10 border border-gv-gold/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+              <span className="text-gv-gold text-[10px] font-black">
                 +{ (tier.yearlyBonus * 100).toFixed(0) }% 
                 {tier.id === 'platinum' && '*'}
               </span>
-              <span className={`text-[8px] font-black uppercase tracking-widest ${isActive ? 'text-gv-gold/60' : 'text-gray-600'}`}>Yearly</span>
+              <span className="text-gv-gold/60 text-[7px] font-black uppercase tracking-widest">Yearly</span>
             </div>
           </div>
         )}
       </div>
 
-      <ul className="space-y-3 flex-1">
+      <ul className="space-y-2 flex-1">
         {tier.id === 'platinum' && (
-          <li className="flex items-start gap-2 pb-3 border-b border-slate-100 mb-3">
-            <div className="h-4 w-4 rounded-md bg-gv-gold/20 flex items-center justify-center shrink-0 border border-gv-gold/40">
-              <Check className="h-2.5 w-2.5 text-gv-gold" strokeWidth={4} />
+          <li className="flex items-start gap-1.5 pb-2 border-b border-gray-200 mb-2">
+            <div className="h-4 w-4 rounded-md bg-gv-gold/10 flex items-center justify-center shrink-0">
+              <Check className="h-2.5 w-2.5 text-gv-gold" />
             </div>
-            <span className="text-[9px] text-gv-gold/80 font-black uppercase tracking-tighter italic leading-tight">
-              * 12 MONTH MANDATORY LOCK-IN PERIOD
+            <span className="text-[8px] text-gv-gold font-bold uppercase tracking-tighter italic">
+              * 12 months lock-in period is required
             </span>
           </li>
         )}
         {tier.benefits.map((benefit, idx) => (
-          <li key={idx} className="flex items-start gap-3 group/benefit">
-            <div className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors ${isActive ? 'bg-slate-900/5 text-gv-gold' : 'bg-slate-50 text-slate-400 group-hover/benefit:text-slate-500'}`}>
-              <Check className="h-2.5 w-2.5" strokeWidth={4} />
-            </div>
-            <span className={`text-[11px] font-semibold leading-snug transition-colors ${isActive ? 'text-slate-700' : 'text-slate-500 group-hover/benefit:text-slate-600'}`}>{benefit}</span>
+          <li key={idx} className="flex items-start gap-1.5">
+            <Check className={`h-3 w-3 mt-0.5 shrink-0 ${isActive ? 'text-gv-gold' : 'text-gray-500'}`} />
+            <span className="text-[11px] text-gray-500 font-medium leading-tight">{benefit}</span>
           </li>
         ))}
       </ul>

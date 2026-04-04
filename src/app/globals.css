@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FFFFFF;
-  --foreground: #0F172A;
-  --color-gv-gold: #D4AF37;
-  --color-surface: #F8FAFC;
-  --color-surface-alt: #F1F5F9;
-  --color-border: rgba(212, 175, 55, 0.2);
-  --color-border-light: rgba(0, 0, 0, 0.05);
+  --background: #FAFAF8;
+  --foreground: #1a1a1a;
+  --color-gv-gold: #9A7D2E;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F5F5F3;
+  --color-border: #E8E6E1;
+  --color-border-light: #F0EEEA;
   color-scheme: light;
 }
 
@@ -78,52 +78,4 @@ body {
 
 .animate-gold-glow {
   animation: gold-glow 3s infinite ease-in-out;
-}
-
-/* Institutional Circular Loader Animations */
-@keyframes premium-rotate {
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes premium-dash {
-  0% {
-     stroke-dasharray: 1, 200;
-     stroke-dashoffset: 0;
-  }
-  50% {
-     stroke-dasharray: 89, 200;
-     stroke-dashoffset: -35px;
-  }
-  100% {
-     stroke-dasharray: 89, 200;
-     stroke-dashoffset: -124px;
-  }
-}
-
-.animate-premium-rotate {
-  animation: premium-rotate 2s linear infinite;
-}
-
-.animate-premium-dash {
-  animation: premium-dash 1.5s ease-in-out infinite;
-}
-
-/* Institutional Aesthetics */
-/* Institutional Aesthetics - Light Glass */
-.premium-glass {
-  background: rgba(255, 255, 255, 0.7) !important;
-  backdrop-filter: blur(25px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05) !important;
-}
-
-@keyframes institutional-pulse {
-  0% { transform: scale(0.95); opacity: 0.5; }
-  50% { transform: scale(1.05); opacity: 1; }
-  100% { transform: scale(0.95); opacity: 0.5; }
-}
-
-.animate-institutional-pulse {
-  animation: institutional-pulse 2s infinite ease-in-out;
 }

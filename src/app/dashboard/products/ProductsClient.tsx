@@ -19,11 +19,11 @@ export default function ProductsPageContent({ lang }: { lang: "en" | "zh" }) {
                         <div className="h-0.5 w-6 bg-gv-gold rounded-full"></div>
                         <span className="text-gv-gold text-[9px] font-black uppercase tracking-[0.25em]">Investment Tiers</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter leading-none text-slate-900">
-                        {lang === "en" ? "Products & Portfolios" : "理财产品与组�?}
+                    <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter leading-none text-gray-900">
+                        {lang === "en" ? "Products & Portfolios" : "理财产品与组合"}
                     </h1>
-                    <p className="text-slate-500 text-xs max-w-lg mt-2">
-                        {lang === "en" ? "Explore our fund management tiers with fixed dividends and priority capital processing." : "探索我们专业的基金管理等级，享受固定分红和优先资金处理�?}
+                    <p className="text-gray-400 text-xs max-w-lg mt-2">
+                        {lang === "en" ? "Explore our fund management tiers with fixed dividends and priority capital processing." : "探索我们专业的基金管理等级，享受固定分红和优先资金处理。"}
                     </p>
                 </div>
                 <a href="/deposit" className="inline-flex shrink-0 items-center justify-center bg-gv-gold text-black font-black uppercase tracking-widest text-xs px-8 py-4 rounded-2xl hover:-translate-y-1 transition-all shadow-xl hover:shadow-gv-gold/20">

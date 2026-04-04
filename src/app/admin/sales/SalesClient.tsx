@@ -71,24 +71,24 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter text-slate-900">{t.title}</h2>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
+                    <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h2>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
                 </div>
                 <input
                     type="text"
                     placeholder={t.searchPlaceholder}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs w-full md:w-80 focus:outline-none focus:border-gv-gold transition-all"
+                    className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs w-full md:w-80 focus:outline-none focus:border-gv-gold transition-all"
                 />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Leaderboard */}
-                <div className="lg:col-span-2 overflow-hidden border border-slate-200 rounded-[40px] bg-white backdrop-blur-md shadow-xl">
+                <div className="lg:col-span-2 overflow-hidden border border-gray-200 rounded-[40px] bg-white backdrop-blur-md shadow-2xl">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400">
                                 <tr>
                                     <th className="px-8 py-6">{t.tableRank}</th>
                                     <th className="px-8 py-6">{t.tableAgent}</th>
@@ -96,35 +96,35 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
                                     <th className="px-8 py-6 text-right">{t.tableTotalCapital}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-gray-100">
                                 {filteredSales.map((agent, index) => (
                                     <tr 
                                         key={agent.agent_username} 
-                                        className={`text-sm group hover:bg-slate-50 transition-colors cursor-pointer font-medium ${selectedAgent === agent.agent_username ? "bg-gv-gold/5 border-gv-gold/20" : ""}`}
+                                        className={`text-sm group hover:bg-gray-50 transition-colors cursor-pointer ${selectedAgent === agent.agent_username ? "bg-gv-gold/5 border-gv-gold/20" : ""}`}
                                         onClick={() => fetchAgentReferrals(agent.agent_username)}
                                     >
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-3">
-                                                <span className="font-mono text-slate-400 text-[10px]">#{(index + 1).toString().padStart(2, '0')}</span>
+                                                <span className="font-mono text-gray-500 text-[10px]">#{(index + 1).toString().padStart(2, '0')}</span>
                                                 {index === 0 && <span className="text-xl">🥇</span>}
                                                 {index === 1 && <span className="text-xl">🥈</span>}
                                                 {index === 2 && <span className="text-xl">🥉</span>}
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <div className="font-black text-slate-900 group-hover:text-gv-gold transition-colors uppercase tracking-tight">@{agent.agent_username}</div>
+                                            <div className="font-black text-gray-900 group-hover:text-gv-gold transition-colors uppercase tracking-tight">@{agent.agent_username}</div>
                                         </td>
-                                        <td className="px-8 py-6 font-bold text-slate-400">{agent.total_referrals} Clients</td>
+                                        <td className="px-8 py-6 font-bold text-gray-400">{agent.total_referrals} Clients</td>
                                         <td className="px-8 py-6 text-right">
                                             <div className="flex flex-col">
-                                                <span className="font-black text-emerald-600 tabular-nums">$ {(Number(agent.total_referred_capital_usd || (Number(agent.total_referred_capital || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">RM {Number(agent.total_referred_capital || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                <span className="font-black text-emerald-400 tabular-nums">$ {(Number(agent.total_referred_capital_usd || (Number(agent.total_referred_capital || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">RM {Number(agent.total_referred_capital || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                     </tr>
                                 ))}
                                 {filteredSales.length === 0 && (
-                                    <tr><td colSpan={4} className="p-20 text-center text-slate-400 font-black uppercase tracking-widest">{t.noSales}</td></tr>
+                                    <tr><td colSpan={4} className="p-20 text-center text-gray-400 font-black uppercase tracking-widest">{t.noSales}</td></tr>
                                 )}
                             </tbody>
                         </table>
@@ -132,21 +132,21 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
 
                 {/* Detail Panel */}
-                <div className="bg-slate-50 border border-slate-200 rounded-[40px] p-8 h-fit min-h-[500px] shadow-xl backdrop-blur-xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-8 opacity-5 select-none text-9xl font-black text-slate-900">GV</div>
+                <div className="bg-gray-50 border border-gray-200 rounded-[40px] p-8 h-fit min-h-[500px] shadow-2xl backdrop-blur-xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 select-none text-9xl font-black">GV</div>
                     {selectedAgent ? (
                         <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500 relative z-10">
                                 <div>
                                     <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold mb-2">{t.detailTitle}</h4>
-                                    <div className="text-4xl font-black text-slate-900 uppercase tracking-tighter">@{selectedAgent}</div>
+                                    <div className="text-4xl font-black text-gray-900 uppercase tracking-tighter">@{selectedAgent}</div>
                                     <div className="mt-4 flex flex-col">
                                         {(() => {
                                             const totalUSD = agentReferrals.reduce((sum, ref) => sum + Number(ref.balance_usd || 0), 0);
                                             const totalRM = agentReferrals.reduce((sum, ref) => sum + Number(ref.balance || 0), 0);
                                             return (
                                                 <>
-                                                    <span className="text-2xl font-black text-emerald-600 tabular-nums">$ {totalUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                    <span className="text-[11px] text-slate-400 font-black uppercase tracking-widest">RM {totalRM.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                    <span className="text-2xl font-black text-emerald-500 tabular-nums">$ {totalUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                    <span className="text-[11px] text-gray-400 font-black uppercase tracking-widest">RM {totalRM.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                                 </>
                                             );
                                         })()}
@@ -154,36 +154,36 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
                                 </div>
                                 
                                 <div className="space-y-6">
-                                    <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-200 pb-2">{t.referredClients} ({agentReferrals.length})</h5>
+                                    <h5 className="text-[10px] font-black uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-2">{t.referredClients} ({agentReferrals.length})</h5>
                                     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                         {isLoadingReferrals ? (
                                             <div className="py-20 flex justify-center"><div className="h-6 w-6 border-2 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>
                                         ) : agentReferrals.map((ref, i) => (
-                                            <div key={i} className="bg-white border border-slate-100 p-5 rounded-3xl flex items-center justify-between group hover:border-gv-gold/30 transition-all shadow-sm">
+                                            <div key={i} className="bg-white border border-gray-200 p-5 rounded-3xl flex items-center justify-between group hover:border-gray-200 transition-all">
                                                 <div>
-                                                    <div className="text-xs font-black text-slate-900 uppercase tracking-tight">{ref.full_name || ref.username}</div>
-                                                    <div className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">@{ref.username}</div>
+                                                    <div className="text-xs font-black text-gray-900 uppercase tracking-tight">{ref.full_name || ref.username}</div>
+                                                    <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">@{ref.username}</div>
                                                 </div>
                                                 <div className="text-right">
                                                     <div className="flex flex-col">
-                                                        <span className="text-xs font-black text-emerald-600">$ {(Number(ref.balance_usd || (Number(ref.balance || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">RM {Number(ref.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                        <span className="text-xs font-black text-emerald-400">$ {(Number(ref.balance_usd || (Number(ref.balance || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                        <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">RM {Number(ref.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         ))}
                                     {agentReferrals.length === 0 && !isLoadingReferrals && (
-                                        <div className="text-center py-20 text-slate-400 text-[10px] font-black uppercase tracking-widest">{t.noReferrals}</div>
+                                        <div className="text-center py-20 text-gray-400 text-[10px] font-black uppercase tracking-widest">{t.noReferrals}</div>
                                     )}
                                 </div>
                             </div>
                         </div>
                     ) : (
                         <div className="h-full flex flex-col items-center justify-center text-center p-10 space-y-6">
-                            <div className="h-24 w-24 bg-white rounded-full flex items-center justify-center border border-slate-200 shadow-inner">
-                                <svg className="h-10 w-10 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                            <div className="h-24 w-24 bg-white rounded-full flex items-center justify-center border border-gray-200">
+                                <svg className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                             </div>
-                            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 max-w-[140px] leading-relaxed">{t.selectAgent}</div>
+                            <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 max-w-[140px] leading-relaxed">{t.selectAgent}</div>
                         </div>
                     )}
                 </div>

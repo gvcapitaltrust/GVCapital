@@ -10,7 +10,6 @@ import TierMedal from "@/components/TierMedal";
 import { getTierByAmount, TIERS } from "@/lib/tierUtils";
 import ComparisonTable from "@/components/ComparisonTable";
 import ProductSelection from "@/components/ProductSelection";
-import PremiumLoader from "@/components/PremiumLoader";
 import { X } from "lucide-react";
 
 export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
@@ -70,35 +69,35 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             member: "Member",
         },
         zh: {
-            verificationInProgress: "审核�?,
-            verificationInProgressDesc: "我们的合规团队正在审核您的文档。帐户访问就绪后，您将收到通知�?,
+            verificationInProgress: "审核中",
+            verificationInProgressDesc: "我们的合规团队正在审核您的文档。帐户访问就绪后，您将收到通知。",
             verificationUnsuccessful: "审核未通过",
-            verificationUnsuccessfulDesc: "我们无法验证您的文档。请查看以下原因并重新提交您的详细信息�?,
-            rejectionReasonLabel: "未提供原�?,
-            reuploadPrompt: "请仔细检查您的信息并提供清晰的文档照片�?,
+            verificationUnsuccessfulDesc: "我们无法验证您的文档。请查看以下原因并重新提交您的详细信息。",
+            rejectionReasonLabel: "未提供原因",
+            reuploadPrompt: "请仔细检查您的信息并提供清晰的文档照片。",
             reuploadBtn: "重新提交验证",
             completeProfile: "完善您的资料",
-            completeProfileDesc: "要开始投资并赚取每月分红，请完成您的身份识别流程�?,
+            completeProfileDesc: "要开始投资并赚取每月分红，请完成您的身份识别流程。",
             totalEquity: "总投资额",
             totalProfit: "总分红额",
             investmentNote: "净流量 (存款 - 提款)",
             dividendNote: "包括奖金",
-            startVerification: "开始验�?,
+            startVerification: "开始验证",
             resumeVerification: "继续验证",
             expectedMonthly: "预计每月分红",
             projectedYearly: "预计年度分红",
-            dividendRateDesc: "基于当前等级分红�?,
+            dividendRateDesc: "基于当前等级分红率",
             basedOn: "基于",
             dividendTrends: "分红趋势",
             noDividendData: "暂无分红数据",
             latestActivity: "近期活动",
-            noTxFound: "未找到交�?,
+            noTxFound: "未找到交易",
             deposit: "存款",
             withdraw: "提款",
             noTier: "-",
             activeStatus: "活跃会员",
             currentPackage: "当前等级",
-            depositTitle: "新存�?,
+            depositTitle: "新存款",
             amountMYR: "金额 (USD)",
             transferDate: "转账日期",
             bankReceipt: "银行收据 / 转账凭证",
@@ -107,17 +106,17 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             withdrawTitle: "申请提款",
             requestWithdraw: "继续输入密码",
             securityPin: "安全密码",
-            enterPin: "请输入您�?6 位安全密码以授权此提款�?,
+            enterPin: "请输入您的 6 位安全密码以授权此提款。",
             confirmWithdraw: "确认提款",
             cancelTx: "取消交易",
             successTitle: "提交成功",
-            successDesc: "您的请求已收到，财务团队正在处理中�?,
-            docSubmitted: "文档已接�?,
-            docSubmittedDesc: "您的验证请求已更新。我们的团队将在 24-48 小时内进行审核�?,
+            successDesc: "您的请求已收到，财务团队正在处理中。",
+            docSubmitted: "文档已接收",
+            docSubmittedDesc: "您的验证请求已更新。我们的团队将在 24-48 小时内进行审核。",
             totalWithdraw: "总提款额",
             walletBalance: "钱包余额",
-            lifetimeDeposit: "累计充�?,
-            totalPrincipal: "总本�?,
+            lifetimeDeposit: "累计充值",
+            totalPrincipal: "总本金",
             member: "会员",
         }
     }[lang];
@@ -140,7 +139,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
     };
 
     if (isCheckingAuth && !user) {
-        return <div className="flex items-center justify-center p-20"><PremiumLoader /></div>;
+        return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
     }
 
     return (
@@ -152,27 +151,19 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         <span className="text-gv-gold text-[10px] font-black uppercase tracking-[0.4em] mb-0.5">Institutional Access</span>
                     </div>
                     <div className="flex items-center gap-6">
-                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 leading-none">
+                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-gray-900 leading-none">
                             {lang === "en" ? "Overview" : "概览"}
                         </h1>
-
-                        <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full">
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-institutional-pulse absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                            </span>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Global Network Live</span>
-                        </div>
                         
                         {user?.is_verified && (
-                            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow-xl hover:border-gv-gold/30 transition-all group scale-90 origin-left backdrop-blur-md">
+                            <div className="flex items-center gap-3 bg-white border border-gray-200 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow-xl hover:border-gv-gold/30 transition-all group scale-90 origin-left">
                                 <TierMedal 
                                     tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
                                     size="sm" 
                                     className="group-hover:rotate-12 transition-transform"
                                 />
                                 <div className="flex flex-col">
-                                    <span className="text-xs font-black uppercase tracking-tighter text-slate-900">
+                                    <span className="text-xs font-black uppercase tracking-tighter text-gray-900">
                                         {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
                                     </span>
                                     <span className="text-[8px] font-bold text-gv-gold uppercase tracking-widest leading-none mt-0.5">{t.activeStatus}</span>
@@ -186,81 +177,80 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             <div className="space-y-10">
                 {(!user?.is_verified && user?.email !== "thenja96@gmail.com") ? (
                     (user?.kyc_status === 'Pending' || user?.kyc_status === 'pending') ? (
-                        <div className="premium-glass border-amber-500/20 p-8 rounded-[32px] flex flex-col sm:flex-row items-center gap-6 animate-in fade-in duration-700 max-w-4xl mx-auto shadow-2xl relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-amber-500/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div className="h-16 w-16 bg-amber-500/10 rounded-2xl flex items-center justify-center shrink-0 border border-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.1)] relative z-10">
-                                <svg className="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <div className="bg-amber-400/10 border border-amber-400/20 p-6 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-4 animate-in fade-in duration-700 max-w-4xl mx-auto">
+                            <div className="h-12 w-12 bg-amber-400/20 rounded-full flex items-center justify-center shrink-0">
+                                <svg className="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
-                            <div className="space-y-2 relative z-10 text-center sm:text-left flex-1">
-                                <h2 className="text-2xl font-black text-amber-500 uppercase tracking-tight">{t.verificationInProgress}</h2>
-                                <p className="text-slate-500 text-sm font-semibold leading-relaxed max-w-xl">{t.verificationInProgressDesc}</p>
+                            <div className="space-y-1">
+                                <h2 className="text-xl font-bold text-amber-500">{t.verificationInProgress}</h2>
+                                <p className="text-gray-500 text-sm leading-relaxed">{t.verificationInProgressDesc}</p>
                             </div>
                         </div>
                     ) : (user?.kyc_status === 'Rejected' || user?.kyc_status === 'rejected') ? (
-                        <div className="premium-glass border-red-500/20 p-8 rounded-[32px] flex flex-col md:flex-row items-center gap-8 animate-in fade-in duration-700 justify-between max-w-4xl mx-auto shadow-2xl group">
-                            <div className="flex flex-col sm:flex-row items-center gap-6 flex-1">
-                                <div className="h-16 w-16 bg-red-500/10 rounded-2xl flex items-center justify-center shrink-0 border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
-                                    <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center gap-6 animate-in fade-in duration-700 justify-between max-w-4xl mx-auto">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                <div className="h-12 w-12 bg-red-500/20 rounded-full flex items-center justify-center shrink-0">
+                                    <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 </div>
-                                <div className="space-y-2 text-center sm:text-left">
-                                    <h2 className="text-2xl font-black text-red-500 uppercase tracking-tight">{t.verificationUnsuccessful}</h2>
-                                    <p className="text-slate-500 text-sm font-semibold leading-relaxed">
-                                        {t.verificationUnsuccessfulDesc} <span className="text-red-400 font-black ml-1 bg-red-500/10 px-3 py-1 rounded-lg uppercase tracking-widest text-[10px] border border-red-500/20">{user?.rejection_reason || t.rejectionReasonLabel}</span>
+                                <div className="space-y-1">
+                                    <h2 className="text-xl font-bold text-red-500">{t.verificationUnsuccessful}</h2>
+                                    <p className="text-gray-500 text-sm leading-relaxed">
+                                        {t.verificationUnsuccessfulDesc} <span className="text-gray-900 font-medium ml-1 bg-red-500/20 px-2 py-0.5 rounded-md">{user?.rejection_reason || t.rejectionReasonLabel}</span>
                                     </p>
                                 </div>
                             </div>
-                            <Link href={`/verify?lang=${lang}`} className="shrink-0 bg-red-500 text-white hover:bg-red-600 font-black uppercase tracking-[0.2em] px-8 py-4 rounded-2xl transition-all text-xs shadow-[0_10px_30px_rgba(239,68,68,0.2)] hover:-translate-y-1">{t.reuploadBtn}</Link>
+                            <Link href={`/verify?lang=${lang}`} className="shrink-0 bg-red-500/20 text-red-500 hover:bg-red-500/30 font-bold px-6 py-3 rounded-xl transition-all text-sm">{t.reuploadBtn}</Link>
                         </div>
                     ) : (
-                        <div className="premium-glass bg-gv-gold/[0.03] border-gv-gold/20 p-10 md:p-14 rounded-[48px] flex flex-col lg:flex-row items-center gap-10 animate-in fade-in duration-700 justify-between relative overflow-hidden group shadow-2xl">
-                            <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:opacity-10 transition-all duration-1000 rotate-12 group-hover:rotate-0">
-                                <svg className="h-48 w-48 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 d9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        <div className="bg-gv-gold/5 border border-gv-gold/20 p-8 rounded-[32px] flex flex-col md:flex-row items-center gap-8 animate-in fade-in duration-700 justify-between relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-8 opacity-5">
+                                <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 d9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                             </div>
-                             <div className="flex flex-col sm:flex-row items-center gap-8 relative z-10 text-center sm:text-left flex-1">
-                                <div className="h-20 w-20 bg-gv-gold/10 rounded-3xl flex items-center justify-center shrink-0 text-gv-gold border border-gv-gold/20 shadow-[0_0_30px_rgba(212,175,55,0.15)] ring-4 ring-gv-gold/5">
-                                    <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10 text-center sm:text-left">
+                                <div className="h-16 w-16 bg-gv-gold/20 rounded-full flex items-center justify-center shrink-0 text-gv-gold">
+                                    <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                 </div>
-                                <div className="space-y-3">
-                                    <h2 className="text-4xl font-black uppercase tracking-tighter text-slate-900 leading-none">{t.completeProfile}</h2>
-                                    <p className="text-slate-500 text-sm font-semibold leading-relaxed max-w-xl opacity-80">{t.completeProfileDesc}</p>
+                                <div className="space-y-2">
+                                    <h2 className="text-3xl font-black uppercase tracking-tighter text-gv-gold">{t.completeProfile}</h2>
+                                    <p className="text-gray-500 text-sm leading-relaxed max-w-lg">{t.completeProfileDesc}</p>
                                 </div>
                             </div>
-                            <Link href={`/verify?lang=${lang}`} className="relative z-10 shrink-0 bg-gv-gold text-black hover:bg-gv-gold/90 font-black uppercase tracking-[0.25em] px-10 py-5 rounded-2xl transition-all shadow-[0_15px_40px_rgba(212,175,55,0.25)] hover:shadow-[0_20px_50px_rgba(212,175,55,0.35)] hover:-translate-y-1 text-sm">{t.startVerification}</Link>
+                            <Link href={`/verify?lang=${lang}`} className="relative z-10 shrink-0 bg-gv-gold text-black hover:bg-gv-gold/90 font-black uppercase tracking-widest px-8 py-4 rounded-2xl transition-all shadow-[0_10px_20px_rgba(212,175,55,0.15)]">{t.startVerification}</Link>
                         </div>
                     )
                 ) : (
                     <>
                         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* Total Investment Card */}
-                            <div className="premium-glass p-10 rounded-[40px] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-hidden">
+                            <div className="bg-white border border-gray-200 p-10 rounded-[40px] shadow-sm hover:shadow-lg hover:border-gv-gold/30 transition-all group relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                     <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 </div>
                                 <div className="relative z-10">
-                                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalEquity}</p>
-                                    <h2 className="text-5xl font-black tracking-tighter text-slate-900 tabular-nums whitespace-nowrap">$ {(user?.total_investment_usd ?? (Number(user?.total_investment || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                                    <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
-                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.lifetimeDeposit}</span>
-                                        <span className="text-xs font-black text-slate-900">$ {(user?.total_deposited_usd ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalEquity}</p>
+                                    <h2 className="text-5xl font-black tracking-tighter text-gray-900 tabular-nums whitespace-nowrap">$ {(user?.total_investment_usd ?? (Number(user?.total_investment || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                    <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.lifetimeDeposit}</span>
+                                        <span className="text-xs font-black text-gray-900">$ {(user?.total_deposited_usd ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Total Dividends Card */}
-                            <div className="premium-glass p-10 rounded-[40px] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-hidden">
+                            <div className="bg-white border border-gray-200 p-10 rounded-[40px] shadow-sm hover:shadow-lg hover:border-gv-gold/30 transition-all group relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                     <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                 </div>
                                 <div className="relative z-10">
-                                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
+                                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
                                     <h2 className="text-5xl font-black tracking-tighter text-emerald-600 tabular-nums whitespace-nowrap">$ {(user?.profit_usd ?? (Number(user?.profit || 0) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                                 </div>
                             </div>
                         </section>
 
                         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="premium-glass p-10 rounded-[40px] relative overflow-hidden group">
-                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
+                            <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] relative overflow-hidden group">
+                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
                                 {(() => {
                                     const tier = (user?.tier && user?.tier !== "Standard") 
                                         ? TIERS.find(te => te.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
@@ -268,14 +258,14 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     const maxUSD = Number(user?.total_investment_usd || 0) * tier.maxDividend;
                                     return (
                                         <>
-                                            <h3 className="text-3xl font-black text-slate-900 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
-                                            <p className="text-[10px] text-slate-600 font-bold uppercase mt-4 border-t border-slate-100 pt-4 inline-block">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
+                                            <h3 className="text-3xl font-black text-gray-900 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
+                                            <p className="text-[10px] text-gray-500 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                         </>
                                     );
                                 })()}
                             </div>
-                            <div className="premium-glass p-10 rounded-[40px] relative overflow-hidden group">
-                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
+                            <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] relative overflow-hidden group">
+                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
                                 {(() => {
                                     const tier = (user?.tier && user?.tier !== "Standard") 
                                         ? TIERS.find(te => te.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
@@ -291,7 +281,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                                     </div>
                                                 )}
                                             </div>
-                                            <p className="text-[10px] text-slate-600 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
+                                            <p className="text-[10px] text-gray-500 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                         </>
                                     );
                                 })()}
@@ -303,38 +293,25 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                 <div className="h-14 w-14 bg-gv-gold/20 text-gv-gold rounded-full flex items-center justify-center mb-4 ring-1 ring-gv-gold/30">
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                 </div>
-                                <h2 className="text-2xl font-black tracking-tighter text-slate-900 mb-2 uppercase">{lang === 'en' ? 'Start Investing Now' : '立即开始投�?}</h2>
-                                <p className="text-slate-600 text-[10px] font-medium mb-6 max-w-[250px] uppercase tracking-wider">{lang === 'en' ? 'Choose from our tier packages to start earning daily dividends.' : '探索我们专业的理财产品，开启您的财富增长之旅�?}</p>
+                                <h2 className="text-2xl font-black tracking-tighter text-gray-900 mb-2 uppercase">{lang === 'en' ? 'Start Investing Now' : '立即开始投资'}</h2>
+                                <p className="text-gray-500 text-[10px] font-medium mb-6 max-w-[250px] uppercase tracking-wider">{lang === 'en' ? 'Choose from our tier packages to start earning daily dividends.' : '探索我们专业的理财产品，开启您的财富增长之旅。'}</p>
                                 <a href="/dashboard/products" className="bg-gv-gold text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-2xl shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/40 transition-all border border-gv-gold/50">{lang === 'en' ? 'View Products' : '查看产品'}</a>
                             </div>
                         )}
                         
-                        <section className="flex flex-col sm:flex-row gap-8 mt-12">
-                            {user?.is_verified ? (
-                                <Link
-                                    href={`/dashboard/deposit?lang=${lang}`}
-                                    className="flex-1 bg-gv-gold text-black font-black text-xs py-7 rounded-[32px] hover:bg-gv-gold/90 hover:-translate-y-1.5 transition-all flex items-center justify-center gap-4 shadow-[0_15px_40px_rgba(212,175,55,0.25)] uppercase tracking-[0.3em] group"
-                                >
-                                    <div className="h-8 w-8 bg-black/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 4v16m8-8H4" /></svg>
-                                    </div>
-                                    {t.deposit}
-                                </Link>
-                            ) : (
-                                <div className="flex-1 bg-white/5 text-slate-600 font-black text-xs py-7 rounded-[32px] flex items-center justify-center gap-4 border border-white/5 cursor-not-allowed opacity-50 uppercase tracking-[0.3em] relative group/locked">
-                                     <div className="h-8 w-8 bg-black/20 rounded-full flex items-center justify-center text-slate-600">
-                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                                    </div>
-                                    {t.deposit}
-                                </div>
-                            )}
+                        <section className="flex flex-col sm:flex-row gap-6 mt-10">
+                            <Link
+                                href={`/dashboard/deposit?lang=${lang}`}
+                                className="flex-1 bg-gv-gold text-black font-black text-xl py-6 rounded-[28px] hover:bg-gv-gold/90 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 shadow-[0_15px_30px_rgba(212,175,55,0.2)]"
+                            >
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4v16m8-8H4" /></svg>
+                                {t.deposit}
+                            </Link>
                             <Link
                                 href={`/dashboard/withdraw?lang=${lang}`}
-                                className="flex-1 bg-[#1a1a1a] text-white font-black text-xs py-7 rounded-[32px] hover:bg-[#222] hover:-translate-y-1.5 transition-all flex items-center justify-center gap-4 border border-white/5 shadow-2xl uppercase tracking-[0.3em] group"
+                                className="flex-1 bg-gray-100 text-gray-900 font-black text-xl py-6 rounded-[28px] hover:bg-gray-200 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 border border-gray-300"
                             >
-                                <div className="h-8 w-8 bg-white/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform text-gv-gold">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
-                                </div>
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                                 {t.withdraw}
                             </Link>
                         </section>
@@ -344,13 +321,13 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
             {/* Action Toast */}
             {actionToast && (
-                <div className="fixed bottom-24 sm:bottom-6 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-6 z-[600] bg-slate-50 border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 w-[90%] sm:max-w-sm">
+                <div className="fixed bottom-24 sm:bottom-6 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-6 z-[600] bg-gray-50 border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 w-[90%] sm:max-w-sm">
                     <div className="flex flex-col gap-4">
-                        <p className="text-slate-900 font-black text-sm uppercase tracking-widest">{actionToast.message}</p>
+                        <p className="text-gray-900 font-black text-sm uppercase tracking-widest">{actionToast.message}</p>
                         {actionToast.actionUrl && (
                             <button onClick={() => { setActionToast(null); router.push(actionToast.actionUrl!); }} className="bg-gv-gold text-black font-black py-3 rounded-xl uppercase tracking-widest text-xs">{actionToast.actionText}</button>
                         )}
-                        <button onClick={() => setActionToast(null)} className="text-slate-500 hover:text-slate-900 text-[10px] font-bold uppercase tracking-widest">Dismiss</button>
+                        <button onClick={() => setActionToast(null)} className="text-gray-400 hover:text-gray-900 text-[10px] font-bold uppercase tracking-widest">Dismiss</button>
                     </div>
                 </div>
             )}
