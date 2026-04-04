@@ -5,11 +5,16 @@ import ProductSelection from "@/components/ProductSelection";
 import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import ComparisonTable from "@/components/ComparisonTable";
+import VerificationBlocker from "@/components/VerificationBlocker";
 
 export default function ProductsPageContent({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user } = useUser();
     const { forexRate } = useSettings();
     const [isComparisonOpen, setIsComparisonOpen] = useState(false);
+
+    if (user && user.kyc_status !== 'Verified' && user.email !== 'thenja96@gmail.com') {
+        return <VerificationBlocker lang={lang} />;
+    }
 
     return (
         <div className="max-w-7xl mx-auto space-y-6">

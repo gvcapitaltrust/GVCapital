@@ -6,6 +6,7 @@ import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { X, ArrowLeft, Upload, CheckCircle2 } from "lucide-react";
+import VerificationBlocker from "@/components/VerificationBlocker";
 
 export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, refreshData } = useUser();
@@ -115,6 +116,10 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
         );
     }
 
+    if (user && user.kyc_status !== 'Verified' && user.email !== 'thenja96@gmail.com') {
+        return <VerificationBlocker lang={lang} />;
+    }
+
     return (
         <div className="max-w-4xl mx-auto space-y-12 pb-20">
             <div className="flex items-center gap-6">
@@ -130,25 +135,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </div>
 
-            {!user?.is_verified && (
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-[32px] p-8 flex flex-col md:flex-row items-center gap-6 animate-in slide-in-from-top-4 duration-500">
-                    <div className="h-14 w-14 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-500 shrink-0">
-                        <Upload className="h-7 w-7" />
-                    </div>
-                    <div className="flex-1 text-center md:text-left space-y-1">
-                        <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight">Identity Verification Required</h3>
-                        <p className="text-sm font-medium text-gray-500">To comply with financial regulations, you must complete your identity verification (KYC) before making a deposit.</p>
-                    </div>
-                    <button 
-                        onClick={() => router.push(`/dashboard/profile?lang=${lang}`)}
-                        className="bg-black text-white font-black px-8 py-4 rounded-2xl uppercase tracking-widest text-xs hover:bg-gv-gold hover:text-black transition-all shadow-xl active:scale-95"
-                    >
-                        Verify Now
-                    </button>
-                </div>
-            )}
-
-            <div className={`bg-white border border-gray-200 rounded-[32px] p-8 md:p-10 shadow-2xl space-y-8 transition-all duration-500 ${!user?.is_verified ? 'opacity-40 grayscale pointer-events-none select-none' : ''}`}>
+            <div className="bg-white border border-gray-200 rounded-[32px] p-8 md:p-10 shadow-2xl space-y-8 transition-all duration-500">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div className="space-y-8">
                         <div className="space-y-3">
@@ -189,7 +176,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                                 {depositReceipt ? (
                                     <div className="absolute inset-0 p-4">
                                         <div className="w-full h-full rounded-2xl relative overflow-hidden group">
-                                            <img src={URL.createObjectURL(depositReceipt)} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-700" />
+                                            <img src={depositReceipt ? URL.createObjectURL(depositReceipt) : ""} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-700" />
                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                 <span className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{t.selectFile}</span>
                                             </div>

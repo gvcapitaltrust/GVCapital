@@ -133,8 +133,22 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                     </td>
                                     <td className="px-4 py-6">
                                         <div className="flex flex-col leading-tight">
-                                            <span className="text-[9px] font-black text-gray-900 uppercase tracking-tighter">{tx.profiles?.bank_name || tx.profiles?.kyc_data?.bank_name || "N/A"}</span>
-                                            <span className="text-[9px] font-mono text-gv-gold font-bold">{tx.profiles?.account_number || tx.profiles?.kyc_data?.account_number || "-"}</span>
+                                            {(() => {
+                                                const method = tx.metadata?.method_details;
+                                                const isOneTime = tx.metadata?.payout_method?.startsWith('[ONE-TIME]');
+                                                const name = method ? (method.type === 'BANK' ? method.bank_name : 'USDT TRC20') : (tx.profiles?.bank_name || tx.profiles?.kyc_data?.bank_name || "N/A");
+                                                const account = method ? (method.type === 'BANK' ? method.account_number : method.usdt_address) : (tx.profiles?.account_number || tx.profiles?.kyc_data?.account_number || "-");
+                                                
+                                                return (
+                                                    <>
+                                                        <div className="flex items-center gap-1">
+                                                            {isOneTime && <span className="text-[7px] bg-slate-900 text-gv-gold px-1 rounded font-black">ONE-TIME</span>}
+                                                            <span className="text-[9px] font-black text-gray-900 uppercase tracking-tighter truncate max-w-[120px]">{name}</span>
+                                                        </div>
+                                                        <span className="text-[9px] font-mono text-gv-gold font-bold truncate max-w-[150px]">{account}</span>
+                                                    </>
+                                                );
+                                            })()}
                                         </div>
                                     </td>
                                     <td className="px-4 py-6 text-emerald-500 font-black tabular-nums">
@@ -215,9 +229,23 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                 </div>
                                             </div>
                                             <div className="flex flex-col p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                                                <span className="text-[8px] font-black uppercase text-gv-gold tracking-[0.2em] mb-2">Verified Bank Info</span>
-                                                <span className="text-[10px] font-black text-gray-900 uppercase mb-1 leading-none">{tx.profiles?.bank_name || tx.profiles?.kyc_data?.bank_name || "N/A"}</span>
-                                                <span className="text-[11px] font-mono font-bold text-gray-500 select-all tracking-tighter">{tx.profiles?.account_number || tx.profiles?.kyc_data?.account_number || "-"}</span>
+                                                <span className="text-[8px] font-black uppercase text-gv-gold tracking-[0.2em] mb-2">Payout destination</span>
+                                                {(() => {
+                                                    const method = tx.metadata?.method_details;
+                                                    const isOneTime = tx.metadata?.payout_method?.startsWith('[ONE-TIME]');
+                                                    const name = method ? (method.type === 'BANK' ? method.bank_name : 'USDT TRC20') : (tx.profiles?.bank_name || tx.profiles?.kyc_data?.bank_name || "N/A");
+                                                    const account = method ? (method.type === 'BANK' ? method.account_number : method.usdt_address) : (tx.profiles?.account_number || tx.profiles?.kyc_data?.account_number || "-");
+                                                    
+                                                    return (
+                                                        <>
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                {isOneTime && <span className="text-[7px] bg-slate-900 text-gv-gold px-1.5 py-0.5 rounded font-black">ONE-TIME</span>}
+                                                                <span className="text-[10px] font-black text-gray-900 uppercase leading-none">{name}</span>
+                                                            </div>
+                                                            <span className="text-[11px] font-mono font-bold text-gray-500 select-all tracking-tighter break-all">{account}</span>
+                                                        </>
+                                                    );
+                                                })()}
                                             </div>
                                             <div className="flex flex-col gap-3">
                                                 {tx.status === 'Pending' && (

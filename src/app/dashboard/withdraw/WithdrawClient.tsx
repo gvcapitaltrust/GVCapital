@@ -7,6 +7,7 @@ import { useSettings } from "@/providers/SettingsProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { ArrowLeft, CheckCircle2, ShieldCheck, AlertTriangle, Eye, EyeOff } from "lucide-react";
 import TierMedal from "@/components/TierMedal";
+import VerificationBlocker from "@/components/VerificationBlocker";
 import { getTierByAmount } from "@/lib/tierUtils";
 
 export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
@@ -81,6 +82,9 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             continueToPin: "Continue",
             currentTier: "Current Tier",
             member: "Member",
+            verificationRequired: "Verification Required",
+            verificationDesc: "To ensure the security of your assets and comply with institutional regulations, we require all users to complete identity verification before initiating a withdrawal.",
+            verifyNow: "Verify Identity",
         },
         zh: {
             title: "申请提款",
@@ -104,6 +108,9 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             continueToPin: "继续",
             currentTier: "当前等级",
             member: "会员",
+            verificationRequired: "需要身份验证",
+            verificationDesc: "为了确保您的资产安全并遵守机构监管要求，我们要求所有用户在发起提款前完成身份验证。",
+            verifyNow: "立即验证",
         }
     }[lang];
 
@@ -273,6 +280,10 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             setIsSubmitting(false);
         }
     };
+
+    if (user && user.kyc_status !== 'Verified' && user.email !== 'thenja96@gmail.com') {
+        return <VerificationBlocker lang={lang} />;
+    }
 
     if (showSuccess) {
         return (
