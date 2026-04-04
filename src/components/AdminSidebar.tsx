@@ -14,6 +14,7 @@ interface AdminSidebarProps {
     onToggleMaintenance: () => void;
     isMobileMenuOpen?: boolean;
     onCloseMobileMenu?: () => void;
+    onOpenMobileMenu?: () => void;
 }
 
 export default function AdminSidebar({ 
@@ -23,7 +24,8 @@ export default function AdminSidebar({
     maintenanceMode, 
     onToggleMaintenance,
     isMobileMenuOpen = false,
-    onCloseMobileMenu = () => {}
+    onCloseMobileMenu = () => {},
+    onOpenMobileMenu = () => {}
 }: AdminSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
@@ -90,7 +92,7 @@ export default function AdminSidebar({
 
     const bottomNavItems = [
         menuItems.find(i => i.id === "dashboard"),
-        menuItems.find(i => i.id === "users"),
+        menuItems.find(i => i.id === "kyc"),
         menuItems.find(i => i.id === "deposits"),
         menuItems.find(i => i.id === "withdrawals"),
     ].filter(Boolean) as typeof menuItems;
@@ -238,26 +240,41 @@ export default function AdminSidebar({
             <nav className="fixed bottom-0 left-0 right-0 z-[50] h-20 bg-[#FAFAF8]/90 backdrop-blur-2xl border-t border-gray-200 flex items-center justify-around px-2 lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.03)] pb-safe">
                 {bottomNavItems.map((item) => {
                     const isActive = pathname === item.path;
+                    const pendingCount = getPendingCount(item.id);
                     return (
                         <Link
                             key={item.id}
                             href={`${item.path}?lang=${lang}`}
                             className={`group relative flex flex-col items-center justify-center w-16 h-16 transition-all duration-300 ${
-                                isActive ? "scale-110" : "hover:bg-gray-50 rounded-2xl"
+                                isActive ? "text-gv-gold" : "text-gray-400"
                             }`}
                         >
                             {isActive && (
-                                <div className="absolute inset-0 bg-gv-gold/10 rounded-2xl border border-gv-gold/20 shadow-inner"></div>
+                                <div className="absolute -top-px left-1/2 -translate-x-1/2 w-8 h-0.5 bg-gv-gold shadow-[0_0_15px_rgba(184,134,11,0.5)] rounded-full"></div>
                             )}
-                            <span className={`relative z-10 transition-colors duration-300 ${isActive ? "text-gv-gold" : "text-gray-400 group-hover:text-gray-900"}`}>
-                                {item.icon}
-                            </span>
-                            <span className={`absolute -bottom-1 text-[8px] font-black uppercase tracking-widest transition-all duration-300 ${isActive ? "text-gv-gold opacity-100 translate-y-3" : "text-gray-400 opacity-0 translate-y-0"}`}>
-                                {item.label}
+                            <div className="relative">
+                                <span className={`transition-transform duration-300 ${isActive ? "scale-110 -translate-y-1 block" : "group-hover:scale-110"}`}>
+                                    {item.icon}
+                                </span>
+                                {pendingCount > 0 && (
+                                    <div className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[7px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">
+                                        {pendingCount}
+                                    </div>
+                                )}
+                            </div>
+                            <span className={`text-[8px] font-black uppercase tracking-widest mt-1 transition-all duration-300 ${isActive ? "opacity-100" : "opacity-60"}`}>
+                                {item.id === "dashboard" ? "HOME" : item.label}
                             </span>
                         </Link>
                     );
                 })}
+                <button
+                    onClick={onOpenMobileMenu}
+                    className={`flex flex-col items-center justify-center w-16 h-16 text-gray-400`}
+                >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    <span className="text-[8px] font-black uppercase tracking-widest mt-1 opacity-60">MENU</span>
+                </button>
             </nav>
         </>
     );

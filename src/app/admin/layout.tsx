@@ -55,6 +55,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                         onToggleMaintenance={toggleMaintenance}
                         isMobileMenuOpen={isMobileMenuOpen}
                         onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
+                        onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
                     />
                     
                     <main className="flex-1 flex flex-col h-screen overflow-hidden ring-1 ring-gray-200 shadow-sm">
