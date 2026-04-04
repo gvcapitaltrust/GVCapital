@@ -172,12 +172,12 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 metadata: {
                     original_usd_amount: withdrawAmount,
                     forex_rate: withdrawalRate,
+                    expected_payout: penaltyInfo?.payout,
+                    original_usd_payout: penaltyInfo?.payout_usd,
                     ...(penaltyInfo?.isApplied ? {
                         penalty_applied: true,
                         penalty_amount: penaltyInfo.penalty,
                         original_usd_penalty: penaltyInfo.penalty_usd,
-                        expected_payout: penaltyInfo.payout,
-                        original_usd_payout: penaltyInfo.payout_usd,
                         locked_portion: penaltyInfo.lockedPortion,
                         penalty_rate: "40%"
                     } : {})
@@ -260,7 +260,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t.withdrawable}</span>
                                 <div className="text-right">
                                     <p className="text-lg font-black text-emerald-500 tabular-nums">$ {(user?.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">≈ RM {user?.withdrawable_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">≈ RM {(user?.withdrawable_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                 </div>
                             </div>
 

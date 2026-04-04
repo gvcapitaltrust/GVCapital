@@ -103,8 +103,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 const lifetimeDividendsUSD = txs.filter((t: any) => {
                     const type = (t.type || "").toLowerCase();
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                    const isDivOrBonus = type === 'dividend' || type === 'bonus' || category === 'dividend' || category === 'bonus';
-                    return isDivOrBonus && t.status === 'Approved';
+                    const reason = (t.metadata?.reason || "").toLowerCase();
+                    const isDivOrBonus = type === 'dividend' || type === 'bonus' || category === 'dividend' || category === 'bonus' || category === 'profit' || reason.includes('dividend');
+                    return isDivOrBonus && ['Approved', 'Completed'].includes(t.status);
                 }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate)), 0);
 
                 const fullProfile = {
@@ -113,6 +114,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     fullName: profile.full_name || user.user_metadata?.full_name,
                     total_assets: totalAssetsUSD * forexRate, // RM value for legacy display only
                     total_assets_usd: totalAssetsUSD,
+                    withdrawable_balance: withdrawableBalanceUSD * forexRate,
                     withdrawable_balance_usd: withdrawableBalanceUSD,
                     locked_capital: lockedCapitalUSD * forexRate, // RM value for legacy display
                     locked_capital_usd: lockedCapitalUSD,
@@ -124,8 +126,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     total_investment_usd: balanceUSD,
                     totalEquity: totalAssetsUSD,
                     balanceUSD: balanceUSD,
+                    profit_rm: profitUSD * forexRate,
                     profit_usd: profitUSD,
-                    lifetime_dividends_usd: lifetimeDividendsUSD
+                    lifetime_dividends_usd: lifetimeDividendsUSD,
+                    accumulated_dividend_rm: lifetimeDividendsUSD * forexRate
                 };
 
                 setUserProfile(fullProfile);

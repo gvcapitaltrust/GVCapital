@@ -116,7 +116,9 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                     </td>
                                     <td className="px-3 py-2.5 md:px-4 md:py-4">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-red-500 tabular-nums text-sm md:text-md whitespace-nowrap">$ {(Number(tx.original_currency_amount || (Math.abs(Number(tx.amount)) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="font-black text-red-500 tabular-nums text-sm md:text-md whitespace-nowrap">
+                                                $ {(Number(tx.original_currency_amount || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Math.abs(Number(tx.amount)) / forexRate)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="px-3 py-2.5 md:px-4 md:py-4">
@@ -141,7 +143,9 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                     </td>
                                     <td className="px-3 py-2.5 md:px-4 md:py-4">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-emerald-500 tabular-nums text-[9px] md:text-xs whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="font-black text-emerald-500 tabular-nums text-[9px] md:text-xs whitespace-nowrap">
+                                                $ {(Number(tx.metadata?.original_usd_payout || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="px-3 py-2.5 md:px-4 md:py-4 text-gray-400 font-mono text-[9px] md:text-[10px] whitespace-nowrap">{formatDate(tx.created_at)}</td>
