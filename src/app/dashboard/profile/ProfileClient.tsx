@@ -35,14 +35,14 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
         zh: {
             personalInfo: "个人信息",
             fullName: "姓名",
-            username: "用户名",
+            username: "用户�?,
             gender: "性别",
-            male: "男",
-            female: "女",
+            male: "�?,
+            female: "�?,
             email: "电子邮件",
             phone: "电话号码",
             country: "国家",
-            compliance: "合规与行业",
+            compliance: "合规与行�?,
             occupation: "职业",
             industry: "行业",
             wealthSource: "财富来源",
@@ -171,7 +171,7 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                                     <span className="relative z-10">{t.viewStatement}</span>
                                 </button>
                             ) : (
-                                <p className="text-gray-600 font-black uppercase text-xs mt-3 italic opacity-40">Verification Document Pending</p>
+                                <p className="text-slate-600 font-black uppercase text-xs mt-3 italic opacity-40">Verification Document Pending</p>
                             )}
                         </div>
                     </div>

@@ -22,13 +22,13 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
         },
         zh: {
             securityTitle: "安全设置",
-            securitySubtitle: "通过定期更新您的访问凭据，为您的机构账户提供最高级别的安全保护。",
+            securitySubtitle: "通过定期更新您的访问凭据，为您的机构账户提供最高级别的安全保护�?,
             currentPass: "当前密码",
-            newPass: "新密码",
-            confirmPass: "确认新密码",
+            newPass: "新密�?,
+            confirmPass: "确认新密�?,
             updateBtn: "更新凭据",
-            passwordSuccess: "密码更新成功。",
-            passwordError: "当前密码不正确或新密码不匹配。",
+            passwordSuccess: "密码更新成功�?,
+            passwordError: "当前密码不正确或新密码不匹配�?,
         }
     }[lang];
 
@@ -63,16 +63,16 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A3.323 3.323 0 0010.605 7.88a3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651" /></svg>
                             Active Protection
                         </h4>
-                        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.15em] leading-loose opacity-80 relative z-10">
+                        <p className="text-slate-600 text-[10px] font-bold uppercase tracking-[0.15em] leading-loose opacity-80 relative z-10">
                             {lang === 'en' 
                                 ? "Withdrawals are secured by your unique 6-digit Security PIN established during account registration."
-                                : "提款由您在开户时设置的唯一 6 位安全密码保护。"}
+                                : "提款由您在开户时设置的唯一 6 位安全密码保护�?}
                         </p>
                     </div>
 
                     <div className="space-y-4">
                         <h2 className="text-3xl font-black uppercase tracking-tighter text-white underline decoration-gv-gold decoration-4 underline-offset-8 decoration-gv-gold/20">{t.securityTitle}</h2>
-                        <p className="text-gray-500 text-[10px] uppercase font-black tracking-[0.25em] opacity-60 leading-relaxed max-w-lg">{t.securitySubtitle}</p>
+                        <p className="text-slate-600 text-[10px] uppercase font-black tracking-[0.25em] opacity-60 leading-relaxed max-w-lg">{t.securitySubtitle}</p>
                     </div>
 
                     <form onSubmit={handlePasswordUpdate} className="grid gap-6">
@@ -82,13 +82,13 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
                             { label: t.confirmPass, name: "confirmPassword" },
                         ].map((field, i) => (
                             <div key={i} className="space-y-2">
-                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{field.label}</label>
+                                <label className="text-slate-500 text-[10px] font-black uppercase tracking-widest px-1">{field.label}</label>
                                 <input
                                     name={field.name}
                                     type="password"
                                     required
                                     className="w-full bg-black/40 border border-white/5 rounded-2xl p-6 text-base font-bold focus:outline-none focus:border-gv-gold/50 focus:bg-black/60 transition-all text-white placeholder:text-white/10 shadow-inner"
-                                    placeholder="••••••••"
+                                    placeholder="•••••••�?
                                 />
                             </div>
                         ))}

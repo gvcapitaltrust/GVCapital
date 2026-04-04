@@ -61,23 +61,23 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
         },
         zh: {
             title: "申请提款",
-            desc: "从您的账户中提取本金或分红。处理时间为 24-48 个工作小时。",
+            desc: "从您的账户中提取本金或分红。处理时间为 24-48 个工作小时�?,
             amount: "金额 (USD)",
-            withdrawable: "可提款余额",
+            withdrawable: "可提款余�?,
             securityPin: "安全密码",
-            enterPin: "请输入您的 6 位安全密码以授权此项提款。",
+            enterPin: "请输入您�?6 位安全密码以授权此项提款�?,
             submit: "授权提款",
-            back: "返回仪表板",
+            back: "返回仪表�?,
             success: "提交成功",
-            successDesc: "您的提款请求已收到，财务团队正在处理中。",
-            ref: "参考编号",
-            penaltyTitle: "违约金确认",
-            penaltyDesc: "您的提款包含受锁定期保护的资金。",
+            successDesc: "您的提款请求已收到，财务团队正在处理中�?,
+            ref: "参考编�?,
+            penaltyTitle: "违约金确�?,
+            penaltyDesc: "您的提款包含受锁定期保护的资金�?,
             lockedPortion: "锁定部分",
-            penaltyAmt: "提前取款违约金 (40%)",
+            penaltyAmt: "提前取款违约�?(40%)",
             estPayout: "预计到账金额",
             acceptBtn: "我接受并继续",
-            cancelBtn: "取消并编辑",
+            cancelBtn: "取消并编�?,
             continueToPin: "继续输入安全密码",
             currentTier: "当前等级",
             member: "会员",
@@ -92,7 +92,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
         const totalAssetsUSD = Number(user?.total_assets_usd || 0);
 
         if (amountUSD > (totalAssetsUSD + 0.01)) {
-            alert(lang === 'zh' ? "金额超过总资产。" : "Requested amount exceeds total assets.");
+            alert(lang === 'zh' ? "金额超过总资产�? : "Requested amount exceeds total assets.");
             return;
         }
 
@@ -107,7 +107,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             // Check for total withdrawal using USD to avoid rate issues
             const isTotalWithdrawal = amountUSD >= (totalAssetsUSD - 0.01);
             if (!isTotalWithdrawal) {
-                alert(lang === 'zh' ? "不允许部分提取锁定资金。要提取锁定资金，您必须提取全部余额。" : "Partial withdrawal of locked capital is not permitted. To withdraw from your locked capital, you must withdraw your entire balance.");
+                alert(lang === 'zh' ? "不允许部分提取锁定资金。要提取锁定资金，您必须提取全部余额�? : "Partial withdrawal of locked capital is not permitted. To withdraw from your locked capital, you must withdraw your entire balance.");
                 return;
             }
             lockedPortionUSD = amountUSD - userWithdrawableUSD;
@@ -257,7 +257,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 </div>
                                 {withdrawAmount && (
                                     <p className="px-2 text-[11px] font-bold text-gv-gold/80 uppercase tracking-[0.1em] animate-in fade-in slide-in-from-left-2">
-                                        ≈ RM {(parseFloat(withdrawAmount) * withdrawalRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        �?RM {(parseFloat(withdrawAmount) * withdrawalRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </p>
                                 )}
                             </div>
@@ -266,7 +266,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gv-gold/60">{t.withdrawable}</span>
                                 <div className="text-right">
                                     <p className="text-2xl font-black text-emerald-600 tabular-nums shadow-[0_0_20px_rgba(52,211,153,0.05)]">$ {(user?.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 opacity-60">≈ RM {user?.withdrawable_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 opacity-60">�?RM {user?.withdrawable_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                 </div>
                             </div>
 
@@ -350,7 +350,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                             >
                                 {t.acceptBtn}
                             </button>
-                            <button onClick={() => setShowPenaltyConfirm(false)} className="w-full text-gray-500 font-black hover:text-white transition-colors uppercase tracking-[0.3em] text-[9px]">{t.cancelBtn}</button>
+                            <button onClick={() => setShowPenaltyConfirm(false)} className="w-full text-slate-600 font-black hover:text-white transition-colors uppercase tracking-[0.3em] text-[9px]">{t.cancelBtn}</button>
                         </div>
                     </div>
                 </div>
@@ -386,7 +386,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                             <button onClick={handleWithdrawConfirm} disabled={isSubmitting || withdrawPIN.length !== 6} className="w-full bg-gv-gold text-black font-black py-7 rounded-3xl flex justify-center items-center gap-4 uppercase tracking-[0.3em] shadow-[0_15px_40px_rgba(212,175,55,0.25)] transition-all hover:shadow-[0_20px_50px_rgba(212,175,55,0.35)] hover:-translate-y-1 group active:scale-95 disabled:opacity-50">
                                 {isSubmitting ? <PremiumLoader size="sm" color="black" /> : t.submit}
                             </button>
-                            <button onClick={() => setIsPinModalOpen(false)} className="w-full text-gray-500 font-black hover:text-white transition-colors uppercase tracking-[0.3em] text-[9px]">Cancel Transaction</button>
+                            <button onClick={() => setIsPinModalOpen(false)} className="w-full text-slate-600 font-black hover:text-white transition-colors uppercase tracking-[0.3em] text-[9px]">Cancel Transaction</button>
                         </div>
                     </div>
                 </div>

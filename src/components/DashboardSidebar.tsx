@@ -130,7 +130,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                         </span>
                                         {!isCollapsed && <span className="truncate relative z-10">{item.label}</span>}
                                         {!isCollapsed && (
-                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 opacity-40">
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 opacity-40">
                                                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                             </div>
                                         )}
@@ -189,9 +189,9 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                     <p className="text-[11px] font-black text-slate-900 uppercase tracking-tight truncate group-hover:text-gv-gold transition-colors">
                                         {user.full_name || user.fullName || user.email?.split('@')[0] || "User"}
                                     </p>
-                                    <p className={`text-[9px] font-black text-slate-500 uppercase tracking-[0.25em] mt-1`}>
-                                        {getTierByAmount(Number(balanceUSD || 0)).name}
-                                    </p>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-gv-gold group-hover/tier-badge:text-slate-900 transition-colors">
+                                        {(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(Number(balanceUSD || 0)).name}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -238,7 +238,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                 key={item.id}
                                 className={`group relative flex flex-col items-center justify-center w-16 h-16 opacity-30 cursor-not-allowed`}
                             >
-                                <span className="text-gray-400">
+                                <span className="text-slate-400">
                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                 </span>
                             </div>
@@ -250,7 +250,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                             key={item.id}
                             href={`${item.path}?lang=${lang}`}
                             className={`group relative flex flex-col items-center justify-center w-16 h-16 transition-all duration-300 ${
-                                isActive ? "text-gv-gold" : "text-gray-500"
+                                isActive ? "text-gv-gold" : "text-slate-500"
                             }`}
                         >
                             {isActive && (

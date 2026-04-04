@@ -36,17 +36,17 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         zh: {
             history: "交易历史",
             date: "日期",
-            refId: "参考编号",
+            refId: "参考编�?,
             type: "类型",
-            status: "状态",
+            status: "状�?,
             amount: "金额 (USD)",
-            noTxFound: "未找到交易记录",
-            statementCenter: "对账单中心",
-            statementCenterDesc: "生成并下载您的账户活动和投资表现的官方 PDF 对账单。",
+            noTxFound: "未找到交易记�?,
+            statementCenter: "对账单中�?,
+            statementCenterDesc: "生成并下载您的账户活动和投资表现的官�?PDF 对账单�?,
             selectMonth: "选择月份",
             selectYear: "选择年份",
-            generateDownload: "生成并下载 PDF",
-            months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            generateDownload: "生成并下�?PDF",
+            months: ["一�?, "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一�?, "十二�?],
             all: "All Transactions",
             capital: "Capital Flow",
             dividends: "Dividends & Bonuses",
@@ -275,7 +275,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                 </div>
                                                                 <div className="flex flex-col gap-1">
                                                                     <p className="text-[9px] font-black text-gv-gold/60 uppercase tracking-widest">Beneficiary</p>
-                                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{tx.metadata?.bank_account_holder || user?.full_name}</p>
+                                                                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{tx.metadata?.bank_account_holder || user?.full_name}</p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -304,7 +304,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                         <div className="h-3 w-3 rounded-full bg-emerald-500 absolute left-[1.5px] shadow-[0_0_15px_rgba(16,185,129,0.6)] ring-4 ring-emerald-500/20"></div>
                                                                         <div className="flex flex-col">
                                                                             <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Successful</span>
-                                                                            <span className="text-[9px] text-gray-500 font-bold tabular-nums">{new Date(tx.metadata?.approved_at || tx.updated_at || tx.created_at).toLocaleString()}</span>
+                                                                            <span className="text-[9px] text-slate-600 font-bold tabular-nums">{new Date(tx.metadata?.approved_at || tx.updated_at || tx.created_at).toLocaleString()}</span>
                                                                         </div>
                                                                     </div>
                                                                 )}

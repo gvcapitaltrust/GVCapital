@@ -40,16 +40,16 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
         },
         zh: {
             title: "资金存款",
-            desc: "为您的投资账户添加资金。所有存款将在 24 小时内处理。",
+            desc: "为您的投资账户添加资金。所有存款将�?24 小时内处理�?,
             amount: "金额 (USD)",
             date: "转账日期",
             receipt: "上传银行收据",
-            remark: "备注 (可选)",
+            remark: "备注 (可�?",
             submit: "提交存款",
-            back: "返回仪表板",
+            back: "返回仪表�?,
             success: "提交成功",
-            successDesc: "您的存款请求已收到，财务团队正在核实中。",
-            ref: "参考编号",
+            successDesc: "您的存款请求已收到，财务团队正在核实中�?,
+            ref: "参考编�?,
             selectFile: "选择收据图片",
         }
     }[lang];
@@ -174,7 +174,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                             {depositAmount && (
                                 <p className="px-2 text-[11px] font-bold text-gv-gold/80 uppercase tracking-[0.1em] animate-in fade-in slide-in-from-left-2">
-                                    Total Value: ≈ RM {(parseFloat(depositAmount) * depositRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                    Total Value: �?RM {(parseFloat(depositAmount) * depositRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </p>
                             )}
                         </div>

@@ -347,7 +347,7 @@ export default function DashboardClient() {
         if (amount > totalWithdrawable) {
             // New Rule: If touching locked capital, must withdraw everything
             if (amount < Number(user.total_assets)) {
-                alert(lang === 'zh' ? "不允许部分提取锁定资金。要提取锁定资金，您必须提取全部余额。" : "Partial withdrawal of locked capital is not permitted. To withdraw from your locked capital, you must withdraw your entire balance.");
+                alert(lang === 'zh' ? "不允许部分提取锁定资金。要提取锁定资金，您必须提取全部余额�? : "Partial withdrawal of locked capital is not permitted. To withdraw from your locked capital, you must withdraw your entire balance.");
                 return;
             }
             const lockedPortion = amount - totalWithdrawable;
@@ -551,7 +551,7 @@ export default function DashboardClient() {
 
     const handleKycSubmit = async () => {
         if (!idPhoto || !signature || !occupation || !bankName || !accountNumber) {
-            alert(lang === "en" ? "Please complete all required fields and upload your ID." : "请填写所有必填字段并上传您的证件照片。");
+            alert(lang === "en" ? "Please complete all required fields and upload your ID." : "请填写所有必填字段并上传您的证件照片�?);
             return;
         }
 
@@ -730,14 +730,14 @@ export default function DashboardClient() {
         },
         zh: {
             welcome: "欢迎, ",
-            nav: "控制台",
+            nav: "控制�?,
             products: "投资产品",
             statements: "账单中心",
-            logout: "退出登录",
+            logout: "退出登�?,
             activeInvestment: "总投资额",
             totalProfit: "总可提现金额",
             totalEquity: "总投资额",
-            dividendNote: "(可提取)",
+            dividendNote: "(可提�?",
             investmentNote: "(安全资本)",
             currentPackage: "当前等级",
             deposit: "入金",
@@ -753,42 +753,42 @@ export default function DashboardClient() {
                 fees: "提款费用",
                 standard: "标准",
                 reduced: "降低",
-                zero: "零",
-                footnote: "* 所有分红均根据您的投资本金按月计算。更高级别享受更低的提款费和优先清算权。"
+                zero: "�?,
+                footnote: "* 所有分红均根据您的投资本金按月计算。更高级别享受更低的提款费和优先清算权�?
             },
             history: "交易历史",
-            unverifiedBanner: "⚠️ 账户未核实。存款、取款和基金管理功能受限。",
+            unverifiedBanner: "⚠️ 账户未核实。存款、取款和基金管理功能受限�?,
             verifyNow: "立即核实",
-            securityPin: "提款安全码",
-            enterPin: "请输入您的 6 位安全代码以授权此申请。",
+            securityPin: "提款安全�?,
+            enterPin: "请输入您�?6 位安全代码以授权此申请�?,
             confirmWithdraw: "授权提款",
             successTitle: "提交成功",
-            successDesc: "我们的团队将在 24 小时内审核您的申请。",
+            successDesc: "我们的团队将�?24 小时内审核您的申请�?,
             whatsapp: "通过 WhatsApp 联系支持",
             expectedMonthly: "预计月度股息",
             projectedYearly: "预计年度股息",
-            dividendRateDesc: "基于目前档位分红率",
-            latestDeposit: "最新存款状态",
+            dividendRateDesc: "基于目前档位分红�?,
+            latestDeposit: "最新存款状�?,
             dividendTrends: "6 个月股息趋势",
             downloadStatement: "下载月度账单",
             referTitle: "推荐朋友",
-            referSubtitle: "邀请他人加入 GV 资本，共同发展社区。",
-            copyCode: "复制推荐码",
-            copied: "已复制!",
-            shareWA: "在 WhatsApp 上分享",
-            totalReferred: "已成功推荐人数",
+            referSubtitle: "邀请他人加�?GV 资本，共同发展社区�?,
+            copyCode: "复制推荐�?,
+            copied: "已复�?",
+            shareWA: "�?WhatsApp 上分�?,
+            totalReferred: "已成功推荐人�?,
             securityTitle: "安全设置",
-            securitySubtitle: "更新您的账户密码以确保您的资金得到保护。",
+            securitySubtitle: "更新您的账户密码以确保您的资金得到保护�?,
             currentPass: "当前密码",
-            newPass: "新密码",
-            confirmPass: "确认新密码",
+            newPass: "新密�?,
+            confirmPass: "确认新密�?,
             updateBtn: "更新密码",
             profile: "个人资料",
             personalInfo: "个人信息",
-            compliance: "合规与行业",
+            compliance: "合规与行�?,
             bankDetails: "银行资料",
             fullName: "全名",
-            username: "用户名",
+            username: "用户�?,
             email: "电子邮件",
             phone: "电话号码",
             country: "国家",
@@ -798,30 +798,30 @@ export default function DashboardClient() {
             riskProfile: "风险评估",
             bankName: "银行名称",
             accNumber: "银行账号",
-            accHolder: "账户持有人姓名",
+            accHolder: "账户持有人姓�?,
             bankStatement: "银行账单",
             viewStatement: "查看银行账单",
-            pendingVerification: "账户待审核。请联系您的代理或管理员以激活您的账户。",
-            verificationInProgress: "账户核实中",
-            verificationInProgressDesc: "感谢您选择 GV 资本。我们的合规团队正在审核您的文件。人工核实通常需要 1 到 3 个工作日。一旦批准，您将可以完全访问我们的投资和存款功能。",
-            verificationUnsuccessful: "核实未成功",
+            pendingVerification: "账户待审核。请联系您的代理或管理员以激活您的账户�?,
+            verificationInProgress: "账户核实�?,
+            verificationInProgressDesc: "感谢您选择 GV 资本。我们的合规团队正在审核您的文件。人工核实通常需�?1 �?3 个工作日。一旦批准，您将可以完全访问我们的投资和存款功能�?,
+            verificationUnsuccessful: "核实未成�?,
             verificationUnsuccessfulDesc: "我们的团队由于以下原因无法核实您的文件：",
-            rejectionReasonLabel: "文件不清晰 / 信息不匹配",
-            reuploadPrompt: "请重新上传一份清晰的证件副本以继续。",
+            rejectionReasonLabel: "文件不清�?/ 信息不匹�?,
+            reuploadPrompt: "请重新上传一份清晰的证件副本以继续�?,
             reuploadBtn: "重新上传文件",
             completeProfile: "完成您的资料",
-            completeProfileDesc: "请完成我们的 3 步核实流程，以解锁投资功能并保护您的账户。",
+            completeProfileDesc: "请完成我们的 3 步核实流程，以解锁投资功能并保护您的账户�?,
             resumeVerification: "恢复待续核实",
-            startVerification: "开始核实",
-            activeStatus: "活跃状态",
+            startVerification: "开始核�?,
+            activeStatus: "活跃状�?,
             noDividendData: "尚无股息数据",
-            noDepositsFound: "未发现存款",
+            noDepositsFound: "未发现存�?,
             statementCenter: "账单中心",
-            statementCenterDesc: "选择您想要的期限以生成并下载专业的投资账单。",
+            statementCenterDesc: "选择您想要的期限以生成并下载专业的投资账单�?,
             selectMonth: "月份",
             selectYear: "年份",
-            generateDownload: "生成并下载 PDF",
-            months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            generateDownload: "生成并下�?PDF",
+            months: ["一�?, "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一�?, "十二�?],
             depositTitle: "入金",
             withdrawTitle: "提款",
             amountMYR: "金额 (马币)",
@@ -829,26 +829,26 @@ export default function DashboardClient() {
             bankReceipt: "银行收据 (图像/PDF)",
             selectDocument: "选择文件",
             confirmDeposit: "确认入金",
-            requestWithdraw: "继续验证 PIN 码",
+            requestWithdraw: "继续验证 PIN �?,
             cancelTx: "取消交易",
-            docSubmitted: "文件已提交",
-            docSubmittedDesc: "我们的合规团队将在 24 小时内审核您的账户。批准后您的投资组合将自动激活。",
+            docSubmitted: "文件已提�?,
+            docSubmittedDesc: "我们的合规团队将�?24 小时内审核您的账户。批准后您的投资组合将自动激活�?,
             debugMode: "调试模式",
             role: "角色",
-            verified: "已核实",
+            verified: "已核�?,
             date: "日期",
-            refId: "参考 ID",
+            refId: "参�?ID",
             type: "类型",
             amount: "金额",
-            status: "状态",
-            noTxFound: "未发现交易历史",
+            status: "状�?,
+            noTxFound: "未发现交易历�?,
             basedOn: "基于",
             returns: "回报",
             yearlyForecast: "年度预测",
             yourCode: "您的代码",
             transactions: "交易记录",
             referrals: "推荐记录",
-            accountStatus: "账户状态",
+            accountStatus: "账户状�?,
             investmentTier: "投资等级",
             registrationDate: "注册日期",
             referredUsersList: "推荐用户列表"
@@ -914,22 +914,22 @@ export default function DashboardClient() {
                                     </div>
                                 ) : (user?.kyc_status === 'Rejected' || user?.kyc_status === 'rejected') && !isReuploading ? (
                                     <div className="bg-red-500 p-12 rounded-[40px] text-center space-y-8 py-24 animate-in fade-in zoom-in-95 duration-700 max-w-3xl mx-auto shadow-[0_30px_60px_rgba(239,68,68,0.3)] border border-red-600/20">
-                                        <div className="h-28 w-28 bg-gray-200 rounded-full flex items-center justify-center mx-auto border-4 border-gray-200">
-                                            <svg className="h-16 w-16 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                        <div className="h-28 w-28 bg-slate-200 rounded-full flex items-center justify-center mx-auto border-4 border-slate-200">
+                                            <svg className="h-16 w-16 text-slate-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                             </svg>
                                         </div>
-                                        <div className="space-y-6 text-gray-900">
+                                        <div className="space-y-6 text-slate-900">
                                             <h2 className="text-4xl font-black uppercase tracking-tighter">{t.verificationUnsuccessful}</h2>
-                                            <div className="bg-gray-100 p-6 rounded-3xl border border-white/20 max-w-2xl mx-auto">
-                                                <p className="text-gray-900 font-bold text-xl leading-relaxed">
+                                            <div className="bg-slate-100 p-6 rounded-3xl border border-white/20 max-w-2xl mx-auto">
+                                                <p className="text-slate-900 font-bold text-xl leading-relaxed">
                                                     {t.verificationUnsuccessfulDesc}<br/>
                                                     <span className="text-black bg-white/90 px-3 py-1 mt-3 inline-block rounded-xl font-black uppercase tracking-tight">
                                                         {user?.rejection_reason || t.rejectionReasonLabel}
                                                     </span>
                                                 </p>
                                             </div>
-                                            <p className="text-gray-900/80 font-medium">{t.reuploadPrompt}</p>
+                                            <p className="text-slate-900/80 font-medium">{t.reuploadPrompt}</p>
                                             <button 
                                                 onClick={() => router.push(`/verify?lang=${lang}`)}
                                                 className="bg-white text-red-600 font-black px-10 py-5 rounded-2xl uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all"
@@ -939,7 +939,7 @@ export default function DashboardClient() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="bg-gray-50 p-12 rounded-[40px] border border-gray-200 shadow-xl space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700 text-center py-20">
+                                    <div className="bg-slate-50 p-12 rounded-[40px] border border-slate-200 shadow-xl space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700 text-center py-20">
                                         <div className="h-24 w-24 bg-gv-gold/10 rounded-full flex items-center justify-center mx-auto text-gv-gold shadow-[0_0_50px_rgba(212,175,55,0.1)]">
                                             <svg className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                                         </div>
@@ -947,28 +947,28 @@ export default function DashboardClient() {
                                             <h2 className="text-3xl font-black uppercase tracking-tighter">
                                                 {user?.kyc_status === 'Draft' ? t.verificationInProgress : t.completeProfile}
                                             </h2>
-                                            <p className="text-gray-400 font-medium leading-relaxed max-w-lg mx-auto">
+                                            <p className="text-slate-500 font-medium leading-relaxed max-w-lg mx-auto">
                                                 {t.completeProfileDesc}
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{t.totalEquity}</p>
+                                            <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{t.totalEquity}</p>
                                             <div className="flex flex-col items-center">
                                                 <h3 className="text-4xl font-black text-[#e0c872] tracking-tighter tabular-nums">
                                                     $ {(user?.total_assets / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </h3>
-                                                <p className="text-[10px] font-bold text-gray-400 mt-2">
+                                                <p className="text-[10px] font-bold text-slate-500 mt-2">
                                                     RM {user?.total_assets?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                 </p>
                                             </div>
-                                            <p className="text-gray-500 text-[10px] font-bold mt-1 lowercase opacity-50">{t.investmentNote}</p>
+                                            <p className="text-slate-600 text-[10px] font-bold mt-1 lowercase opacity-50">{t.investmentNote}</p>
                                             {user?.locked_capital > 0 && (
                                                 <div className="mt-4 flex flex-col items-center gap-1">
                                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
                                                         <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></div>
                                                         <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">$ {(user.locked_capital / forexRate).toLocaleString()} USD Locked</span>
                                                     </div>
-                                                    <p className="text-[8px] text-gray-500 font-bold uppercase">(RM {user.locked_capital.toLocaleString()} RM)</p>
+                                                    <p className="text-[8px] text-slate-600 font-bold uppercase">(RM {user.locked_capital.toLocaleString()} RM)</p>
                                                 </div>
                                             )}
                                         </div>
@@ -984,21 +984,21 @@ export default function DashboardClient() {
                                 <>
                                     <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         {/* Card 1: Total Withdrawable Amount */}
-                                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
+                                        <div className="bg-slate-50 border border-slate-200 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
                                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
-                                                <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                                             </div>
                                             <div className="relative z-10">
                                                 <div>
-                                                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-gray-500 transition-colors">{t.totalProfit}</p>
+                                                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4 group-hover:text-slate-500 transition-colors">{t.totalProfit}</p>
                                                     <div className="flex flex-col gap-2">
                                                         <h2 className="text-4xl font-black tracking-tighter text-emerald-500 tabular-nums whitespace-nowrap">
                                                             {isCheckingAuth ? "..." : `$ ${(Number(user?.profit || 0) / forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                         </h2>
                                                         {!isCheckingAuth && (
                                                             <div className="flex flex-col gap-1">
-                                                                <p className="text-[10px] font-bold text-gray-400">
-                                                                    ≈ RM {Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                <p className="text-[10px] font-bold text-slate-500">
+                                                                    �?RM {Number(user?.profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                                 </p>
                                                                 <span className="text-[10px] font-black text-emerald-500/60 uppercase tracking-widest">{t.dividendNote}</span>
                                                             </div>
@@ -1009,7 +1009,7 @@ export default function DashboardClient() {
                                         </div>
 
                                         {/* Card 2: Total Investment & Current Package */}
-                                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
+                                        <div className="bg-slate-50 border border-slate-200 p-10 rounded-[40px] shadow-xl hover:border-gv-gold/20 transition-all group relative overflow-hidden">
                                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
                                                 <svg className="h-32 w-32 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                             </div>
@@ -1022,19 +1022,19 @@ export default function DashboardClient() {
                                                         </h2>
                                                         {!isCheckingAuth && (
                                                             <div className="flex flex-col gap-1">
-                                                                <p className="text-[10px] font-bold text-gray-400">
-                                                                    ≈ RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                <p className="text-[10px] font-bold text-slate-500">
+                                                                    �?RM {Number(user?.total_investment || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                                 </p>
                                                                 <span className="text-[10px] font-black text-gv-gold/60 uppercase tracking-widest">{t.investmentNote}</span>
                                                             </div>
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="sm:border-l border-t sm:border-t-0 border-gray-200 pt-6 sm:pt-0 sm:pl-8 flex flex-col justify-center">
+                                                <div className="sm:border-l border-t sm:border-t-0 border-slate-200 pt-6 sm:pt-0 sm:pl-8 flex flex-col justify-center">
                                                     <p className="text-gv-gold text-[10px] font-black uppercase tracking-widest mb-4">{t.currentPackage}</p>
                                                     <div className="flex items-center gap-6 group/tier">
                                                         <div className="flex flex-col gap-1.5 min-w-0 flex-1">
-                                                            <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter truncate leading-none">
+                                                            <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter truncate leading-none">
                                                                 {Number(user?.total_investment_usd || 0) > 0 
                                                                     ? ((user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name)
                                                                     : t.noInvestment}
@@ -1063,11 +1063,11 @@ export default function DashboardClient() {
 
                                     {(Number(user?.total_investment || 0) > 0 || Number(user?.profit || 0) > 0) && (
                                         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] relative overflow-hidden group">
+                                            <div className="bg-slate-50 border border-slate-200 p-10 rounded-[40px] relative overflow-hidden group">
                                                 <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
                                                     <svg className="h-20 w-20 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                                 </div>
-                                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
+                                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
                                                 {(() => {
                                                     const currentTier = (user?.tier && user?.tier !== "Standard") 
                                                         ? TIERS.find(t => t.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
@@ -1075,23 +1075,23 @@ export default function DashboardClient() {
                                                     const monthlyMaxUSD = Number(user?.total_investment_usd || 0) * currentTier.maxDividend;
                                                     return (
                                                         <>
-                                                            <h3 className="text-3xl font-black text-gray-900 tabular-nums whitespace-nowrap">
+                                                            <h3 className="text-3xl font-black text-slate-900 tabular-nums whitespace-nowrap">
                                                                 <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
                                                                 $ {monthlyMaxUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                                             </h3>
-                                                            <p className="text-[10px] text-gray-400 font-bold mt-1">≈ RM {(monthlyMaxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
-                                                            <p className="text-[10px] text-gray-500 font-bold uppercase mt-4 tracking-tighter">
+                                                            <p className="text-[10px] text-slate-500 font-bold mt-1">�?RM {(monthlyMaxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                                                            <p className="text-[10px] text-slate-600 font-bold uppercase mt-4 tracking-tighter">
                                                                 {t.dividendRateDesc} ({t.basedOn} {currentTier.name})
                                                             </p>
                                                         </>
                                                     );
                                                 })()}
                                             </div>
-                                            <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] relative overflow-hidden group">
+                                            <div className="bg-slate-50 border border-slate-200 p-10 rounded-[40px] relative overflow-hidden group">
                                                 <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-all">
                                                     <svg className="h-20 w-20 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                                 </div>
-                                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
+                                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
                                                 {(() => {
                                                     const currentTier = (user?.tier && user?.tier !== "Standard") 
                                                         ? TIERS.find(t => t.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
@@ -1103,8 +1103,8 @@ export default function DashboardClient() {
                                                                 <span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>
                                                                 $ {yearlyMaxUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                                             </h3>
-                                                            <p className="text-[10px] text-gray-400 font-bold mt-1">≈ RM {(yearlyMaxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
-                                                            <p className="text-[10px] text-gray-500 font-bold uppercase mt-4 tracking-tighter">{t.dividendRateDesc} ({t.basedOn} {currentTier.name})</p>
+                                                            <p className="text-[10px] text-slate-500 font-bold mt-1">�?RM {(yearlyMaxUSD * forexRate).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                                                            <p className="text-[10px] text-slate-600 font-bold uppercase mt-4 tracking-tighter">{t.dividendRateDesc} ({t.basedOn} {currentTier.name})</p>
                                                         </>
                                                     );
                                                 })()}
@@ -1114,7 +1114,7 @@ export default function DashboardClient() {
 
                                     {/* Temporary hide Dividend Trends
                                     <section className="grid grid-cols-1 gap-8">
-                                        <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] space-y-8 overflow-hidden">
+                                        <div className="bg-slate-50 border border-slate-200 p-10 rounded-[40px] space-y-8 overflow-hidden">
                                             <h3 className="text-lg font-black uppercase tracking-tight">{t.dividendTrends}</h3>
                                             <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 px-2 sm:px-4">
                                                 {dividendHistory.length > 0 ? dividendHistory.slice(-12).map((div: any, i: number) => (
@@ -1123,10 +1123,10 @@ export default function DashboardClient() {
                                                             className="w-full bg-gv-gold rounded-t-xl transition-all duration-500 group-hover:brightness-125"
                                                             style={{ height: `${Math.max(10, (div.amount / (Math.max(...dividendHistory.map((d: any) => d.amount)) || 1)) * 100)}%` }}
                                                         ></div>
-                                                        <span className="text-[8px] font-black text-gray-500 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
+                                                        <span className="text-[8px] font-black text-slate-600 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
                                                     </div>
                                                 )) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-400 font-black uppercase tracking-widest text-xs">{t.noDividendData}</div>
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-500 font-black uppercase tracking-widest text-xs">{t.noDividendData}</div>
                                                 )}
                                             </div>
                                         </div>
@@ -1136,7 +1136,7 @@ export default function DashboardClient() {
                             <section className="flex flex-col sm:flex-row gap-6">
                                 <Link
                                     href={`/deposit?lang=${lang}`}
-                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gv-gold text-black hover:bg-gv-gold/90 hover:-translate-y-1 shadow-[0_15px_30px_rgba(212,175,55,0.2)]" : "bg-white text-gray-500 cursor-not-allowed grayscale"}`}
+                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gv-gold text-black hover:bg-gv-gold/90 hover:-translate-y-1 shadow-[0_15px_30px_rgba(212,175,55,0.2)]" : "bg-white text-slate-600 cursor-not-allowed grayscale"}`}
                                     onClick={(e) => handleProtectedAction(e, () => router.push(`/deposit?lang=${lang}`))}
                                 >
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4v16m8-8H4" /></svg>
@@ -1144,7 +1144,7 @@ export default function DashboardClient() {
                                 </Link>
                                 <button
                                     onClick={(e) => handleProtectedAction(e, () => setIsWithdrawModalOpen(true))}
-                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-gray-100 text-gray-900 hover:bg-gray-200 hover:-translate-y-1 border border-gray-300" : "bg-white text-gray-500 cursor-not-allowed grayscale"}`}
+                                    className={`flex-1 font-black text-xl py-6 rounded-[28px] transition-all flex items-center justify-center gap-3 ${user?.is_verified ? "bg-slate-100 text-slate-900 hover:bg-slate-200 hover:-translate-y-1 border border-slate-300" : "bg-white text-slate-400 cursor-not-allowed"}`}
                                 >
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
                                     {t.withdraw}
@@ -1157,29 +1157,29 @@ export default function DashboardClient() {
                                 <h3 className="text-xl font-black uppercase tracking-tight">{t.history}</h3>
                                 <button
                                     onClick={() => generateStatement()}
-                                    className="bg-white border border-gray-200 hover:bg-gray-100 text-gray-900 font-black text-xs py-3 px-6 rounded-xl uppercase tracking-widest transition-all flex items-center gap-2"
+                                    className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 font-black text-xs py-3 px-6 rounded-xl uppercase tracking-widest transition-all flex items-center gap-2"
                                 >
                                     <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
                                     {t.downloadStatement}
                                 </button>
                             </div>
-                            <div className="border border-gray-200 rounded-[40px] overflow-x-auto bg-white backdrop-blur-md shadow-2xl">
+                            <div className="border border-slate-200 rounded-[40px] overflow-x-auto bg-white backdrop-blur-md shadow-2xl">
                                 <table className="w-full text-left min-w-[800px]">
-                                    <thead className="bg-white border-b border-gray-200 text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">
+                                    <thead className="bg-white border-b border-slate-200 text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">
                                         <tr><th className="px-8 py-6">{t.date}</th><th className="px-8 py-6">{t.refId}</th><th className="px-8 py-6">{t.type}</th><th className="px-8 py-6">{t.amount}</th><th className="px-8 py-6 text-right">{t.status}</th></tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100">
+                                    <tbody className="divide-y divide-slate-100">
                                         {transactions.map((tx: any, idx: number) => (
-                                            <tr key={idx} className="text-sm font-bold group hover:bg-gray-50 transition-colors">
-                                                <td className="px-8 py-6 text-gray-400">
+                                            <tr key={idx} className="text-sm font-bold group hover:bg-slate-50 transition-colors">
+                                                <td className="px-8 py-6 text-slate-500">
                                                     {new Date(tx.transfer_date || tx.created_at || tx.date).toISOString().split('T')[0]}
                                                 </td>
-                                                <td className="px-8 py-6 font-mono text-xs text-gray-900/40">{tx.ref_id || tx.ref}</td>
+                                                <td className="px-8 py-6 font-mono text-xs text-slate-900/40">{tx.ref_id || tx.ref}</td>
                                                  <td className="px-8 py-6 uppercase tracking-widest text-[10px]">
                                                      <div className="flex flex-col">
                                                          <span>{tx.metadata?.description || tx.type}</span>
                                                          {tx.metadata?.processed_by_name && (
-                                                             <span className="text-[8px] text-gray-500 font-bold lowercase tracking-tight mt-1">
+                                                             <span className="text-[8px] text-slate-600 font-bold lowercase tracking-tight mt-1">
                                                                  Allocated by {tx.metadata.processed_by_name}
                                                              </span>
                                                          )}
@@ -1188,14 +1188,14 @@ export default function DashboardClient() {
                                                 <td className={`px-8 py-6 text-lg tracking-tighter ${Number(tx.amount) >= 0 ? "text-emerald-400" : "text-red-500"}`}>
                                                     <div className="flex flex-col">
                                                         <span>RM {Number(tx.amount || 0).toFixed(2)}</span>
-                                                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
+                                                        <span className="text-[10px] text-slate-600 font-bold uppercase tracking-tighter">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6 text-right"><span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' : tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>{tx.status}</span></td>
                                             </tr>
                                         ))}
                                         {transactions.length === 0 && (
-                                            <tr><td colSpan={5} className="px-8 py-20 text-center text-gray-500 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
+                                            <tr><td colSpan={5} className="px-8 py-20 text-center text-slate-600 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
                                         )}
                                     </tbody>
                                 </table>
@@ -1204,36 +1204,36 @@ export default function DashboardClient() {
                     ) : activeTab === "referrals" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-12">
                             {/* Refer-a-Friend Header */}
-                            <div className="bg-gray-50 border border-gray-200 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                            <div className="bg-slate-50 border border-slate-200 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                 <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                                     <div className="space-y-6">
-                                        <h2 className="text-2xl font-black uppercase tracking-tight text-gray-900">{t.referTitle}</h2>
-                                        <p className="text-gray-400 font-medium text-base leading-relaxed">{t.referSubtitle}</p>
+                                        <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900">{t.referTitle}</h2>
+                                        <p className="text-slate-500 font-medium text-base leading-relaxed">{t.referSubtitle}</p>
                                         <div className="flex flex-col sm:flex-row gap-4">
-                                            <div className="bg-white border border-gray-200 rounded-2xl p-5 flex-1 flex items-center justify-between">
+                                            <div className="bg-white border border-slate-200 rounded-2xl p-5 flex-1 flex items-center justify-between">
                                                 <span className="text-gv-gold font-black tracking-widest uppercase">{user?.username}</span>
                                                 <button 
                                                     onClick={() => {
                                                         navigator.clipboard.writeText(user?.username || "");
                                                         setActionToast({ message: t.copied });
                                                     }}
-                                                    className="text-gray-900 hover:text-gv-gold transition-colors text-xs font-black uppercase tracking-widest pl-4 border-l border-gray-200"
+                                                    className="text-slate-900 hover:text-gv-gold transition-colors text-xs font-black uppercase tracking-widest pl-4 border-l border-slate-200"
                                                 >
                                                     {t.copyCode}
                                                 </button>
                                             </div>
                                             <button 
                                                 onClick={() => window.open(`https://wa.me/?text=Join%20GV%20Capital%20using%20my%20code:%20${user?.username}`, '_blank')}
-                                                className="bg-emerald-500 hover:bg-emerald-600 text-gray-900 font-black px-8 py-5 rounded-2xl flex items-center justify-center gap-3 transition-all"
+                                                className="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-black px-8 py-5 rounded-2xl flex items-center justify-center gap-3 transition-all"
                                             >
                                                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                                                 {t.shareWA}
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-center justify-center bg-white border border-gray-200 rounded-[40px] p-12 text-center group-hover:bg-gray-100 transition-all">
-                                        <p className="text-gray-400 font-black uppercase tracking-widest mb-2 text-[10px]">{t.totalReferred}</p>
+                                    <div className="flex flex-col items-center justify-center bg-white border border-slate-200 rounded-[40px] p-12 text-center group-hover:bg-slate-50 transition-all">
+                                        <p className="text-slate-500 font-black uppercase tracking-widest mb-2 text-[10px]">{t.totalReferred}</p>
                                         <h3 className="text-5xl font-black text-gv-gold tabular-nums">{referredCount}</h3>
                                     </div>
                                 </div>
@@ -1242,9 +1242,9 @@ export default function DashboardClient() {
                             {/* Referred Users List */}
                             <div className="space-y-6">
                                 <h3 className="text-xl font-black uppercase tracking-tight">{t.referredUsersList}</h3>
-                                <div className="border border-gray-200 rounded-[40px] overflow-x-auto bg-white backdrop-blur-md shadow-2xl">
+                                <div className="border border-slate-200 rounded-[40px] overflow-x-auto bg-white backdrop-blur-md shadow-2xl">
                                     <table className="w-full text-left min-w-[800px]">
-                                        <thead className="bg-white border-b border-gray-200 text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">
+                                        <thead className="bg-white border-b border-slate-200 text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">
                                             <tr>
                                                 <th className="px-8 py-6">{t.username}</th>
                                                 <th className="px-8 py-6">{t.registrationDate}</th>
@@ -1252,21 +1252,21 @@ export default function DashboardClient() {
                                                 <th className="px-8 py-6 text-right">{t.accountStatus}</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-100">
+                                        <tbody className="divide-y divide-slate-100">
                                             {referredUsers.map((ref: any, idx: number) => (
-                                                <tr key={idx} className="text-sm font-bold group hover:bg-gray-50 transition-colors">
+                                                <tr key={idx} className="text-sm font-bold group hover:bg-slate-50 transition-colors">
                                                     <td className="px-8 py-6">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center text-xs font-black text-gv-gold">
+                                                            <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-xs font-black text-gv-gold">
                                                                 {ref.full_name?.[0] || 'U'}
                                                             </div>
                                                             <div className="flex flex-col">
-                                                                <span className="text-gray-900">{ref.full_name}</span>
-                                                                <span className="text-[10px] text-gray-500">@{ref.username}</span>
+                                                                <span className="text-slate-900">{ref.full_name}</span>
+                                                                <span className="text-[10px] text-slate-500">@{ref.username}</span>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-8 py-6 text-gray-400 font-mono text-xs">
+                                                    <td className="px-8 py-6 text-slate-500 font-mono text-xs">
                                                         {new Date(ref.created_at).toLocaleDateString()}
                                                     </td>
                                                     <td className="px-8 py-6">
@@ -1282,7 +1282,7 @@ export default function DashboardClient() {
                                                 </tr>
                                             ))}
                                             {referredUsers.length === 0 && (
-                                                <tr><td colSpan={4} className="px-8 py-20 text-center text-gray-500 font-bold uppercase tracking-widest">No referrals yet</td></tr>
+                                                <tr><td colSpan={4} className="px-8 py-20 text-center text-slate-600 font-bold uppercase tracking-widest">No referrals yet</td></tr>
                                             )}
                                         </tbody>
                                     </table>
@@ -1298,34 +1298,34 @@ export default function DashboardClient() {
                         />
                     ) : activeTab === "statements" ? (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="bg-gray-50 border border-gray-200 p-12 rounded-[40px] shadow-2xl overflow-hidden relative group">
+                            <div className="bg-slate-50 border border-slate-200 p-12 rounded-[40px] shadow-2xl overflow-hidden relative group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                 <div className="relative z-10 max-w-2xl">
-                                    <h2 className="text-2xl font-black uppercase tracking-tight mb-3 text-gray-900">{t.statementCenter}</h2>
-                                    <p className="text-gray-400 font-medium text-sm">{t.statementCenterDesc}</p>
+                                    <h2 className="text-2xl font-black uppercase tracking-tight mb-3 text-slate-900">{t.statementCenter}</h2>
+                                    <p className="text-slate-500 font-medium text-sm">{t.statementCenterDesc}</p>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12">
                                         <div className="space-y-4">
-                                            <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.selectMonth}</label>
+                                            <label className="text-slate-500 text-[10px] font-black uppercase tracking-widest px-1">{t.selectMonth}</label>
                                             <select
                                                 value={selectedMonth}
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedMonth(parseInt(e.target.value))}
-                                                className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
+                                                className="w-full bg-white border border-slate-200 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
                                             >
                                                 {t.months.map((m: string, i: number) => (
-                                                    <option key={i} value={i} className="bg-gray-50 text-gray-900">{m}</option>
+                                                    <option key={i} value={i} className="bg-slate-50 text-slate-900">{m}</option>
                                                 ))}
                                             </select>
                                         </div>
                                         <div className="space-y-4">
-                                            <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.selectYear}</label>
+                                            <label className="text-slate-500 text-[10px] font-black uppercase tracking-widest px-1">{t.selectYear}</label>
                                             <select
                                                 value={selectedYear}
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedYear(parseInt(e.target.value))}
-                                                className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
+                                                className="w-full bg-white border border-slate-200 rounded-2xl p-5 text-lg font-black focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer"
                                             >
                                                 {[2024, 2025, 2026].map(y => (
-                                                    <option key={y} value={y} className="bg-gray-50 text-gray-900">{y}</option>
+                                                    <option key={y} value={y} className="bg-slate-50 text-slate-900">{y}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -1345,7 +1345,7 @@ export default function DashboardClient() {
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {/* Personal Information */}
-                                <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-2xl space-y-8 relative overflow-hidden group">
+                                <div className="bg-slate-50 border border-slate-200 p-10 rounded-[40px] shadow-2xl space-y-8 relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                     <div className="relative z-10">
                                         <h3 className="text-xl font-black uppercase tracking-tighter text-gv-gold mb-8 flex items-center gap-3">
@@ -1354,25 +1354,25 @@ export default function DashboardClient() {
                                         </h3>
                                         <div className="grid gap-6">
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.fullName}</p>
-                                                <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.fullName || "-"}</p>
+                                                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.fullName}</p>
+                                                <p className="text-lg font-bold text-slate-900 tracking-tight">{user?.fullName || "-"}</p>
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.username}</p>
-                                                <p className="text-lg font-bold text-gray-900 tracking-tight">@{user?.username || "-"}</p>
+                                                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.username}</p>
+                                                <p className="text-lg font-bold text-slate-900 tracking-tight">@{user?.username || "-"}</p>
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.email}</p>
-                                                <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.email || "-"}</p>
+                                                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.email}</p>
+                                                <p className="text-lg font-bold text-slate-900 tracking-tight">{user?.email || "-"}</p>
                                             </div>
                                             <div className="grid grid-cols-2 gap-6">
                                                 <div className="space-y-1">
-                                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.phone}</p>
-                                                    <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.phone || "-"}</p>
+                                                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.phone}</p>
+                                                    <p className="text-lg font-bold text-slate-900 tracking-tight">{user?.phone || "-"}</p>
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.country}</p>
-                                                    <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.country || "-"}</p>
+                                                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.country}</p>
+                                                    <p className="text-lg font-bold text-slate-900 tracking-tight">{user?.country || "-"}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1380,7 +1380,7 @@ export default function DashboardClient() {
                                 </div>
 
                                 {/* Compliance & Industry */}
-                                <div className="bg-gray-50 border border-gray-200 p-10 rounded-[40px] shadow-2xl space-y-8 relative overflow-hidden group">
+                                <div className="bg-slate-50 border border-slate-200 p-10 rounded-[40px] shadow-2xl space-y-8 relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                     <div className="relative z-10">
                                         <h3 className="text-xl font-black uppercase tracking-tighter text-gv-gold mb-8 flex items-center gap-3">
@@ -1389,19 +1389,19 @@ export default function DashboardClient() {
                                         </h3>
                                         <div className="grid gap-6">
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.occupation}</p>
-                                                <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.occupation || "-"}</p>
+                                                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.occupation}</p>
+                                                <p className="text-lg font-bold text-slate-900 tracking-tight">{user?.occupation || "-"}</p>
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.industry}</p>
-                                                <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.industry || "-"}</p>
+                                                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.industry}</p>
+                                                <p className="text-lg font-bold text-slate-900 tracking-tight">{user?.industry || "-"}</p>
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.wealthSource}</p>
-                                                <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.source_of_wealth || "-"}</p>
+                                                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.wealthSource}</p>
+                                                <p className="text-lg font-bold text-slate-900 tracking-tight">{user?.source_of_wealth || "-"}</p>
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.riskProfile}</p>
+                                                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.riskProfile}</p>
                                                 <p className="text-lg font-bold text-emerald-400 tracking-tight">{user?.risk_profile === "Moderate" ? "40%" : (user?.risk_profile || "-")}</p>
                                             </div>
                                         </div>
@@ -1419,22 +1419,22 @@ export default function DashboardClient() {
                                     </h3>
                                     <div className="flex flex-col md:flex-row gap-12">
                                         <div className="space-y-1 flex-1">
-                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.bankName}</p>
-                                            <p className="text-2xl font-black text-gray-900 tracking-widest uppercase">{user?.bank_name || "-"}</p>
+                                            <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.bankName}</p>
+                                            <p className="text-2xl font-black text-slate-900 tracking-widest uppercase">{user?.bank_name || "-"}</p>
                                         </div>
                                         <div className="space-y-1 flex-1">
-                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.accNumber}</p>
-                                            <p className="text-2xl font-black text-gray-900 tracking-[0.2em] font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
+                                            <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.accNumber}</p>
+                                            <p className="text-2xl font-black text-slate-900 tracking-[0.2em] font-mono">{user?.account_number ? `**** **** ${user.account_number.slice(-4)}` : "-"}</p>
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col md:flex-row gap-12 mt-8 pt-8 border-t border-gray-200">
+                                    <div className="flex flex-col md:flex-row gap-12 mt-8 pt-8 border-t border-slate-200">
                                         <div className="space-y-1 flex-1">
-                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.accHolder}</p>
-                                            <p className="text-2xl font-black text-gray-900 tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
+                                            <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.accHolder}</p>
+                                            <p className="text-2xl font-black text-slate-900 tracking-widest uppercase">{user?.bank_account_holder || "-"}</p>
                                         </div>
                                         <div className="space-y-1 flex-1">
-                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.bankStatement}</p>
+                                            <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.bankStatement}</p>
                                             {user?.bank_statement_url ? (
                                                 <button 
                                                     onClick={async () => {
@@ -1442,13 +1442,13 @@ export default function DashboardClient() {
                                                         if (data?.signedUrl) setViewDocumentUrl(data.signedUrl);
                                                         else alert("Could not generate secure link for your statement.");
                                                     }}
-                                                    className="inline-flex items-center gap-2 bg-white hover:bg-gv-gold hover:text-black border border-gray-200 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all mt-2"
+                                                    className="inline-flex items-center gap-2 bg-white hover:bg-gv-gold hover:text-black border border-slate-200 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all mt-2"
                                                 >
                                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                     {t.viewStatement}
                                                 </button>
                                             ) : (
-                                                <p className="text-gray-500 font-bold uppercase text-[10px] mt-2 italic">Not Provided</p>
+                                                <p className="text-slate-600 font-bold uppercase text-[10px] mt-2 italic">Not Provided</p>
                                             )}
                                         </div>
                                     </div>
@@ -1457,7 +1457,7 @@ export default function DashboardClient() {
                         </section>
                     ) : (
                         <section className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="bg-gray-50 border border-gray-200 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                            <div className="bg-slate-50 border border-slate-200 p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                                 <div className="relative z-10 max-w-xl text-left space-y-10">
                                     <div className="mb-10 p-6 bg-gv-gold/10 border border-gv-gold/20 rounded-3xl">
@@ -1465,7 +1465,7 @@ export default function DashboardClient() {
                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A3.323 3.323 0 0010.605 7.88a3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651" /></svg>
                                             Active Protection
                                         </h4>
-                                        <p className="text-gray-500 text-xs font-medium leading-relaxed">
+                                        <p className="text-slate-600 text-xs font-medium leading-relaxed">
                                             {lang === 'en' 
                                                 ? "Withdrawals are secured by your unique 6-digit Security PIN established during account registration."
                                                 : "提款由您在开户时设置的唯一 6 位安全密码保护。"}
@@ -1473,38 +1473,39 @@ export default function DashboardClient() {
                                     </div>
 
                                     <div>
-                                        <h2 className="text-2xl font-black uppercase tracking-tight mb-2 text-gray-900">{t.securityTitle}</h2>
-                                        <p className="text-gray-400 font-medium">{t.securitySubtitle}</p>
+                                        <h2 className="text-2xl font-black uppercase tracking-tight mb-2 text-slate-900">{t.securityTitle}</h2>
+                                        <p className="text-slate-500 font-medium">{t.securitySubtitle}</p>
                                     </div>
 
                                     <form onSubmit={handlePasswordUpdate} className="space-y-6 text-left">
                                         <div className="space-y-2">
-                                            <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.currentPass}</label>
+                                            <label className="text-slate-500 text-[10px] font-black uppercase tracking-widest px-1">{t.currentPass}</label>
                                             <input
                                                 name="currentPassword"
                                                 type="password"
                                                 required
-                                                className="w-full bg-white border border-gray-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
-                                                placeholder="••••••••"
+                                                className="w-full bg-white border border-slate-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
+                                                placeholder="•••••••"
                                             />
+                                        </div>
                                         <div className="space-y-2">
-                                            <label className="text-slate-400 text-[10px] font-black uppercase tracking-widest px-1">{t.newPass}</label>
+                                            <label className="text-slate-500 text-[10px] font-black uppercase tracking-widest px-1">{t.newPass}</label>
                                             <input
                                                 name="newPassword"
                                                 type="password"
                                                 required
                                                 className="w-full bg-white border border-slate-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
-                                                placeholder="••••••••"
+                                                placeholder="•••••••"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-slate-400 text-[10px] font-black uppercase tracking-widest px-1">{t.confirmPass}</label>
+                                            <label className="text-slate-500 text-[10px] font-black uppercase tracking-widest px-1">{t.confirmPass}</label>
                                             <input
                                                 name="confirmPassword"
                                                 type="password"
                                                 required
                                                 className="w-full bg-white border border-slate-200 rounded-2xl p-5 text-xl font-bold focus:outline-none focus:border-gv-gold transition-all"
-                                                placeholder="••••••••"
+                                                placeholder="•••••••"
                                             />
                                         </div>
                                         <button
@@ -1519,8 +1520,6 @@ export default function DashboardClient() {
                             </div>
                         </section>
                     )}
-                </div>
-
             {/* Document Viewer Modal */}
             {viewDocumentUrl && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 md:p-12 animate-in fade-in duration-300">
@@ -1607,7 +1606,7 @@ export default function DashboardClient() {
                                 <p className="text-slate-500 text-sm font-medium leading-relaxed">
                                     {lang === 'en' 
                                         ? `Part of your withdrawal (RM ${penaltyInfo?.lockedPortion?.toLocaleString(undefined, { minimumFractionDigits: 2 })}) is still within the 6-month capital lock-in period. An early withdrawal penalty of 40% applies to this portion.`
-                                        : `您的提款中有一部分 (RM ${penaltyInfo?.lockedPortion?.toLocaleString(undefined, { minimumFractionDigits: 2 })}) 仍处于 6 个月的资金锁定期内。根据协议，该部分将收取 40% 的提前提款违约金。`}
+                                        : `您的提款中有一部分 (RM ${penaltyInfo?.lockedPortion?.toLocaleString(undefined, { minimumFractionDigits: 2 })}) 仍处�?6 个月的资金锁定期内。根据协议，该部分将收取 40% 的提前提款违约金。`}
                                 </p>
                                 <div className="pt-4 border-t border-slate-200 space-y-2">
                                     <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
@@ -1638,7 +1637,7 @@ export default function DashboardClient() {
                                 }} 
                                 className="w-full text-slate-400 font-bold hover:text-slate-900 transition-colors uppercase tracking-widest text-[10px]"
                             >
-                                {lang === 'en' ? "Cancel & Re-adjust Amount" : "取消并重新调整金额"}
+                                {lang === 'en' ? "Cancel & Re-adjust Amount" : "取消并重新调整金�?}
                             </button>
                         </div>
                     </div>
@@ -1687,7 +1686,7 @@ export default function DashboardClient() {
                                                     <p className="text-[10px] text-slate-500 font-bold leading-relaxed">
                                                         {lang === 'en' 
                                                             ? "A 40% penalty will be applied to the portion of your withdrawal taken from locked capital."
-                                                            : "提款金额超出可自由提取部分，超出部分将涉及 40% 的提前提取费用。"}
+                                                            : "提款金额超出可自由提取部分，超出部分将涉�?40% 的提前提取费用�?}
                                                     </p>
                                                 </div>
                                             );
@@ -1717,7 +1716,7 @@ export default function DashboardClient() {
                         </div>
                         <div>
                             <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2">{t.securityPin}</h3>
-                            <p className="text-slate-400 font-medium text-sm px-4">{t.enterPin}</p>
+                            <p className="text-slate-500 font-medium text-sm px-4">{t.enterPin}</p>
                         </div>
                         <div className="relative flex justify-center items-center group">
                             <input
@@ -1800,7 +1799,7 @@ export default function DashboardClient() {
                         </div>
                         {(() => {
                             const toast = actionToast;
-                            if (!toast.actionUrl) return null;
+                            if (!toast || !toast.actionUrl) return null;
                             return (
                                 <button
                                     onClick={() => {

@@ -70,35 +70,35 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             member: "Member",
         },
         zh: {
-            verificationInProgress: "审核中",
-            verificationInProgressDesc: "我们的合规团队正在审核您的文档。帐户访问就绪后，您将收到通知。",
+            verificationInProgress: "审核�?,
+            verificationInProgressDesc: "我们的合规团队正在审核您的文档。帐户访问就绪后，您将收到通知�?,
             verificationUnsuccessful: "审核未通过",
-            verificationUnsuccessfulDesc: "我们无法验证您的文档。请查看以下原因并重新提交您的详细信息。",
-            rejectionReasonLabel: "未提供原因",
-            reuploadPrompt: "请仔细检查您的信息并提供清晰的文档照片。",
+            verificationUnsuccessfulDesc: "我们无法验证您的文档。请查看以下原因并重新提交您的详细信息�?,
+            rejectionReasonLabel: "未提供原�?,
+            reuploadPrompt: "请仔细检查您的信息并提供清晰的文档照片�?,
             reuploadBtn: "重新提交验证",
             completeProfile: "完善您的资料",
-            completeProfileDesc: "要开始投资并赚取每月分红，请完成您的身份识别流程。",
+            completeProfileDesc: "要开始投资并赚取每月分红，请完成您的身份识别流程�?,
             totalEquity: "总投资额",
             totalProfit: "总分红额",
             investmentNote: "净流量 (存款 - 提款)",
             dividendNote: "包括奖金",
-            startVerification: "开始验证",
+            startVerification: "开始验�?,
             resumeVerification: "继续验证",
             expectedMonthly: "预计每月分红",
             projectedYearly: "预计年度分红",
-            dividendRateDesc: "基于当前等级分红率",
+            dividendRateDesc: "基于当前等级分红�?,
             basedOn: "基于",
             dividendTrends: "分红趋势",
             noDividendData: "暂无分红数据",
             latestActivity: "近期活动",
-            noTxFound: "未找到交易",
+            noTxFound: "未找到交�?,
             deposit: "存款",
             withdraw: "提款",
             noTier: "-",
             activeStatus: "活跃会员",
             currentPackage: "当前等级",
-            depositTitle: "新存款",
+            depositTitle: "新存�?,
             amountMYR: "金额 (USD)",
             transferDate: "转账日期",
             bankReceipt: "银行收据 / 转账凭证",
@@ -107,17 +107,17 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             withdrawTitle: "申请提款",
             requestWithdraw: "继续输入密码",
             securityPin: "安全密码",
-            enterPin: "请输入您的 6 位安全密码以授权此提款。",
+            enterPin: "请输入您�?6 位安全密码以授权此提款�?,
             confirmWithdraw: "确认提款",
             cancelTx: "取消交易",
             successTitle: "提交成功",
-            successDesc: "您的请求已收到，财务团队正在处理中。",
-            docSubmitted: "文档已接收",
-            docSubmittedDesc: "您的验证请求已更新。我们的团队将在 24-48 小时内进行审核。",
+            successDesc: "您的请求已收到，财务团队正在处理中�?,
+            docSubmitted: "文档已接�?,
+            docSubmittedDesc: "您的验证请求已更新。我们的团队将在 24-48 小时内进行审核�?,
             totalWithdraw: "总提款额",
             walletBalance: "钱包余额",
-            lifetimeDeposit: "累计充值",
-            totalPrincipal: "总本金",
+            lifetimeDeposit: "累计充�?,
+            totalPrincipal: "总本�?,
             member: "会员",
         }
     }[lang];
@@ -193,7 +193,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                             <div className="space-y-2 relative z-10 text-center sm:text-left flex-1">
                                 <h2 className="text-2xl font-black text-amber-500 uppercase tracking-tight">{t.verificationInProgress}</h2>
-                                <p className="text-gray-400 text-sm font-semibold leading-relaxed max-w-xl">{t.verificationInProgressDesc}</p>
+                                <p className="text-slate-500 text-sm font-semibold leading-relaxed max-w-xl">{t.verificationInProgressDesc}</p>
                             </div>
                         </div>
                     ) : (user?.kyc_status === 'Rejected' || user?.kyc_status === 'rejected') ? (
@@ -204,7 +204,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                 </div>
                                 <div className="space-y-2 text-center sm:text-left">
                                     <h2 className="text-2xl font-black text-red-500 uppercase tracking-tight">{t.verificationUnsuccessful}</h2>
-                                    <p className="text-gray-400 text-sm font-semibold leading-relaxed">
+                                    <p className="text-slate-500 text-sm font-semibold leading-relaxed">
                                         {t.verificationUnsuccessfulDesc} <span className="text-red-400 font-black ml-1 bg-red-500/10 px-3 py-1 rounded-lg uppercase tracking-widest text-[10px] border border-red-500/20">{user?.rejection_reason || t.rejectionReasonLabel}</span>
                                     </p>
                                 </div>
@@ -260,7 +260,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
                         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="premium-glass p-10 rounded-[40px] relative overflow-hidden group">
-                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
+                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.expectedMonthly}</p>
                                 {(() => {
                                     const tier = (user?.tier && user?.tier !== "Standard") 
                                         ? TIERS.find(te => te.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
@@ -269,13 +269,13 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     return (
                                         <>
                                             <h3 className="text-3xl font-black text-slate-900 tabular-nums whitespace-nowrap"><span className="text-sm font-normal normal-case opacity-60 mr-1">up to</span>$ {maxUSD.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h3>
-                                            <p className="text-[10px] text-gray-500 font-bold uppercase mt-4 border-t border-gray-100 pt-4 inline-block">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
+                                            <p className="text-[10px] text-slate-600 font-bold uppercase mt-4 border-t border-slate-100 pt-4 inline-block">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                         </>
                                     );
                                 })()}
                             </div>
                             <div className="premium-glass p-10 rounded-[40px] relative overflow-hidden group">
-                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
+                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">{t.projectedYearly}</p>
                                 {(() => {
                                     const tier = (user?.tier && user?.tier !== "Standard") 
                                         ? TIERS.find(te => te.name === user.tier) || getTierByAmount(Number(user?.total_investment_usd || 0))
@@ -291,7 +291,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                                     </div>
                                                 )}
                                             </div>
-                                            <p className="text-[10px] text-gray-500 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
+                                            <p className="text-[10px] text-slate-600 font-bold uppercase mt-4">{t.dividendRateDesc} ({t.basedOn} {tier.name})</p>
                                         </>
                                     );
                                 })()}
@@ -303,8 +303,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                 <div className="h-14 w-14 bg-gv-gold/20 text-gv-gold rounded-full flex items-center justify-center mb-4 ring-1 ring-gv-gold/30">
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                 </div>
-                                <h2 className="text-2xl font-black tracking-tighter text-gray-900 mb-2 uppercase">{lang === 'en' ? 'Start Investing Now' : '立即开始投资'}</h2>
-                                <p className="text-gray-500 text-[10px] font-medium mb-6 max-w-[250px] uppercase tracking-wider">{lang === 'en' ? 'Choose from our tier packages to start earning daily dividends.' : '探索我们专业的理财产品，开启您的财富增长之旅。'}</p>
+                                <h2 className="text-2xl font-black tracking-tighter text-slate-900 mb-2 uppercase">{lang === 'en' ? 'Start Investing Now' : '立即开始投�?}</h2>
+                                <p className="text-slate-600 text-[10px] font-medium mb-6 max-w-[250px] uppercase tracking-wider">{lang === 'en' ? 'Choose from our tier packages to start earning daily dividends.' : '探索我们专业的理财产品，开启您的财富增长之旅�?}</p>
                                 <a href="/dashboard/products" className="bg-gv-gold text-black font-black uppercase tracking-widest text-[10px] px-8 py-3.5 rounded-2xl shadow-xl hover:-translate-y-1 hover:shadow-gv-gold/40 transition-all border border-gv-gold/50">{lang === 'en' ? 'View Products' : '查看产品'}</a>
                             </div>
                         )}
@@ -321,8 +321,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     {t.deposit}
                                 </Link>
                             ) : (
-                                <div className="flex-1 bg-white/5 text-gray-500 font-black text-xs py-7 rounded-[32px] flex items-center justify-center gap-4 border border-white/5 cursor-not-allowed opacity-50 uppercase tracking-[0.3em] relative group/locked">
-                                     <div className="h-8 w-8 bg-black/20 rounded-full flex items-center justify-center text-gray-600">
+                                <div className="flex-1 bg-white/5 text-slate-600 font-black text-xs py-7 rounded-[32px] flex items-center justify-center gap-4 border border-white/5 cursor-not-allowed opacity-50 uppercase tracking-[0.3em] relative group/locked">
+                                     <div className="h-8 w-8 bg-black/20 rounded-full flex items-center justify-center text-slate-600">
                                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                     </div>
                                     {t.deposit}
@@ -344,13 +344,13 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
             {/* Action Toast */}
             {actionToast && (
-                <div className="fixed bottom-24 sm:bottom-6 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-6 z-[600] bg-gray-50 border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 w-[90%] sm:max-w-sm">
+                <div className="fixed bottom-24 sm:bottom-6 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-6 z-[600] bg-slate-50 border border-gv-gold/30 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-5 w-[90%] sm:max-w-sm">
                     <div className="flex flex-col gap-4">
-                        <p className="text-gray-900 font-black text-sm uppercase tracking-widest">{actionToast.message}</p>
+                        <p className="text-slate-900 font-black text-sm uppercase tracking-widest">{actionToast.message}</p>
                         {actionToast.actionUrl && (
                             <button onClick={() => { setActionToast(null); router.push(actionToast.actionUrl!); }} className="bg-gv-gold text-black font-black py-3 rounded-xl uppercase tracking-widest text-xs">{actionToast.actionText}</button>
                         )}
-                        <button onClick={() => setActionToast(null)} className="text-gray-400 hover:text-gray-900 text-[10px] font-bold uppercase tracking-widest">Dismiss</button>
+                        <button onClick={() => setActionToast(null)} className="text-slate-500 hover:text-slate-900 text-[10px] font-bold uppercase tracking-widest">Dismiss</button>
                     </div>
                 </div>
             )}

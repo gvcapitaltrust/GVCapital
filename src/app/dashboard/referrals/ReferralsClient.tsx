@@ -32,19 +32,19 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
         },
         zh: {
             referTitle: "推荐好友",
-            referSubtitle: "邀请他人加入 GV Capital，共同发展社区。",
+            referSubtitle: "邀请他人加�?GV Capital，共同发展社区�?,
             copyCode: "复制代码",
             copied: "已复制！",
-            shareWA: "分享到 WhatsApp",
+            shareWA: "分享�?WhatsApp",
             totalReferred: "推荐好友总数",
             referredUsersList: "您的推荐网络",
-            username: "用户名",
+            username: "用户�?,
             registrationDate: "注册日期",
             investmentTier: "投资等级",
-            accountStatus: "账户状态",
+            accountStatus: "账户状�?,
             noReferrals: "暂无推荐记录",
-            verified: "已验证",
-            unverified: "未验证",
+            verified: "已验�?,
+            unverified: "未验�?,
             noInvestment: "暂无投资"
         }
     }[lang];
