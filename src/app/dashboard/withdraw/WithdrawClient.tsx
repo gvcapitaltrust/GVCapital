@@ -588,14 +588,12 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 <span>{t.lockedPortion}</span>
                                 <div className="text-right">
                                     <span className="block">$ {(penaltyInfo.lockedPortion_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                    <span className="block text-[8px] opacity-70 font-bold">≈ RM {(penaltyInfo.lockedPortion || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                             </div>
                             <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-red-500">
                                 <span>{t.penaltyAmt}</span>
                                 <div className="text-right">
                                     <span className="block">- $ {(penaltyInfo.penalty_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                    <span className="block text-[8px] opacity-70 font-bold">≈ RM {(penaltyInfo.penalty || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                             </div>
                             <div className="h-px bg-gray-200"></div>
