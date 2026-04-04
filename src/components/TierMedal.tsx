@@ -6,13 +6,14 @@ import { Medal, Shield, Star, Trophy, X } from "lucide-react";
 interface TierMedalProps {
   tierId: string;
   className?: string;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
 }
 
 export default function TierMedal({ tierId, className = "", size = "md" }: TierMedalProps) {
   const sizeMap = {
+    xs: "h-3 w-3",
     sm: "h-4 w-4",
-    md: "h-8 w-8",
+    md: "h-6 w-6",
     lg: "h-12 w-12",
     xl: "h-20 w-20"
   };
@@ -53,8 +54,9 @@ export default function TierMedal({ tierId, className = "", size = "md" }: TierM
 
   return (
     <div className={`relative flex items-center justify-center shrink-0 ${sizeMap[size].replace('h-', 'h-[calc(').replace('w-', 'w-[calc(').replace(' ', ')] ')} ${
-      size === 'sm' ? 'w-6 h-6' : 
-      size === 'md' ? 'w-12 h-12' : 
+      size === 'xs' ? 'w-6 h-6' : 
+      size === 'sm' ? 'w-8 h-8' : 
+      size === 'md' ? 'w-10 h-10' : 
       size === 'lg' ? 'w-16 h-16' : 
       'w-24 h-24'
     } ${className}`}>

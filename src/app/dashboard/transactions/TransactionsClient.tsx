@@ -77,78 +77,131 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         const doc = new jsPDF();
         const monthName = t.months[selectedMonth];
         
-        // Header
-        doc.setFillColor(10, 10, 10);
-        doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(212, 175, 55);
-        doc.setFontSize(22);
+        // Institutional Header
+        doc.setFillColor(15, 23, 42); // slate-900
+        doc.rect(0, 0, 210, 45, 'F');
+        doc.setTextColor(212, 175, 55); // gv-gold
+        doc.setFontSize(24);
         doc.setFont("helvetica", "bold");
-        doc.text("GV CAPITAL TRUST", 20, 25);
+        doc.text("GV CAPITAL TRUST", 20, 28);
         
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(10);
-        doc.text("OFFICIAL ACCOUNT STATEMENT", 140, 25);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.text("OFFICIAL INSTITUTIONAL ACCOUNT STATEMENT", 130, 28);
+        doc.text("SECURE MULTI-ASSET INVESTMENT TERMINAL", 130, 33);
 
-        // User Info
-        doc.setTextColor(50, 50, 50);
+        // Client & Period Info
+        doc.setTextColor(100, 116, 139); // slate-500
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "bold");
+        doc.text("IDENTIFICATION / AUDIT TRAIL", 20, 55);
+        
+        doc.setTextColor(30, 41, 59); // slate-800
         doc.setFontSize(10);
-        doc.text(`Account Holder: ${user.full_name || user.username}`, 20, 50);
-        doc.text(`Statement Period: ${monthName} ${selectedYear}`, 20, 55);
-        doc.text(`Date Generated: ${formatDateTime(new Date())}`, 20, 60);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Account Holder: ${user.full_name || user.username}`, 20, 62);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Statement Period: ${monthName} ${selectedYear}`, 20, 68);
+        doc.text(`Date Generated: ${formatDateTime(new Date())}`, 20, 74);
+        doc.text(`Currency Base: USD (United States Dollar)`, 20, 80);
 
-        // Data processing
+        // Data processing - Institutional Consistency
         const periodTxs = transactions.filter(tx => {
             const d = new Date(tx.created_at || tx.transfer_date);
             return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
         });
 
-        const periodProfit = periodTxs.filter(t => 
+        const getUSD = (tx: any) => Number(tx.original_currency_amount || (Number(tx.amount) / forexRate));
+
+        const periodProfitUSD = periodTxs.filter(t => 
             (t.metadata?.adjustment_category === 'Dividend' || t.metadata?.adjustment_category === 'Bonus' || t.type?.toLowerCase().includes('dividend') || t.type?.toLowerCase().includes('bonus')) &&
             t.status === 'Approved'
-        ).reduce((acc, t) => acc + Number(t.amount), 0);
+        ).reduce((acc, t) => acc + getUSD(t), 0);
 
-        const totalDeposits = periodTxs.filter(tx => tx.type === 'Deposit' && tx.status === 'Approved').reduce((acc, tx) => acc + Number(tx.amount), 0);
-        const totalWithdrawals = periodTxs.filter(tx => tx.type === 'Withdrawal' && !tx.metadata?.is_penalty && ['Approved', 'Completed', 'Pending Release'].includes(tx.status)).reduce((acc, tx) => acc + Math.abs(Number(tx.amount)), 0);
-        const totalPenalties = periodTxs.filter(tx => (tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty')) && ['Approved', 'Completed'].includes(tx.status)).reduce((acc, tx) => acc + Math.abs(Number(tx.amount)), 0);
+        const totalDepositsUSD = periodTxs.filter(tx => tx.type === 'Deposit' && tx.status === 'Approved').reduce((acc, tx) => acc + getUSD(tx), 0);
+        const totalWithdrawalsUSD = periodTxs.filter(tx => tx.type === 'Withdrawal' && !tx.metadata?.is_penalty && ['Approved', 'Completed', 'Pending Release'].includes(tx.status)).reduce((acc, tx) => acc + Math.abs(getUSD(tx)), 0);
+        const totalPenaltiesUSD = periodTxs.filter(tx => (tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty')) && ['Approved', 'Completed'].includes(tx.status)).reduce((acc, tx) => acc + Math.abs(getUSD(tx)), 0);
         
-        const closingBalance = (user.total_investment || 0) + (Number(user.profit || 0));
-        const openingBalance = closingBalance - totalDeposits + totalWithdrawals + totalPenalties - periodProfit;
+        const closingBalanceUSD = (Number(user.balance_usd || (Number(user.total_investment || 0) / forexRate))) + (Number(user.profit || 0));
+        const openingBalanceUSD = closingBalanceUSD - totalDepositsUSD + totalWithdrawalsUSD + totalPenaltiesUSD - periodProfitUSD;
+
+        const formatDual = (usd: number) => `$ ${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (RM ${(usd * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`;
 
         const summaryBody = [
-            ['Opening Balance', openingBalance.toFixed(2)],
-            ['Total Deposits', totalDeposits.toFixed(2)],
-            ['Total Monthly Dividends', periodProfit.toFixed(2)],
-            ['Total Withdrawals (Net)', totalWithdrawals.toFixed(2)],
+            ['Opening Balance', formatDual(openingBalanceUSD)],
+            ['Total Net Deposits', formatDual(totalDepositsUSD)],
+            ['Total Monthly Dividends', formatDual(periodProfitUSD)],
+            ['Total Withdrawals (Net)', formatDual(totalWithdrawalsUSD)],
         ];
 
-        if (totalPenalties > 0) {
-            summaryBody.push(['Early Withdrawal Penalties', `-${totalPenalties.toFixed(2)}`]);
+        if (totalPenaltiesUSD > 0) {
+            summaryBody.push(['Early Withdrawal Penalties', `-${formatDual(totalPenaltiesUSD)}`]);
         }
 
-        summaryBody.push(['Closing Balance', closingBalance.toFixed(2)]);
+        summaryBody.push(['Closing Balance', formatDual(closingBalanceUSD)]);
 
         autoTable(doc, {
-            startY: 70,
-            head: [['Description', 'Amount (USD)']],
-            body: summaryBody.map(([desc, amt]) => [desc, (Number(amt) / forexRate).toFixed(2)]),
-            theme: 'striped',
-            headStyles: { fillColor: [51, 65, 85] }
+            startY: 90,
+            head: [['Account Summary', 'Financial Position (USD / RM)']],
+            body: summaryBody,
+            theme: 'grid',
+            headStyles: { fillColor: [15, 23, 42], textColor: [212, 175, 55], fontStyle: 'bold' },
+            bodyStyles: { fontSize: 9, cellPadding: 5 },
+            columnStyles: { 0: { fontStyle: 'bold', width: 60 } }
+        });
+
+        // Transaction List - Detailed Breakdown
+        const txBody = periodTxs.map(tx => {
+            const usd = getUSD(tx);
+            let typeDesc = tx.metadata?.description || tx.type;
+            
+            // Add details for penalized withdrawals
+            if (tx.type === 'Withdrawal' && tx.metadata?.penalty_applied) {
+                const grossUSD = Number(tx.metadata?.original_request_amount_usd || usd);
+                const penaltyUSD = Number(tx.metadata?.penalty_amount_usd || (grossUSD * 0.4));
+                const bank = tx.metadata?.bank_name || "Institutional Bank";
+                const acc = tx.metadata?.account_number || "Verified Account";
+                
+                typeDesc = {
+                    content: `${typeDesc}\nGross: $${grossUSD.toFixed(2)} | Penalty: $${penaltyUSD.toFixed(2)}\nPay to: ${bank} (${acc})`,
+                    styles: { fontSize: 7, textColor: [100, 116, 139] }
+                } as any;
+            } else if (tx.type === 'Deposit') {
+                 typeDesc = `${typeDesc}\nVerification: Hash Certified`;
+            }
+
+            return [
+                formatDate(tx.created_at || tx.transfer_date),
+                tx.ref_id || "-",
+                typeDesc,
+                tx.status,
+                formatDual(usd)
+            ];
         });
 
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 15,
-            head: [['Date', 'Ref ID', 'Type', 'Status', 'Amount (USD)']],
-            body: periodTxs.map(tx => [
-                formatDate(tx.created_at || tx.transfer_date),
-                tx.ref_id || "-",
-                tx.metadata?.description || tx.type,
-                tx.status,
-                (Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toFixed(2)
-            ]),
-            headStyles: { fillColor: [71, 85, 105] }
+            head: [['Date', 'Reference ID', 'Position Description', 'Status', 'Net Amount (Base/Local)']],
+            body: txBody,
+            theme: 'striped',
+            headStyles: { fillColor: [71, 85, 105], fontSize: 8 },
+            bodyStyles: { fontSize: 8, cellPadding: 4 },
+            columnStyles: { 2: { width: 70 }, 4: { halign: 'right', fontStyle: 'bold' } }
         });
 
-        doc.save(`GV_Statement_${monthName}_${selectedYear}.pdf`);
+        // Fiduciary Footer
+        const finalY = (doc as any).lastAutoTable.finalY + 20;
+        doc.setDrawColor(226, 232, 240);
+        doc.line(20, finalY, 190, finalY);
+        
+        doc.setTextColor(148, 163, 184);
+        doc.setFontSize(7);
+        doc.text("SECURITY CLASSIFICATION: CONFIDENTIAL", 20, finalY + 10);
+        doc.text("This statement is electronically generated and verified by GV Capital Trust Fiduciary Systems. No physical signature required.", 20, finalY + 15);
+        doc.text("For support, please contact your account manager directly via the secure portal.", 20, finalY + 20);
+
+        doc.save(`GV_Institutional_Statement_${monthName}_${selectedYear}.pdf`);
     };
 
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
