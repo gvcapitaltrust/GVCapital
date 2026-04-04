@@ -259,68 +259,52 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </div>
 
-            {/* Capital Status & Lock-in Countdown Section */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in slide-in-from-top-4 duration-700">
-                <div className="bg-slate-900 p-8 rounded-[32px] border border-slate-800 shadow-2xl flex flex-col justify-between">
-                    <div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gv-gold/60 mb-2 block">Total Capital Assets</span>
-                        <p className="text-4xl font-black text-white">$ {((user?.balance_usd || 0) + (user?.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            {/* Capital Status & Lock-in Countdown - Compact Text Bar */}
+            <div className="bg-gray-50/80 backdrop-blur-md border border-gray-200 rounded-2xl px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-6 animate-in slide-in-from-top-4 duration-700 shadow-sm transition-all hover:bg-white group">
+                <div className="flex items-center gap-4 w-full md:w-auto">
+                    <div className="h-8 w-8 rounded-full bg-slate-900 flex items-center justify-center text-gv-gold shadow-lg rotate-12 group-hover:rotate-0 transition-all">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
-                    <div className="mt-6 flex items-center gap-2 group">
-                        <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Institutional Fiduciary Trust</span>
+                    <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Total Capital Assets' : '总资产'}</span>
+                        <p className="text-lg font-black text-slate-900 tabular-nums leading-none tracking-tighter">
+                            $ {((user?.balance_usd || 0) + (user?.profit || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
                     </div>
                 </div>
 
-                <div className="bg-white p-8 rounded-[32px] border border-gray-200 shadow-xl flex flex-col justify-between relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-[50px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
-                    <div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 mb-2 block">Capital Lock-in Status</span>
+                <div className="h-px w-full md:h-8 md:w-px bg-gray-200 hidden md:block"></div>
+
+                <div className="flex items-center gap-4 w-full md:w-auto">
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center transition-all ${user?.next_maturity_date ? 'bg-amber-100 text-amber-500' : 'bg-emerald-100 text-emerald-500'}`}>
+                        {user?.next_maturity_date 
+                            ? <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            : <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M5 13l4 4L19 7" /></svg>
+                        }
+                    </div>
+                    <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Capital Status' : '资金状态'}</span>
                         {user?.next_maturity_date ? (
-                            <div className="space-y-1">
-                                <p className="text-2xl font-black text-gray-900 uppercase tracking-tighter">
+                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                                <p className="text-base font-black text-slate-900 uppercase tracking-tighter">
                                     {(() => {
                                         const now = new Date();
                                         const maturityDate = new Date(user.next_maturity_date);
                                         const diffMs = maturityDate.getTime() - now.getTime();
                                         const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-                                        return lang === 'en' ? `${diffDays} Days Remaining` : `剩余 ${diffDays} 天`;
+                                        return lang === 'en' ? `${diffDays} Days to Maturity` : `距到期还剩 ${diffDays} 天`;
                                     })()}
                                 </p>
-                                <p className="text-[10px] font-bold text-gv-gold uppercase tracking-widest">
-                                    {lang === 'en' ? 'Maturity Date: ' : '到期日期: '}
-                                    {new Date(user.next_maturity_date).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="space-y-1">
-                                <p className="text-2xl font-black text-emerald-500 uppercase tracking-tighter">
-                                    {lang === 'en' ? 'Fully Matured' : '资金已完全到期'}
-                                </p>
-                                <p className="text-[10px] font-bold text-emerald-600/50 uppercase tracking-widest">
-                                    {lang === 'en' ? 'No lock-in penalty applied' : '提款无锁定期罚金'}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                    {(user?.locked_capital_usd || 0) > 0 && (
-                        <div className="mt-6">
-                            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                                {(() => {
-                                    const total = (user?.balance_usd || 0) + (user?.profit || 0);
-                                    const locked = user?.locked_capital_usd || 0;
-                                    const percentage = Math.min(100, ( (total - locked) / total) * 100);
-                                    return <div className="h-full bg-gv-gold transition-all duration-1000" style={{ width: `${percentage}%` }}></div>;
-                                })()}
-                            </div>
-                            <div className="flex justify-between mt-2">
-                                <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest">{lang === 'en' ? 'Liquid Position' : '流动资金'}</span>
-                                <span className="text-[8px] font-black text-gv-gold uppercase tracking-widest">
-                                    {Math.round((( ( (user?.balance_usd || 0) + (user?.profit || 0)) - (user?.locked_capital_usd || 0)) / ( (user?.balance_usd || 0) + (user?.profit || 0))) * 100)}%
+                                <span className="text-[10px] font-bold text-gv-gold bg-gv-gold/10 px-2 py-0.5 rounded-md uppercase tracking-tight">
+                                    {new Date(user.next_maturity_date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
                                 </span>
                             </div>
-                        </div>
-                    )}
+                        ) : (
+                            <p className="text-base font-black text-emerald-500 uppercase tracking-tighter">
+                                {lang === 'en' ? 'Fully Matured' : '资金已到期'}
+                            </p>
+                        )}
+                    </div>
                 </div>
             </div>
 
