@@ -126,24 +126,25 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         const closingBalanceUSD = (Number(user.balance_usd || (Number(user.total_investment || 0) / forexRate))) + (Number(user.profit || 0));
         const openingBalanceUSD = closingBalanceUSD - totalDepositsUSD + totalWithdrawalsUSD + totalPenaltiesUSD - periodProfitUSD;
 
+        const formatUSD = (usd: number) => `$ ${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         const formatDual = (usd: number) => `$ ${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (RM ${(usd * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`;
 
         const summaryBody = [
-            ['Opening Balance', formatDual(openingBalanceUSD)],
-            ['Total Net Deposits', formatDual(totalDepositsUSD)],
-            ['Total Monthly Dividends', formatDual(periodProfitUSD)],
-            ['Total Withdrawals (Net)', formatDual(totalWithdrawalsUSD)],
+            ['Opening Balance', formatUSD(openingBalanceUSD)],
+            ['Total Net Deposits', formatUSD(totalDepositsUSD)],
+            ['Total Monthly Dividends', formatUSD(periodProfitUSD)],
+            ['Total Withdrawals (Net)', formatUSD(totalWithdrawalsUSD)],
         ];
 
         if (totalPenaltiesUSD > 0) {
-            summaryBody.push(['Early Withdrawal Penalties', `-${formatDual(totalPenaltiesUSD)}`]);
+            summaryBody.push(['Early Withdrawal Penalties', `-${formatUSD(totalPenaltiesUSD)}`]);
         }
 
-        summaryBody.push(['Closing Balance', formatDual(closingBalanceUSD)]);
+        summaryBody.push(['Closing Balance', formatUSD(closingBalanceUSD)]);
 
         autoTable(doc, {
             startY: 90,
-            head: [['Account Summary', 'Financial Position (USD / RM)']],
+            head: [['Account Summary', 'Financial Position (USD)']],
             body: summaryBody,
             theme: 'grid',
             headStyles: { fillColor: [15, 23, 42], textColor: [212, 175, 55], fontStyle: 'bold' },
@@ -154,6 +155,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         // Transaction List - Detailed Breakdown
         const txBody = periodTxs.map(tx => {
             const usd = getUSD(tx);
+            const rm = usd * forexRate;
             let typeDesc = tx.metadata?.description || tx.type;
             
             // Add details for penalized withdrawals
@@ -175,19 +177,18 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                 formatDate(tx.created_at || tx.transfer_date),
                 tx.ref_id || "-",
                 typeDesc,
-                tx.status,
-                formatDual(usd)
+                { content: `$ ${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\nRM ${rm.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, styles: { fontSize: 8, halign: 'right' } }
             ];
         });
 
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 15,
-            head: [['Date', 'Reference ID', 'Position Description', 'Status', 'Net Amount (Base/Local)']],
+            head: [['Date', 'Reference ID', 'Position Description', 'Net Amount (Base/Local)']],
             body: txBody,
             theme: 'striped',
             headStyles: { fillColor: [71, 85, 105], fontSize: 8 },
             bodyStyles: { fontSize: 8, cellPadding: 4 },
-            columnStyles: { 2: { cellWidth: 70 }, 4: { halign: 'right', fontStyle: 'bold' } }
+            columnStyles: { 2: { cellWidth: 80 }, 3: { halign: 'right', fontStyle: 'bold' } }
         });
 
         // Fiduciary Footer
