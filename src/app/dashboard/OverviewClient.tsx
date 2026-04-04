@@ -66,6 +66,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             docSubmitted: "Documents Received",
             docSubmittedDesc: "Your verification request has been updated. Our team will review it within 24-48 hours.",
             totalPrincipal: "Total Principal Capital",
+            lifetimeDeposit: "Lifetime Deposits",
+            totalWithdraw: "Total Withdrawn",
             member: "Member",
         },
         zh: {
