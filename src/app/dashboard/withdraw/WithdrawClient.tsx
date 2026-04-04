@@ -312,7 +312,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                     <ArrowLeft className="h-6 w-6" />
                 </button>
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tighter">{t.title}</h1>
+                    <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">{t.title}</h1>
                     <p className="text-gray-400 text-sm font-medium">{t.desc}</p>
                 </div>
             </div>

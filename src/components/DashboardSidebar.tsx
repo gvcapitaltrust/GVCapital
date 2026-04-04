@@ -88,7 +88,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                     </div>
 
                     <nav className="space-y-2">
-                        <p className={`text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 mb-6 px-4 transition-opacity duration-300 ${isCollapsed ? "opacity-0 invisible h-0" : "opacity-100"}`}>
+                        <p className={`text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-6 px-4 transition-opacity duration-300 ${isCollapsed ? "opacity-0 invisible h-0" : "opacity-100"}`}>
                             {t.nav}
                         </p>
                         {menuItems.map((item: any) => {
@@ -99,7 +99,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                 return (
                                     <div
                                         key={item.id}
-                                        className={`w-full flex items-center justify-between gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 opacity-50 cursor-not-allowed text-gray-400`}
+                                    className={`w-full flex items-center justify-between gap-4 px-4 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 opacity-50 cursor-not-allowed text-gray-400`}
                                         title={t.verifiedRequired}
                                     >
                                         <div className="flex items-center gap-4 relative">
@@ -126,7 +126,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                 <Link
                                     key={item.id}
                                     href={`${item.path}?lang=${lang}`}
-                                    className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isActive ? "bg-gv-gold/10 text-gv-gold border border-gv-gold/20" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"}`}
+                                    className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 ${isActive ? "bg-gv-gold/10 text-gv-gold border border-gv-gold/20" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"}`}
                                     title={isCollapsed ? item.label : ""}
                                 >
                                     <span className={`shrink-0 ${isCollapsed ? "mx-auto" : ""}`}>{item.icon}</span>
@@ -157,7 +157,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                                     )}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-[10px] font-black text-gray-900 uppercase tracking-tight truncate">
+                                    <p className="text-[9px] font-black text-gray-900 uppercase tracking-tight truncate">
                                         {user.full_name || user.fullName || user.email?.split('@')[0] || "User"}
                                     </p>
                                     <p className="text-[8px] font-bold text-gv-gold uppercase tracking-[0.2em] mt-0.5 whitespace-nowrap">
@@ -175,7 +175,7 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
                         >
                             <svg className={`h-5 w-5 transition-transform duration-500 ${isCollapsed ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
                         </button>
-                        <button onClick={handleLogout} className={`w-full text-gray-400 hover:text-red-500 transition-colors text-[10px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-3 rounded-2xl ${isCollapsed ? "justify-center" : "hover:bg-red-50"}`}>
+                        <button onClick={handleLogout} className={`w-full text-gray-400 hover:text-red-500 transition-colors text-[9px] font-black uppercase tracking-widest flex items-center gap-3 px-4 py-3 rounded-2xl ${isCollapsed ? "justify-center" : "hover:bg-red-50"}`}>
                             <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
                             {!isCollapsed && <span>{t.logout}</span>}
                         </button>

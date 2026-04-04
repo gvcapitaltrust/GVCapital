@@ -16,7 +16,7 @@ export default async function ReferralsPage({
                     <div className="h-1 w-12 bg-gv-gold rounded-full"></div>
                     <span className="text-gv-gold text-sm font-semibold tracking-wider">Community & Rewards</span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-gray-900">
+                <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-gray-900">
                     {lang === "en" ? "Referrals" : "推荐好友"}
                 </h1>
             </header>

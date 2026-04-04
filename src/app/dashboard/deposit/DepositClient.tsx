@@ -100,7 +100,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                 <div className="h-24 w-24 bg-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(16,185,129,0.3)]">
                     <CheckCircle2 className="h-12 w-12 text-white" strokeWidth={3} />
                 </div>
-                <h2 className="text-4xl font-black uppercase text-gray-900 tracking-tighter mb-4">{t.success}</h2>
+                <h2 className="text-3xl font-black uppercase text-gray-900 tracking-tighter mb-4">{t.success}</h2>
                 <p className="text-gray-500 font-medium mb-8 text-center max-w-sm">{t.successDesc}</p>
                 <div className="bg-white px-8 py-4 rounded-3xl border border-emerald-500/20 text-emerald-500 font-black text-xl mb-12">
                     {t.ref}: {successRefId}
@@ -126,7 +126,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                     <ArrowLeft className="h-6 w-6" />
                 </button>
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tighter">{t.title}</h1>
+                    <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">{t.title}</h1>
                     <p className="text-gray-400 text-sm font-medium">{t.desc}</p>
                 </div>
             </div>

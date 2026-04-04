@@ -154,7 +154,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         <span className="text-gv-gold text-[10px] font-black uppercase tracking-[0.4em] mb-0.5">Institutional Access</span>
                     </div>
                     <div className="flex items-center gap-6">
-                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-gray-900 leading-none">
+                        <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-gray-900 leading-none">
                             {lang === "en" ? "Overview" : "概览"}
                         </h1>
                         
