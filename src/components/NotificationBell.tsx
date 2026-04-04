@@ -40,12 +40,11 @@ export default function NotificationBell({ userId, lang = "en" }: NotificationBe
 
     const formatNotificationMessage = (message: string) => {
         if (!message) return message;
-        // Find RM [Amount] patterns and convert them (handles commas and decimals)
-        return message.replace(/RM\s?([\d,]+(\.\d{1,2})?)/g, (match, amountStr) => {
-            const amountRM = parseFloat(amountStr.replace(/,/g, ''));
-            if (isNaN(amountRM)) return match;
-            const amountUSD = amountRM / (forexRate || 4.0);
-            return `$ ${amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        // Identify currency patterns and standardize to USD without dividing (USD-primary transition)
+        return message.replace(/(?:RM|\$)\s?([\d,]+(\.\d{1,2})?)/g, (match, amountStr) => {
+            const amount = parseFloat(amountStr.replace(/,/g, ''));
+            if (isNaN(amount)) return match;
+            return `$ ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         });
     };
 
