@@ -18,6 +18,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
     const router = useRouter();
 
     const [actionToast, setActionToast] = useState<{message: string, actionUrl?: string, actionText?: string} | null>(null);
+    const [isProfileExpanded, setIsProfileExpanded] = useState(false);
 
     const t = {
         en: {
@@ -311,109 +312,121 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                         )}
 
-                        {/* Fiduciary Verification Details Section */}
+                        {/* User Profile Section */}
                         <section className="bg-white border border-gray-200 rounded-[32px] overflow-hidden shadow-sm">
-                            <div className="bg-slate-900 px-8 py-5 flex items-center justify-between">
+                            <div 
+                                onClick={() => setIsProfileExpanded(!isProfileExpanded)}
+                                className="bg-slate-900 px-8 py-5 flex items-center justify-between cursor-pointer hover:bg-slate-800 transition-colors group"
+                            >
                                 <div className="flex items-center gap-3">
                                     <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                                    <h3 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{lang === 'en' ? 'Fiduciary Verification Details' : '受托验证详情'}</h3>
+                                    <h3 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{lang === 'en' ? 'User Profile' : '用户资料'}</h3>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 d9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                                    <span className="text-gv-gold text-[8px] font-black uppercase tracking-widest">{lang === 'en' ? 'Identity Verified' : '身份已验证'}</span>
+                                <div className="flex items-center gap-4">
+                                    <div className="hidden sm:flex items-center gap-2">
+                                        <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 d9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                        <span className="text-gv-gold text-[8px] font-black uppercase tracking-widest">{lang === 'en' ? 'Identity Verified' : '身份已验证'}</span>
+                                    </div>
+                                    <div className={`p-2 rounded-lg bg-white/5 text-white/50 group-hover:text-white transition-all ${isProfileExpanded ? 'rotate-180' : ''}`}>
+                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-                                {/* Identity Group */}
-                                <div className="space-y-6">
-                                    <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-widest border-b border-gray-100 pb-2 flex items-center justify-between">
-                                        {lang === 'en' ? 'Identity & Contact' : '身份与联系方式'}
-                                        <svg className="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                                    </h4>
-                                    <div className="space-y-4">
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Full Name' : '全名'}</span>
-                                            <span className="text-xs font-black text-gray-900 tracking-tight">{user?.kyc_data?.full_name || user?.full_name || '-'}</span>
+                            {isProfileExpanded && (
+                                <>
+                                    <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                                        {/* Identity Group */}
+                                        <div className="space-y-6">
+                                            <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-widest border-b border-gray-100 pb-2 flex items-center justify-between">
+                                                {lang === 'en' ? 'Identity & Contact' : '身份与联系方式'}
+                                                <svg className="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                            </h4>
+                                            <div className="space-y-4">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Full Name' : '全名'}</span>
+                                                    <span className="text-xs font-black text-gray-900 tracking-tight">{user?.kyc_data?.full_name || user?.full_name || '-'}</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Legal Document' : '法定证件'}</span>
+                                                    <span className="text-xs font-mono font-bold text-gray-700">{user?.kyc_data?.id_type || '-'}</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Verified Phone' : '验证电话'}</span>
+                                                    <span className="text-xs font-mono font-bold text-gray-900 tracking-tighter">{user?.kyc_data?.phone || user?.phone || '-'}</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Primary Address' : '主要地址'}</span>
+                                                    <span className="text-[10px] font-bold text-gray-600 leading-tight">{user?.kyc_data?.address || '-'}, {user?.kyc_data?.country || '-'}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Legal Document' : '法定证件'}</span>
-                                            <span className="text-xs font-mono font-bold text-gray-700">{user?.kyc_data?.id_type || '-'}</span>
+
+                                        {/* Financial Group */}
+                                        <div className="space-y-6">
+                                            <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-widest border-b border-gray-100 pb-2 flex items-center justify-between">
+                                                {lang === 'en' ? 'Financial Profile' : '财务概况'}
+                                                <svg className="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            </h4>
+                                            <div className="space-y-4">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Employment Status' : '就业状态'}</span>
+                                                    <span className="text-xs font-black text-gray-900 tracking-tight">{user?.kyc_data?.employment_status || '-'} ({user?.kyc_data?.industry || '-'})</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Annual Income Range' : '年收入范围'}</span>
+                                                    <span className="text-xs font-black text-gray-700 tracking-tight">{user?.kyc_data?.annual_income || '-'}</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Est. Total Wealth' : '预估总财富'}</span>
+                                                    <span className="text-xs font-black text-gray-900 tracking-tight">{user?.kyc_data?.total_wealth || '-'}</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Source of Wealth' : '财富来源'}</span>
+                                                    <span className="text-[10px] font-bold text-gray-600 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100 mt-1">
+                                                        {Array.isArray(user?.kyc_data?.source_of_wealth) ? user.kyc_data.source_of_wealth.join(", ") : (user?.kyc_data?.source_of_wealth || '-')}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Verified Phone' : '验证电话'}</span>
-                                            <span className="text-xs font-mono font-bold text-gray-900 tracking-tighter">{user?.kyc_data?.phone || user?.phone || '-'}</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Primary Address' : '主要地址'}</span>
-                                            <span className="text-[10px] font-bold text-gray-600 leading-tight">{user?.kyc_data?.address || '-'}, {user?.kyc_data?.country || '-'}</span>
+
+                                        {/* Banking Group */}
+                                        <div className="space-y-6">
+                                            <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-widest border-b border-gray-100 pb-2 flex items-center justify-between">
+                                                {lang === 'en' ? 'Institutional Banking' : '机构银行业务'}
+                                                <svg className="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 10h18M7 15h1m4 0h1m4 0h1m-7 4h12a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                            </h4>
+                                            <div className="space-y-4">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Institution Name' : '机构名称'}</span>
+                                                    <span className="text-xs font-black text-gray-900 tracking-tight">{user?.kyc_data?.bank_name || user?.bank_name || '-'}</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Verified Account Number' : '验证账号'}</span>
+                                                    <span className="text-sm font-mono font-black text-gv-gold select-all tracking-tighter">{user?.kyc_data?.account_number || user?.account_number || '-'}</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Account Purpose' : '账户用途'}</span>
+                                                    <span className="text-xs font-black text-gray-900 tracking-tight">{user?.kyc_data?.account_purpose || '-'}</span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Verified Account Holder' : '验证账户持有人'}</span>
+                                                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-tight">{user?.kyc_data?.bank_account_holder || user?.bank_account_holder || '-'}</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Financial Group */}
-                                <div className="space-y-6">
-                                    <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-widest border-b border-gray-100 pb-2 flex items-center justify-between">
-                                        {lang === 'en' ? 'Financial Profile' : '财务概况'}
-                                        <svg className="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    </h4>
-                                    <div className="space-y-4">
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Employment Status' : '就业状态'}</span>
-                                            <span className="text-xs font-black text-gray-900 tracking-tight">{user?.kyc_data?.employment_status || '-'} ({user?.kyc_data?.industry || '-'})</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Annual Income Range' : '年收入范围'}</span>
-                                            <span className="text-xs font-black text-gray-700 tracking-tight">{user?.kyc_data?.annual_income || '-'}</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Est. Total Wealth' : '预估总财富'}</span>
-                                            <span className="text-xs font-black text-gray-900 tracking-tight">{user?.kyc_data?.total_wealth || '-'}</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Source of Wealth' : '财富来源'}</span>
-                                            <span className="text-[10px] font-bold text-gray-600 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100 mt-1">
-                                                {Array.isArray(user?.kyc_data?.source_of_wealth) ? user.kyc_data.source_of_wealth.join(", ") : (user?.kyc_data?.source_of_wealth || '-')}
-                                            </span>
+                                    <div className="bg-gray-50 px-8 py-3 border-t border-gray-100 flex items-center justify-between">
+                                        <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">{lang === 'en' ? 'Security: This information is confidential and visible only to you.' : '安全：此信息属机密，仅限您查看。'}</span>
+                                        <div className="flex items-center gap-1">
+                                            <div className="h-1 w-1 rounded-full bg-gray-300"></div>
+                                            <div className="h-1 w-1 rounded-full bg-gray-300"></div>
+                                            <div className="h-1 w-1 rounded-full bg-gray-300"></div>
                                         </div>
                                     </div>
-                                </div>
-
-                                {/* Banking Group */}
-                                <div className="space-y-6">
-                                    <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-widest border-b border-gray-100 pb-2 flex items-center justify-between">
-                                        {lang === 'en' ? 'Institutional Banking' : '机构银行业务'}
-                                        <svg className="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 10h18M7 15h1m4 0h1m4 0h1m-7 4h12a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                    </h4>
-                                    <div className="space-y-4">
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Institution Name' : '机构名称'}</span>
-                                            <span className="text-xs font-black text-gray-900 tracking-tight">{user?.kyc_data?.bank_name || user?.bank_name || '-'}</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Verified Account Number' : '验证账号'}</span>
-                                            <span className="text-sm font-mono font-black text-gv-gold select-all tracking-tighter">{user?.kyc_data?.account_number || user?.account_number || '-'}</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Account Purpose' : '账户用途'}</span>
-                                            <span className="text-xs font-black text-gray-900 tracking-tight">{user?.kyc_data?.account_purpose || '-'}</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Verified Account Holder' : '验证账户持有人'}</span>
-                                            <span className="text-[10px] font-black text-gray-600 uppercase tracking-tight">{user?.kyc_data?.bank_account_holder || user?.bank_account_holder || '-'}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-gray-50 px-8 py-3 border-t border-gray-100 flex items-center justify-between">
-                                <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">{lang === 'en' ? 'Security: This information is confidential and visible only to you.' : '安全：此信息属机密，仅限您查看。'}</span>
-                                <div className="flex items-center gap-1">
-                                    <div className="h-1 w-1 rounded-full bg-gray-300"></div>
-                                    <div className="h-1 w-1 rounded-full bg-gray-300"></div>
-                                    <div className="h-1 w-1 rounded-full bg-gray-300"></div>
-                                </div>
-                            </div>
+                                </>
+                            )}
                         </section>
                         
                         <section className="flex flex-col sm:flex-row gap-6 mt-10">
