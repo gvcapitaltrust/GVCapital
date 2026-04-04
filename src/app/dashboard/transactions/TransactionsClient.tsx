@@ -148,7 +148,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             theme: 'grid',
             headStyles: { fillColor: [15, 23, 42], textColor: [212, 175, 55], fontStyle: 'bold' },
             bodyStyles: { fontSize: 9, cellPadding: 5 },
-            columnStyles: { 0: { fontStyle: 'bold', width: 60 } }
+            columnStyles: { 0: { fontStyle: 'bold', cellWidth: 60 } }
         });
 
         // Transaction List - Detailed Breakdown
@@ -187,7 +187,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             theme: 'striped',
             headStyles: { fillColor: [71, 85, 105], fontSize: 8 },
             bodyStyles: { fontSize: 8, cellPadding: 4 },
-            columnStyles: { 2: { width: 70 }, 4: { halign: 'right', fontStyle: 'bold' } }
+            columnStyles: { 2: { cellWidth: 70 }, 4: { halign: 'right', fontStyle: 'bold' } }
         });
 
         // Fiduciary Footer
