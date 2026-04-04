@@ -98,20 +98,19 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     const currentTier = getTierByAmount(totalInvestmentUSD);
                     const lockPeriodDays = currentTier.lockInDays || 180;
                     
-                    // Locked Capital Logic (same as UserProvider)
-                    const lockedCapital = userTxs.filter((t: any) => t.type === 'Deposit').reduce((acc: number, tx: any) => {
+                    // Locked Capital Logic (standardized to USD-primary)
+                    const lockedCapitalUSD = userTxs.filter((t: any) => t.type === 'Deposit').reduce((acc: number, tx: any) => {
                         const rawDate = tx.transfer_date || tx.created_at;
                         const txDate = new Date(rawDate);
                         if (isNaN(txDate.getTime())) return acc;
                         const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
-                        return diffDays < lockPeriodDays ? acc + Number(tx.amount) : acc;
+                        return diffDays < lockPeriodDays ? acc + Number(tx.original_currency_amount ?? (Number(tx.amount || 0) / forexRate)) : acc;
                     }, 0);
 
-                    const withdrawableBalance = Math.max(0, (Number(p.balance || 0) - lockedCapital) + Number(p.profit || 0));
-                    
-                    // Stabilize Profit and Withdrawable USD
-                    const profitUSD = Number(p.profit || 0) / forexRate; 
-                    const withdrawableBalanceUSD = Math.max(0, (totalInvestmentUSD - (lockedCapital / forexRate)) + profitUSD);
+                    const profitUSD = Number(p.profit || 0); // Profit field is USD-primary
+                    const withdrawableBalanceUSD = Math.max(0, (totalInvestmentUSD - lockedCapitalUSD) + profitUSD);
+                    const withdrawableBalance = withdrawableBalanceUSD * forexRate;
+                    const lockedCapital = lockedCapitalUSD * forexRate;
                     const totalAssetsUSD = totalInvestmentUSD + profitUSD;
 
                     return {
@@ -132,13 +131,13 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 // Calculate Global Platform Stats (Both RM and USD)
                 const stats = profileList.reduce((acc, p) => {
                     const currentBalanceUSD = p.balance_usd ?? (Number(p.balance || 0) / forexRate);
-                    const currentProfitUSD = Number(p.profit || 0) / forexRate;
+                    const currentProfitUSD = Number(p.profit || 0); // Profit is USD-primary
                     return {
-                        totalBalance: acc.totalBalance + Number(p.balance || 0),
+                        totalBalance: acc.totalBalance + (currentBalanceUSD * forexRate),
                         totalBalanceUSD: acc.totalBalanceUSD + currentBalanceUSD,
-                        totalProfit: acc.totalProfit + Number(p.profit || 0),
+                        totalProfit: acc.totalProfit + (currentProfitUSD * forexRate),
                         totalProfitUSD: acc.totalProfitUSD + currentProfitUSD,
-                        totalAssets: acc.totalAssets + (Number(p.balance || 0) + Number(p.profit || 0)),
+                        totalAssets: acc.totalAssets + (currentBalanceUSD + currentProfitUSD) * forexRate,
                         totalAssetsUSD: acc.totalAssetsUSD + currentBalanceUSD + currentProfitUSD,
                         userCount: acc.userCount + 1,
                         verifiedCount: acc.verifiedCount + (p.kyc_status === 'Verified' ? 1 : 0)
