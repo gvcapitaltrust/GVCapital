@@ -79,11 +79,11 @@ export default function DashboardSidebar({ lang, isCollapsed, onToggleCollapse, 
             {/* Desktop Sidebar */}
             <aside className={`fixed inset-y-0 left-0 z-50 bg-[#FAFAF8] border-r border-gray-200 p-6 flex flex-col justify-between transition-all duration-500 ease-in-out hidden md:flex ${isCollapsed ? "w-20" : "w-64"} overflow-y-auto`}>
                 <div className="space-y-12">
-                    <div className={`flex items-center gap-4 px-2 transition-all duration-500 ${isCollapsed ? "justify-center" : ""}`}>
+                    <div className={`flex items-center gap-4 transition-all duration-500 ${isCollapsed ? "justify-center px-0" : "px-4"}`}>
                         {isCollapsed ? (
                             <img src="/logo.png" alt="GV Capital" className="h-8 w-auto object-contain" />
                         ) : (
-                            <img src="/logo.png" alt="GV Capital" className="h-[21px] w-auto object-contain" />
+                            <img src="/logo.png" alt="GV Capital" className="h-[60px] w-auto object-contain" />
                         )}
                     </div>
 
