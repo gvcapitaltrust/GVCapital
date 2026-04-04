@@ -206,7 +206,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     action: t.type === 'Deposit' ? 'Deposit Approved' : 
                             t.type === 'Withdrawal' ? (t.status === 'Pending Release' ? 'Withdrawal Accepted' : 'Withdrawal Released') : 
                             t.type === 'Audit' ? t.metadata?.action : 
-                            t.type === 'Dividend' ? 'Final Received' :
+                            t.type === 'Dividend' ? 'Dividend Received' :
                             t.type === 'Bonus' ? 'Bonus Awarded' :
                             t.type === 'Penalty' ? 'Withdrawal Penalty' :
                             'Adjustment',
