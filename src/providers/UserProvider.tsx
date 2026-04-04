@@ -87,8 +87,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 }, 0);
 
                 const profitUSD = Number(profile.profit || 0);
-                const totalAssetsUSD = balanceUSD + profitUSD;
-                const withdrawableBalanceUSD = Math.max(0, balanceUSD - lockedCapitalUSD) + profitUSD;
+                const matureCapitalUSD = Math.max(0, balanceUSD - lockedCapitalUSD);
+                const dividendWithdrawableUSD = profitUSD;
+                const withdrawableBalanceUSD = matureCapitalUSD + dividendWithdrawableUSD;
                 
                 const totalDepositedUSD = approvedDeposits.filter((t: any) => {
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
@@ -112,24 +113,28 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     ...user,
                     ...profile,
                     fullName: profile.full_name || user.user_metadata?.full_name,
-                    total_assets: totalAssetsUSD * forexRate, // RM value for legacy display only
-                    total_assets_usd: totalAssetsUSD,
-                    withdrawable_balance: withdrawableBalanceUSD * forexRate,
+                    total_assets: (balanceUSD + profitUSD) * forexRate, // RM value for legacy display only
+                    total_assets_usd: balanceUSD + profitUSD,
+                    withdrawable_balance: withdrawableBalanceUSD * (forexRate - 0.4),
                     withdrawable_balance_usd: withdrawableBalanceUSD,
+                    mature_capital_usd: matureCapitalUSD,
+                    mature_capital_rm: matureCapitalUSD * (forexRate - 0.4),
+                    dividend_withdrawable_usd: dividendWithdrawableUSD,
+                    dividend_withdrawable_rm: dividendWithdrawableUSD * (forexRate - 0.4),
                     locked_capital: lockedCapitalUSD * forexRate, // RM value for legacy display
                     locked_capital_usd: lockedCapitalUSD,
                     total_deposited: totalDepositedUSD * forexRate,
                     total_deposited_usd: totalDepositedUSD,
-                    total_withdrawn: totalWithdrawnUSD * forexRate,
+                    total_withdrawn: totalWithdrawnUSD * (forexRate - 0.4),
                     total_withdrawn_usd: totalWithdrawnUSD,
                     total_investment: balanceUSD * forexRate,
                     total_investment_usd: balanceUSD,
-                    totalEquity: totalAssetsUSD,
+                    totalEquity: balanceUSD + profitUSD,
                     balanceUSD: balanceUSD,
                     profit_rm: profitUSD * forexRate,
                     profit_usd: profitUSD,
                     lifetime_dividends_usd: lifetimeDividendsUSD,
-                    accumulated_dividend_rm: lifetimeDividendsUSD * forexRate
+                    accumulated_dividend_rm: lifetimeDividendsUSD * forexRate // Accumulated is historical gross
                 };
 
                 setUserProfile(fullProfile);

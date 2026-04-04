@@ -87,7 +87,6 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
         const amountUSD = parseFloat(withdrawAmount);
         if (!amountUSD || amountUSD <= 0) return;
         
-        const amountRM = amountUSD * withdrawalRate;
         const totalAssetsUSD = Number(user?.total_assets_usd || 0);
 
         if (amountUSD > (totalAssetsUSD + 0.01)) {
@@ -95,30 +94,26 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             return;
         }
 
-        const lockedCapitalUSD = user?.locked_capital_usd || 0;
-        const profitUSD = Number(user?.profit_usd || user?.profit || 0); // profit is now USD-primary
-        const currentBalanceUSD = Number(user?.balance_usd || 0);
-        const maturedCapitalUSD = Math.max(0, currentBalanceUSD - lockedCapitalUSD);
-        const userWithdrawableUSD = profitUSD + maturedCapitalUSD;
+        const matureCapitalUSD = Number(user?.mature_capital_usd || 0);
+        const dividendWithdrawableUSD = Number(user?.dividend_withdrawable_usd || 0);
+        const totalLiquidWithdrawableUSD = matureCapitalUSD + dividendWithdrawableUSD;
         
-        let lockedPortionUSD = 0;
-        if (amountUSD > userWithdrawableUSD) {
-            // Check for total withdrawal using USD to avoid rate issues
+        // If they want to withdraw more than is liquid (mature + profit), they must withdraw EVERYTHING (Locked Withdrawal)
+        if (amountUSD > totalLiquidWithdrawableUSD) {
             const isTotalWithdrawal = amountUSD >= (totalAssetsUSD - 0.01);
             if (!isTotalWithdrawal) {
                 alert(lang === 'zh' ? "不允许部分提取锁定资金。要提取锁定资金，您必须提取全部余额。" : "Partial withdrawal of locked capital is not permitted. To withdraw from your locked capital, you must withdraw your entire balance.");
                 return;
             }
-            lockedPortionUSD = amountUSD - userWithdrawableUSD;
-        }
-
-        if (lockedPortionUSD > 0) {
+            // Entire balance withdrawal triggers 40% penalty on the locked portion
+            const lockedPortionUSD = amountUSD - totalLiquidWithdrawableUSD;
             const penaltyUSD = lockedPortionUSD * 0.4;
             const finalPayoutUSD = amountUSD - penaltyUSD;
+            
             setPenaltyInfo({
-                penalty: penaltyUSD * withdrawalRate,
-                payout: finalPayoutUSD * withdrawalRate,
-                lockedPortion: lockedPortionUSD * withdrawalRate,
+                penalty: penaltyUSD * (withdrawalRate - 0.4),
+                payout: finalPayoutUSD * (withdrawalRate - 0.4),
+                lockedPortion: lockedPortionUSD * (withdrawalRate - 0.4),
                 penalty_usd: penaltyUSD,
                 payout_usd: finalPayoutUSD,
                 lockedPortion_usd: lockedPortionUSD,
@@ -126,9 +121,10 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             });
             setShowPenaltyConfirm(true);
         } else {
+            // Standard withdrawal from liquid funds (Profit or Mature Capital)
             setPenaltyInfo({
                 penalty: 0,
-                payout: amountUSD * withdrawalRate,
+                payout: amountUSD * (withdrawalRate - 0.4),
                 lockedPortion: 0,
                 penalty_usd: 0,
                 payout_usd: amountUSD,
@@ -148,7 +144,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
         try {
             const { data: p, error: pinError } = await supabase
                 .from('profiles')
-                .select('security_pin')
+                .select('security_pin, balance_usd, profit')
                 .eq('id', user.id)
                 .single();
             
@@ -157,14 +153,42 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 throw new Error("Invalid security PIN.");
             }
 
-            const refId = `WDL-${Math.floor(100000 + Math.random() * 900000)}`;
             const amountUSD = parseFloat(withdrawAmount);
-            const amountRM = amountUSD * withdrawalRate;
+            const initialProfitUSD = Number(p.profit || 0);
+            const initialBalanceUSD = Number(p.balance_usd || 0);
+
+            // 1. Calculate Deductions (Profit first, then Balance)
+            let newProfitUSD = initialProfitUSD;
+            let newBalanceUSD = initialBalanceUSD;
+            let remainingUSD = amountUSD;
+
+            if (remainingUSD <= newProfitUSD) {
+                newProfitUSD -= remainingUSD;
+                remainingUSD = 0;
+            } else {
+                remainingUSD -= newProfitUSD;
+                newProfitUSD = 0;
+                newBalanceUSD = Math.max(0, newBalanceUSD - remainingUSD);
+            }
+
+            // 2. Perform Single Submission Deduction
+            const { error: profileUpdateError } = await supabase
+                .from('profiles')
+                .update({ 
+                    balance: 0, // Cleanup legacy RM balance
+                    profit: newProfitUSD,
+                    balance_usd: newBalanceUSD
+                })
+                .eq('id', user.id);
             
+            if (profileUpdateError) throw profileUpdateError;
+
+            // 3. Insert Withdrawal Transaction (NEGATIVE amount)
+            const refId = `WDL-${Math.floor(100000 + Math.random() * 900000)}`;
             const { error } = await supabase.from('transactions').insert([{
                 user_id: user.id,
                 type: 'Withdrawal',
-                amount: Math.abs(amountUSD), // Record USD value primary truth
+                amount: -Math.abs(amountUSD), // ENSURE NEGATIVE SIGN FOR WITHDRAWAL
                 status: 'Pending',
                 ref_id: refId,
                 original_currency_amount: amountUSD,
@@ -174,6 +198,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                     forex_rate: withdrawalRate,
                     expected_payout: penaltyInfo?.payout,
                     original_usd_payout: penaltyInfo?.payout_usd,
+                    locked_withdrawal: penaltyInfo?.isApplied,
                     ...(penaltyInfo?.isApplied ? {
                         penalty_applied: true,
                         penalty_amount: penaltyInfo.penalty,
@@ -251,16 +276,21 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 </div>
                                 {withdrawAmount && (
                                     <p className="px-1 text-[11px] font-black text-gv-gold uppercase tracking-tighter">
-                                        ≈ RM {(parseFloat(withdrawAmount) * withdrawalRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        ≈ RM {(parseFloat(withdrawAmount) * (withdrawalRate - 0.4)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </p>
                                 )}
                             </div>
 
-                            <div className="flex items-center justify-between p-6 bg-gray-50 rounded-3xl border border-gray-200">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t.withdrawable}</span>
-                                <div className="text-right">
-                                    <p className="text-lg font-black text-emerald-500 tabular-nums">$ {(user?.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">≈ RM {(user?.withdrawable_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="p-6 bg-emerald-50/50 rounded-3xl border border-emerald-500/10">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60 block mb-1">Available Dividend</span>
+                                    <p className="text-xl font-black text-emerald-600 tabular-nums">$ {(user?.dividend_withdrawable_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                    <p className="text-[9px] font-bold text-emerald-600/40 uppercase tracking-tighter">≈ RM {(user?.dividend_withdrawable_rm || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                </div>
+                                <div className="p-6 bg-blue-50/50 rounded-3xl border border-blue-500/10">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-blue-600/60 block mb-1">Withdrawable Capital</span>
+                                    <p className="text-xl font-black text-blue-600 tabular-nums">$ {(user?.mature_capital_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                    <p className="text-[9px] font-bold text-blue-600/40 uppercase tracking-tighter">≈ RM {(user?.mature_capital_rm || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                 </div>
                             </div>
 
