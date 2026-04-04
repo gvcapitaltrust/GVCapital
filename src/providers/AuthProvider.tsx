@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import { supabase, MASTER_ADMIN_EMAIL } from "@/lib/supabaseClient";
 import { useRouter, usePathname } from "next/navigation";
+import { generateUUID, safeStorage } from "@/lib/authUtils";
 
 interface AuthContextType {
     user: any;
@@ -43,10 +44,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // 0. Device ID Management
     useEffect(() => {
         if (typeof window !== "undefined") {
-            let id = localStorage.getItem("gv_device_session_id");
+            let id = safeStorage.getItem("gv_device_session_id");
             if (!id) {
-                id = crypto.randomUUID();
-                localStorage.setItem("gv_device_session_id", id);
+                id = generateUUID();
+                safeStorage.setItem("gv_device_session_id", id);
             }
             setDeviceId(id);
         }

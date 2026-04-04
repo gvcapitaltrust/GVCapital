@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
+import { generateUUID, safeStorage } from "@/lib/authUtils";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -291,10 +292,10 @@ export default function RegisterPage() {
                 // Device ID Management for single-session enforcement
                 let deviceId = null;
                 if (typeof window !== "undefined") {
-                    deviceId = localStorage.getItem("gv_device_session_id");
+                    deviceId = safeStorage.getItem("gv_device_session_id");
                     if (!deviceId) {
-                        deviceId = crypto.randomUUID();
-                        localStorage.setItem("gv_device_session_id", deviceId);
+                        deviceId = generateUUID();
+                        safeStorage.setItem("gv_device_session_id", deviceId);
                     }
                 }
 

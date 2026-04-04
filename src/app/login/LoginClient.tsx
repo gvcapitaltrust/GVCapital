@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
 import { useSettings } from "@/providers/SettingsProvider";
+import { generateUUID, safeStorage } from "@/lib/authUtils";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -113,10 +114,10 @@ export default function LoginPage() {
 
             if (data.session) {
                 // Device ID Management for multi-session enforcement (Limit 2)
-                let deviceId = localStorage.getItem("gv_device_session_id");
+                let deviceId = safeStorage.getItem("gv_device_session_id");
                 if (!deviceId) {
-                    deviceId = crypto.randomUUID();
-                    localStorage.setItem("gv_device_session_id", deviceId);
+                    deviceId = generateUUID();
+                    safeStorage.setItem("gv_device_session_id", deviceId);
                 }
 
                 // Fetch current active sessions to update the list
