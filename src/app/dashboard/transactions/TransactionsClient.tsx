@@ -247,7 +247,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                 )}
                                                                 <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2 gap-4">
                                                                     <span className="text-emerald-500 uppercase whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : 'Final Payout (Net)'}</span>
-                                                                    <span className="text-emerald-500 underline decoration-gv-gold tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || tx.metadata?.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                    <span className="text-emerald-500 underline decoration-gv-gold tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                                 {tx.metadata?.remark && (
                                                                     <div className="mt-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
@@ -291,7 +291,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                         <div className="h-2 w-2 rounded-full bg-emerald-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
                                                                         <div className="flex flex-col">
                                                                             <span className="text-[10px] font-black text-emerald-500 uppercase">Successful</span>
-                                                                            <span className="text-[9px] text-gray-500 font-bold">{formatDateTime(tx.metadata?.approved_at || tx.updated_at || tx.created_at)}</span>
+                                                                            <span className="text-[9px] text-gray-500 font-bold">{formatDateTime(tx.metadata?.approved_at || (tx.status === 'Completed' ? tx.updated_at : null))}</span>
                                                                         </div>
                                                                     </div>
                                                                 )}

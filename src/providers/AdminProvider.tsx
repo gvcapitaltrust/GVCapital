@@ -264,7 +264,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     ...tx.metadata,
                     processed_by_name: authUser?.user_metadata?.full_name || "Admin",
                     processed_by_id: authUser?.id,
-                    processed_by_email: authUser?.email
+                    processed_by_email: authUser?.email,
+                    approved_at: new Date().toISOString()
                 }
             }).eq('id', tx.id);
             
@@ -286,7 +287,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         processed_by_name: authUser?.user_metadata?.full_name || "Admin",
                         processed_by_id: authUser?.id,
                         processed_by_email: authUser?.email,
-                        reason: "Policy violation or invalid receipt"
+                        reason: "Policy violation or invalid receipt",
+                        approved_at: new Date().toISOString()
                     }
                 })
                 .eq('id', tx.id);
