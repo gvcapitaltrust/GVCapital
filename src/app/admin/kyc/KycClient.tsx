@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useAdmin } from "@/providers/AdminProvider";
 import { supabase } from "@/lib/supabaseClient";
+import { formatDate } from "@/lib/dateUtils";
 
 export default function KycClient({ lang }: { lang: "en" | "zh" }) {
     const { kycQueue, loading, handleApproveKyc, handleRejectKyc } = useAdmin();
@@ -116,7 +117,7 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                             <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">@{user.username}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6 text-gray-400 font-mono text-xs">{new Date(user.created_at).toLocaleDateString()}</td>
+                                    <td className="px-8 py-6 text-gray-400 font-mono text-xs">{formatDate(user.created_at)}</td>
                                     <td className="px-8 py-6">
                                         <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${
                                             user.kyc_status === 'Draft' 

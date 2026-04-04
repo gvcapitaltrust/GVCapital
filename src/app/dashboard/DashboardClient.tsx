@@ -17,6 +17,7 @@ import { TIERS, getTierByAmount, formatUSD } from "@/lib/tierUtils";
 import TierMedal from "@/components/TierMedal";
 import MobileSideMenu from "@/components/MobileSideMenu";
 import { MASTER_ADMIN_EMAIL } from "@/lib/supabaseClient";
+import { formatDate, formatDateTime } from "@/lib/dateUtils";
 
 export default function DashboardClient() {
     const { user: authUser, role: authRole, isVerified: authVerified, refresh: refreshAuth, loading: authLoading } = useAuth();
@@ -461,7 +462,7 @@ export default function DashboardClient() {
         const targetYear = y !== undefined ? y : selectedYear;
 
         const dateObj = new Date(targetYear, targetMonth);
-        const statementDate = new Date().toLocaleDateString('en-MY', { year: 'numeric', month: 'long', day: 'numeric' });
+        const statementDate = formatDate(new Date());
         const monthName = dateObj.toLocaleString('en-MY', { month: 'long' });
 
         doc.setFillColor(15, 23, 42);
@@ -1234,7 +1235,7 @@ export default function DashboardClient() {
                                                             className="w-full bg-gv-gold rounded-t-xl transition-all duration-500 group-hover:brightness-125"
                                                             style={{ height: `${Math.max(10, (div.amount / (Math.max(...dividendHistory.map((d: any) => d.amount)) || 1)) * 100)}%` }}
                                                         ></div>
-                                                        <span className="text-[8px] font-black text-gray-500 uppercase tracking-tighter">{new Date(div.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
+                                                        <span className="text-[8px] font-black text-gray-500 uppercase tracking-tighter">{formatDate(div.created_at)}</span>
                                                     </div>
                                                 )) : (
                                                     <div className="w-full h-full flex items-center justify-center text-gray-400 font-black uppercase tracking-widest text-xs">{t.noDividendData}</div>
@@ -1378,7 +1379,7 @@ export default function DashboardClient() {
                                                         </div>
                                                     </td>
                                                     <td className="px-8 py-6 text-gray-400 font-mono text-xs">
-                                                        {new Date(ref.created_at).toLocaleDateString()}
+                                                        {formatDate(ref.created_at)}
                                                     </td>
                                                     <td className="px-8 py-6">
                                                         <span className="text-gv-gold uppercase text-[10px] tracking-widest font-black">

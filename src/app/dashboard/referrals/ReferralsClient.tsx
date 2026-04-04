@@ -5,6 +5,7 @@ import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { getTierByAmount } from "@/lib/tierUtils";
 import { X } from "lucide-react";
+import { formatDate } from "@/lib/dateUtils";
 
 export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, referredUsers, referredCount, loading } = useUser();
@@ -113,7 +114,7 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-400 font-mono text-xs">{new Date(ref.created_at).toLocaleDateString()}</td>
+                                        <td className="px-6 py-4 text-gray-400 font-mono text-xs">{formatDate(ref.created_at)}</td>
                                         <td className="px-6 py-4">
                                                 {ref.tier && ref.tier !== "Standard" 
                                                     ? ref.tier 

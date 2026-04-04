@@ -5,6 +5,7 @@ import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { formatDate, formatDateTime } from "@/lib/dateUtils";
 
 export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, transactions, dividendHistory, loading } = useUser();
@@ -93,7 +94,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         doc.setFontSize(10);
         doc.text(`Account Holder: ${user.full_name || user.username}`, 20, 50);
         doc.text(`Statement Period: ${monthName} ${selectedYear}`, 20, 55);
-        doc.text(`Date Generated: ${new Date().toLocaleDateString()}`, 20, 60);
+        doc.text(`Date Generated: ${formatDateTime(new Date())}`, 20, 60);
 
         // Data processing
         const periodTxs = transactions.filter(tx => {
@@ -138,7 +139,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             startY: (doc as any).lastAutoTable.finalY + 15,
             head: [['Date', 'Ref ID', 'Type', 'Status', 'Amount (USD)']],
             body: periodTxs.map(tx => [
-                new Date(tx.created_at || tx.transfer_date).toLocaleDateString(),
+                formatDate(tx.created_at || tx.transfer_date),
                 tx.ref_id || "-",
                 tx.metadata?.description || tx.type,
                 tx.status,
@@ -197,7 +198,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                             onClick={() => setExpandedId(expandedId === tx.id ? null : tx.id)}
                                             className="text-sm font-medium group hover:bg-gray-50 transition-colors border-t border-gray-100 cursor-pointer"
                                         >
-                                            <td className="px-6 py-4 text-gray-500 font-mono text-xs">{new Date(tx.created_at || tx.transfer_date).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4 text-gray-500 font-mono text-xs">{formatDate(tx.created_at || tx.transfer_date)}</td>
                                             <td className="px-6 py-4 text-gray-400 font-mono text-[11px] opacity-70">{tx.ref_id || "-"}</td>
                                             <td className="px-6 py-4 uppercase tracking-widest text-[10px] font-bold text-gray-900">
                                                 <div className="flex items-center gap-2">
@@ -273,7 +274,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                     <div className="h-2 w-2 rounded-full bg-zinc-500 absolute left-[3.5px]"></div>
                                                                     <div className="flex flex-col">
                                                                         <span className="text-[10px] font-black text-gray-900 uppercase">Submitted</span>
-                                                                        <span className="text-[9px] text-gray-500 font-bold">{new Date(tx.created_at).toLocaleString()}</span>
+                                                                        <span className="text-[9px] text-gray-500 font-bold">{formatDateTime(tx.created_at)}</span>
                                                                     </div>
                                                                 </div>
                                                                 {tx.metadata?.approved_at && (
@@ -281,7 +282,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                         <div className="h-2 w-2 rounded-full bg-blue-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
                                                                         <div className="flex flex-col">
                                                                             <span className="text-[10px] font-black text-blue-400 uppercase">Accepted by {tx.metadata?.processed_by_name || 'Admin'}</span>
-                                                                            <span className="text-[9px] text-gray-500 font-bold">{new Date(tx.metadata.approved_at).toLocaleString()}</span>
+                                                                            <span className="text-[9px] text-gray-500 font-bold">{formatDateTime(tx.metadata.approved_at)}</span>
                                                                         </div>
                                                                     </div>
                                                                 )}
@@ -290,7 +291,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                         <div className="h-2 w-2 rounded-full bg-emerald-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
                                                                         <div className="flex flex-col">
                                                                             <span className="text-[10px] font-black text-emerald-500 uppercase">Successful</span>
-                                                                            <span className="text-[9px] text-gray-500 font-bold">{new Date(tx.metadata?.approved_at || tx.updated_at || tx.created_at).toLocaleString()}</span>
+                                                                            <span className="text-[9px] text-gray-500 font-bold">{formatDateTime(tx.metadata?.approved_at || tx.updated_at || tx.created_at)}</span>
                                                                         </div>
                                                                     </div>
                                                                 )}

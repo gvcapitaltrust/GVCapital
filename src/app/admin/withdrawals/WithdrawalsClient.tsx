@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useAdmin } from "@/providers/AdminProvider";
 import { useSettings } from "@/providers/SettingsProvider";
+import { formatDate } from "@/lib/dateUtils";
 
 export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
     const { withdrawals, loading, handleApproveWithdrawal, handleCompleteWithdrawal, handleRejectWithdrawal } = useAdmin();
@@ -143,7 +144,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                             <span className="font-black text-emerald-500 tabular-nums text-xs whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-1.5 text-gray-400 font-mono text-[10px] whitespace-nowrap">{new Date(tx.created_at).toLocaleDateString()}</td>
+                                    <td className="px-4 py-1.5 text-gray-400 font-mono text-[10px] whitespace-nowrap">{formatDate(tx.created_at)}</td>
                                     <td className="px-4 py-1.5 align-middle">
                                         <span className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest whitespace-nowrap ${
                                             tx.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500' :
