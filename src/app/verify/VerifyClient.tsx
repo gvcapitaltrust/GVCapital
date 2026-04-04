@@ -71,6 +71,25 @@ export default function VerifyPage() {
             accHolder: "Account Holder Name",
             bankStatement: "Bank Statement",
             uploadStatement: "Upload Bank Statement (PDF/Image)",
+            malaysianBanks: [
+                "Maybank (Malayan Banking)",
+                "CIMB Bank",
+                "Public Bank",
+                "RHB Bank",
+                "Hong Leong Bank",
+                "AmBank",
+                "UOB Malaysia",
+                "OCBC Bank Malaysia",
+                "HSBC Bank Malaysia",
+                "Standard Chartered Malaysia",
+                "Alliance Bank",
+                "Affin Bank",
+                "Bank Islam Malaysia",
+                "Bank Muamalat",
+                "Bank Rakyat",
+                "Bank Simpanan Nasional (BSN)",
+                "Other"
+            ],
             footerNote: "By providing your identity document, you authorize GV Capital Trust to perform security and compliance screenings in accordance with global AML/KYC regulations."
         },
         zh: {
@@ -132,6 +151,25 @@ export default function VerifyPage() {
             accHolder: "账户持有人姓名",
             bankStatement: "银行账单",
             uploadStatement: "上传银行账单 (PDF/图片)",
+            malaysianBanks: [
+                "Maybank (马来亚银行)",
+                "CIMB Bank (联昌银行)",
+                "Public Bank (大众银行)",
+                "RHB Bank (兴业银行)",
+                "Hong Leong Bank (丰隆银行)",
+                "AmBank (大马银行)",
+                "UOB Malaysia (大华银行)",
+                "OCBC Bank Malaysia (华侨银行)",
+                "HSBC Bank Malaysia (汇丰银行)",
+                "Standard Chartered Malaysia (渣打银行)",
+                "Alliance Bank (安联银行)",
+                "Affin Bank (艾芬银行)",
+                "Bank Islam Malaysia (马来西亚伊斯兰银行)",
+                "Bank Muamalat",
+                "Bank Rakyat",
+                "Bank Simpanan Nasional (BSN)",
+                "其他 (Other)"
+            ],
             footerNote: "通过提供您的身份证件，您授权 GV 资本信托根据全球 AML/KYC 法规进行安全和合规筛选。"
         }
     };
@@ -672,7 +710,16 @@ export default function VerifyPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t.bankName}</label>
-                                        <input type="text" value={formData.bank_name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, bank_name: e.target.value})} className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all" placeholder="e.g. Maybank, CIMB" />
+                                        <select 
+                                            value={formData.bank_name} 
+                                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({...formData, bank_name: e.target.value})} 
+                                            className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 focus:ring-1 focus:ring-gv-gold/20 transition-all"
+                                        >
+                                            <option value="">Select your bank</option>
+                                            {t.malaysianBanks.map((bank: string) => (
+                                                <option key={bank} value={bank}>{bank}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t.accNumber}</label>

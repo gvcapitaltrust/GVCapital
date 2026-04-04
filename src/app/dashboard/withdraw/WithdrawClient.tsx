@@ -37,7 +37,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
     const t = {
         en: {
             title: "Request Withdrawal",
-            desc: "Withdraw capital or dividends from your account. Processed within 24-48 business hours.",
+            desc: "Withdraw capital or dividends from your account. Processed within 3 working days.",
             amount: "Amount (USD)",
             withdrawable: "Withdrawable",
             securityPin: "Security PIN",
@@ -45,7 +45,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             submit: "Authorize Withdrawal",
             back: "Back to Dashboard",
             success: "Submission Successful",
-            successDesc: "Your withdrawal request has been received and is being processed by our finance team.",
+            successDesc: "Your withdrawal request will be reviewed and processed within 3 working days.",
             ref: "Reference ID",
             penaltyTitle: "Penalty Confirmation",
             penaltyDesc: "Your withdrawal includes capital protected by our lock-in period.",
@@ -60,7 +60,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
         },
         zh: {
             title: "申请提款",
-            desc: "从您的账户中提取本金或分红。处理时间为 24-48 个工作小时。",
+            desc: "从您的账户中提取本金或分红。处理时间为 3 个工作日。",
             amount: "金额 (USD)",
             withdrawable: "可提款余额",
             securityPin: "安全密码",
@@ -68,7 +68,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             submit: "授权提款",
             back: "返回仪表板",
             success: "提交成功",
-            successDesc: "您的提款请求已收到，财务团队正在处理中。",
+            successDesc: "您的提款请求将在 3 个工作日内审核并处理。",
             ref: "参考编号",
             penaltyTitle: "违约金确认",
             penaltyDesc: "您的提款包含受锁定期保护的资金。",
@@ -276,7 +276,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                     />
                                 </div>
                                 {withdrawAmount && (
-                                    <p className="px-1 text-[11px] font-black text-gv-gold uppercase tracking-tighter">
+                                    <p className="px-1 text-[11px] font-black text-gv-gold/0 uppercase tracking-tighter h-0 overflow-hidden">
                                         ≈ RM {(parseFloat(withdrawAmount) * (withdrawalRate - 0.4)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </p>
                                 )}
@@ -286,12 +286,10 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 <div className="p-6 bg-emerald-50/50 rounded-3xl border border-emerald-500/10">
                                     <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60 block mb-1">Available Dividend</span>
                                     <p className="text-xl font-black text-emerald-600 tabular-nums">$ {(user?.dividend_withdrawable_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                                    <p className="text-[9px] font-bold text-emerald-600/40 uppercase tracking-tighter">≈ RM {(user?.dividend_withdrawable_rm || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                 </div>
                                 <div className="p-6 bg-blue-50/50 rounded-3xl border border-blue-500/10">
                                     <span className="text-[9px] font-black uppercase tracking-widest text-blue-600/60 block mb-1">Withdrawable Capital</span>
                                     <p className="text-xl font-black text-blue-600 tabular-nums">$ {(user?.mature_capital_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                                    <p className="text-[9px] font-bold text-blue-600/40 uppercase tracking-tighter">≈ RM {(user?.mature_capital_rm || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                 </div>
                             </div>
 
