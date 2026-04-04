@@ -31,7 +31,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             completeProfile: "Complete Your Profile",
             completeProfileDesc: "To start investing and earn monthly dividends, please complete your identification process.",
             totalEquity: "Total Investment",
-            totalProfit: "Total Dividends",
+            totalProfit: "Accumulated Dividend",
             investmentNote: "Net Flow (Deposits - Withdrawals)",
             dividendNote: "Including Bonuses",
             startVerification: "Start Verification",
@@ -81,7 +81,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             completeProfile: "完善您的资料",
             completeProfileDesc: "要开始投资并赚取每月分红，请完成您的身份识别流程。",
             totalEquity: "总投资额",
-            totalProfit: "总分红额",
+            totalProfit: "累计分红",
             investmentNote: "净流量 (存款 - 提款)",
             dividendNote: "包括奖金",
             startVerification: "开始验证",
@@ -116,7 +116,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             docSubmitted: "文档已接收",
             docSubmittedDesc: "您的验证请求已更新。我们的团队将在 24-48 小时内进行审核。",
             totalWithdraw: "总提款额",
-            walletBalance: "钱包余额",
+            walletBalance: "可用分红",
             lifetimeDeposit: "累计充值",
             totalPrincipal: "总本金",
             member: "会员",
@@ -247,7 +247,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
                                     <h2 className="text-4xl font-black tracking-tighter text-emerald-600 tabular-nums whitespace-nowrap">$ {(user?.lifetime_dividends_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                                     <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{lang === 'en' ? 'Dividend Wallet' : t.walletBalance}</span>
+                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{lang === 'en' ? 'Available Dividend' : t.walletBalance}</span>
                                         <span className="text-xs font-black text-gv-gold tabular-nums">$ {(user?.profit_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </div>
                                 </div>
