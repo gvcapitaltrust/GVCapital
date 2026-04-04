@@ -194,6 +194,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 original_currency_amount: amountUSD,
                 original_currency: 'USD',
                 metadata: {
+                    description: "Withdrawal",
                     original_usd_amount: withdrawAmount,
                     forex_rate: withdrawalRate,
                     expected_payout: penaltyInfo?.payout,

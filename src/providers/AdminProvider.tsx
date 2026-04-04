@@ -371,7 +371,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     amount: -Math.abs(Number(withdrawAmountUSD)), // Keep Gross amount in USD
                     metadata: {
                         ...tx.metadata,
-                        description: penaltyApplied ? "Capital Withdrawal (Penalized)" : "Capital Withdrawal",
+                        description: "Withdrawal",
                         penalty_applied: penaltyApplied,
                         penalty_amount: penaltyUSD * (forexRate - 0.4), // RM value for audit
                         penalty_amount_usd: penaltyUSD,
