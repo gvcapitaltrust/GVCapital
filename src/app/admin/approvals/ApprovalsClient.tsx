@@ -12,6 +12,7 @@ export default function ApprovalsClient() {
     const [isLoading, setIsLoading] = useState(true);
     const [distributing, setDistributing] = useState(false);
     const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
+    const [expandedId, setExpandedId] = useState<string | null>(null);
     const { forexRate } = useSettings();
 
     useEffect(() => {
@@ -160,72 +161,73 @@ export default function ApprovalsClient() {
     }
 
     return (
-        <div className="min-h-screen bg-white text-gray-700 font-sans p-8">
-            <header className="max-w-7xl mx-auto mb-12 flex justify-between items-end">
+        <div className="min-h-screen bg-white text-gray-700 font-sans p-4 md:p-8">
+            <header className="max-w-7xl mx-auto mb-8 md:mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
-                    <Link href="/admin" className="text-gray-500 hover:text-gray-900 transition-colors text-xs font-black uppercase tracking-widest mb-4 inline-block">← Back to Master Control</Link>
-                    <h1 className="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter">Approval Center</h1>
-                    <p className="text-gv-gold text-[10px] font-black tracking-widest uppercase mt-1">Manage pending deposits & dividend payouts</p>
+                    <Link href="/admin" className="text-gray-500 hover:text-gray-900 transition-colors text-[9px] md:text-xs font-black uppercase tracking-widest mb-4 inline-block">← Back to Master Control</Link>
+                    <h1 className="text-2xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter">Approval Center</h1>
+                    <p className="text-gv-gold text-[8px] md:text-[10px] font-black tracking-widest uppercase mt-1">Manage pending deposits & dividend payouts</p>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                     <button
                         onClick={handleDistributeDividends}
                         disabled={distributing}
-                        className="bg-emerald-500 hover:bg-emerald-600 text-black font-black px-8 py-4 rounded-2xl flex items-center gap-3 uppercase tracking-widest text-xs transition-all shadow-xl active:scale-95 disabled:opacity-50"
+                        className="bg-emerald-500 hover:bg-emerald-600 text-black font-black px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl flex items-center justify-center gap-3 uppercase tracking-widest text-[9px] md:text-xs transition-all shadow-xl active:scale-95 disabled:opacity-50"
                     >
                         {distributing ? "Distributing..." : "Distribute 1% Monthly Dividends"}
                     </button>
-                    <button onClick={fetchPending} className="bg-white border border-gray-200 hover:bg-gray-100 text-gray-900 font-black px-6 py-4 rounded-2xl uppercase tracking-widest text-xs transition-all">Refresh</button>
+                    <button onClick={fetchPending} className="bg-white border border-gray-200 hover:bg-gray-100 text-gray-900 font-black px-6 py-3 md:py-4 rounded-xl md:rounded-2xl uppercase tracking-widest text-[9px] md:text-xs transition-all">Refresh</button>
                 </div>
             </header>
 
             <main className="max-w-7xl mx-auto">
-                <div className="bg-white border border-gray-200 rounded-[40px] overflow-hidden shadow-2xl">
-                    <div className="p-8 border-b border-gray-200 flex items-center justify-between">
-                        <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">Pending Deposit Review</h2>
-                        <span className="bg-gv-gold/10 text-gv-gold px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-gv-gold/20">{pendingDeposits.length} Pending</span>
+                <div className="bg-white border border-gray-200 rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl">
+                    <div className="p-6 md:p-8 border-b border-gray-200 flex items-center justify-between">
+                        <h2 className="text-lg md:text-xl font-black text-gray-900 uppercase tracking-tight">Pending Deposit Review</h2>
+                        <span className="bg-gv-gold/10 text-gv-gold px-3 md:px-4 py-1 rounded-full text-[8px] md:text-[10px] font-black uppercase tracking-widest border border-gv-gold/20">{pendingDeposits.length} Pending</span>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200">
+                    <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
+                        {/* Desktop View (Table) */}
+                        <table className="w-full text-left border-collapse hidden md:table">
+                            <thead className="bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200 sticky top-0 z-10">
                                 <tr>
-                                     <th className="px-4 py-4">Client Details</th>
-                                     <th className="px-4 py-4">Reference ID</th>
-                                     <th className="px-4 py-4">Amount (USD)</th>
-                                     <th className="px-4 py-4">Status</th>
-                                     <th className="px-4 py-4">Date</th>
-                                     <th className="px-4 py-4">Receipt</th>
-                                     <th className="px-4 py-4 text-right">Action</th>
+                                     <th className="px-6 py-4">Client Details</th>
+                                     <th className="px-6 py-4">Reference ID</th>
+                                     <th className="px-6 py-4">Amount (USD)</th>
+                                     <th className="px-6 py-4">Status</th>
+                                     <th className="px-6 py-4">Date</th>
+                                     <th className="px-6 py-4">Receipt</th>
+                                     <th className="px-6 py-4 text-right">Action</th>
                                  </tr>
                              </thead>
                              <tbody className="divide-y divide-gray-100">
                                  {pendingDeposits.map((tx) => (
-                                     <tr key={tx.id} className="text-xs font-bold hover:bg-white/[0.01] transition-colors border-b border-gray-100">
-                                         <td className="px-4 py-4">
+                                     <tr key={tx.id} className="text-sm font-bold hover:bg-gray-50 transition-colors">
+                                         <td className="px-6 py-4">
                                              <div className="text-gray-900 mb-0.5 uppercase tracking-tight">{tx.profiles?.full_name || tx.profiles?.email || "Unknown"}</div>
-                                             <div className="text-[9px] text-gray-500 lowercase font-medium">{tx.profiles?.email}</div>
+                                             <div className="text-[10px] text-gray-500 lowercase font-medium">{tx.profiles?.email}</div>
                                          </td>
-                                         <td className="px-4 py-4">
+                                         <td className="px-6 py-4">
                                              <span className="font-mono text-[10px] text-gray-400">{tx.ref_id}</span>
                                          </td>
-                                          <td className="px-4 py-4 font-bold text-emerald-400">
-                                               ${(Number(tx.original_currency_amount || (Number(tx.amount || 0) / forexRate))).toFixed(2)}
+                                          <td className="px-6 py-4 font-black text-emerald-500">
+                                               ${(Number(tx.original_currency_amount || (Number(tx.amount || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                           </td>
-                                         <td className="px-4 py-4">
-                                             <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
-                                                 tx.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-500' :
-                                                 tx.status === 'Rejected' ? 'bg-red-500/20 text-red-500' :
-                                                 'bg-amber-500/20 text-amber-500'
+                                         <td className="px-6 py-4">
+                                             <span className={`px-2.5 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest ${
+                                                 tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
+                                                 tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
+                                                 'bg-amber-500/10 text-amber-500'
                                              }`}>
                                                  { (tx.status === 'Approved' || tx.status === 'Rejected') ? tx.status : 'Pending' }
                                              </span>
                                          </td>
-                                         <td className="px-4 py-4 text-gray-500 font-mono text-[10px] whitespace-nowrap">
+                                         <td className="px-6 py-4 text-gray-500 font-mono text-[10px] whitespace-nowrap">
                                              {tx.created_at ? new Date(tx.created_at).toLocaleString() : "N/A"}
                                          </td>
-                                         <td className="px-4 py-4">
+                                         <td className="px-6 py-4">
                                              <button
                                                  onClick={() => setViewingReceipt(tx.receipt_url)}
                                                  className="bg-white hover:bg-gray-100 border border-gray-200 text-[9px] font-black uppercase px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5"
@@ -234,7 +236,7 @@ export default function ApprovalsClient() {
                                                  View Slip
                                              </button>
                                          </td>
-                                         <td className="px-4 py-4 text-right">
+                                         <td className="px-6 py-4 text-right">
                                             {tx.status === 'Pending' && (
                                                 <div className="flex justify-end gap-2">
                                                     <button
@@ -252,23 +254,86 @@ export default function ApprovalsClient() {
                                                 </div>
                                             )}
                                          </td>
-                                    </tr>
-                                ))}
-                                {pendingDeposits.length === 0 && (
-                                    <tr>
-                                        <td colSpan={5} className="px-8 py-32 text-center">
-                                            <div className="flex flex-col items-center">
-                                                <div className="h-20 w-20 bg-white rounded-full flex items-center justify-center mb-6">
-                                                    <svg className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M5 13l4 4L19 7" /></svg>
-                                                </div>
-                                                <p className="text-gray-500 font-black uppercase tracking-[0.2em] text-sm">No deposits recorded</p>
-                                                <p className="text-[10px] text-gray-300 mt-2 font-black uppercase tracking-widest">No data in state</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                     </tr>
+                                 ))}
+                             </tbody>
+                         </table>
+
+                         {/* Mobile View (Grid Cards) */}
+                         <div className="md:hidden divide-y divide-gray-100">
+                             {pendingDeposits.map((tx) => {
+                                 const isExpanded = expandedId === tx.id;
+                                 const amountUSD = Number(tx.original_currency_amount || (Number(tx.amount || 0) / forexRate));
+
+                                 return (
+                                     <div key={tx.id} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
+                                         <div 
+                                             onClick={() => setExpandedId(isExpanded ? null : tx.id)}
+                                             className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors"
+                                         >
+                                             <div className="flex justify-between items-center">
+                                                 <span className="text-gray-500 font-mono text-[9px] uppercase">{tx.created_at ? new Date(tx.created_at).toLocaleDateString() : "N/A"}</span>
+                                                 <span className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${
+                                                     tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
+                                                     tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
+                                                     'bg-amber-500/10 text-amber-500'
+                                                 }`}>
+                                                     { (tx.status === 'Approved' || tx.status === 'Rejected') ? tx.status : 'Pending' }
+                                                 </span>
+                                             </div>
+                                             <div className="flex justify-between items-end">
+                                                 <div className="space-y-1">
+                                                     <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block">{tx.profiles?.full_name || tx.profiles?.email || "Unknown"}</span>
+                                                     <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none truncate w-40 block">{tx.profiles?.email}</span>
+                                                 </div>
+                                                 <div className="text-right">
+                                                     <p className="text-sm font-black text-emerald-500 tabular-nums tracking-tighter">
+                                                         $ {amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                     </p>
+                                                 </div>
+                                             </div>
+                                         </div>
+
+                                         {isExpanded && (
+                                             <div className="bg-gray-50 px-6 py-6 space-y-6 border-t border-gray-100 animate-in fade-in duration-300">
+                                                 <div className="flex flex-col gap-1">
+                                                     <span className="text-[8px] font-black uppercase text-gray-400 tracking-[0.1em]">Reference ID</span>
+                                                     <span className="text-[10px] font-mono font-bold text-gray-600 tracking-tight">{tx.ref_id || "-"}</span>
+                                                 </div>
+                                                 
+                                                 <div className="flex flex-col gap-3">
+                                                     <button
+                                                         onClick={() => setViewingReceipt(tx.receipt_url)}
+                                                         className="w-full bg-white border border-gray-200 text-[10px] font-black uppercase tracking-widest py-3 rounded-xl flex items-center justify-center gap-2"
+                                                     >
+                                                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                         View Bank Receipt
+                                                     </button>
+                                                     
+                                                     {tx.status === 'Pending' && (
+                                                         <div className="grid grid-cols-2 gap-3">
+                                                             <button onClick={() => handleReject(tx)} className="bg-white border border-red-500/20 text-red-500 text-[10px] font-black uppercase py-3 rounded-xl">Reject</button>
+                                                             <button onClick={() => handleApprove(tx)} className="bg-gv-gold text-black text-[10px] font-black uppercase py-3 rounded-xl shadow-lg shadow-gv-gold/20">Approve</button>
+                                                         </div>
+                                                     )}
+                                                 </div>
+                                             </div>
+                                         )}
+                                     </div>
+                                 );
+                             })}
+                         </div>
+
+                         {pendingDeposits.length === 0 && (
+                             <div className="p-20 text-center">
+                                 <div className="flex flex-col items-center">
+                                     <div className="h-16 md:h-20 w-16 md:w-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                                         <svg className="h-8 md:h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M5 13l4 4L19 7" /></svg>
+                                     </div>
+                                     <p className="text-gray-400 font-black uppercase tracking-[0.2em] text-xs">No pending deposits</p>
+                                 </div>
+                             </div>
+                         )}
                     </div>
                 </div>
             </main>

@@ -105,53 +105,85 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
             </div>
 
             <div className="bg-white backdrop-blur-md rounded-3xl border border-gray-200 overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-white border-b border-gray-200 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-400">
+                <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
+                    {/* Desktop View (Table) */}
+                    <table className="w-full text-left min-w-[800px] hidden md:table">
+                        <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400 sticky top-0 z-10 backdrop-blur-md">
                             <tr>
-                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableUser}</th>
-                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableAmount}</th>
-                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableDate}</th>
-                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableStatus}</th>
-                                <th className="px-4 py-4 md:px-8 md:py-6 text-right">{t.tableActions}</th>
+                                <th className="px-8 py-6">{t.tableUser}</th>
+                                <th className="px-8 py-6">{t.tableAmount}</th>
+                                <th className="px-8 py-6">{t.tableDate}</th>
+                                <th className="px-8 py-6">{t.tableStatus}</th>
+                                <th className="px-8 py-6 text-right">{t.tableActions}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {filteredDeposits.map((tx, idx) => (
-                                <tr key={idx} className="text-[11px] md:text-sm group hover:bg-gray-50 transition-all">
-                                    <td className="px-4 py-4 md:px-8 md:py-6">
+                                <tr key={idx} className="text-sm group hover:bg-gray-50 transition-all">
+                                    <td className="px-8 py-6">
                                         <div className="flex flex-col">
                                             <span className="font-black text-gray-900 uppercase tracking-tight">{tx.profiles?.full_name}</span>
-                                            <span className="text-[8px] md:text-[10px] text-gray-500 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
+                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-4 md:px-8 md:py-6">
+                                    <td className="px-8 py-6">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-emerald-400 tabular-nums text-sm md:text-lg">$ {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="font-black text-emerald-500 tabular-nums text-lg">$ {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-4 md:px-8 md:py-6 text-gray-400 font-mono text-[9px] md:text-[10px] uppercase">
+                                    <td className="px-8 py-6 text-gray-400 font-mono text-[10px] uppercase">
                                         {formatDateTime(tx.created_at)}
                                     </td>
-                                    <td className="px-4 py-4 md:px-8 md:py-6">
-                                        <span className={`px-2 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[7px] md:text-[9px] font-black uppercase tracking-widest ${
+                                    <td className="px-8 py-6">
+                                        <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${
                                             tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
                                             tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
                                             'bg-amber-500/10 text-amber-500'
                                         }`}>{tx.status}</span>
                                     </td>
-                                    <td className="px-4 py-4 md:px-8 md:py-6 text-right">
-                                        <div className="flex items-center justify-end gap-2 md:gap-3">
+                                    <td className="px-8 py-6 text-right">
+                                        <div className="flex items-center justify-end gap-3">
                                             {tx.status === 'Pending' && (
-                                                <button onClick={() => openReceipt(tx)} className="bg-white hover:bg-gray-100 text-[8px] md:text-[10px] font-black uppercase tracking-widest px-2.5 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl transition-all border border-gray-200">{t.viewReceipt}</button>
+                                                <button onClick={() => openReceipt(tx)} className="bg-white hover:bg-gray-100 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all border border-gray-200">{t.viewReceipt}</button>
                                             )}
-                                            {tx.status !== 'Pending' && <span className="text-[9px] md:text-[10px] text-gray-400 font-black uppercase italic">Processed</span>}
+                                            {tx.status !== 'Pending' && <span className="text-[10px] text-gray-400 font-black uppercase italic">Processed</span>}
                                         </div>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
+
+                    {/* Mobile View (Grid Cards) */}
+                    <div className="md:hidden divide-y divide-gray-100">
+                        {filteredDeposits.map((tx, idx) => (
+                            <div key={idx} className="px-6 py-5 space-y-4 animate-in slide-in-from-right-4 duration-300">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-500 font-mono text-[10px] uppercase">{formatDate(tx.created_at)}</span>
+                                    <span className={`px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${
+                                        tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
+                                        tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
+                                        'bg-amber-500/10 text-amber-400'
+                                    }`}>{tx.status}</span>
+                                </div>
+                                <div className="flex justify-between items-end">
+                                    <div className="space-y-1">
+                                        <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block">{tx.profiles?.full_name}</span>
+                                        <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">@{tx.profiles?.username}</span>
+                                    </div>
+                                    <div className="text-right space-y-2">
+                                        <p className="text-sm font-black text-emerald-500 tabular-nums tracking-tighter">
+                                            $ {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </p>
+                                        {tx.status === 'Pending' && (
+                                            <button onClick={() => openReceipt(tx)} className="bg-gv-gold text-black text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-lg shadow-gv-gold/20">{t.viewReceipt}</button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
                     {filteredDeposits.length === 0 && (
                         <div className="p-20 text-center text-gray-500 font-black uppercase tracking-[0.2em]">{t.noDeposits}</div>
                     )}

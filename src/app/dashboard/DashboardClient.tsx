@@ -1275,42 +1275,95 @@ export default function DashboardClient() {
                                     {t.downloadStatement}
                                 </button>
                             </div>
-                            <div className="border border-gray-200 rounded-[40px] overflow-x-auto bg-white backdrop-blur-md shadow-2xl">
-                                <table className="w-full text-left min-w-[800px]">
-                                    <thead className="bg-white border-b border-gray-200 text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">
-                                        <tr><th className="px-8 py-6">{t.date}</th><th className="px-8 py-6">{t.refId}</th><th className="px-8 py-6">{t.type}</th><th className="px-8 py-6">{t.amount}</th><th className="px-8 py-6 text-right">{t.status}</th></tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {transactions.map((tx: any, idx: number) => (
-                                            <tr key={idx} className="text-sm font-bold group hover:bg-gray-50 transition-colors">
-                                                <td className="px-8 py-6 text-gray-400">
-                                                    {new Date(tx.transfer_date || tx.created_at || tx.date).toISOString().split('T')[0]}
-                                                </td>
-                                                <td className="px-8 py-6 font-mono text-xs text-gray-900/40">{tx.ref_id || tx.ref}</td>
-                                                 <td className="px-8 py-6 uppercase tracking-widest text-[10px]">
-                                                     <div className="flex flex-col">
-                                                         <span>{tx.metadata?.description || tx.type}</span>
-                                                         {tx.metadata?.processed_by_name && (
-                                                             <span className="text-[8px] text-gray-500 font-bold lowercase tracking-tight mt-1">
-                                                                 Allocated by {tx.metadata.processed_by_name}
-                                                             </span>
-                                                         )}
-                                                     </div>
-                                                 </td>
-                                                <td className={`px-8 py-6 text-lg tracking-tighter ${Number(tx.amount) >= 0 ? "text-emerald-400" : "text-red-500"}`}>
-                                                    <div className="flex flex-col">
-                                                        <span>RM {Number(tx.amount || 0).toFixed(2)}</span>
-                                                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6 text-right"><span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' : tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>{tx.status}</span></td>
+                            <div className="bg-white border border-gray-200 rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl">
+                                <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
+                                    {/* Desktop View (Table) */}
+                                    <table className="w-full text-left hidden md:table">
+                                        <thead className="bg-white border-b border-gray-200 text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] sticky top-0 z-10">
+                                            <tr>
+                                                <th className="px-8 py-6">{t.date}</th>
+                                                <th className="px-8 py-6">{t.refId}</th>
+                                                <th className="px-8 py-6">{t.type}</th>
+                                                <th className="px-8 py-6">{t.amount}</th>
+                                                <th className="px-8 py-6 text-right">{t.status}</th>
                                             </tr>
-                                        ))}
-                                        {transactions.length === 0 && (
-                                            <tr><td colSpan={5} className="px-8 py-20 text-center text-gray-500 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
-                                        )}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            {transactions.map((tx: any, idx: number) => (
+                                                <tr key={idx} className="text-sm font-bold group hover:bg-gray-50 transition-colors">
+                                                    <td className="px-8 py-6 text-gray-400">
+                                                        {new Date(tx.transfer_date || tx.created_at || tx.date).toISOString().split('T')[0]}
+                                                    </td>
+                                                    <td className="px-8 py-6 font-mono text-xs text-gray-900/40">{tx.ref_id || tx.ref}</td>
+                                                    <td className="px-8 py-6 uppercase tracking-widest text-[10px]">
+                                                        <div className="flex flex-col">
+                                                            <span>{tx.metadata?.description || tx.type}</span>
+                                                            {tx.metadata?.processed_by_name && (
+                                                                <span className="text-[8px] text-gray-500 font-bold lowercase tracking-tight mt-1">
+                                                                    Allocated by {tx.metadata.processed_by_name}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className={`px-8 py-6 text-lg tracking-tighter ${Number(tx.amount) >= 0 ? "text-emerald-400" : "text-red-500"}`}>
+                                                        <div className="flex flex-col">
+                                                            <span>RM {Number(tx.amount || 0).toFixed(2)}</span>
+                                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">(${(Number(tx.amount || 0) / (forexRate || 4.0)).toFixed(2)})</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-8 py-6 text-right"><span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' : tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>{tx.status}</span></td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+
+                                    {/* Mobile View (Grid Cards) */}
+                                    <div className="md:hidden divide-y divide-gray-100">
+                                        {transactions.map((tx: any, idx: number) => {
+                                            const isNegative = Number(tx.amount) < 0;
+                                            const displayType = tx.metadata?.description || tx.type;
+                                            
+                                            return (
+                                                <div key={idx} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
+                                                    <div className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors">
+                                                        <div className="flex justify-between items-center">
+                                                            <span className="text-gray-400 font-mono text-[9px] uppercase">{new Date(tx.transfer_date || tx.created_at || tx.date).toLocaleDateString()}</span>
+                                                            <span className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${
+                                                                tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-400' : 
+                                                                tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' : 
+                                                                'bg-amber-500/10 text-amber-500'
+                                                            }`}>
+                                                                {tx.status}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex justify-between items-end">
+                                                            <div className="space-y-1">
+                                                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block">{displayType}</span>
+                                                                {tx.metadata?.processed_by_name && (
+                                                                    <span className="text-[8px] text-gray-400 font-bold lowercase tracking-tight block">
+                                                                        Allocated by {tx.metadata.processed_by_name}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <p className={`text-sm font-black tabular-nums tracking-tighter ${isNegative ? "text-red-500" : "text-emerald-500"}`}>
+                                                                    RM {Math.abs(Number(tx.amount || 0)).toFixed(2)}
+                                                                </p>
+                                                                <p className="text-[8px] text-gray-300 font-bold uppercase tracking-tighter">
+                                                                    (${(Math.abs(Number(tx.amount || 0)) / (forexRate || 4.0)).toFixed(2)})
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {transactions.length === 0 && (
+                                        <div className="p-20 text-center text-gray-500 font-black uppercase tracking-widest">{t.noTxFound}</div>
+                                    )}
+                                </div>
                             </div>
                         </section>
                     ) : activeTab === "referrals" ? (
@@ -1354,50 +1407,90 @@ export default function DashboardClient() {
                             {/* Referred Users List */}
                             <div className="space-y-6">
                                 <h3 className="text-xl font-black uppercase tracking-tight">{t.referredUsersList}</h3>
-                                <div className="border border-gray-200 rounded-[40px] overflow-x-auto bg-white backdrop-blur-md shadow-2xl">
-                                    <table className="w-full text-left min-w-[800px]">
-                                        <thead className="bg-white border-b border-gray-200 text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">
-                                            <tr>
-                                                <th className="px-8 py-6">{t.username}</th>
-                                                <th className="px-8 py-6">{t.registrationDate}</th>
-                                                <th className="px-8 py-6">{t.investmentTier}</th>
-                                                <th className="px-8 py-6 text-right">{t.accountStatus}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100">
-                                            {referredUsers.map((ref: any, idx: number) => (
-                                                <tr key={idx} className="text-sm font-bold group hover:bg-gray-50 transition-colors">
-                                                    <td className="px-8 py-6">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center text-xs font-black text-gv-gold">
-                                                                {ref.full_name?.[0] || 'U'}
+                                <div className="border border-gray-200 rounded-[30px] md:rounded-[40px] overflow-hidden bg-white shadow-2xl">
+                                    <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
+                                        {/* Desktop View (Table) */}
+                                        <table className="w-full text-left hidden md:table">
+                                            <thead className="bg-white border-b border-gray-200 text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] sticky top-0 z-10">
+                                                <tr>
+                                                    <th className="px-8 py-6">{t.username}</th>
+                                                    <th className="px-8 py-6">{t.registrationDate}</th>
+                                                    <th className="px-8 py-6">{t.investmentTier}</th>
+                                                    <th className="px-8 py-6 text-right">{t.accountStatus}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100">
+                                                {referredUsers.map((ref: any, idx: number) => (
+                                                    <tr key={idx} className="text-sm font-bold group hover:bg-gray-50 transition-colors">
+                                                        <td className="px-8 py-6">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center text-xs font-black text-gv-gold shadow-sm border border-gray-100">
+                                                                    {ref.full_name?.[0] || 'U'}
+                                                                </div>
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-gray-900">{ref.full_name}</span>
+                                                                    <span className="text-[10px] text-gray-500">@{ref.username}</span>
+                                                                </div>
                                                             </div>
-                                                            <div className="flex flex-col">
-                                                                <span className="text-gray-900">{ref.full_name}</span>
-                                                                <span className="text-[10px] text-gray-500">@{ref.username}</span>
+                                                        </td>
+                                                        <td className="px-8 py-6 text-gray-400 font-mono text-xs">
+                                                            {formatDate(ref.created_at)}
+                                                        </td>
+                                                        <td className="px-8 py-6">
+                                                            <span className="text-gv-gold uppercase text-[10px] tracking-widest font-black">
+                                                                {ref.balance > 0 ? getTierByAmount(ref.balance / forexRate).name : 'No Investment'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-8 py-6 text-right">
+                                                            <span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${ref.is_verified ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-500'}`}>
+                                                                {ref.is_verified ? 'Verified' : 'Unverified'}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+
+                                        {/* Mobile View (Grid Cards) */}
+                                        <div className="md:hidden divide-y divide-gray-100">
+                                            {referredUsers.map((ref: any, idx: number) => {
+                                                const tierName = ref.balance > 0 ? getTierByAmount(ref.balance / forexRate).name : 'No Investment';
+                                                
+                                                return (
+                                                    <div key={idx} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
+                                                        <div className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors">
+                                                            <div className="flex justify-between items-center">
+                                                                <span className="text-gray-400 font-mono text-[9px] uppercase">{formatDate(ref.created_at)}</span>
+                                                                <span className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${
+                                                                    ref.is_verified ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-500'
+                                                                }`}>
+                                                                    {ref.is_verified ? 'Verified' : 'Unverified'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex justify-between items-end">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="h-8 w-8 rounded-lg bg-gray-50 flex items-center justify-center text-xs font-black text-gv-gold border border-gray-100 shadow-sm shrink-0">
+                                                                        {ref.full_name?.[0] || 'U'}
+                                                                    </div>
+                                                                    <div className="flex flex-col overflow-hidden">
+                                                                        <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block truncate">{ref.full_name}</span>
+                                                                        <span className="text-[8px] text-gray-400 font-bold lowercase tracking-tight block truncate mt-1">@{ref.username}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <span className="text-[9px] font-black text-gv-gold uppercase tracking-widest block whitespace-nowrap">{tierName}</span>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </td>
-                                                    <td className="px-8 py-6 text-gray-400 font-mono text-xs">
-                                                        {formatDate(ref.created_at)}
-                                                    </td>
-                                                    <td className="px-8 py-6">
-                                                        <span className="text-gv-gold uppercase text-[10px] tracking-widest font-black">
-                                                            {ref.balance > 0 ? getTierByAmount(ref.balance / forexRate).name : 'No Investment'}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-8 py-6 text-right">
-                                                        <span className={`px-4 py-2 rounded-xl text-[9px] uppercase font-black tracking-widest ${ref.is_verified ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-500'}`}>
-                                                            {ref.is_verified ? 'Verified' : 'Unverified'}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                            {referredUsers.length === 0 && (
-                                                <tr><td colSpan={4} className="px-8 py-20 text-center text-gray-500 font-bold uppercase tracking-widest">No referrals yet</td></tr>
-                                            )}
-                                        </tbody>
-                                    </table>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {referredUsers.length === 0 && (
+                                            <div className="p-20 text-center text-gray-500 font-black uppercase tracking-widest">No referrals yet</div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </section>

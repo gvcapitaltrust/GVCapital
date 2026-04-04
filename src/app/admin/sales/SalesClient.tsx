@@ -86,9 +86,10 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Leaderboard */}
                 <div className="lg:col-span-2 overflow-hidden border border-gray-200 rounded-[40px] bg-white backdrop-blur-md shadow-2xl">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-200">
+                        {/* Desktop View (Table) */}
+                        <table className="w-full text-left hidden md:table">
+                            <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400 sticky top-0 z-10">
                                 <tr>
                                     <th className="px-8 py-6">{t.tableRank}</th>
                                     <th className="px-8 py-6">{t.tableAgent}</th>
@@ -117,17 +118,52 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
                                         <td className="px-8 py-6 font-bold text-gray-400">{agent.total_referrals} Clients</td>
                                         <td className="px-8 py-6 text-right">
                                             <div className="flex flex-col">
-                                                <span className="font-black text-emerald-400 tabular-nums">$ {(Number(agent.total_referred_capital_usd || (Number(agent.total_referred_capital || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <span className="font-black text-emerald-400 tabular-nums text-sm">$ {(Number(agent.total_referred_capital_usd || (Number(agent.total_referred_capital || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">RM {Number(agent.total_referred_capital || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                     </tr>
                                 ))}
-                                {filteredSales.length === 0 && (
-                                    <tr><td colSpan={4} className="p-20 text-center text-gray-400 font-black uppercase tracking-widest">{t.noSales}</td></tr>
-                                )}
                             </tbody>
                         </table>
+
+                        {/* Mobile View (Grid Cards) */}
+                        <div className="md:hidden divide-y divide-gray-100">
+                            {filteredSales.map((agent, index) => (
+                                <div 
+                                    key={agent.agent_username} 
+                                    className={`flex flex-col animate-in slide-in-from-right-4 duration-300 ${selectedAgent === agent.agent_username ? "bg-gv-gold/5" : "bg-white"}`}
+                                >
+                                    <div 
+                                        onClick={() => fetchAgentReferrals(agent.agent_username)}
+                                        className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors"
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-mono text-gray-400 text-[10px]">RANK #{index + 1}</span>
+                                                {index < 3 && <span className="text-sm">{index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}</span>}
+                                            </div>
+                                            <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">{agent.total_referrals} REFS</span>
+                                        </div>
+                                        <div className="flex justify-between items-end">
+                                            <div className="space-y-1">
+                                                <span className="text-[12px] font-black uppercase tracking-widest text-gray-900 leading-none">@{agent.agent_username}</span>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm font-black text-emerald-500 tabular-nums tracking-tighter">
+                                                    $ {(Number(agent.total_referred_capital_usd || (Number(agent.total_referred_capital || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </p>
+                                                <p className="text-[8px] font-bold text-gray-300 uppercase italic">Total Volume</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {filteredSales.length === 0 && (
+                            <div className="p-20 text-center text-gray-400 font-black uppercase tracking-widest">{t.noSales}</div>
+                        )}
                     </div>
                 </div>
 

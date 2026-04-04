@@ -57,10 +57,11 @@ export default function AuditClient({ lang }: { lang: "en" | "zh" }) {
                 />
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-[40px] overflow-hidden backdrop-blur-md shadow-2xl">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400">
+            <div className="bg-white border border-gray-200 rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl">
+                <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-200">
+                    {/* Desktop View (Table) */}
+                    <table className="w-full text-left hidden md:table">
+                        <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400 sticky top-0 z-10">
                             <tr>
                                 <th className="px-8 py-6">{t.tableDate}</th>
                                 <th className="px-8 py-6">{t.tableAction}</th>
@@ -92,11 +93,48 @@ export default function AuditClient({ lang }: { lang: "en" | "zh" }) {
                                     </td>
                                 </tr>
                             ))}
-                            {filteredLogs.length === 0 && (
-                                <tr><td colSpan={5} className="p-20 text-center text-gray-400 font-black uppercase tracking-widest">{t.noLogs}</td></tr>
-                            )}
                         </tbody>
                     </table>
+
+                    {/* Mobile View (Grid Cards) */}
+                    <div className="md:hidden divide-y divide-gray-100">
+                        {filteredLogs.map((log, i) => {
+                            const isTransaction = log.auditType === 'transaction';
+                            const detailText = log.rejection_reason || (log.amount ? `RM ${Number(log.amount).toFixed(2)}` : "System Profile Update");
+                            
+                            return (
+                                <div key={i} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
+                                    <div className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-400 font-mono text-[9px] uppercase">{new Date(log.created_at).toLocaleDateString()}</span>
+                                            <div className="flex items-center gap-2">
+                                                <div className={`h-1.5 w-1.5 rounded-full ${isTransaction ? 'bg-emerald-500' : 'bg-gv-gold'}`}></div>
+                                                <span className={`text-[8px] font-black uppercase tracking-widest ${isTransaction ? 'text-emerald-500' : 'text-gv-gold'}`}>
+                                                    {log.auditType}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-between items-end">
+                                            <div className="space-y-1">
+                                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block">{log.action}</span>
+                                                <span className="text-[8px] font-black text-gray-300 uppercase italic tracking-tighter truncate w-40 block">{log.user_email}</span>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-[10px] font-black text-gray-900 uppercase tracking-tight truncate max-w-[120px]">
+                                                    {detailText}
+                                                </p>
+                                                <p className="text-[7px] font-bold text-gray-300 uppercase tracking-widest">BY: {log.admin_username}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {filteredLogs.length === 0 && (
+                        <div className="p-20 text-center text-gray-400 font-black uppercase tracking-widest">{t.noLogs}</div>
+                    )}
                 </div>
             </div>
         </div>

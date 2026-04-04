@@ -94,10 +94,11 @@ export default function ForexClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="h-[1px] flex-1 bg-white mx-8"></div>
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-[40px] overflow-hidden backdrop-blur-md">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                <div className="bg-white border border-gray-200 rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl">
+                    <div className="overflow-x-auto overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-gray-200">
+                        {/* Desktop View (Table) */}
+                        <table className="w-full text-left hidden md:table">
+                            <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400 sticky top-0 z-10">
                                 <tr>
                                     <th className="px-8 py-6">{t.tableDate}</th>
                                     <th className="px-8 py-6">{t.tableOld}</th>
@@ -125,11 +126,44 @@ export default function ForexClient({ lang }: { lang: "en" | "zh" }) {
                                         </tr>
                                     );
                                 })}
-                                {forexHistory.length === 0 && (
-                                    <tr><td colSpan={5} className="p-20 text-center text-gray-400 font-black uppercase tracking-widest">{t.noHistory}</td></tr>
-                                )}
                             </tbody>
                         </table>
+
+                        {/* Mobile View (Grid Cards) */}
+                        <div className="md:hidden divide-y divide-gray-100">
+                            {forexHistory.map((h, i) => {
+                                const change = ((h.new_rate - h.old_rate) / h.old_rate) * 100;
+                                return (
+                                    <div key={i} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
+                                        <div className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-400 font-mono text-[9px] uppercase">{new Date(h.created_at).toLocaleDateString()}</span>
+                                                <span className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${change >= 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                                                    {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-end">
+                                                <div className="space-y-1">
+                                                    <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest block">ADMIN: {h.admin_username}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] font-mono text-gray-400 line-through">RM {h.old_rate.toFixed(3)}</span>
+                                                        <svg className="h-2 w-2 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M9 5l7 7-7 7"/></svg>
+                                                        <span className="text-[12px] font-black text-gray-900 tracking-tighter uppercase">RM {h.new_rate.toFixed(4)}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="text-[8px] font-bold text-gray-300 uppercase italic">Rate Adjustment</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {forexHistory.length === 0 && (
+                            <div className="p-20 text-center text-gray-400 font-black uppercase tracking-widest">{t.noHistory}</div>
+                        )}
                     </div>
                 </div>
             </div>

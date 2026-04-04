@@ -97,9 +97,10 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                 />
             </div>
 
-            <div className="bg-white backdrop-blur-md rounded-3xl border border-gray-200 overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+            <div className="bg-white border border-gray-200 rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl">
+                <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
+                    {/* Desktop View (Table) */}
+                    <table className="w-full text-left hidden md:table">
                         <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400">
                             <tr>
                                 <th className="px-8 py-6">{t.tableUser}</th>
@@ -134,6 +135,43 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                             ))}
                         </tbody>
                     </table>
+
+                    {/* Mobile View (Grid Cards) */}
+                    <div className="md:hidden divide-y divide-gray-100">
+                        {filteredKyc.map((user) => (
+                            <div key={user.id} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
+                                <div 
+                                    onClick={() => openDetails(user)}
+                                    className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors"
+                                >
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-400 font-mono text-[9px] uppercase">{formatDate(user.created_at)}</span>
+                                        <span className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${
+                                            user.kyc_status === 'Draft' 
+                                                ? 'bg-zinc-500/10 text-gray-400' 
+                                                : 'bg-amber-500/10 text-amber-500'
+                                        }`}>
+                                            {user.kyc_status}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-end">
+                                        <div className="space-y-1">
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block">{user.full_name}</span>
+                                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none block truncate w-40">@{user.username}</span>
+                                        </div>
+                                        <div className="text-right">
+                                            <button 
+                                                className="bg-white border border-gray-200 text-[8px] font-black uppercase tracking-widest px-3 py-2 rounded-lg"
+                                            >
+                                                Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
                     {filteredKyc.length === 0 && (
                         <div className="p-20 text-center text-gray-500 font-black uppercase tracking-[0.2em]">{t.noKyc}</div>
                     )}

@@ -256,8 +256,9 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
 
                 <div className="border border-gray-200 rounded-[32px] overflow-hidden bg-white backdrop-blur-md shadow-2xl">
-                    <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
-                        <table className="w-full text-left min-w-[700px] border-collapse">
+                    <div className="max-h-[600px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300">
+                        {/* Desktop View (Table) */}
+                        <table className="w-full text-left min-w-[700px] border-collapse hidden md:table">
                             <thead className="bg-white border-b border-gray-200 sticky top-0 z-10 backdrop-blur-md">
                                 <tr className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">
                                     <th className="px-6 py-4">{t.date}</th>
@@ -309,6 +310,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                         {expandedId === tx.id && (
                                             <tr>
                                                 <td colSpan={5} className="px-6 py-6 bg-white/[0.01] animate-in slide-in-from-top-2 duration-300">
+                                                    {/* Expansion content (Desktop) */}
                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                                         <div className="space-y-4">
                                                             <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Financial Breakdown</h4>
@@ -327,12 +329,6 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                     <span className="text-emerald-500 uppercase whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : (tx.type === 'Dividend' ? 'Dividend Received (Net)' : 'Final Payout (Net)')}</span>
                                                                     <span className="text-emerald-500 underline decoration-gv-gold tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
-                                                                {tx.metadata?.remark && (
-                                                                    <div className="mt-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">User Remark</p>
-                                                                        <p className="text-[11px] font-bold text-gray-600 italic">"{tx.metadata.remark}"</p>
-                                                                    </div>
-                                                                )}
                                                             </div>
                                                         </div>
 
@@ -340,8 +336,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                             <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Target Account</h4>
                                                             <div className="bg-white border border-gray-200 p-4 rounded-2xl space-y-2">
                                                                 <p className="text-[10px] font-black text-gv-gold uppercase">{tx.metadata?.bank_name || user?.bank_name || "Institutional Account"}</p>
-                                                                <p className="text-sm font-mono text-gray-900 select-all">{tx.metadata?.account_number || user?.account_number || "Verified on File"}</p>
-                                                                <p className="text-[9px] font-bold text-gray-400 uppercase">{tx.metadata?.bank_account_holder || user?.full_name}</p>
+                                                                <p className="text-sm font-mono text-gray-900 select-all tracking-tighter shrink-0">{tx.metadata?.account_number || user?.account_number || "Verified on File"}</p>
                                                             </div>
                                                         </div>
 
@@ -355,15 +350,6 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                         <span className="text-[9px] text-gray-500 font-bold">{formatDateTime(tx.created_at)}</span>
                                                                     </div>
                                                                 </div>
-                                                                {tx.metadata?.approved_at && (
-                                                                    <div className="flex items-center gap-3 pl-6 relative">
-                                                                        <div className="h-2 w-2 rounded-full bg-blue-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-                                                                        <div className="flex flex-col">
-                                                                            <span className="text-[10px] font-black text-blue-400 uppercase">Accepted by {tx.metadata?.processed_by_name || 'Admin'}</span>
-                                                                            <span className="text-[9px] text-gray-500 font-bold">{formatDateTime(tx.metadata.approved_at)}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
                                                                 {['Approved', 'Completed'].includes(tx.status) && (
                                                                     <div className="flex items-center gap-3 pl-6 relative">
                                                                         <div className="h-2 w-2 rounded-full bg-emerald-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
@@ -381,11 +367,98 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                         )}
                                     </React.Fragment>
                                 ))}
-                                {filteredTransactions.length === 0 && (
-                                    <tr><td colSpan={5} className="px-8 py-20 text-center text-gray-500 font-bold uppercase tracking-widest">{t.noTxFound}</td></tr>
-                                )}
                             </tbody>
                         </table>
+
+                        {/* Mobile View (Grid Cards) */}
+                        <div className="md:hidden divide-y divide-gray-100">
+                            {filteredTransactions.map((tx, idx) => {
+                                const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease' || tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty');
+                                const amountUSD = Number(tx.original_currency_amount || (Number(tx.amount) / forexRate));
+                                const displayAmount = isWithdrawal ? -Math.abs(amountUSD) : amountUSD;
+                                const isExpanded = expandedId === tx.id;
+                                
+                                return (
+                                    <div key={idx} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
+                                        <div 
+                                            onClick={() => setExpandedId(isExpanded ? null : tx.id)}
+                                            className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors"
+                                        >
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-500 font-mono text-[10px] tracking-tight">{formatDate(tx.created_at || tx.transfer_date)}</span>
+                                                <span className={`px-2.5 py-1 rounded-lg text-[8px] uppercase font-black tracking-widest ${
+                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                                    tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
+                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                                                    'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                                }`}>{tx.status}</span>
+                                            </div>
+                                            
+                                            <div className="flex justify-between items-end">
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none">
+                                                            {(tx.type === 'Dividend' || tx.metadata?.adjustment_category === 'Dividend') && (!tx.metadata?.description || tx.metadata?.description === 'Dividend') 
+                                                                ? "Dividend Received" 
+                                                                : (tx.metadata?.description || tx.type)}
+                                                        </span>
+                                                        {(tx.type === 'Withdrawal' || tx.metadata?.is_adjustment) && (
+                                                            <svg className={`h-3 w-3 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className={`text-sm font-black tabular-nums tracking-tighter ${displayAmount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                        {displayAmount >= 0 ? '+' : '-'}{Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    </p>
+                                                    <p className="text-[8px] font-bold text-gray-300 uppercase italic tracking-tighter">Verified Institutional</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {isExpanded && (
+                                            <div className="bg-gray-50/50 px-6 py-6 space-y-6 border-t border-gray-100 animate-in fade-in duration-300">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="text-[8px] font-black uppercase text-gray-400 tracking-[0.1em]">Gross Position</span>
+                                                        <span className="text-xs font-black text-gray-700 tracking-tight">$ {Number(tx.original_currency_amount || (Number(tx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                    </div>
+                                                    {tx.metadata?.penalty_applied && (
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="text-[8px] font-black uppercase text-red-400 tracking-[0.1em]">Early Penalty</span>
+                                                            <span className="text-xs font-black text-red-500 tracking-tight">-$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                
+                                                <div className="flex flex-col p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                                                    <span className="text-[8px] font-black uppercase text-gv-gold tracking-[0.2em] mb-2">Institutional Payout Location</span>
+                                                    <span className="text-[10px] font-black text-gray-900 uppercase mb-1 leading-none">{tx.metadata?.bank_name || user?.bank_name || "Institutional Account"}</span>
+                                                    <span className="text-[11px] font-mono font-bold text-gray-500 select-all tracking-tighter">{tx.metadata?.account_number || user?.account_number || "Verified on File"}</span>
+                                                </div>
+
+                                                <div className="flex justify-between items-center border-t border-gray-200 pt-4">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Final Net Position</span>
+                                                        <span className="text-base font-black text-emerald-500 tabular-nums tracking-tighter">
+                                                            $ {(Number(tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-[8px] font-black text-gray-400 uppercase leading-none">Security Hash</p>
+                                                        <p className="text-[7px] font-mono text-gray-300 mt-1 uppercase tracking-tighter">{tx.id.split('-')[0]}...{tx.id.split('-').pop()}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {filteredTransactions.length === 0 && (
+                            <div className="px-8 py-20 text-center text-gray-500 font-bold uppercase tracking-widest">{t.noTxFound}</div>
+                        )}
                     </div>
                 </div>
             </section>

@@ -21,6 +21,8 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
     const [isAdjusting, setIsAdjusting] = useState(false);
     const [isRoleChanging, setIsRoleChanging] = useState(false);
     const [isProcessingAction, setIsProcessingAction] = useState(false);
+    const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
+    const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
     const t = {
         en: {
@@ -152,8 +154,9 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             </div>
 
             <div className="bg-white backdrop-blur-md rounded-3xl border border-gray-200 overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
+                    {/* Desktop View (Table) */}
+                    <table className="w-full text-left hidden md:table">
                         <thead className="bg-white border-b border-gray-200 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-400">
                             <tr>
                                 <th className="px-4 py-4 md:px-8 md:py-6">{t.tableUser}</th>
@@ -210,6 +213,64 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                             ))}
                         </tbody>
                     </table>
+
+                    {/* Mobile View (Grid Cards) */}
+                    <div className="md:hidden divide-y divide-gray-100">
+                        {filteredUsers.map((user) => {
+                            const isExpanded = expandedUserId === user.id;
+                            const tierName = (user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(user.total_investment_usd || 0).name;
+                            
+                            return (
+                                <div key={user.id} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
+                                    <div 
+                                        onClick={() => setExpandedUserId(isExpanded ? null : user.id)}
+                                        className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors"
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <div className="flex items-center gap-2">
+                                                <TierMedal tierId={tierName} size="xs" />
+                                                <span className="text-gray-500 font-mono text-[9px] uppercase">Client #{user.username?.slice(-4)}</span>
+                                            </div>
+                                            <span className={`px-2 py-1 rounded-lg text-[7px] font-black uppercase tracking-widest ${
+                                                user.kyc_status === 'Verified' ? 'bg-emerald-500/10 text-emerald-500' :
+                                                'bg-gray-100 text-gray-400'
+                                            }`}>{user.kyc_status}</span>
+                                        </div>
+                                        <div className="flex justify-between items-end">
+                                            <div className="space-y-1">
+                                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block">{user.full_name || user.username}</span>
+                                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none truncate w-40 block">{user.email}</span>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm font-black text-emerald-500 tabular-nums tracking-tighter">
+                                                    $ {(user.total_assets_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </p>
+                                                <p className="text-[8px] font-bold text-gray-300 uppercase italic tracking-tighter">Total Assets</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {isExpanded && (
+                                        <div className="bg-gray-50/50 px-6 py-6 space-y-6 border-t border-gray-100 animate-in fade-in duration-300">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-[8px] font-black uppercase text-gray-400 tracking-[0.1em]">Invested</span>
+                                                    <span className="text-[10px] font-black text-gray-900 tracking-tight">$ {(user.total_investment_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                </div>
+                                                <div className="flex flex-col gap-1 text-right">
+                                                    <span className="text-[8px] font-black uppercase text-gv-gold tracking-[0.1em]">Withdrawable</span>
+                                                    <span className="text-[10px] font-black text-gv-gold tracking-tight">$ {(user.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col gap-3">
+                                                <button onClick={() => openDetails(user)} className="w-full bg-black text-white text-[9px] font-black uppercase tracking-widest py-3.5 rounded-xl shadow-lg shadow-black/10">Manage Profile</button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
 
@@ -329,9 +390,10 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                         <div className="flex items-center justify-between">
                                             <h4 className="text-[10px] font-black uppercase tracking-widest text-gv-gold">{t.txHistory}</h4>
                                         </div>
-                                        <div className="overflow-x-auto overflow-y-auto max-h-[500px] custom-scrollbar">
-                                            <table className="w-full text-left">
-                                                <thead className="bg-gray-50 text-[7px] md:text-[8px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200">
+                                        <div className="overflow-x-auto overflow-y-auto max-h-[500px] custom-scrollbar scrollbar-thin scrollbar-thumb-gray-200">
+                                            {/* Desktop View */}
+                                            <table className="w-full text-left hidden md:table">
+                                                <thead className="bg-gray-50 text-[7px] md:text-[8px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200 sticky top-0 z-10">
                                                     <tr>
                                                         <th className="px-3 py-3 md:px-4">{t.txDate}</th>
                                                         <th className="px-3 py-3 md:px-4">{t.txAction}</th>
@@ -355,13 +417,44 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                                 </td>
                                                             </tr>
                                                         ))}
-                                                    {combinedAuditLogs.filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction').length === 0 && (
-                                                        <tr>
-                                                            <td colSpan={3} className="px-4 py-20 text-center text-gray-400 font-black uppercase tracking-widest text-[9px]">{t.noTx}</td>
-                                                        </tr>
-                                                    )}
                                                 </tbody>
                                             </table>
+
+                                            {/* Mobile View */}
+                                            <div className="md:hidden divide-y divide-gray-100">
+                                                {combinedAuditLogs
+                                                    .filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction')
+                                                    .map((log, i) => {
+                                                        const isExpanded = expandedLogId === `${log.created_at}-${i}`;
+                                                        const isNegative = log.txType === 'Withdrawal' && log.action !== 'Adjustment' || log.rejection_reason?.toLowerCase().includes('decrease');
+                                                        
+                                                        return (
+                                                            <div key={i} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
+                                                                <div 
+                                                                    onClick={() => setExpandedLogId(isExpanded ? null : `${log.created_at}-${i}`)}
+                                                                    className="px-4 py-4 space-y-3 hover:bg-gray-50 transition-colors"
+                                                                >
+                                                                    <div className="flex justify-between items-center">
+                                                                        <span className="text-gray-400 font-mono text-[8px] uppercase">{formatDateTime(log.created_at)}</span>
+                                                                        <span className={`text-[9px] font-black uppercase tracking-tight ${isNegative ? 'text-red-400' : 'text-emerald-400'}`}>
+                                                                            {log.action === 'Adjustment' ? (log.txType === 'Deposit' ? 'Add' : 'Remove') : log.action}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex justify-between items-end">
+                                                                        <span className="text-[8px] font-bold text-gray-500 uppercase tracking-widest truncate max-w-[150px]">{log.rejection_reason || "System Process"}</span>
+                                                                        <span className={`text-xs font-black tabular-nums ${isNegative ? 'text-red-500' : 'text-emerald-500'}`}>
+                                                                            $ {(Number(log.original_currency_amount || (Number(log.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                            </div>
+
+                                            {combinedAuditLogs.filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction').length === 0 && (
+                                                <div className="p-20 text-center text-gray-400 font-black uppercase tracking-widest text-[9px]">{t.noTx}</div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
