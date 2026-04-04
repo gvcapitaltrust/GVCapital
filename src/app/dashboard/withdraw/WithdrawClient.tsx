@@ -10,9 +10,26 @@ import TierMedal from "@/components/TierMedal";
 import { getTierByAmount } from "@/lib/tierUtils";
 
 export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
-    const { userProfile: user, refreshData } = useUser();
+    const { userProfile: user, withdrawalMethods, refreshData } = useUser();
     const { withdrawalRate } = useSettings();
     const router = useRouter();
+    const [selectedMethodId, setSelectedMethodId] = useState<string | null>(null);
+    const [isOneTime, setIsOneTime] = useState(false);
+    const [oneTimeMethod, setOneTimeMethod] = useState({
+        type: 'BANK' as 'BANK' | 'USDT',
+        bank_name: '',
+        account_number: '',
+        bank_account_holder: '',
+        usdt_address: '',
+        usdt_network: 'TRC20'
+    });
+
+    const malaysianBanks = [
+        "Maybank", "CIMB Bank", "Public Bank", "RHB Bank", "Hong Leong Bank", 
+        "AmBank", "UOB Malaysia", "OCBC Bank Malaysia", "HSBC Bank Malaysia", 
+        "Bank Islam Malaysia", "Affin Bank", "Alliance Bank", "Standard Chartered Malaysia", 
+        "MBSB Bank", "Bank Rakyat", "Bank Muamalat", "Other"
+    ];
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
@@ -33,6 +50,13 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
         lockedPortion_usd: number;
         isApplied: boolean;
     } | null>(null);
+
+    React.useEffect(() => {
+        if (withdrawalMethods && withdrawalMethods.length > 0 && !selectedMethodId) {
+            const defaultMethod = withdrawalMethods.find((m: any) => m.is_default) || withdrawalMethods[0];
+            setSelectedMethodId(defaultMethod.id);
+        }
+    }, [withdrawalMethods, selectedMethodId]);
 
     const t = {
         en: {
@@ -86,6 +110,20 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
     const handleWithdrawInitiate = () => {
         const amountUSD = parseFloat(withdrawAmount);
         if (!amountUSD || amountUSD <= 0) return;
+
+        if (isOneTime) {
+            if (oneTimeMethod.type === 'BANK' && (!oneTimeMethod.bank_name || !oneTimeMethod.account_number)) {
+                alert(lang === 'en' ? "Please provide bank details for the one-time payout." : "请提供一次性提款的银行信息。");
+                return;
+            }
+            if (oneTimeMethod.type === 'USDT' && !oneTimeMethod.usdt_address) {
+                alert(lang === 'en' ? "Please provide a USDT address for the one-time payout." : "请提供一次性提款的 USDT 地址。");
+                return;
+            }
+        } else if (!selectedMethodId) {
+            alert(lang === 'en' ? "Please select a payout destination." : "请选择提款目标。");
+            return;
+        }
         
         const totalAssetsUSD = Number(user?.total_assets_usd || 0);
 
@@ -200,6 +238,19 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                     expected_payout: penaltyInfo?.payout,
                     original_usd_payout: penaltyInfo?.payout_usd,
                     locked_withdrawal: penaltyInfo?.isApplied,
+                    payout_method: (() => {
+                        if (isOneTime) {
+                            return oneTimeMethod.type === 'BANK' 
+                                ? `[ONE-TIME] ${oneTimeMethod.bank_name} (${oneTimeMethod.account_number})`
+                                : `[ONE-TIME] USDT TRC20 (${oneTimeMethod.usdt_address})`;
+                        }
+                        const method = withdrawalMethods.find(m => m.id === selectedMethodId);
+                        if (!method) return "Institutional Account";
+                        return method.type === 'BANK' 
+                            ? `${method.bank_name} (${method.account_number})`
+                            : `USDT TRC20 (${method.usdt_address})`;
+                    })(),
+                    method_details: isOneTime ? oneTimeMethod : withdrawalMethods.find(m => m.id === selectedMethodId),
                     ...(penaltyInfo?.isApplied ? {
                         penalty_applied: true,
                         penalty_amount: penaltyInfo.penalty,
@@ -342,9 +393,137 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 </div>
                             </div>
 
+                            {/* Payout Destination Selection */}
+                            <div className="space-y-4 pt-4 border-t border-gray-100">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block px-1">{lang === 'en' ? 'Payout Destination' : '提款目标'}</label>
+                                <div className="grid grid-cols-1 gap-3">
+                                    {withdrawalMethods && withdrawalMethods.length > 0 && !isOneTime ? (
+                                        withdrawalMethods.map((method: any) => (
+                                            <button 
+                                                key={method.id}
+                                                onClick={() => setSelectedMethodId(method.id)}
+                                                className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left group ${selectedMethodId === method.id ? 'bg-gv-gold/5 border-gv-gold ring-1 ring-gv-gold' : 'bg-gray-50 border-gray-100 hover:border-gray-200'}`}
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${selectedMethodId === method.id ? 'bg-gv-gold text-white' : 'bg-white text-gray-300 group-hover:text-gray-400'}`}>
+                                                        {method.type === 'BANK' ? (
+                                                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 00-3 3z" /></svg>
+                                                        ) : (
+                                                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <p className={`text-[11px] font-black uppercase tracking-tight ${selectedMethodId === method.id ? 'text-gray-900' : 'text-gray-500'}`}>
+                                                            {method.type === 'BANK' ? method.bank_name : 'USDT TRC20'}
+                                                        </p>
+                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mt-0.5">
+                                                            {method.type === 'BANK' ? `**** ${method.account_number.slice(-4)}` : `${method.usdt_address.slice(0, 6)}...${method.usdt_address.slice(-4)}`}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                {selectedMethodId === method.id && (
+                                                    <div className="h-5 w-5 bg-gv-gold rounded-full flex items-center justify-center text-white">
+                                                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
+                                                    </div>
+                                                )}
+                                            </button>
+                                        ))
+                                    ) : !isOneTime ? (
+                                        <div className="bg-amber-50 border border-amber-100 p-6 rounded-[24px] text-center space-y-4">
+                                            <p className="text-[10px] font-bold text-amber-800 uppercase tracking-tight">
+                                                {lang === 'en' ? 'No payout methods added yet.' : '尚未设置提款方式。'}
+                                            </p>
+                                            <button 
+                                                onClick={() => router.push(`/dashboard/profile?lang=${lang}`)}
+                                                className="bg-white text-slate-900 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-amber-200 hover:bg-amber-100 transition-all"
+                                            >
+                                                {lang === 'en' ? 'Manage Payouts' : '管理提款方式'}
+                                            </button>
+                                        </div>
+                                    ) : null}
+
+                                    {/* One-time Option Toggle */}
+                                    <button 
+                                        onClick={() => setIsOneTime(!isOneTime)}
+                                        className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all text-left ${isOneTime ? 'bg-slate-900 border-slate-900 shadow-xl' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${isOneTime ? 'bg-gv-gold text-slate-900' : 'bg-gray-100 text-gray-400'}`}>
+                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                            </div>
+                                            <div>
+                                                <p className={`text-[11px] font-black uppercase tracking-tight ${isOneTime ? 'text-white' : 'text-gray-900'}`}>{lang === 'en' ? 'One-time Account' : '一次性提款账户'}</p>
+                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mt-0.5">{lang === 'en' ? 'Use detailed payout details for this transaction only' : '仅为此项交易提供详细提款信息'}</p>
+                                            </div>
+                                        </div>
+                                        <div className={`h-6 w-10 rounded-full relative transition-colors ${isOneTime ? 'bg-gv-gold' : 'bg-gray-200'}`}>
+                                            <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${isOneTime ? 'left-5' : 'left-1'}`}></div>
+                                        </div>
+                                    </button>
+
+                                    {/* One-time Inputs */}
+                                    {isOneTime && (
+                                        <div className="space-y-4 p-6 bg-gray-50 rounded-2xl border border-gray-200 animate-in slide-in-from-top-2 duration-300">
+                                            <div className="flex bg-white p-1 rounded-xl gap-1">
+                                                <button 
+                                                    onClick={() => setOneTimeMethod({...oneTimeMethod, type: 'BANK'})}
+                                                    className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${oneTimeMethod.type === 'BANK' ? 'bg-slate-900 text-gv-gold' : 'text-gray-400'}`}
+                                                >
+                                                    Bank Account
+                                                </button>
+                                                <button 
+                                                    onClick={() => setOneTimeMethod({...oneTimeMethod, type: 'USDT'})}
+                                                    className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${oneTimeMethod.type === 'USDT' ? 'bg-slate-900 text-gv-gold' : 'text-gray-400'}`}
+                                                >
+                                                    USDT TRC20
+                                                </button>
+                                            </div>
+
+                                            {oneTimeMethod.type === 'BANK' ? (
+                                                <div className="grid grid-cols-1 gap-3">
+                                                    <select 
+                                                        value={oneTimeMethod.bank_name}
+                                                        onChange={(e) => setOneTimeMethod({...oneTimeMethod, bank_name: e.target.value})}
+                                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold"
+                                                    >
+                                                        <option value="">Select Bank...</option>
+                                                        {malaysianBanks.map(b => <option key={b} value={b}>{b}</option>)}
+                                                    </select>
+                                                    <input 
+                                                        type="text"
+                                                        value={oneTimeMethod.account_number}
+                                                        onChange={(e) => setOneTimeMethod({...oneTimeMethod, account_number: e.target.value})}
+                                                        placeholder="Account Number"
+                                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold"
+                                                    />
+                                                    <input 
+                                                        type="text"
+                                                        value={oneTimeMethod.bank_account_holder}
+                                                        onChange={(e) => setOneTimeMethod({...oneTimeMethod, bank_account_holder: e.target.value})}
+                                                        placeholder="Account Holder Name"
+                                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-3">
+                                                    <input 
+                                                        type="text"
+                                                        value={oneTimeMethod.usdt_address}
+                                                        onChange={(e) => setOneTimeMethod({...oneTimeMethod, usdt_address: e.target.value})}
+                                                        placeholder="USDT Wallet Address (TRC20)"
+                                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold font-mono"
+                                                    />
+                                                    <p className="text-[10px] text-amber-600 font-bold uppercase leading-tight px-1">Ensure network is Tron (TRC20)</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
                             <button 
                                 onClick={handleWithdrawInitiate} 
-                                disabled={!withdrawAmount || isSubmitting} 
+                                disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0 || (!selectedMethodId && !isOneTime) || isSubmitting} 
                                 className="w-full bg-black text-white font-black py-5 rounded-2xl flex justify-center items-center gap-4 text-lg uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
                             >
                                 {t.continueToPin}

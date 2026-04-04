@@ -12,6 +12,7 @@ interface UserContextType {
     dividendHistory: any[];
     referredUsers: any[];
     referredCount: number;
+    withdrawalMethods: any[];
     loading: boolean;
     refreshData: () => Promise<void>;
 }
@@ -25,6 +26,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [dividendHistory, setDividendHistory] = useState<any[]>([]);
     const [referredUsers, setReferredUsers] = useState<any[]>([]);
     const [referredCount, setReferredCount] = useState(0);
+    const [withdrawalMethods, setWithdrawalMethods] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     const { forexRate: rawForexRate } = useSettings();
@@ -172,6 +174,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             if (refs) setReferredUsers(refs);
             if (count !== null) setReferredCount(count);
 
+            // 5. Fetch Withdrawal Methods
+            const { data: wMethods } = await supabase
+                .from('withdrawal_methods')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+            
+            if (wMethods) setWithdrawalMethods(wMethods);
+
         } catch (error) {
             console.error("Error fetching user dashboard data:", error);
         } finally {
@@ -224,6 +235,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             dividendHistory, 
             referredUsers, 
             referredCount, 
+            withdrawalMethods,
             loading,
             refreshData: fetchData 
         }}>
