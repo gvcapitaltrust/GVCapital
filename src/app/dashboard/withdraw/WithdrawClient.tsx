@@ -281,10 +281,6 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
         }
     };
 
-    if (user && user.kyc_status !== 'Verified' && user.email !== 'thenja96@gmail.com') {
-        return <VerificationBlocker lang={lang} />;
-    }
-
     if (showSuccess) {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in-95 duration-500">

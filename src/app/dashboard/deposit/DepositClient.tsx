@@ -6,7 +6,6 @@ import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { X, ArrowLeft, Upload, CheckCircle2 } from "lucide-react";
-import VerificationBlocker from "@/components/VerificationBlocker";
 
 export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, refreshData } = useUser();
@@ -116,9 +115,6 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
         );
     }
 
-    if (user && user.kyc_status !== 'Verified' && user.email !== 'thenja96@gmail.com') {
-        return <VerificationBlocker lang={lang} />;
-    }
 
     return (
         <div className="max-w-4xl mx-auto space-y-12 pb-20">

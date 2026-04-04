@@ -6,7 +6,6 @@ import { useSettings } from "@/providers/SettingsProvider";
 import { getTierByAmount } from "@/lib/tierUtils";
 import { X } from "lucide-react";
 import { formatDate } from "@/lib/dateUtils";
-import VerificationBlocker from "@/components/VerificationBlocker";
 
 export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, referredUsers, referredCount, loading } = useUser();
@@ -59,9 +58,6 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
 
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
 
-    if (user && user.kyc_status !== 'Verified' && user.email !== 'thenja96@gmail.com') {
-        return <VerificationBlocker lang={lang} />;
-    }
 
     return (
         <div className="space-y-12 pb-20">
