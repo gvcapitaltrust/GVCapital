@@ -63,7 +63,7 @@ export default function DepositClient() {
                 .insert([{
                     user_id: user.id,
                     type: 'Deposit',
-                    amount: currentAmountRm,
+                    amount: depositUSD,
                     metadata: { original_usd_amount: amount, forex_rate: forexRate },
                     original_currency_amount: depositUSD,
                     original_currency: 'USD',
