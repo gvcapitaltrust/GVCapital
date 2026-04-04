@@ -202,7 +202,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     action: t.type === 'Deposit' ? 'Deposit Approved' : 
                             t.type === 'Withdrawal' ? (t.status === 'Pending Release' ? 'Withdrawal Accepted' : 'Withdrawal Released') : 
                             t.type === 'Audit' ? t.metadata?.action : 
-                            t.type === 'Dividend' ? 'Dividend Payout' :
+                            t.type === 'Dividend' ? 'Final Received' :
                             t.type === 'Bonus' ? 'Bonus Awarded' :
                             t.type === 'Penalty' ? 'Withdrawal Penalty' :
                             'Adjustment',
@@ -485,15 +485,16 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             const isDividendOrBonus = type === 'profit' || reason?.toLowerCase().includes('dividend') || reason?.toLowerCase().includes('bonus');
             const targetField = isDividendOrBonus ? 'profit' : 'balance';
 
-            const amountRM = amountUSD * forexRate;
-            const newRM = Number(user[targetField] || 0) + amountRM;
-            const updatePayload: any = { [targetField]: newRM };
+            const amountAdjustment = isDividendOrBonus ? amountUSD : (amountUSD * forexRate);
+            const newBalanceForField = Number(user[targetField] || 0) + amountAdjustment;
+            const updatePayload: any = { [targetField]: newBalanceForField };
+
             if (targetField === 'balance') {
                 const currentBalanceUSD = user.balance_usd || (Number(user.balance || 0) / forexRate);
                 let newBalanceUSD = currentBalanceUSD + amountUSD;
                 
                 // Final safety guard: If RM balance is 0, USD balance MUST be 0
-                if (Math.abs(newRM) < 0.01) {
+                if (Math.abs(newBalanceForField) < 0.01) {
                     newBalanceUSD = 0;
                 }
                 
@@ -532,7 +533,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 });
             if (txError) throw txError;
 
-            showToast(`Successfully adjusted ${targetField} by $${amountUSD.toFixed(2)} (≈ RM ${amountRM.toFixed(2)})`);
+            showToast(`Successfully adjusted ${targetField} by $${amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
             fetchData();
         } catch (err: any) {
             alert(err.message);

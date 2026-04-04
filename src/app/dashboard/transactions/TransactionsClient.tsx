@@ -139,7 +139,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         const summaryBody = [
             ['Opening Balance', formatUSD(openingBalanceUSD)],
             ['Total Net Deposits', formatUSD(totalDepositsUSD)],
-            ['Total Monthly Dividends', formatUSD(periodProfitUSD)],
+            ['Total Monthly Dividends (Final Received)', formatUSD(periodProfitUSD)],
             ['Total Withdrawals (Net)', formatUSD(totalWithdrawalsUSD)],
         ];
 
@@ -164,6 +164,11 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             const usd = getUSD(tx);
             const rm = usd * forexRate;
             let typeDesc = tx.metadata?.description || tx.type;
+            const isDiv = tx.metadata?.adjustment_category === 'Dividend' || tx.type === 'Dividend';
+            
+            if (isDiv && (!tx.metadata?.description || tx.metadata?.description === 'Dividend')) {
+                typeDesc = "Final Received";
+            }
             
             // Add details for penalized withdrawals
             if (tx.type === 'Withdrawal' && tx.metadata?.penalty_applied) {
@@ -273,7 +278,9 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                             <td className="px-6 py-4 text-gray-400 font-mono text-[11px] opacity-70">{tx.ref_id || "-"}</td>
                                             <td className="px-6 py-4 uppercase tracking-widest text-[10px] font-bold text-gray-900">
                                                 <div className="flex items-center gap-2">
-                                                    {tx.metadata?.description || tx.type}
+                                                    {(tx.type === 'Dividend' || tx.metadata?.adjustment_category === 'Dividend') && (!tx.metadata?.description || tx.metadata?.description === 'Dividend') 
+                                                        ? "Final Received" 
+                                                        : (tx.metadata?.description || tx.type)}
                                                     {(tx.type === 'Withdrawal' || tx.metadata?.is_adjustment) && (
                                                         <svg className={`h-3 w-3 text-gray-500 transition-transform ${expandedId === tx.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
                                                     )}
@@ -317,7 +324,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                     </div>
                                                                 )}
                                                                 <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2 gap-4">
-                                                                    <span className="text-emerald-500 uppercase whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : 'Final Payout (Net)'}</span>
+                                                                    <span className="text-emerald-500 uppercase whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : (tx.type === 'Dividend' ? 'Final Received (Net)' : 'Final Payout (Net)')}</span>
                                                                     <span className="text-emerald-500 underline decoration-gv-gold tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                                 {tx.metadata?.remark && (
