@@ -116,7 +116,7 @@ export default function PortfolioClient({ lang }: { lang: "en" | "zh" }) {
                                 </Pie>
                                 <Tooltip 
                                     contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 50px rgba(0,0,0,0.1)' }}
-                                    formatter={(value: number) => [`$ ${value.toLocaleString()}`, 'Allocated']}
+                                    formatter={(value: any) => [`$ ${Number(value || 0).toLocaleString()}`, 'Allocated']}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
