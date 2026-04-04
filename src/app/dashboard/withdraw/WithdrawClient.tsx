@@ -318,16 +318,25 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                         <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 space-y-4">
                             <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
                                 <span>{t.lockedPortion}</span>
-                                <span>$ {(penaltyInfo.lockedPortion_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <div className="text-right">
+                                    <span className="block">$ {(penaltyInfo.lockedPortion_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    <span className="block text-[8px] opacity-70 font-bold">≈ RM {(penaltyInfo.lockedPortion || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                </div>
                             </div>
                             <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-red-500">
                                 <span>{t.penaltyAmt}</span>
-                                <span>- $ {(penaltyInfo.penalty_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <div className="text-right">
+                                    <span className="block">- $ {(penaltyInfo.penalty_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    <span className="block text-[8px] opacity-70 font-bold">≈ RM {(penaltyInfo.penalty || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                </div>
                             </div>
                             <div className="h-px bg-gray-200"></div>
                             <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-emerald-500">
                                 <span>{t.estPayout}</span>
-                                <span>$ {(penaltyInfo.payout_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <div className="text-right">
+                                    <span className="block">$ {(penaltyInfo.payout_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    <span className="block text-[10px] opacity-80 font-black">≈ RM {(penaltyInfo.payout || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                </div>
                             </div>
                         </div>
                         <div className="flex flex-col gap-4">
