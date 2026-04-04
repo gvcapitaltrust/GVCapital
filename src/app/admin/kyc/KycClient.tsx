@@ -248,9 +248,27 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                         <div className="bg-white border border-gray-200 p-3 rounded-2xl col-span-2">
                                             <p className="text-[8px] font-black text-gray-500 uppercase mb-1">Sources of Wealth</p>
                                             <div className="flex flex-wrap gap-2 mt-1">
-                                                {selectedUser?.kyc_data?.source_of_wealth?.map((s: string, i: number) => (
-                                                    <span key={i} className="bg-gv-gold/10 text-gv-gold text-[9px] font-black px-2 py-1 rounded-lg uppercase">{s}</span>
-                                                )) || <span className="text-xs font-bold text-gray-500">-</span>}
+                                                {(() => {
+                                                    const val = selectedUser?.kyc_data?.source_of_wealth;
+                                                    let list: string[] = [];
+                                                    if (Array.isArray(val)) {
+                                                        list = val;
+                                                    } else if (val) {
+                                                        try {
+                                                            const parsed = JSON.parse(val);
+                                                            if (Array.isArray(parsed)) list = parsed;
+                                                            else list = [val];
+                                                        } catch (e) {
+                                                            list = [val];
+                                                        }
+                                                    }
+                                                    
+                                                    if (list.length === 0) return <span className="text-xs font-bold text-gray-500">-</span>;
+
+                                                    return list.map((s: string, i: number) => (
+                                                        <span key={i} className="bg-gv-gold/10 text-gv-gold text-[9px] font-black px-2 py-1 rounded-lg uppercase">{s}</span>
+                                                    ));
+                                                })()}
                                             </div>
                                         </div>
                                     </div>

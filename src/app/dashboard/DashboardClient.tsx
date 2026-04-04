@@ -1603,7 +1603,18 @@ export default function DashboardClient() {
                                             </div>
                                             <div className="space-y-1">
                                                 <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.wealthSource}</p>
-                                                <p className="text-lg font-bold text-gray-900 tracking-tight">{user?.source_of_wealth || "-"}</p>
+                                                <p className="text-lg font-bold text-gray-900 tracking-tight">
+                                                    {(() => {
+                                                        const val = user?.source_of_wealth;
+                                                        if (!val) return "-";
+                                                        if (Array.isArray(val)) return val.join(", ");
+                                                        try {
+                                                            const parsed = JSON.parse(val);
+                                                            if (Array.isArray(parsed)) return parsed.join(", ");
+                                                        } catch (e) {}
+                                                        return val;
+                                                    })()}
+                                                </p>
                                             </div>
                                             <div className="space-y-1">
                                                 <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t.riskProfile}</p>

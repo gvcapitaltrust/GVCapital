@@ -113,7 +113,19 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                             {[
                                 { label: t.occupation, value: user?.occupation },
                                 { label: t.industry, value: user?.industry },
-                                { label: t.wealthSource, value: user?.source_of_wealth },
+                                { 
+                                    label: t.wealthSource, 
+                                    value: (() => {
+                                        const val = user?.source_of_wealth;
+                                        if (!val) return "-";
+                                        if (Array.isArray(val)) return val.join(", ");
+                                        try {
+                                            const parsed = JSON.parse(val);
+                                            if (Array.isArray(parsed)) return parsed.join(", ");
+                                        } catch (e) {}
+                                        return val;
+                                    })()
+                                },
                                 { label: t.riskProfile, value: user?.risk_profile === "Moderate" ? "40%" : (user?.risk_profile || "-"), className: "text-emerald-400" },
                             ].map((item, i) => (
                                 <div key={i} className="space-y-1">

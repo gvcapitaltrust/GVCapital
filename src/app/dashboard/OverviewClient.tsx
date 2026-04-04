@@ -384,7 +384,16 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                                 <div className="flex flex-col">
                                                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{lang === 'en' ? 'Source of Wealth' : '财富来源'}</span>
                                                     <span className="text-[10px] font-bold text-gray-600 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100 mt-1">
-                                                        {Array.isArray(user?.kyc_data?.source_of_wealth) ? user.kyc_data.source_of_wealth.join(", ") : (user?.kyc_data?.source_of_wealth || '-')}
+                                                        {(() => {
+                                                            const val = user?.kyc_data?.source_of_wealth;
+                                                            if (!val) return "-";
+                                                            if (Array.isArray(val)) return val.join(", ");
+                                                            try {
+                                                                const parsed = JSON.parse(val);
+                                                                if (Array.isArray(parsed)) return parsed.join(", ");
+                                                            } catch (e) {}
+                                                            return val;
+                                                        })()}
                                                     </span>
                                                 </div>
                                             </div>
