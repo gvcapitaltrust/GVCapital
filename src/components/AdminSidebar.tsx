@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useAdmin } from "@/providers/AdminProvider";
 
 interface AdminSidebarProps {
     lang: "en" | "zh";
@@ -26,6 +27,18 @@ export default function AdminSidebar({
 }: AdminSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
+    const { kycQueue, deposits, withdrawals } = useAdmin();
+
+    const pendingKYC = kycQueue?.length || 0;
+    const pendingDeposits = deposits?.filter((d: any) => d.status === 'Pending').length || 0;
+    const pendingWithdrawals = withdrawals?.filter((w: any) => w.status === 'Pending' || w.status === 'Pending Release').length || 0;
+
+    const getPendingCount = (id: string) => {
+        if (id === 'kyc') return pendingKYC;
+        if (id === 'deposits') return pendingDeposits;
+        if (id === 'withdrawals') return pendingWithdrawals;
+        return 0;
+    };
 
     const t = {
         en: {
@@ -99,7 +112,7 @@ export default function AdminSidebar({
                 </button>
 
                 <div className="space-y-12">
-                    <div className={`flex items-center transition-all duration-500 ${isCollapsed ? "justify-center" : "gap-2"}`}>
+                    <div className="flex items-center justify-center w-full transition-all duration-500">
                         <img src="/logo.png" alt="GV Capital" className={`transition-all duration-500 object-contain ${isCollapsed ? "h-8" : "h-[60px]"}`} />
                     </div>
 
@@ -115,9 +128,23 @@ export default function AdminSidebar({
                                     } ${isActive ? "bg-gv-gold/10 text-gv-gold border border-gv-gold/20" : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"}`}
                                     title={isCollapsed ? item.label : ""}
                                 >
-                                    {item.icon}
-                                    {!isCollapsed && (
-                                        <span className="text-[10px] font-black uppercase tracking-widest truncate">{item.label}</span>
+                                    <div className="flex items-center gap-4 relative">
+                                        <div className="relative">
+                                            {item.icon}
+                                            {isCollapsed && getPendingCount(item.id) > 0 && (
+                                                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[7px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-[#FAFAF8]">
+                                                    {getPendingCount(item.id)}
+                                                </div>
+                                            )}
+                                        </div>
+                                        {!isCollapsed && (
+                                            <span className="text-[10px] font-black uppercase tracking-widest truncate">{item.label}</span>
+                                        )}
+                                    </div>
+                                    {!isCollapsed && getPendingCount(item.id) > 0 && (
+                                        <span className="ml-auto bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full min-w-[16px] h-[16px] flex items-center justify-center animate-in zoom-in duration-300">
+                                            {getPendingCount(item.id)}
+                                        </span>
                                     )}
                                     {isCollapsed && (
                                         <div className="absolute left-full ml-4 px-3 py-1.5 bg-gv-gold text-white text-[9px] font-black uppercase tracking-widest rounded-lg opacity-0 pointer-events-none group-hover/item:opacity-100 transition-all z-[100] shadow-2xl whitespace-nowrap">
