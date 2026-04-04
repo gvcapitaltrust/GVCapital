@@ -119,7 +119,6 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
                                         <td className="px-8 py-6 text-right">
                                             <div className="flex flex-col">
                                                 <span className="font-black text-emerald-400 tabular-nums text-sm">$ {(Number(agent.total_referred_capital_usd || (Number(agent.total_referred_capital || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">RM {Number(agent.total_referred_capital || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -178,11 +177,9 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
                                     <div className="mt-4 flex flex-col">
                                         {(() => {
                                             const totalUSD = agentReferrals.reduce((sum, ref) => sum + Number(ref.balance_usd || 0), 0);
-                                            const totalRM = agentReferrals.reduce((sum, ref) => sum + Number(ref.balance || 0), 0);
                                             return (
                                                 <>
                                                     <span className="text-2xl font-black text-emerald-500 tabular-nums">$ {totalUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                    <span className="text-[11px] text-gray-400 font-black uppercase tracking-widest">RM {totalRM.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                                 </>
                                             );
                                         })()}
@@ -203,7 +200,6 @@ export default function SalesClient({ lang }: { lang: "en" | "zh" }) {
                                                 <div className="text-right">
                                                     <div className="flex flex-col">
                                                         <span className="text-xs font-black text-emerald-400">$ {(Number(ref.balance_usd || (Number(ref.balance || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                        <span className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">RM {Number(ref.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                                     </div>
                                                 </div>
                                             </div>
