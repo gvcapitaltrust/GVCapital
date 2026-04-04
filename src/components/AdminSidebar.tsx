@@ -152,13 +152,13 @@ export default function AdminSidebar({
                 onClick={onCloseMobileMenu}
             />
             <aside
-                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#FAFAF8] border-r border-gray-200 p-8 flex flex-col justify-between transition-transform duration-500 ease-out lg:hidden ${
+                className={`fixed inset-y-0 left-0 z-[60] w-80 bg-[#FAFAF8] border-r border-gray-200 p-8 flex flex-col justify-between transition-transform duration-500 ease-out lg:hidden overflow-y-auto ${
                     isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
                 <div className="space-y-12">
                     <div className="flex items-center justify-between">
-                        <img src="/logo2.png" alt="GV Capital" className="h-[40px] w-auto object-contain " />
+                        <img src="/logo.png" alt="GV Capital" className="h-[40px] w-auto object-contain " />
                         <button
                             onClick={onCloseMobileMenu}
                             className="h-10 w-10 flex items-center justify-center rounded-full border border-gray-200 text-gray-400 hover:text-gray-900 transition-colors"
@@ -175,7 +175,7 @@ export default function AdminSidebar({
                                     <button
                                         key={item.id}
                                         onClick={() => { router.push(`${item.path}?lang=${lang}`); onCloseMobileMenu(); }}
-                                        className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                                        className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
                                             pathname === item.path ? "bg-gv-gold/10 text-gv-gold border border-gv-gold/20" : "text-gray-400 hover:text-gray-900 hover:bg-white"
                                         }`}
                                     >
@@ -190,13 +190,13 @@ export default function AdminSidebar({
 
                 <div className="space-y-6">
                     <div className="p-6 bg-white rounded-[32px] border border-gray-200 space-y-4">
-                        <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-widest text-gray-400 px-2 pb-2 border-b border-gray-100">
+                        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-gray-400 px-2 pb-2 border-b border-gray-100">
                             <span>{t.maintenance}</span>
                             <button onClick={onToggleMaintenance} className={`h-5 rounded-full relative transition-all w-10 ${maintenanceMode ? "bg-red-500" : "bg-gray-200"}`}>
                                 <div className={`h-3.5 w-3.5 bg-white rounded-full absolute top-[3px] transition-all shadow-sm ${maintenanceMode ? "right-1" : "left-1"}`}></div>
                             </button>
                         </div>
-                        <button onClick={handleLogout} className="w-full bg-red-50 hover:bg-red-100 text-red-600 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border border-red-200 active:scale-[0.98]">
+                        <button onClick={handleLogout} className="w-full bg-red-50 hover:bg-red-100 text-red-600 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border border-red-200 active:scale-[0.98]">
                             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
                             Logout
                         </button>
