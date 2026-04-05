@@ -1,5 +1,10 @@
 import React from "react";
+import { Metadata } from "next";
 import KycClient from "./KycClient";
+
+export const metadata: Metadata = {
+    title: "Institutional Audit",
+};
 
 export default async function AdminKycPage({
     searchParams,

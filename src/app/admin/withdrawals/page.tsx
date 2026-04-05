@@ -1,5 +1,10 @@
 import React from "react";
+import { Metadata } from "next";
 import WithdrawalsClient from "./WithdrawalsClient";
+
+export const metadata: Metadata = {
+    title: "Withdrawal Management",
+};
 
 export default async function AdminWithdrawalsPage({
     searchParams,

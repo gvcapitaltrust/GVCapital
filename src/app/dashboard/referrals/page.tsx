@@ -1,5 +1,10 @@
 import React from "react";
+import { Metadata } from "next";
 import ReferralsClient from "./ReferralsClient";
+
+export const metadata: Metadata = {
+    title: "Network Referrals",
+};
 
 export default async function ReferralsPage({
     searchParams,
