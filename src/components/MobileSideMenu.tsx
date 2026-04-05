@@ -32,7 +32,7 @@ export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: Mo
             profile: "Profile",
             securityTitle: "Security",
             deposit: "Deposit",
-            withdraw: "Withdraw",
+            withdraw: "Withdrawal",
             logout: "Logout",
         },
         zh: {
