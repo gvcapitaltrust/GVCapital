@@ -258,7 +258,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                     </div>
                                     <div>
                                         <h3 className="text-2xl font-black uppercase tracking-tight text-slate-900 leading-none mb-1">{selectedTx.profiles?.full_name}</h3>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">AUDIT RECORD: {selectedTx.ref_id || selectedTx.id}</p>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">REF NO: {selectedTx.ref_id || selectedTx.id}</p>
                                     </div>
                                 </div>
                                 <button 
@@ -285,10 +285,9 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                 </div>
                                             )}
                                             <div className="pt-4 border-t border-slate-200 flex flex-col items-end gap-1">
-                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest self-start">Final Liquid Asset</span>
+                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest self-start">Net Payout</span>
                                                 <div className="flex flex-col items-end">
                                                     <span className="text-3xl font-black text-emerald-500 tabular-nums tracking-tighter leading-none">$ {Number(selectedTx.metadata?.original_usd_payout || selectedTx.metadata?.final_payout_usd || (selectedTx.original_currency === 'USD' ? Math.abs(Number(selectedTx.amount)) : (Number(selectedTx.metadata?.finalized_payout || selectedTx.metadata?.expected_payout || Math.abs(Number(selectedTx.amount))) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                    <span className="text-[11px] font-black text-slate-400 mt-2">≈ RM {(Number(selectedTx.metadata?.original_usd_payout || selectedTx.metadata?.final_payout_usd || (selectedTx.original_currency === 'USD' ? Math.abs(Number(selectedTx.amount)) : (Number(selectedTx.metadata?.finalized_payout || selectedTx.metadata?.expected_payout || Math.abs(Number(selectedTx.amount))) / forexRate))) * (selectedTx.metadata?.forex_rate || (forexRate - 0.4))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -326,7 +325,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className="flex items-start gap-6 pl-8 relative">
                                                 <div className="h-4 w-4 rounded-full bg-slate-200 absolute left-[4px] border-4 border-white"></div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Request Origin</span>
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">User Submitted</span>
                                                     <span className="text-xs font-bold text-slate-900">{formatDateTime(selectedTx.created_at)}</span>
                                                 </div>
                                             </div>
@@ -335,7 +334,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                 <div className="flex items-start gap-6 pl-8 relative">
                                                     <div className="h-4 w-4 rounded-full bg-blue-500 absolute left-[4px] border-4 border-white shadow-[0_0_12px_rgba(59,130,246,0.4)]"></div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest leading-none mb-2">Audit Compliance Passed</span>
+                                                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest leading-none mb-2">Approved</span>
                                                         <span className="text-xs font-bold text-slate-900">{formatDateTime(selectedTx.metadata?.approved_at || selectedTx.updated_at)}</span>
                                                     </div>
                                                 </div>
@@ -345,7 +344,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                 <div className="flex items-start gap-6 pl-8 relative">
                                                     <div className="h-4 w-4 rounded-full bg-emerald-500 absolute left-[4px] border-4 border-white shadow-[0_0_12px_rgba(16,185,129,0.4)]"></div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none mb-2">Capital Dispatched</span>
+                                                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none mb-2">Fund Released</span>
                                                         <span className="text-xs font-bold text-slate-900">{formatDateTime(selectedTx.metadata?.released_at || selectedTx.metadata?.completed_at || selectedTx.updated_at)}</span>
                                                     </div>
                                                 </div>
