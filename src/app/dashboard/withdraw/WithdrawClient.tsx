@@ -13,6 +13,15 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, withdrawalMethods, refreshData } = useUser();
     const { withdrawalRate } = useSettings();
     const router = useRouter();
+
+    if (!user) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 animate-in fade-in duration-700">
+                <div className="h-12 w-12 border-4 border-gv-gold border-t-transparent animate-spin rounded-full shadow-lg shadow-gv-gold/20"></div>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Synchronizing Vault Assets...</p>
+            </div>
+        );
+    }
     const [selectedMethodId, setSelectedMethodId] = useState<string | null>(null);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -240,29 +249,27 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             </div>
 
             {/* Redesigned Quick Stats Card */}
-            <div className="bg-white border border-gray-100 rounded-[32px] px-10 py-8 flex flex-col md:flex-row items-center justify-between gap-10 shadow-lg shadow-gray-200/50">
-                <div className="flex items-center gap-6 w-full md:w-auto">
-                    <div className="relative">
-                        <TierMedal tierId={userTierId} size="lg" />
-                    </div>
-                    <div className="space-y-1">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{lang === 'en' ? 'Total Capital Assets' : '总资产'}</span>
-                        <p className="text-3xl font-black text-slate-900 tabular-nums leading-none tracking-tighter">$ {(totalCapitalUSD).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            <div className="bg-white border border-gray-100 rounded-[32px] px-12 py-10 flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 shadow-lg shadow-gray-200/50 animate-in fade-in duration-1000">
+                <div className="flex flex-col items-center md:items-start gap-3 w-full md:w-auto">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{lang === 'en' ? 'Total Capital Assets' : '总资产'}</span>
+                    <div className="flex items-center gap-4">
+                        <p className="text-4xl font-black text-slate-900 tabular-nums leading-none tracking-tighter">$ {(totalCapitalUSD).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                        <TierMedal tierId={userTierId} size="md" className="shrink-0 -mt-2" />
                     </div>
                 </div>
 
                 <div className="h-px w-full md:h-12 md:w-px bg-gray-100 hidden md:block"></div>
 
-                <div className="flex items-center gap-6 w-full md:w-auto">
-                    <div className={`h-14 w-14 rounded-2xl flex items-center justify-center shadow-inner ${user?.next_maturity_date ? 'bg-amber-50 text-amber-500' : 'bg-emerald-50 text-emerald-500'}`}>
-                        {user?.next_maturity_date ? <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> : <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M5 13l4 4L19 7" /></svg>}
-                    </div>
-                    <div className="space-y-1 flex flex-col justify-center">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{lang === 'en' ? 'Capital Status' : '资金状态'}</span>
+                <div className="flex flex-col items-center md:items-start gap-3 w-full md:w-auto">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{lang === 'en' ? 'Capital Status' : '资金状态'}</span>
+                    <div className="flex items-center gap-4">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${user?.next_maturity_date ? 'bg-amber-100 text-amber-500' : 'bg-emerald-100 text-emerald-500'}`}>
+                            {user?.next_maturity_date ? <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> : <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M5 13l4 4L19 7" /></svg>}
+                        </div>
                         <div className="flex items-baseline gap-1.5 leading-none">
                             {user?.next_maturity_date ? (
                                 <>
-                                    <span className="text-2xl font-black text-slate-900 tabular-nums">
+                                    <span className="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">
                                         {Math.ceil((new Date(user.next_maturity_date).getTime() - new Date().getTime()) / 86400000)}
                                     </span>
                                     <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
@@ -277,9 +284,9 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-10">
-                <div className="space-y-10">
-                    <div className="bg-white border border-gray-100 rounded-[40px] p-8 md:p-12 shadow-2xl shadow-gray-200/50 space-y-10">
+            <div className="flex justify-center w-full">
+                <div className="w-full max-w-2xl space-y-10 animate-in slide-in-from-bottom-4 duration-700">
+                    <div className="bg-white border border-gray-100 rounded-[40px] p-8 md:p-12 shadow-2xl shadow-gray-200/40 space-y-10">
                         <div className="space-y-10">
                             {/* Source Selection */}
                             <div className="space-y-4">
@@ -329,9 +336,9 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                             {selectedMethodId === method.id && <div className="h-6 w-6 bg-gv-gold rounded-full flex items-center justify-center text-white scale-110 shadow-lg shadow-gv-gold/30"><svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg></div>}
                                         </button>
                                     ))}
-                                    {user.bank_name && (
+                                    {user?.bank_name && (
                                         <button onClick={() => setSelectedMethodId('KYC_BANK')} className={`flex items-center justify-between p-5 rounded-3xl border transition-all ${selectedMethodId === 'KYC_BANK' ? 'bg-gv-gold/5 border-gv-gold ring-1 ring-gv-gold' : 'bg-slate-50/50 border-slate-100 hover:border-slate-200'}`}>
-                                            <div className="flex items-center gap-5"><div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-all ${selectedMethodId === 'KYC_BANK' ? 'bg-gv-gold text-white' : 'bg-slate-100 text-slate-400'}`}><ShieldCheck className="h-6 w-6" /></div><div className="space-y-0.5"><p className="text-xs font-black uppercase tracking-tight">Primary Bank (KYC)</p><p className="text-[10px] font-bold text-gray-400 tracking-wider">{user.bank_name}</p></div></div>
+                                            <div className="flex items-center gap-5"><div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-all ${selectedMethodId === 'KYC_BANK' ? 'bg-gv-gold text-white' : 'bg-slate-100 text-slate-400'}`}><ShieldCheck className="h-6 w-6" /></div><div className="space-y-0.5"><p className="text-xs font-black uppercase tracking-tight">Primary Bank (KYC)</p><p className="text-[10px] font-bold text-gray-400 tracking-wider">{user?.bank_name}</p></div></div>
                                             {selectedMethodId === 'KYC_BANK' && <div className="h-6 w-6 bg-gv-gold rounded-full flex items-center justify-center text-white"><svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg></div>}
                                         </button>
                                     )}
