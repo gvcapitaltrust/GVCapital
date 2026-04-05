@@ -186,15 +186,35 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     return isDividendOrBonus && ['Approved', 'Completed'].includes(t.status);
                 }).reverse());
 
-                // 4. Fetch Referrals using both UUID and Username (e.g. for elwin87 and sonmus94 case)
-                // Use .ilike for case-insensitive username matching to ensure robustness if username case varies
-                const { data: refs, count: refsCount } = await supabase
-                    .from('profiles')
-                    .select('id, full_name, username, balance, is_verified, created_at, tier', { count: 'exact' })
-                    .or(`referred_by.eq.${user.id},referred_by_username.ilike.${profile.username}`);
+                // 4. Robust Referral Fetching (Two-Query Merge)
+                // This fix addresses the issue where referrals linked by username were not showing up.
+                // We perform two separate queries and merge them to avoid any PostgREST syntax issues in complex OR filters.
+                const fetchReferrals = async () => {
+                    // Query 1: By UUID (Technical ID)
+                    const { data: refsByUuid } = await supabase
+                        .from('profiles')
+                        .select('id, full_name, username, balance, is_verified, created_at, tier')
+                        .eq('referred_by', user.id);
+
+                    // Query 2: By Username (Registration Code)
+                    let refsByUsername: any[] = [];
+                    if (profile.username) {
+                        const { data } = await supabase
+                            .from('profiles')
+                            .select('id, full_name, username, balance, is_verified, created_at, tier')
+                            .ilike('referred_by_username', profile.username);
+                        if (data) refsByUsername = data;
+                    }
+
+                    // Merge and filter duplicates
+                    const combined = [...(refsByUuid || []), ...refsByUsername];
+                    const uniqueRefs = Array.from(new Map(combined.map(item => [item.id, item])).values());
+                    
+                    setReferredUsers(uniqueRefs);
+                    setReferredCount(uniqueRefs.length);
+                };
                 
-                if (refs) setReferredUsers(refs);
-                if (refsCount !== null) setReferredCount(refsCount);
+                await fetchReferrals();
 
                 // 5. Fetch Withdrawal Methods
                 const { data: wMethods } = await supabase

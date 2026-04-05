@@ -134,6 +134,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         ['Approved', 'Completed', 'Pending Release', 'Pending'].includes(t.status)
                     ).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
 
+                    // Robust Referral Count Calculation (UUID + Username merge)
+                    const referralCount = profileList.filter((u: any) => 
+                        u.referred_by === p.id || 
+                        (p.username && u.referred_by_username?.toLowerCase() === p.username.toLowerCase())
+                    ).length;
+
                     return {
                         ...p,
                         total_investment: totalInvestmentRM,
@@ -146,7 +152,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         total_assets_usd: totalAssetsUSD,
                         mature_capital_usd: matureCapitalUSD,
                         dividend_wallet_usd: profitUSD,
-                        total_withdrawn_usd: totalWithdrawnUSD
+                        total_withdrawn_usd: totalWithdrawnUSD,
+                        referral_count: referralCount
                     };
                 });
 

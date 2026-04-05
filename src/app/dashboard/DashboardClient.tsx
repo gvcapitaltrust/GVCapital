@@ -182,9 +182,18 @@ export default function DashboardClient() {
                     console.warn("No profile found for ID:", authUser.id);
                 }
 
-                const { data: refs, count } = await supabase.from('profiles').select('id, full_name, username, balance, is_verified, created_at', { count: 'exact' }).eq('referred_by', authUser.id);
-                setReferredCount(count || 0);
-                if (refs) setReferredUsers(refs);
+                // Robust Referral Fetching (Two-Query Merge) to correctly count all referrals
+                const { data: refsByUuid } = await supabase.from('profiles').select('id, full_name, username, balance, is_verified, created_at').eq('referred_by', authUser.id);
+                let refsByUsername: any[] = [];
+                if (profile.username) {
+                    const { data } = await supabase.from('profiles').select('id, full_name, username, balance, is_verified, created_at').ilike('referred_by_username', profile.username);
+                    if (data) refsByUsername = data;
+                }
+                const combined = [...(refsByUuid || []), ...refsByUsername];
+                const uniqueRefs = Array.from(new Map(combined.map(item => [item.id, item])).values());
+                
+                setReferredCount(uniqueRefs.length);
+                setReferredUsers(uniqueRefs);
 
                 fetchedRef.current = authUser.id;
             } catch (err) {
