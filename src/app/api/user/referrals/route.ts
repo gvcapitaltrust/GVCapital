@@ -19,29 +19,35 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Service role key missing' }, { status: 500 });
         }
 
-        const { username } = await req.json();
+        const { username, userId } = await req.json();
 
-        if (!username) {
-            return NextResponse.json({ error: 'username is required' }, { status: 400 });
+        if (!username && !userId) {
+            return NextResponse.json({ error: 'username or userId is required' }, { status: 400 });
         }
 
-        console.log('[referrals-api] Fetching referrals for username:', username);
+        console.log('[referrals-api] Fetching referrals for username:', username, 'userId:', userId);
 
-        // Simple direct query: find all profiles where referred_by_username matches 
-        // This is the only referral mechanism used during registration
-        const { data: referrals, error } = await supabaseAdmin
+        // Fetch ALL profiles with service role (bypasses RLS), then filter in-memory
+        // This mirrors AdminProvider logic exactly (lines 173-176 of AdminProvider.tsx)
+        const { data: allProfiles, error } = await supabaseAdmin
             .from('profiles')
-            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier')
-            .ilike('referred_by_username', username);
+            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier, referred_by, referred_by_username');
 
         if (error) {
             console.error('[referrals-api] query error:', error.message);
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        console.log('[referrals-api] Found', referrals?.length || 0, 'referrals for', username);
+        // Match by referred_by_username (primary) OR referred_by UUID (fallback)
+        const referrals = (allProfiles || []).filter((u: any) => {
+            if (userId && u.referred_by === userId) return true;
+            if (username && u.referred_by_username?.toLowerCase() === username.toLowerCase()) return true;
+            return false;
+        });
 
-        return NextResponse.json({ referrals: referrals || [] });
+        console.log('[referrals-api] Found', referrals.length, 'referrals. All profiles count:', allProfiles?.length);
+
+        return NextResponse.json({ referrals });
     } catch (error: any) {
         console.error('[referrals-api] Unhandled error:', error);
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });

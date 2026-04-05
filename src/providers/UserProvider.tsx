@@ -202,7 +202,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                         const res = await fetch('/api/user/referrals', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ username: inviterUsername }),
+                            body: JSON.stringify({ 
+                                username: inviterUsername,
+                                userId: user.id,
+                            }),
                         });
 
                         const json = await res.json();
