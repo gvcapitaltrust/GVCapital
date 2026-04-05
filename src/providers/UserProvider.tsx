@@ -188,36 +188,36 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     return isDividendOrBonus && ['Approved', 'Completed'].includes(t.status);
                 }).reverse());
 
-                // 4. Referral Fetching via server-side API (bypasses RLS so other profiles are visible)
+                // 4. Referral Fetching — direct query (same approach as AdminProvider)
                 const fetchReferrals = async () => {
-                    try {
-                        const res = await fetch('/api/user/referrals', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                username: profile.username || user.user_metadata?.username || '',
-                            }),
-                        });
-
-                        const json = await res.json();
-                        const uniqueRefs: any[] = json.referrals || [];
-
-                        // The list is the ground truth — count always equals the list
-                        setReferredUsers(uniqueRefs);
-                        setReferredCount(uniqueRefs.length);
-
-                        // Team assets = live sum of referred users' balances
-                        const liveAssetsSum = uniqueRefs.reduce(
-                            (acc: number, r: any) => acc + Number(r.balance_usd || (r.balance / forexRate)),
-                            0
-                        );
-                        setReferredTotalCapital(liveAssetsSum);
-                    } catch (err) {
-                        console.error('[UserProvider] fetchReferrals error:', err);
+                    const inviterUsername = profile.username || user.user_metadata?.username || '';
+                    if (!inviterUsername) {
                         setReferredUsers([]);
                         setReferredCount(0);
                         setReferredTotalCapital(0);
+                        return;
                     }
+
+                    // Query profiles where referred_by_username matches this user's username
+                    const { data: refs, error } = await supabase
+                        .from('profiles')
+                        .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier, referred_by_username')
+                        .ilike('referred_by_username', inviterUsername);
+
+                    if (error) {
+                        console.error('[UserProvider] referral query error:', error.message);
+                    }
+
+                    const uniqueRefs = (refs || []).filter((r: any) => r.id !== user.id);
+
+                    setReferredUsers(uniqueRefs);
+                    setReferredCount(uniqueRefs.length);
+
+                    const liveAssetsSum = uniqueRefs.reduce(
+                        (acc: number, r: any) => acc + Number(r.balance_usd || (r.balance / forexRate)),
+                        0
+                    );
+                    setReferredTotalCapital(liveAssetsSum);
                 };
                 
                 await fetchReferrals();
