@@ -143,17 +143,17 @@ export default function PortfolioClient({ lang }: { lang: "en" | "zh" }) {
                     
                     <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                         {users.filter(u => (u.balance_usd || 0) > 0).map((u, i) => (
-                            <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 border border-gray-100 group hover:bg-white hover:border-gv-gold/30 transition-all duration-300">
+                            <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl bg-gray-50 border border-gray-100 group hover:bg-white hover:border-gv-gold/30 transition-all duration-300 gap-4">
                                 <div className="flex items-center gap-4">
                                     <TierMedal tierId={getTierByAmount(u.balance_usd || 0).name} size="xs" />
                                     <div>
                                         <p className="text-[10px] font-black uppercase tracking-tight text-gray-900">{u.full_name || u.username}</p>
-                                        <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">
+                                        <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-tight">
                                             {u.portfolio_platform_name || "PENDING ALLOCATION"}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="text-right flex items-center gap-6">
+                                <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6">
                                     <span className="text-xs font-black tabular-nums text-gray-900">$ {(u.balance_usd || 0).toLocaleString()}</span>
                                     <Link 
                                         href={`/admin/users/${u.id}/portfolio?lang=${lang}`}

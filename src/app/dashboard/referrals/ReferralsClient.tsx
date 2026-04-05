@@ -116,7 +116,7 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
 
                 <div className="border border-gray-200 rounded-[32px] overflow-hidden bg-white shadow-xl shadow-gray-200/20">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left min-w-[700px]">
+                        <table className="w-full text-left hidden md:table">
                             <thead className="bg-gray-50/50 border-b border-gray-200 text-[10px] text-gray-400 font-extrabold uppercase tracking-[0.2em]">
                                 <tr>
                                     <th className="px-8 py-5">{t.username}</th>
@@ -171,6 +171,51 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                                 )}
                             </tbody>
                         </table>
+
+                    {/* Mobile View (Cards) */}
+                    <div className="md:hidden divide-y divide-slate-50">
+                        {referredUsers.map((ref, idx) => {
+                            const tierId = (ref.tier && ref.tier !== "Standard") 
+                                ? ref.tier.toLowerCase() 
+                                : ((ref.balance_usd > 0 || ref.balance > 0) ? getTierByAmount(ref.balance_usd || (ref.balance / forexRate)).id : "none");
+
+                            return (
+                                <div key={idx} className="p-4 space-y-4 hover:bg-slate-50 transition-all flex flex-col group">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-3">
+                                            <TierMedal tierId={tierId} size="sm" className="group-hover:scale-110 transition-transform" />
+                                            <div className="flex flex-col">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-gray-900 font-black text-sm tracking-tight">{ref.full_name || 'Anonymous Investor'}</span>
+                                                    {ref.is_verified && (
+                                                        <CheckCircle2 className="h-3 w-3 text-emerald-500 fill-emerald-500/10" strokeWidth={3} />
+                                                    )}
+                                                </div>
+                                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">@{ref.username}</span>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="text-gray-900 font-black text-sm tabular-nums">
+                                                $ {Number(ref.balance_usd || (ref.balance / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                            </span>
+                                            <div className="mt-1 flex justify-end">
+                                                <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest leading-none">
+                                                    Joined: {formatDate(ref.created_at)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {referredUsers.length === 0 && (
+                            <div className="p-20 text-center flex flex-col items-center gap-4 opacity-30">
+                                <div className="h-16 w-16 rounded-full border-2 border-dashed border-gray-400" />
+                                <span className="text-xs font-black uppercase tracking-widest text-gray-500">{t.noReferrals}</span>
+                            </div>
+                        )}
+                    </div>
                     </div>
                 </div>
             </div>

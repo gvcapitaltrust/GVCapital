@@ -127,7 +127,7 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
 
             <div className="bg-white border border-gray-200 rounded-[32px] overflow-hidden shadow-2xl relative">
                 <div className="overflow-x-auto overflow-y-auto max-h-[650px] scrollbar-thin scrollbar-thumb-gray-200">
-                    <table className="w-full text-left border-collapse min-w-[800px] lg:min-w-full">
+                    <table className="w-full text-left border-collapse hidden md:table">
                         <thead className="bg-slate-50/50 border-b border-slate-100 sticky top-0 z-10 backdrop-blur-md">
                             <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                                 <th className="px-6 py-6 pl-10">User Info</th>
@@ -193,6 +193,44 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                             ))}
                         </tbody>
                     </table>
+
+                    {/* Mobile View (Cards) */}
+                    <div className="md:hidden divide-y divide-slate-50">
+                        {filteredDeposits.map((tx, idx) => {
+                            const amountUSD = Number(tx.original_currency_amount || (Number(tx.amount || 0) / forexRate));
+                            const tierName = tx.profiles?.tier?.toLowerCase() || getTierByAmount(tx.profiles?.balance_usd || 0).id;
+
+                            return (
+                                <div key={tx.id || idx} className="p-4 space-y-4 hover:bg-slate-50 transition-all flex flex-col" onClick={() => openReceipt(tx)}>
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-3">
+                                            <TierMedal tierId={tierName} size="xs" />
+                                            <div className="flex flex-col">
+                                                <span className="font-black text-slate-900 uppercase tracking-tight text-[11px] truncate max-w-[150px]">{tx.profiles?.full_name}</span>
+                                                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="font-black text-emerald-500 tabular-nums text-sm">$ {amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <div className="mt-1 flex justify-end">
+                                                <span className={`px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest border border-slate-100 ${
+                                                    tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
+                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
+                                                    'bg-amber-500/10 text-amber-500'
+                                                }`}>
+                                                    {tx.status}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[9px] font-bold text-slate-300 uppercase italic tracking-tighter pt-2 border-t border-slate-50">
+                                        <span>{formatDate(tx.created_at)}</span>
+                                        <span>Ref: {tx.ref_id?.slice(-8).toUpperCase()}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
 
                     {filteredDeposits.length === 0 && (
                         <div className="p-32 text-center flex flex-col items-center gap-6">

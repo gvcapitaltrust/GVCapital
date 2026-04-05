@@ -262,7 +262,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
 
             <div className="bg-white border border-gray-200 rounded-[32px] overflow-hidden shadow-2xl relative">
                 <div className="overflow-x-auto overflow-y-auto max-h-[650px] scrollbar-thin scrollbar-thumb-gray-200">
-                    <table className="w-full text-left border-collapse min-w-[850px] lg:min-w-full">
+                    <table className="w-full text-left border-collapse hidden md:table">
                         <thead className="bg-slate-50/50 border-b border-slate-100 sticky top-0 z-10 backdrop-blur-md">
                             <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                                 <th className="px-6 py-6 pl-10 whitespace-nowrap">{t.tableType}</th>
@@ -336,6 +336,52 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                             })}
                         </tbody>
                     </table>
+
+                    {/* Mobile View (Cards) */}
+                    <div className="md:hidden divide-y divide-slate-50">
+                        {filteredTransactions.map((tx, idx) => {
+                            const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease' || tx.metadata?.is_penalty;
+                            const amountUSD = Number(tx.original_currency_amount || (Number(tx.amount) / forexRate));
+                            const displayAmount = isWithdrawal ? -Math.abs(amountUSD) : amountUSD;
+
+                            return (
+                                <div key={tx.id || idx} className="p-4 space-y-4 hover:bg-slate-50 transition-all flex flex-col" onClick={() => { setSelectedTx(tx); setIsDetailsOpen(true); }}>
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`h-10 w-10 rounded-xl flex items-center justify-center border ${
+                                                isWithdrawal ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 
+                                                tx.type === 'Deposit' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 
+                                                'bg-gv-gold/10 text-gv-gold border-gv-gold/20'
+                                            }`}>
+                                                {isWithdrawal ? <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg> : 
+                                                tx.type === 'Deposit' ? <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4v16m8-8H4" /></svg> :
+                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="font-black text-slate-900 uppercase tracking-tight text-xs">{tx.type}</span>
+                                                <span className="text-[10px] text-slate-400 font-mono font-bold">{formatDate(tx.created_at || tx.transfer_date)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className={`font-black tabular-nums text-sm ${displayAmount < 0 ? 'text-slate-400' : 'text-emerald-500'}`}>
+                                                {displayAmount < 0 ? '-' : '+'} $ {Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </span>
+                                            <div className="mt-1 flex justify-end">
+                                                <span className={`px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest border ${
+                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                                    tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                                                    'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                                }`}>
+                                                    {tx.status}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                     {filteredTransactions.length === 0 && (
                         <div className="p-20 text-center flex flex-col items-center gap-4">
                             <div className="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">

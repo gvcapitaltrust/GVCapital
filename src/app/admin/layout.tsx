@@ -85,7 +85,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                         </header>
 
                         <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent bg-gray-50/50 lg:pb-0 pb-24">
-                            <div className="p-8 lg:p-12 max-w-[1600px] mx-auto min-h-full">
+                            <div className="p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto min-h-full">
                                 {children}
                             </div>
                         </div>
