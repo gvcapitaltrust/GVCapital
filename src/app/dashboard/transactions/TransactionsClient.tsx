@@ -6,6 +6,8 @@ import { useSettings } from "@/providers/SettingsProvider";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatDate, formatDateTime } from "@/lib/dateUtils";
+import { getTierByAmount } from "@/lib/tierUtils";
+import TierMedal from "@/components/TierMedal";
 
 export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, transactions, loading } = useUser();
