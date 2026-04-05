@@ -32,7 +32,7 @@ interface AdminContextType {
     handleRejectDeposit: (tx: any) => Promise<void>;
     handleApproveWithdrawal: (tx: any) => Promise<void>;
     handleCompleteWithdrawal: (tx: any) => Promise<void>;
-    handleRejectWithdrawal: (tx: any) => Promise<void>;
+    handleRejectWithdrawal: (tx: any, reason: string) => Promise<void>;
     handleAdjustBalance: (user: any, amount: number, type: "balance" | "profit", reason: string) => Promise<void>;
     handleApproveKyc: (userId: string) => Promise<void>;
     handleRejectKyc: (userId: string, reason: string) => Promise<void>;
@@ -534,7 +534,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const handleRejectWithdrawal = async (tx: any) => {
+    const handleRejectWithdrawal = async (tx: any, reason: string) => {
         try {
             // 1. Calculate Refund (Withdrawal amount is recorded as negative)
             const refundUSD = Math.abs(Number(tx.amount || 0));
@@ -559,6 +559,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         processed_by_name: authUser?.user_metadata?.full_name || "Admin",
                         processed_by_id: authUser?.id,
                         processed_by_email: authUser?.email,
+                        reason: reason,
                         rejected_at: new Date().toISOString()
                     }
                 })

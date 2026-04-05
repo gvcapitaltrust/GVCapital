@@ -11,6 +11,9 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [rejectionTx, setRejectionTx] = useState<any | null>(null);
+    const [rejectionReason, setRejectionReason] = useState("");
+    const [isRejecting, setIsRejecting] = useState(false);
 
     const t = {
         en: {
@@ -59,6 +62,18 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
         const matchesStatus = statusFilter === "All" || tx.status === statusFilter;
         return matchesSearch && matchesStatus;
     });
+
+    const triggerReject = async () => {
+        if (!rejectionTx || !rejectionReason.trim()) return;
+        setIsRejecting(true);
+        try {
+            await handleRejectWithdrawal(rejectionTx, rejectionReason);
+            setRejectionTx(null);
+            setRejectionReason("");
+        } finally {
+            setIsRejecting(false);
+        }
+    };
 
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
 
@@ -168,7 +183,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                         <div className="flex items-center justify-end gap-3">
                                             {tx.status === 'Pending' && (
                                                 <>
-                                                    <button onClick={(e) => { e.stopPropagation(); handleRejectWithdrawal(tx); }} className="text-red-500 hover:bg-red-500/10 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">{t.reject}</button>
+                                                    <button onClick={(e) => { e.stopPropagation(); setRejectionTx(tx); }} className="text-red-500 hover:bg-red-500/10 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">{t.reject}</button>
                                                     <button onClick={(e) => { e.stopPropagation(); handleApproveWithdrawal(tx); }} className="bg-emerald-500 text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">{t.approve}</button>
                                                 </>
                                             )}
@@ -250,7 +265,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className="flex flex-col gap-3">
                                                 {tx.status === 'Pending' && (
                                                     <div className="grid grid-cols-2 gap-3">
-                                                        <button onClick={() => handleRejectWithdrawal(tx)} className="bg-white border border-red-500/20 text-red-500 text-[9px] font-black uppercase tracking-widest py-3 rounded-xl">{t.reject}</button>
+                                                        <button onClick={() => setRejectionTx(tx)} className="bg-white border border-red-500/20 text-red-500 text-[9px] font-black uppercase tracking-widest py-3 rounded-xl">{t.reject}</button>
                                                         <button onClick={() => handleApproveWithdrawal(tx)} className="bg-emerald-500 text-black text-[9px] font-black uppercase tracking-widest py-3 rounded-xl shadow-lg shadow-emerald-500/10">{t.approve}</button>
                                                     </div>
                                                 )}
@@ -269,7 +284,65 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                         <div className="p-20 text-center text-gray-500 font-black uppercase tracking-[0.2em]">{t.noWithdrawals}</div>
                     )}
                 </div>
-            </div>
+            {/* Rejection Reason Modal */}
+            {rejectionTx && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 px-6">
+                    <div className="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-300 p-8">
+                        <div className="flex flex-col gap-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xl font-black uppercase tracking-tight text-gray-900">Reject Withdrawal</h3>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Specify the reason for denial</p>
+                                </div>
+                                <button 
+                                    onClick={() => setRejectionTx(null)}
+                                    className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-gray-900 transition-colors"
+                                >
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="p-4 bg-red-50 border border-red-100 rounded-2xl">
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-[9px] font-black uppercase text-red-500 tracking-widest">Amount to Refund</span>
+                                        <span className="text-sm font-black text-red-600 tabular-nums">$ {(Math.abs(Number(rejectionTx.amount))).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    </div>
+                                    <p className="text-[8px] font-bold text-red-400 uppercase tracking-tighter">Funds will be returned to user dividend wallet</p>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Reason for rejection</label>
+                                    <textarea 
+                                        autoFocus
+                                        value={rejectionReason}
+                                        onChange={(e) => setRejectionReason(e.target.value)}
+                                        placeholder="e.g. Invalid bank details, Account verification required..."
+                                        className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 text-sm font-medium focus:outline-none focus:border-gv-gold focus:bg-white transition-all min-h-[120px] resize-none"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button 
+                                    onClick={() => setRejectionTx(null)}
+                                    className="flex-1 px-6 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-all font-bold"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    disabled={!rejectionReason.trim() || isRejecting}
+                                    onClick={triggerReject}
+                                    className="flex-1 px-6 py-4 bg-slate-900 text-gv-gold rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:-translate-y-0.5"
+                                >
+                                    {isRejecting ? 'Rejecting...' : 'Confirm Reject'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
-    );
+    </div>
+);
 }

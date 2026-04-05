@@ -360,9 +360,33 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                         </div>
                                                                     </div>
                                                                 )}
+                                                                {tx.status === 'Rejected' && (
+                                                                    <div className="flex items-center gap-3 pl-6 relative">
+                                                                        <div className="h-2 w-2 rounded-full bg-red-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
+                                                                        <div className="flex flex-col">
+                                                                            <span className="text-[10px] font-black text-red-500 uppercase">Rejected</span>
+                                                                            <span className="text-[9px] text-gray-500 font-bold">{formatDateTime(tx.metadata?.rejected_at || tx.updated_at)}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
+
+                                                    {tx.status === 'Rejected' && tx.metadata?.reason && (
+                                                        <div className="mt-8 p-6 bg-red-50 border border-red-100 rounded-[2rem] animate-in slide-in-from-bottom-4 duration-500">
+                                                            <div className="flex items-start gap-4">
+                                                                <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
+                                                                    <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                    <p className="text-[10px] font-black text-red-500 uppercase tracking-widest leading-none">Rejection Reason</p>
+                                                                    <p className="text-sm font-bold text-gray-900 leading-relaxed italic">"{tx.metadata.reason}"</p>
+                                                                    <p className="text-[8px] font-black text-red-300 uppercase tracking-tighter pt-1">Funds have been restored to your dividend wallet.</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                     )}
                                                 </td>
                                             </tr>
                                         )}
@@ -450,6 +474,21 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                         <p className="text-[7px] font-mono text-gray-300 mt-1 uppercase tracking-tighter">{tx.id.split('-')[0]}...{tx.id.split('-').pop()}</p>
                                                     </div>
                                                 </div>
+
+                                                {tx.status === 'Rejected' && tx.metadata?.reason && (
+                                                    <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-2xl">
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center shrink-0">
+                                                                <svg className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                <p className="text-[8px] font-black text-red-500 uppercase tracking-widest leading-none">Rejection Reason</p>
+                                                                <p className="text-xs font-bold text-gray-900 italic">"{tx.metadata.reason}"</p>
+                                                                <p className="text-[7px] font-black text-red-300 uppercase tracking-tighter pt-1">Funds restored to wallet.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                 )}
                                             </div>
                                         )}
                                     </div>
