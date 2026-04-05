@@ -455,14 +455,12 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 <span>{t.penaltyAmt}</span>
                                 <span>- $ {penaltyInfo.penalty_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                             </div>
-                            <div className="flex justify-between items-start text-emerald-500 border-t border-gray-200 pt-5">
-                                <div className="space-y-1">
-                                    <span className="block text-[10px] font-black uppercase tracking-widest">{t.estPayout}</span>
-                                    <span className="block text-3xl font-black tabular-nums">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                </div>
-                                <div className="text-right space-y-1 opacity-60">
-                                    <span className="block text-[9px] font-bold uppercase">{t.estPayoutUSD}</span>
-                                    <span className="block text-xs font-black">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                            <div className="flex flex-col items-center justify-center text-emerald-500 border-t border-gray-200 pt-8 pb-2 space-y-2">
+                                <span className="text-[10px] font-black uppercase tracking-widest opacity-80">{t.estPayoutUSD}</span>
+                                <span className="text-5xl font-black tabular-nums tracking-tighter">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <div className="flex items-center gap-2 pt-2">
+                                    <span className="text-xs font-bold uppercase tracking-widest opacity-60">{t.estPayout}:</span>
+                                    <span className="text-lg font-black tabular-nums">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                             </div>
                             <div className="text-[9px] font-black text-gray-400 text-center uppercase tracking-widest border-t border-gray-200 pt-3">
