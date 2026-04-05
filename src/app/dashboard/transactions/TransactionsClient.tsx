@@ -425,7 +425,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
 
             {isDetailsOpen && selectedTx && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-2xl rounded-[3rem] overflow-hidden shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-500 p-8 md:p-10">
+                    <div className="bg-white w-full max-w-2xl rounded-[3rem] overflow-y-auto max-h-[90vh] scrollbar-thin scrollbar-thumb-slate-200 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-500 p-8 md:p-10">
                         <div className="flex flex-col gap-8">
                             <div className="flex items-center justify-between">
                                 <div>

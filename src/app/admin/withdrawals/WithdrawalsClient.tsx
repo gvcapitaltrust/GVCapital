@@ -249,7 +249,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
             {/* Withdrawal Detail Modal */}
             {isDetailsOpen && selectedTx && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 px-6">
-                    <div className="bg-white w-full max-w-2xl rounded-[3rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.3)] border border-slate-100 animate-in zoom-in-95 duration-500 p-10">
+                    <div className="bg-white w-full max-w-2xl rounded-[3rem] overflow-y-auto max-h-[90vh] scrollbar-thin scrollbar-thumb-slate-200 shadow-[0_0_100px_rgba(0,0,0,0.3)] border border-slate-100 animate-in zoom-in-95 duration-500 p-10">
                         <div className="flex flex-col gap-10">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
@@ -406,7 +406,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
             {/* Rejection Reason Modal */}
             {rejectionTx && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 px-6">
-                    <div className="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-300 p-8">
+                    <div className="bg-white w-full max-w-md rounded-[2.5rem] overflow-y-auto max-h-[85vh] scrollbar-thin scrollbar-thumb-slate-200 shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-300 p-8">
                         <div className="flex flex-col gap-6">
                             <div className="flex items-center justify-between">
                                 <div>

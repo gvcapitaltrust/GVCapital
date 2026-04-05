@@ -211,7 +211,7 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
             {isDetailModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-300">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-xl" onClick={() => setIsDetailModalOpen(false)}></div>
-                    <div className="relative bg-white border border-gray-200 rounded-[40px] w-full max-w-6xl h-full flex flex-col overflow-hidden shadow-2xl">
+                    <div className="relative bg-white border border-gray-200 rounded-[40px] w-full max-w-6xl max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 flex flex-col shadow-2xl">
                         <div className="p-8 border-b border-gray-200 flex items-center justify-between shrink-0">
                             <div>
                                 <h3 className="text-2xl font-black uppercase tracking-tighter text-gray-900">Verification Review</h3>

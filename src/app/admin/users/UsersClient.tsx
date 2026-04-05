@@ -329,7 +329,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             {isDetailModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-500">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-2xl" onClick={() => setIsDetailModalOpen(false)}></div>
-                    <div className="relative bg-white border border-gray-200 rounded-[40px] w-full max-w-7xl h-full flex flex-col overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+                    <div className="relative bg-white border border-gray-200 rounded-[40px] w-full max-w-7xl max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.5)]">
                         <div className="p-4 md:p-8 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between bg-gray-50 gap-4">
                             <div className="flex items-center gap-4 md:gap-6">
                                 <TierMedal 
