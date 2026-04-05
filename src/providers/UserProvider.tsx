@@ -188,76 +188,38 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     return isDividendOrBonus && ['Approved', 'Completed'].includes(t.status);
                 }).reverse());
 
-                // 4. Robust Referral Fetching (Two-Query Merge)
-                // This fix addresses the issue where referrals linked by username were not showing up.
-                // We perform two separate queries and merge them to avoid any PostgREST syntax issues in complex OR filters.
+                // 4. Referral Fetching via server-side API (bypasses RLS so other profiles are visible)
                 const fetchReferrals = async () => {
-                    // 1. Identify all possible inviter codes for this user
-                    const codes = new Set<string>();
-                    if (profile.username) codes.add(profile.username.toLowerCase());
-                    if (user.email) codes.add(user.email.toLowerCase());
-                    if (user.user_metadata?.username) codes.add(user.user_metadata.username.toLowerCase());
-                    
-                    const inviterCodes = Array.from(codes);
+                    try {
+                        const res = await fetch('/api/user/referrals', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                userId: user.id,
+                                username: profile.username || user.user_metadata?.username || '',
+                                email: user.email || '',
+                            }),
+                        });
 
-                    // 2. Query referrals by both UUID and all possible username/email identifiers
-                    const { data: refsByUuid } = await supabase
-                        .from('profiles')
-                        .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier')
-                        .eq('referred_by', user.id);
+                        const json = await res.json();
+                        const uniqueRefs: any[] = json.referrals || [];
 
-                    let refsByUsername: any[] = [];
-                    if (inviterCodes.length > 0) {
-                        const { data } = await supabase
-                            .from('profiles')
-                            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier')
-                            .or(inviterCodes.map(code => `referred_by_username.ilike.${code}`).join(','));
-                        if (data) refsByUsername = data;
+                        // The list is the ground truth — count always equals the list
+                        setReferredUsers(uniqueRefs);
+                        setReferredCount(uniqueRefs.length);
+
+                        // Team assets = live sum of referred users' balances
+                        const liveAssetsSum = uniqueRefs.reduce(
+                            (acc: number, r: any) => acc + Number(r.balance_usd || (r.balance / forexRate)),
+                            0
+                        );
+                        setReferredTotalCapital(liveAssetsSum);
+                    } catch (err) {
+                        console.error('[UserProvider] fetchReferrals error:', err);
+                        setReferredUsers([]);
+                        setReferredCount(0);
+                        setReferredTotalCapital(0);
                     }
-
-                    // Merge and filter duplicates
-                    const combined = [...(refsByUuid || []), ...refsByUsername];
-                    const uniqueRefs = Array.from(new Map(combined.map(item => [item.id, item])).values());
-                    setReferredUsers(uniqueRefs);
-
-                    // 3. Fetch Aggregate Stats (Count & Team Assets)
-                    // We check several counters and take the highest to ensure data recovery
-                    
-                    // Count head-count directly (bypassing some RLS row-hiding if head:true is permitted)
-                    const { count: uuidCount } = await supabase
-                        .from('profiles')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('referred_by', user.id);
-
-                    let directCount = 0;
-                    if (inviterCodes.length > 0) {
-                        const { count } = await supabase
-                            .from('profiles')
-                            .select('*', { count: 'exact', head: true })
-                            .or(inviterCodes.map(code => `referred_by_username.ilike.${code}`).join(','));
-                        if (count) directCount = count;
-                    }
-
-                    // System counters from Sales Leaderboard or Profile record
-                    const { data: salesStats } = inviterCodes.length > 0 ? await supabase
-                        .from('sales_leaderboard')
-                        .select('total_referrals, total_referred_capital')
-                        .or(inviterCodes.map(code => `agent_username.ilike.${code}`).join(','))
-                        .maybeSingle() : { data: null };
-
-                    const profileCount = Number(profile.total_referrals || profile.referral_count || 0);
-                    const leaderboardCount = Number(salesStats?.total_referrals || 0);
-                    
-                    // Result: Maximum of all found counts
-                    const finalCount = Math.max(uniqueRefs.length, profileCount, leaderboardCount, Number(uuidCount || 0), directCount);
-                    setReferredCount(finalCount);
-
-                    // Assets Result: Max of profile record, leaderboard record, or live sum
-                    const profileAssets = Number(profile.referred_total_capital_usd || profile.total_referred_capital || 0);
-                    const leaderboardAssets = Number(salesStats?.total_referred_capital || 0);
-                    const liveAssetsSum = uniqueRefs.reduce((acc, r) => acc + Number(r.balance_usd || (r.balance / forexRate)), 0);
-                    
-                    setReferredTotalCapital(Math.max(liveAssetsSum, profileAssets, leaderboardAssets));
                 };
                 
                 await fetchReferrals();
