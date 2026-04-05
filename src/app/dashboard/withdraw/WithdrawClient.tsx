@@ -381,10 +381,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                             <div className="flex flex-col items-center justify-center text-emerald-500 space-y-0.5">
                                 <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-80">{t.estPayoutUSD}</span>
                                 <span className="text-4xl font-black tabular-nums tracking-tighter leading-tight">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                <div className="pt-1 text-center"><span className="text-base font-black tabular-nums tracking-tight opacity-90">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
                             </div>
-                            
-                            <div className="text-[9px] font-black text-gray-400 text-center uppercase tracking-[0.3em] font-mono border-t border-slate-200 pt-4">Rate: $1.0 = RM {(forexRate - 0.4).toFixed(2)}</div>
                         </div>
 
                         <div className="flex flex-col gap-2">

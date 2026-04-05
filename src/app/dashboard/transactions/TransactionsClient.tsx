@@ -193,21 +193,19 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         const txBody = periodTxs.map(tx => {
             const usd = getUSD(tx);
             const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease';
-            const rateToUse = tx.metadata?.forex_rate || (isWithdrawal ? withdrawalRate : forexRate);
-            const rm = usd * rateToUse;
             let typeDesc = tx.metadata?.description || tx.type;
             
             return [
                 formatDate(tx.created_at || tx.transfer_date),
                 tx.ref_id || "-",
                 typeDesc,
-                { content: `$ ${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\nRM ${rm.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, styles: { fontSize: 8, halign: 'right' } }
+                { content: `$ ${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, styles: { fontSize: 8, halign: 'right' } }
             ];
         });
 
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 15,
-            head: [['Date', 'Reference ID', 'Position Description', 'Net Amount (Base/Local)']],
+            head: [['Date', 'Reference ID', 'Position Description', 'Net Amount (USD)']],
             body: txBody,
             theme: 'striped',
             headStyles: { fillColor: [71, 85, 105], fontSize: 8 },
@@ -254,58 +252,6 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </div>
 
-            {/* Filter Controls Card - Separated from Header */}
-            <div className="bg-white border border-gray-200 rounded-[2.5rem] p-8 md:p-10 flex flex-wrap items-center gap-8 shadow-sm">
-                <div className="flex flex-wrap items-center gap-4">
-                    <div className="flex flex-col gap-1.5 min-w-[140px]">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t.typeLabel}</span>
-                        <select
-                            value={typeFilter}
-                            onChange={(e) => setTypeFilter(e.target.value)}
-                            className="bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-xs font-black uppercase tracking-widest focus:outline-none focus:border-gv-gold transition-all text-slate-900 appearance-none cursor-pointer"
-                        >
-                            <option value="all">{lang === "en" ? "All Types" : "所有类型"}</option>
-                            <option value="deposit">{lang === "en" ? "Deposits" : "存款"}</option>
-                            <option value="withdraw">{lang === "en" ? "Withdrawals" : "提款"}</option>
-                            <option value="dividend">{lang === "en" ? "Dividends" : "分红"}</option>
-                            <option value="bonus">{lang === "en" ? "Bonuses" : "奖金"}</option>
-                        </select>
-                    </div>
-                    
-                    <div className="flex flex-col gap-1.5 min-w-[140px]">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t.statusLabel}</span>
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-xs font-black uppercase tracking-widest focus:outline-none focus:border-gv-gold transition-all text-slate-900 appearance-none cursor-pointer"
-                        >
-                            <option value="all">{lang === "en" ? "All Status" : "所有状态"}</option>
-                            <option value="Completed">{lang === "en" ? "Completed" : "已完成"}</option>
-                            <option value="Pending">{lang === "en" ? "Pending" : "处理中"}</option>
-                            <option value="Rejected">{lang === "en" ? "Rejected" : "已拒绝"}</option>
-                        </select>
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t.dateRange}</span>
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="date"
-                                value={dateRange.start}
-                                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                                className="bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold transition-all text-slate-900"
-                            />
-                            <span className="text-slate-300 font-bold text-[10px]">TO</span>
-                            <input
-                                type="date"
-                                value={dateRange.end}
-                                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                                className="bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold transition-all text-slate-900"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div className="flex items-center gap-4 px-2">
                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.totalInView}:</span>
@@ -365,7 +311,6 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                 <span className={`font-black tabular-nums text-lg leading-none ${displayAmount < 0 ? 'text-slate-400' : 'text-emerald-500'}`}>
                                                     {displayAmount < 0 ? '-' : '+'} $ {Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </span>
-                                                <span className="text-[9px] text-slate-300 font-bold uppercase mt-1 tracking-widest">≈ RM {payoutRM.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-6">
@@ -468,7 +413,6 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                 <span className="text-[8px] text-emerald-500 uppercase tracking-widest self-start">Final Net Realized</span>
                                                 <div className="flex flex-col items-end leading-none">
                                                     <span className="text-3xl text-slate-900 tabular-nums tracking-tighter">$ {Number(selectedTx.metadata?.final_payout_usd || Math.abs(Number(selectedTx.original_currency_amount || (Number(selectedTx.amount) / forexRate)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                    <span className="text-[11px] text-slate-400 mt-1">≈ RM {(Number(selectedTx.metadata?.final_payout_usd || Math.abs(Number(selectedTx.original_currency_amount || (Number(selectedTx.amount) / forexRate)))) * (selectedTx.metadata?.forex_rate || (selectedTx.type === 'Withdrawal' ? withdrawalRate : forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 </div>
                                             </div>
                                         </div>

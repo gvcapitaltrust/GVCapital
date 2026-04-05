@@ -146,11 +146,6 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                                     placeholder="0.00" 
                                 />
                             </div>
-                            {depositAmount && (
-                                <p className="px-1 text-[11px] font-black text-gv-gold uppercase tracking-tighter">
-                                    ≈ RM {(parseFloat(depositAmount) * depositRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                </p>
-                            )}
                         </div>
 
 
