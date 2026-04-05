@@ -206,6 +206,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                         });
 
                         const json = await res.json();
+                        console.log('[DEBUG-Referrals] API Response:', json);
+
                         const uniqueRefs: any[] = json.referrals || [];
 
                         // Match logic: strictly list-based to match sales leaderboard

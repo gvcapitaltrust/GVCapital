@@ -14,38 +14,49 @@ function getAdminClient() {
 export async function POST(req: Request) {
     try {
         const supabaseAdmin = getAdminClient();
+        
+        // Debug info to confirm if the key is actually loaded in Vercel
+        const diagnostics = {
+            hasUrl: !!supabaseUrl,
+            hasServiceKey: !!supabaseServiceKey,
+            serviceKeyPrefix: supabaseServiceKey ? supabaseServiceKey.substring(0, 10) + '...' : 'NONE',
+            envKeys: Object.keys(process.env).filter(k => k.includes('SUPABASE'))
+        };
+
         if (!supabaseAdmin) {
-            console.error('[referrals-api] CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing in the environment!');
-            return NextResponse.json({ error: 'Service role key missing' }, { status: 500 });
+            console.error('[referrals-api] CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing!', diagnostics);
+            return NextResponse.json({ 
+                error: 'Service role key missing in environment', 
+                diagnostics 
+            }, { status: 500 });
         }
 
         const { username } = await req.json();
 
         if (!username) {
-            console.error('[referrals-api] username is missing in request body');
             return NextResponse.json({ error: 'username is required' }, { status: 400 });
         }
 
-        console.log(`[referrals-api] Querying referrals for username: "${username}"`);
+        console.log(`[referrals-api] Querying for: "${username}"`);
 
-        // To perfectly match the Sales Leaderboard logic, we ONLY check referred_by_username.
-        // This avoids inconsistencies caused by manually edited UUID fields.
-        const { data: referrals, error, status } = await supabaseAdmin
+        const { data: referrals, error } = await supabaseAdmin
             .from('profiles')
-            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier')
-            .ilike('referred_by_username', username);
+            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier, referred_by_username')
+            .ilike('referred_by_username', username.trim());
 
         if (error) {
             console.error('[referrals-api] Supabase error:', error.message);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: error.message, diagnostics }, { status: 500 });
         }
 
-        console.log(`[referrals-api] Found ${referrals?.length || 0} referrals for "${username}" (Status: ${status})`);
+        console.log(`[referrals-api] Success! Found ${referrals?.length || 0} for ${username}`);
 
         return NextResponse.json({ 
             success: true,
             referrals: referrals || [],
-            count: referrals?.length || 0
+            count: referrals?.length || 0,
+            debug_username_queried: username,
+            diagnostics
         });
     } catch (error: any) {
         console.error('[referrals-api] Unhandled error:', error);
