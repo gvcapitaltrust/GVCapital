@@ -42,9 +42,9 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             title: "Transaction Ledger",
             subtitle: "Comprehensive audit trail of all capital movements and dividend distributions.",
             tableType: "Type",
-            tableDate: "Execution Date",
+            tableDate: "Date",
             tableAmount: "Net Amount (USD)",
-            tableStatus: "Audit Status",
+            tableStatus: "Status",
             tableActions: "Actions",
             details: "Details",
             typeLabel: "Type",
@@ -339,13 +339,12 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                     tx.type === 'Deposit' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 group-hover:rotate-12' : 
                                                     'bg-gv-gold/10 text-gv-gold border-gv-gold/20 group-hover:-translate-y-1'
                                                 }`}>
-                                                    {isWithdrawal ? <TierMedal tierId={currentUserTier} size="xs" /> : 
+                                                    {isWithdrawal ? <svg className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg> : 
                                                     tx.type === 'Deposit' ? <svg className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4v16m8-8H4" /></svg> :
                                                     <svg className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>}
                                                 </div>
                                                 <div className="flex flex-col overflow-hidden">
                                                     <span className="font-black text-slate-900 uppercase tracking-tight text-sm group-hover:text-gv-gold transition-colors truncate max-w-[120px]">{tx.type}</span>
-                                                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none">Net Ledger</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -434,7 +433,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h3 className="text-xl font-black uppercase tracking-tight text-slate-900">Transaction Details</h3>
-                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Audit Trace: {selectedTx.ref_id || selectedTx.id}</p>
+                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Reference No: {selectedTx.ref_id || selectedTx.id}</p>
                                 </div>
                                 <button onClick={() => setIsDetailsOpen(false)} className="h-12 w-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:text-slate-900 transition-all border border-slate-100 shadow-sm hover:rotate-90">
                                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M6 18L18 6M6 6l12 12" /></svg>
@@ -469,22 +468,6 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                         </div>
                                     </div>
                                     
-                                    <div className="space-y-4">
-                                        <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
-                                            <div className="h-1 w-4 bg-blue-500 rounded-full"></div>
-                                            Institutional Context
-                                        </h4>
-                                        <div className="bg-slate-50 border border-slate-100 p-6 rounded-3xl space-y-4">
-                                            <div className="flex flex-col">
-                                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Reference ID</span>
-                                                <span className="text-xs font-mono font-black text-slate-900 select-all tracking-tight uppercase">{selectedTx.ref_id || selectedTx.id}</span>
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Transaction Category</span>
-                                                <span className="text-xs font-black text-slate-700 uppercase tracking-tighter">{selectedTx.type}</span>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <div className="space-y-4">
@@ -492,31 +475,31 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className="h-1 w-4 bg-emerald-500 rounded-full"></div>
                                             Execution Timeline
                                     </h4>
-                                    <div className="space-y-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100 px-2 pt-1">
+                                    <div className="space-y-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-200 px-2 pt-1">
                                         <div className="flex items-start gap-6 pl-8 relative">
-                                            <div className="h-4 w-4 rounded-full bg-slate-200 absolute left-[3.5px] border-4 border-white shadow-sm"></div>
+                                            <div className="h-4 w-4 rounded-full bg-slate-400 absolute left-[3.5px] border-4 border-white shadow-sm"></div>
                                             <div className="flex flex-col">
                                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-2">Request Processed</span>
                                                 <span className="text-xs font-black text-slate-900 leading-none">{formatDateTime(selectedTx.created_at)}</span>
                                             </div>
                                         </div>
 
-                                        {['Approved', 'Completed', 'Pending Release'].includes(selectedTx.status) && (
-                                            <div className="flex items-start gap-6 pl-8 relative">
+                                        {['Approved', 'Completed', 'Pending Release'].some(s => s.toLowerCase() === selectedTx.status?.toLowerCase()) && (
+                                            <div className="flex items-start gap-6 pl-8 relative animate-in slide-in-from-top-4 duration-500">
                                                 <div className="h-4 w-4 rounded-full bg-blue-500 absolute left-[3.5px] border-4 border-white shadow-[0_0_12px_rgba(59,130,246,0.3)]"></div>
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] leading-none mb-2">Institutional Clearance</span>
-                                                    <span className="text-xs font-black text-slate-900 leading-none">{formatDateTime(selectedTx.updated_at)}</span>
+                                                    <span className="text-xs font-black text-slate-900 leading-none">{formatDateTime(selectedTx.updated_at || selectedTx.created_at)}</span>
                                                 </div>
                                             </div>
                                         )}
 
-                                        {['Approved', 'Completed'].includes(selectedTx.status) && (
-                                            <div className="flex items-start gap-6 pl-8 relative">
+                                        {['Approved', 'Completed'].some(s => s.toLowerCase() === selectedTx.status?.toLowerCase()) && (
+                                            <div className="flex items-start gap-6 pl-8 relative animate-in slide-in-from-top-4 duration-700">
                                                 <div className="h-4 w-4 rounded-full bg-emerald-500 absolute left-[3.5px] border-4 border-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"></div>
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] leading-none mb-2">Capital Finalized</span>
-                                                    <span className="text-xs font-black text-slate-900 leading-none">{formatDateTime(selectedTx.updated_at)}</span>
+                                                    <span className="text-xs font-black text-slate-900 leading-none">{formatDateTime(selectedTx.updated_at || selectedTx.created_at)}</span>
                                                 </div>
                                             </div>
                                         )}
