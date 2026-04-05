@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
 import { supabase } from "@/lib/supabaseClient";
+import { ArrowLeft } from "lucide-react";
 
 export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
+    const router = useRouter();
     const { userProfile: user } = useUser();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -52,26 +55,24 @@ export default function SecurityClient({ lang }: { lang: "en" | "zh" }) {
     };
 
     return (
-        <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
+        <div className="space-y-12 animate-in fade-in duration-700 pb-20">
+            {/* Standard Header */}
+            <div className="flex items-center gap-6">
+                <button 
+                    onClick={() => router.push(`/dashboard?lang=${lang}`)}
+                    className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm hover:shadow-md"
+                >
+                    <ArrowLeft className="h-6 w-6" />
+                </button>
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tighter leading-none">{t.securityTitle}</h1>
+                    <p className="text-gray-400 text-sm font-medium">{t.securitySubtitle}</p>
+                </div>
+            </div>
+
             <div className="bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
                 <div className="relative z-10 space-y-10">
-                    <div className="mb-10 p-6 bg-gv-gold/10 border border-gv-gold/20 rounded-3xl">
-                        <h4 className="text-gv-gold font-black uppercase text-xs tracking-widest mb-2 flex items-center gap-2">
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A3.323 3.323 0 0010.605 7.88a3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651 3.323 3.323 0 00-4.651 4.651 3.323 3.323 0 01-4.651 4.651" /></svg>
-                            Active Protection
-                        </h4>
-                        <p className="text-gray-500 text-xs font-medium leading-relaxed">
-                            {lang === 'en' 
-                                ? "Withdrawals are secured by your unique 6-digit Security PIN established during account registration."
-                                : "提款由您在开户时设置的唯一 6 位安全密码保护。"}
-                        </p>
-                    </div>
-
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-bold uppercase tracking-tight text-gray-900">{t.securityTitle}</h2>
-                        <p className="text-gray-400 font-medium text-sm leading-relaxed max-w-lg">{t.securitySubtitle}</p>
-                    </div>
 
                     <form onSubmit={handlePasswordUpdate} className="grid gap-6">
                         {[

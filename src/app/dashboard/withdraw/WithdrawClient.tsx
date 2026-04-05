@@ -242,22 +242,16 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 pb-10">
-            {/* Improved Header Card with defined border */}
-            <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 md:p-10 flex items-center justify-between gap-8 shadow-sm animate-in fade-in duration-500">
-                <div className="flex items-center gap-6">
-                    <button onClick={() => router.push(`/dashboard?lang=${lang}`)} className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-gv-gold transition-all shadow-sm group">
-                        <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
-                    </button>
-                    <div className="space-y-3">
-                        <div className="hidden md:flex items-center gap-3">
-                            <div className="h-0.5 w-10 bg-gv-gold rounded-full"></div>
-                            <span className="text-gv-gold text-[10px] font-black uppercase tracking-[0.4em] mb-0.5">Asset Liquidation</span>
-                        </div>
-                        <div className="space-y-0.5">
-                            <h1 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">{t.title}</h1>
-                            <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest mt-1">{t.desc}</p>
-                        </div>
-                    </div>
+            <div className="flex items-center gap-6">
+                <button 
+                    onClick={() => router.push(`/dashboard?lang=${lang}`)}
+                    className="h-12 w-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-gv-gold transition-all shadow-sm hover:shadow-md"
+                >
+                    <ArrowLeft className="h-6 w-6" />
+                </button>
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none">{t.title}</h1>
+                    <p className="text-slate-400 text-sm font-medium">{t.desc}</p>
                 </div>
             </div>
 

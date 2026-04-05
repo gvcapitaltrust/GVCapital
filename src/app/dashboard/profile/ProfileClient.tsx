@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
 import { supabase } from "@/lib/supabaseClient";
+import { ArrowLeft } from "lucide-react";
 
 export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
+    const router = useRouter();
     const { userProfile: user, withdrawalMethods, loading, refreshData } = useUser();
     const [viewDocumentUrl, setViewDocumentUrl] = useState<string | null>(null);
     const [isAddMethodOpen, setIsAddMethodOpen] = useState(false);
@@ -28,6 +31,8 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
 
     const t = {
         en: {
+            profileTitle: "Account Profile",
+            profileSubtitle: "Manage your institutional identity and verify your information.",
             personalInfo: "Personal Information",
             fullName: "Full Name",
             username: "Username",
@@ -50,6 +55,8 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
             viewStatement: "View Document",
         },
         zh: {
+            profileTitle: "个人资料",
+            profileSubtitle: "管理您的机构身份并验证您的信息。",
             personalInfo: "个人信息",
             fullName: "姓名",
             username: "用户名",
@@ -123,7 +130,20 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
+        <div className="space-y-12 animate-in fade-in duration-700 pb-20">
+            {/* Standard Header */}
+            <div className="flex items-center gap-6">
+                <button 
+                    onClick={() => router.push(`/dashboard?lang=${lang}`)}
+                    className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm hover:shadow-md"
+                >
+                    <ArrowLeft className="h-6 w-6" />
+                </button>
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tighter leading-none">{t.profileTitle}</h1>
+                    <p className="text-gray-400 text-sm font-medium">{t.profileSubtitle}</p>
+                </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Personal Information */}
                 <div className="bg-gray-50 border border-gray-200 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">

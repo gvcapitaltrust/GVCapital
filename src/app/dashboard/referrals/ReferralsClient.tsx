@@ -1,14 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { getTierByAmount } from "@/lib/tierUtils";
-import { CheckCircle2, Copy, Share2 } from "lucide-react";
+import { CheckCircle2, Copy, Share2, ArrowLeft } from "lucide-react";
 import { formatDate } from "@/lib/dateUtils";
 import TierMedal from "@/components/TierMedal";
 
 export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
+    const router = useRouter();
     const { userProfile: user, referredUsers, referredCount, referredTotalCapital, loading } = useUser();
     const { forexRate } = useSettings();
     const [actionToast, setActionToast] = useState<{message: string} | null>(null);
@@ -54,7 +56,21 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
 
     return (
-        <div className="space-y-12 pb-20">
+        <div className="space-y-8 pb-20">
+            {/* Standard Header */}
+            <div className="flex items-center gap-6">
+                <button 
+                    onClick={() => router.push(`/dashboard?lang=${lang}`)}
+                    className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm hover:shadow-md"
+                >
+                    <ArrowLeft className="h-6 w-6" />
+                </button>
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tighter leading-none">{t.referTitle}</h1>
+                    <p className="text-gray-400 text-sm font-medium">{t.referSubtitle}</p>
+                </div>
+            </div>
+
             {/* Header / Share Section - Simplified & Professional */}
             <div className="bg-white border border-gray-100 p-8 rounded-[32px] shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
