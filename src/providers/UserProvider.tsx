@@ -54,11 +54,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             // 3. Process Data
             if (profile && txs) {
                 const now = new Date();
-                const approvedDeposits = txs.filter((tx: any) => 
-                    (tx.type === 'Deposit' || tx.type === 'Bonus' || tx.type === 'Adjustment') && 
-                    ['Approved', 'Completed'].includes(tx.status) &&
-                    (tx.metadata?.adjustment_category !== 'Dividend' && tx.metadata?.adjustment_category !== 'Profit')
-                );
+                const approvedDeposits = txs.filter((tx: any) => {
+                    const type = (tx.type || "").toLowerCase();
+                    const category = (tx.metadata?.adjustment_category || "").toLowerCase();
+                    const isInvestmentCapital = (type === 'deposit' || type === 'adjustment') && 
+                                               category !== 'dividend' && 
+                                               category !== 'profit' && 
+                                               category !== 'bonus';
+                    return isInvestmentCapital && ['Approved', 'Completed'].includes(tx.status);
+                });
                 const totalDepositedRaw = txs.filter((t: any) => {
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
                     const isCapital = (t.type === 'Deposit' || t.type === 'Bonus' || t.type === 'Adjustment') && 
@@ -110,7 +114,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
                 const totalWithdrawnUSD = txs.filter((t: any) => 
                     t.type === 'Withdrawal' && 
-                    (t.status === 'Approved' || t.status === 'Completed' || t.status === 'Pending Release')
+                    (t.status === 'Approved' || t.status === 'Completed' || t.status === 'Pending Release' || t.status === 'Pending')
                 ).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
 
                 const lifetimeDividendsUSD = txs.filter((t: any) => {
@@ -152,6 +156,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
                 setUserProfile(fullProfile);
                 setTransactions(txs);
+
                 setDividendHistory(txs.filter((t: any) => {
                     const type = (t.type || "").toLowerCase();
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
@@ -163,16 +168,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     
                     return isDividendOrBonus && t.status === 'Approved';
                 }).reverse());
-            }
 
-            // 4. Fetch Referrals
-            const { data: refs, count } = await supabase
-                .from('profiles')
-                .select('id, full_name, username, balance, is_verified, created_at, tier', { count: 'exact' })
-                .eq('referred_by', user.id);
-            
-            if (refs) setReferredUsers(refs);
-            if (count !== null) setReferredCount(count);
+                // 4. Fetch Referrals using both UUID and Username (e.g. for elwin87 case)
+                const { data: refs, count: refsCount } = await supabase
+                    .from('profiles')
+                    .select('id, full_name, username, balance, is_verified, created_at, tier', { count: 'exact' })
+                    .or(`referred_by.eq.${user.id},referred_by_username.eq.${profile.username}`);
+                
+                if (refs) setReferredUsers(refs);
+                if (refsCount !== null) setReferredCount(refsCount);
+            }
 
             // 5. Fetch Withdrawal Methods
             const { data: wMethods } = await supabase

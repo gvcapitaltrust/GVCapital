@@ -323,12 +323,12 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                 {tx.metadata?.penalty_applied && (
                                                                     <div className="flex justify-between text-xs font-bold gap-4">
                                                                         <span className="text-red-500 uppercase italic whitespace-nowrap">Penalty (40%)</span>
-                                                                        <span className="text-red-500 tabular-nums whitespace-nowrap">-$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                        <span className="text-red-500 tabular-nums whitespace-nowrap">-$ {(Number(tx.metadata?.penalty_amount_usd || tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                     </div>
                                                                 )}
                                                                 <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2 gap-4">
                                                                     <span className="text-emerald-500 uppercase whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : (tx.type === 'Dividend' ? 'Dividend Received (Net)' : 'Final Payout (Net)')}</span>
-                                                                    <span className="text-emerald-500 underline decoration-gv-gold tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                    <span className="text-emerald-500 underline decoration-gv-gold tabular-nums whitespace-nowrap">$ {(Number(tx.metadata?.final_payout_usd || tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -427,7 +427,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                     {tx.metadata?.penalty_applied && (
                                                         <div className="flex flex-col gap-1">
                                                             <span className="text-[8px] font-black uppercase text-red-400 tracking-[0.1em]">Early Penalty</span>
-                                                            <span className="text-xs font-black text-red-500 tracking-tight">-$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                            <span className="text-xs font-black text-red-500 tracking-tight">-$ {(Number(tx.metadata?.penalty_amount_usd || tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -442,7 +442,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                     <div className="flex flex-col">
                                                         <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Final Net Position</span>
                                                         <span className="text-base font-black text-emerald-500 tabular-nums tracking-tighter">
-                                                            $ {(Number(tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                            $ {(Number(tx.metadata?.final_payout_usd || tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </span>
                                                     </div>
                                                     <div className="text-right">

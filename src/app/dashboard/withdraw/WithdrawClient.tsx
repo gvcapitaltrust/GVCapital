@@ -198,6 +198,21 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 throw new Error("Invalid security PIN.");
             }
 
+            // 0. Deduplication Check (Prevent double-submission if clicked twice)
+            const thirtySecondsAgo = new Date(Date.now() - 30000).toISOString();
+            const { data: existingTx } = await supabase
+                .from('transactions')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('type', 'Withdrawal')
+                .eq('status', 'Pending')
+                .gt('created_at', thirtySecondsAgo)
+                .maybeSingle();
+            
+            if (existingTx) {
+                throw new Error("A withdrawal request was already submitted. Please wait for it to process.");
+            }
+
             const amountUSD = parseFloat(withdrawAmount);
             const initialProfitUSD = Number(p.profit || 0);
             const initialBalanceUSD = Number(p.balance_usd || 0);

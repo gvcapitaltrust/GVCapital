@@ -105,10 +105,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     
                     // 2. Locked Capital Logic (standardized to USD-primary)
                     const lockedCapitalUSD = userTxs.filter((t: any) => {
+                        const type = (t.type || "").toLowerCase();
                         const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                        const isCapital = (t.type === 'Deposit' || t.type === 'Bonus' || t.type === 'Adjustment') && 
+                        const isCapital = (type === 'deposit' || type === 'adjustment') && 
                                          category !== 'dividend' && 
-                                         category !== 'profit';
+                                         category !== 'profit' && 
+                                         category !== 'bonus';
                         return isCapital;
                     }).reduce((acc: number, tx: any) => {
                         const rawDate = tx.transfer_date || tx.created_at;
@@ -126,6 +128,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     const lockedCapitalRM = lockedCapitalUSD * forexRate;
                     const totalInvestmentRM = balanceUSD * forexRate;
 
+                    const totalWithdrawnUSD = txList.filter((t: any) => 
+                        t.user_id === p.id && 
+                        t.type === 'Withdrawal' && 
+                        ['Approved', 'Completed', 'Pending Release', 'Pending'].includes(t.status)
+                    ).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
+
                     return {
                         ...p,
                         total_investment: totalInvestmentRM,
@@ -137,7 +145,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         profit_usd: profitUSD,
                         total_assets_usd: totalAssetsUSD,
                         mature_capital_usd: matureCapitalUSD,
-                        dividend_wallet_usd: profitUSD
+                        dividend_wallet_usd: profitUSD,
+                        total_withdrawn_usd: totalWithdrawnUSD
                     };
                 });
 
