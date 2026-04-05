@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useAdmin } from "@/providers/AdminProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { formatDate } from "@/lib/dateUtils";
+import { ChevronDown, ExternalLink, ShieldCheck, History, XCircle, CheckCircle2, MoreVertical, Wallet } from "lucide-react";
 
 export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
     const { withdrawals, loading, handleApproveWithdrawal, handleCompleteWithdrawal, handleRejectWithdrawal } = useAdmin();
@@ -26,14 +27,16 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
             statusCompleted: "Completed",
             statusApproved: "Approved (Legacy)",
             statusRejected: "Rejected",
-            tableUser: "User",
-            tableAmount: "Amount",
-            tableDate: "Date",
-            tableStatus: "Status",
-            tableActions: "Actions",
             approve: "Approve",
             reject: "Reject",
-            noWithdrawals: "No withdrawal records found."
+            release: "Release Funds",
+            noWithdrawals: "No withdrawal records found.",
+            gross: "Gross Request",
+            penalty: "Early Penalty",
+            netPayout: "Final Net Payout",
+            bankDetails: "Bank Details",
+            reference: "Reference ID",
+            date: "Request Date"
         },
         zh: {
             title: "提款管理",
@@ -45,14 +48,16 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
             statusCompleted: "已完成",
             statusApproved: "已批准",
             statusRejected: "已拒绝",
-            tableUser: "用户",
-            tableAmount: "金额",
-            tableDate: "日期",
-            tableStatus: "状态",
-            tableActions: "操作",
             approve: "批准",
             reject: "拒绝",
-            noWithdrawals: "未发现提款记录。"
+            release: "释放资金",
+            noWithdrawals: "未发现提款记录。",
+            gross: "提款总额",
+            penalty: "提前惩罚",
+            netPayout: "实收金额",
+            bankDetails: "银行资料",
+            reference: "参考编号",
+            date: "申请日期"
         }
     }[lang];
 
@@ -78,7 +83,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h2>
@@ -106,184 +111,162 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </div>
 
-            <div className="bg-white backdrop-blur-md rounded-3xl border border-gray-200 overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
-                    {/* Desktop View (Table) */}
-                    <table className="w-full text-left min-w-[1000px] hidden md:table">
-                        <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400 sticky top-0 z-10 backdrop-blur-md">
-                            <tr>
-                                <th className="px-4 py-6">{t.tableUser}</th>
-                                <th className="px-4 py-6">Reference</th>
-                                <th className="px-4 py-6">{t.tableAmount}</th>
-                                <th className="px-4 py-6">Penalty</th>
-                                <th className="px-4 py-6">Bank Details</th>
-                                <th className="px-4 py-6">Total Payout</th>
-                                <th className="px-4 py-6">{t.tableDate}</th>
-                                <th className="px-4 py-6">{t.tableStatus}</th>
-                                <th className="px-4 py-6 text-right">{t.tableActions}</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {filteredWithdrawals.map((tx, idx) => (
-                                <tr key={idx} className="text-sm group hover:bg-gray-50 transition-all cursor-pointer">
-                                    <td className="px-4 py-6">
-                                        <div className="flex flex-col">
-                                            <span className="font-black text-gray-900 uppercase tracking-tight">{tx.profiles?.full_name}</span>
-                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-6">
-                                        <span className="font-mono text-[10px] text-gray-400">{tx.ref_id || "-"}</span>
-                                    </td>
-                                    <td className="px-4 py-6">
-                                        <span className="font-black text-red-500 tabular-nums">$ {(Number(tx.original_currency_amount || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Math.abs(Number(tx.amount)) / forexRate)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                    </td>
-                                    <td className="px-4 py-6">
-                                        {tx.metadata?.penalty_applied ? (
-                                            <div className="flex flex-col">
-                                                <span className="font-bold text-red-400 tabular-nums text-xs">$ {(Number(tx.metadata?.original_usd_penalty || tx.metadata?.penalty_amount_usd || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest leading-none">40% Early</span>
-                                            </div>
-                                        ) : "-"}
-                                    </td>
-                                    <td className="px-4 py-6">
-                                        <div className="flex flex-col leading-tight">
-                                            {(() => {
-                                                const method = tx.metadata?.method_details;
-                                                const isOneTime = tx.metadata?.payout_method?.startsWith('[ONE-TIME]');
-                                                const name = method ? (method.type === 'BANK' ? method.bank_name : 'USDT TRC20') : (tx.profiles?.bank_name || tx.profiles?.kyc_data?.bank_name || "N/A");
-                                                const account = method ? (method.type === 'BANK' ? method.account_number : method.usdt_address) : (tx.profiles?.account_number || tx.profiles?.kyc_data?.account_number || "-");
-                                                
-                                                return (
-                                                    <>
-                                                        <div className="flex items-center gap-1">
-                                                            {isOneTime && <span className="text-[7px] bg-slate-900 text-gv-gold px-1 rounded font-black">ONE-TIME</span>}
-                                                            <span className="text-[9px] font-black text-gray-900 uppercase tracking-tighter truncate max-w-[120px]">{name}</span>
-                                                        </div>
-                                                        <span className="text-[9px] font-mono text-gv-gold font-bold truncate max-w-[150px]">{account}</span>
-                                                    </>
-                                                );
-                                            })()}
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-6 text-emerald-500 font-black tabular-nums">
-                                        $ {(Number(tx.metadata?.original_usd_payout || tx.metadata?.final_payout_usd || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </td>
-                                    <td className="px-4 py-6 text-gray-400 font-mono text-[10px] uppercase">{formatDate(tx.created_at)}</td>
-                                    <td className="px-4 py-6">
-                                        <span className={`px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest ${
-                                            tx.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500' :
-                                            tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500' :
-                                            tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
-                                            tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
-                                            'bg-amber-500/10 text-amber-500'
-                                        }`}>{tx.status}</span>
-                                    </td>
-                                    <td className="px-4 py-6 text-right">
-                                        <div className="flex items-center justify-end gap-3">
-                                            {tx.status === 'Pending' && (
-                                                <>
-                                                    <button onClick={(e) => { e.stopPropagation(); setRejectionTx(tx); }} className="text-red-500 hover:bg-red-500/10 px-4 py-2 rounded-xl text-[9px] font-black uppercase transition-all">{t.reject}</button>
-                                                    <button onClick={(e) => { e.stopPropagation(); handleApproveWithdrawal(tx); }} className="bg-emerald-500 text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-emerald-500/10 hover:-translate-y-0.5 transition-all">{t.approve}</button>
-                                                </>
-                                            )}
-                                            {tx.status === 'Pending Release' && (
-                                                <button onClick={(e) => { e.stopPropagation(); handleCompleteWithdrawal(tx); }} className="bg-gv-gold text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-lg shadow-gv-gold/20 hover:-translate-y-0.5 transition-all font-bold">Release</button>
-                                            )}
-                                            {tx.status === 'Completed' && <span className="text-[10px] text-gray-400 font-black uppercase italic">Done</span>}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            <div className="bg-white backdrop-blur-md rounded-[32px] border border-gray-200 overflow-hidden shadow-2xl">
+                <div className="divide-y divide-gray-100">
+                    {filteredWithdrawals.map((tx, idx) => {
+                        const isExpanded = expandedId === tx.id;
+                        const payoutUSD = Number(tx.metadata?.original_usd_payout || tx.metadata?.final_payout_usd || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate)));
+                        const grossUSD = Number(tx.original_currency_amount || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Math.abs(Number(tx.amount)) / forexRate)));
+                        const penaltyUSD = tx.metadata?.penalty_applied ? Number(tx.metadata?.original_usd_penalty || tx.metadata?.penalty_amount_usd || 0) : 0;
+                        const payoutRM = payoutUSD * forexRate;
 
-                    <div className="md:hidden divide-y divide-gray-100">
-                        {filteredWithdrawals.map((tx) => {
-                            const isExpanded = expandedId === tx.id;
-                            const payoutUSD = Number(tx.metadata?.original_usd_payout || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate)));
-                            
-                            return (
-                                <div key={tx.id} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
-                                    <div 
-                                        onClick={() => setExpandedId(isExpanded ? null : tx.id)}
-                                        className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors"
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-gray-500 font-mono text-[10px] uppercase">{formatDate(tx.created_at)}</span>
-                                            <span className={`px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${
-                                                tx.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500' :
-                                                tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500' :
-                                                'bg-amber-500/10 text-amber-500'
-                                            }`}>{tx.status}</span>
+                        return (
+                            <div key={tx.id || idx} className={`flex flex-col transition-all duration-300 ${isExpanded ? 'bg-gray-50/50' : 'hover:bg-gray-50/30'}`}>
+                                {/* Line 1: Primary Identification and Net Payout */}
+                                <div 
+                                    onClick={() => setExpandedId(isExpanded ? null : tx.id)}
+                                    className="px-8 py-6 flex flex-wrap items-center justify-between gap-4 cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-4 min-w-[240px]">
+                                        <div className="h-10 w-10 bg-slate-100 rounded-xl flex items-center justify-center shrink-0">
+                                            <Wallet className="h-5 w-5 text-slate-400" />
                                         </div>
-                                        <div className="flex justify-between items-end">
-                                            <div className="space-y-1">
-                                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block">{tx.profiles?.full_name}</span>
-                                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">@{tx.profiles?.username}</span>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-sm font-black text-emerald-500 tabular-nums tracking-tighter">
-                                                    $ {(Number(tx.metadata?.original_usd_payout || tx.metadata?.final_payout_usd || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                </p>
-                                                <p className="text-[8px] font-bold text-gray-300 uppercase italic tracking-tighter shrink-0">Net Payout</p>
-                                            </div>
+                                        <div className="flex flex-col">
+                                            <span className="font-black text-gray-900 uppercase tracking-tight text-sm leading-none mb-1">{tx.profiles?.full_name || "N/A"}</span>
+                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">@{tx.profiles?.username || "N/A"}</span>
                                         </div>
                                     </div>
 
-                                    {isExpanded && (
-                                        <div className="bg-gray-50/50 px-6 py-6 space-y-6 border-t border-gray-100 animate-in fade-in duration-300">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="text-[8px] font-black uppercase text-gray-400 tracking-[0.1em]">Reference ID</span>
-                                                    <span className="text-[10px] font-mono font-bold text-gray-600 tracking-tight">{tx.ref_id || "-"}</span>
-                                                </div>
-                                                <div className="flex flex-col gap-1 text-right">
-                                                    <span className="text-[8px] font-black uppercase text-red-400 tracking-[0.1em]">Gross Amount</span>
-                                                    <span className="text-xs font-black text-red-500 tracking-tight">$ {(Number(tx.original_currency_amount || Math.abs(Number(tx.amount)) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                                                <span className="text-[8px] font-black uppercase text-gv-gold tracking-[0.2em] mb-2">Payout destination</span>
-                                                {(() => {
-                                                    const method = tx.metadata?.method_details;
-                                                    const isOneTime = tx.metadata?.payout_method?.startsWith('[ONE-TIME]');
-                                                    const name = method ? (method.type === 'BANK' ? method.bank_name : 'USDT TRC20') : (tx.profiles?.bank_name || tx.profiles?.kyc_data?.bank_name || "N/A");
-                                                    const account = method ? (method.type === 'BANK' ? method.account_number : method.usdt_address) : (tx.profiles?.account_number || tx.profiles?.kyc_data?.account_number || "-");
-                                                    
-                                                    return (
-                                                        <>
-                                                            <div className="flex items-center gap-2 mb-1">
-                                                                {isOneTime && <span className="text-[7px] bg-slate-900 text-gv-gold px-1.5 py-0.5 rounded font-black">ONE-TIME</span>}
-                                                                <span className="text-[10px] font-black text-gray-900 uppercase leading-none">{name}</span>
-                                                            </div>
-                                                            <span className="text-[11px] font-mono font-bold text-gray-500 select-all tracking-tighter break-all">{account}</span>
-                                                        </>
-                                                    );
-                                                })()}
-                                            </div>
-                                            <div className="flex flex-col gap-3">
-                                                {tx.status === 'Pending' && (
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        <button onClick={() => setRejectionTx(tx)} className="bg-white border border-red-500/20 text-red-500 text-[9px] font-black uppercase tracking-widest py-3 rounded-xl">{t.reject}</button>
-                                                        <button onClick={() => handleApproveWithdrawal(tx)} className="bg-emerald-500 text-black text-[9px] font-black uppercase tracking-widest py-3 rounded-xl shadow-lg shadow-emerald-500/10">{t.approve}</button>
+                                    <div className="flex items-center gap-8 md:gap-16">
+                                        <div className="flex flex-col items-end md:items-start min-w-[100px]">
+                                            <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">{t.date}</span>
+                                            <span className="text-[10px] font-mono text-gray-600 font-bold">{formatDate(tx.created_at)}</span>
+                                        </div>
+
+                                        <div className="hidden md:flex flex-col items-start min-w-[120px]">
+                                            <span className="text-[9px] font-black uppercase text-emerald-500 tracking-widest">NET PAYOUT (USD)</span>
+                                            <span className="text-sm font-black text-emerald-500 tabular-nums">$ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                        </div>
+
+                                        <div className="flex items-center gap-4">
+                                            <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border ${
+                                                tx.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                                tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                                                tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                                                'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                            }`}>{tx.status}</span>
+                                            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Line 2: Expanded Details */}
+                                {isExpanded && (
+                                    <div className="px-8 pb-8 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-xl shadow-gray-200/40">
+                                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                                                <div className="space-y-4">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">{t.reference}</span>
+                                                        <span className="text-xs font-mono font-bold text-gray-900 select-all tracking-tighter">{tx.ref_id || "-"}</span>
                                                     </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Gross Request</span>
+                                                        <span className="text-base font-black text-slate-900 tabular-nums tracking-tighter">$ {grossUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-4">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[9px] font-black uppercase text-red-400 tracking-widest mb-1">{t.penalty}</span>
+                                                        <span className={`text-base font-black tabular-nums tracking-tighter ${penaltyUSD > 0 ? 'text-red-500' : 'text-gray-200'}`}>
+                                                            {penaltyUSD > 0 ? `-$ ${penaltyUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "-"}
+                                                        </span>
+                                                        {penaltyUSD > 0 && <span className="text-[8px] font-black uppercase text-red-300">40% Early Settle</span>}
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex flex-col space-y-1">
+                                                    <span className="text-[9px] font-black uppercase text-gv-gold tracking-widest mb-1">{t.bankDetails}</span>
+                                                    {(() => {
+                                                        const method = tx.metadata?.method_details;
+                                                        const isOneTime = tx.metadata?.payout_method?.startsWith('[ONE-TIME]');
+                                                        const name = method ? (method.type === 'BANK' ? method.bank_name : 'USDT TRC20') : (tx.profiles?.bank_name || tx.profiles?.kyc_data?.bank_name || "N/A");
+                                                        const account = method ? (method.type === 'BANK' ? method.account_number : method.usdt_address) : (tx.profiles?.account_number || tx.profiles?.kyc_data?.account_number || "-");
+                                                        
+                                                        return (
+                                                            <div className="bg-gray-50 border border-gray-100 p-3 rounded-2xl">
+                                                                <div className="flex items-center gap-1 mb-1">
+                                                                    {isOneTime && <span className="text-[7px] bg-slate-900 text-gv-gold px-1.5 py-0.5 rounded font-black">ONE-TIME</span>}
+                                                                    <span className="text-[10px] font-black text-gray-900 uppercase tracking-tighter truncate leading-none">{name}</span>
+                                                                </div>
+                                                                <span className="text-[10px] font-mono text-gv-gold font-bold truncate block select-all tracking-tighter">{account}</span>
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </div>
+
+                                                <div className="flex flex-col items-end justify-center">
+                                                    <span className="text-[10px] font-black uppercase text-emerald-500 tracking-[0.2em] mb-1">{t.netPayout}</span>
+                                                    <div className="flex flex-col items-end">
+                                                        <span className="text-2xl font-black text-emerald-500 tabular-nums leading-none tracking-tighter underline decoration-emerald-500/20 decoration-4 underline-offset-4">$ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                        <span className="text-[10px] font-black text-gray-400 mt-2">≈ RM {payoutRM.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Action Bar */}
+                                            <div className="mt-8 pt-8 border-t border-gray-100 flex items-center justify-end gap-3">
+                                                {tx.status === 'Pending' && (
+                                                    <>
+                                                        <button 
+                                                            onClick={() => setRejectionTx(tx)} 
+                                                            className="px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all"
+                                                        >
+                                                            {t.reject}
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleApproveWithdrawal(tx)} 
+                                                            className="px-10 py-3 bg-emerald-500 text-black rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:-translate-y-0.5 transition-all"
+                                                        >
+                                                            {t.approve}
+                                                        </button>
+                                                    </>
                                                 )}
                                                 {tx.status === 'Pending Release' && (
-                                                    <button onClick={() => handleCompleteWithdrawal(tx)} className="w-full bg-gv-gold text-black text-[9px] font-black uppercase tracking-widest py-4 rounded-xl shadow-lg shadow-gv-gold/20">Authorize Release</button>
+                                                    <button 
+                                                        onClick={() => handleCompleteWithdrawal(tx)} 
+                                                        className="px-12 py-4 bg-slate-900 text-gv-gold rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-2xl hover:-translate-y-0.5 transition-all flex items-center gap-2"
+                                                    >
+                                                        <ShieldCheck className="h-5 w-5" />
+                                                        {t.release}
+                                                    </button>
+                                                )}
+                                                {['Completed', 'Rejected'].includes(tx.status) && (
+                                                    <div className="flex items-center gap-2 px-6 py-2 bg-gray-50 rounded-xl">
+                                                        <History className="h-4 w-4 text-gray-400" />
+                                                        <span className="text-[10px] text-gray-400 font-black uppercase italic tracking-widest">Transaction Closed</span>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    {filteredWithdrawals.length === 0 && (
-                        <div className="p-20 text-center text-gray-500 font-black uppercase tracking-[0.2em]">{t.noWithdrawals}</div>
-                    )}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
+
+                {filteredWithdrawals.length === 0 && (
+                    <div className="p-20 text-center flex flex-col items-center gap-4">
+                        <div className="h-16 w-16 bg-gray-50 rounded-full flex items-center justify-center">
+                            <XCircle className="h-8 w-8 text-gray-200" />
+                        </div>
+                        <span className="text-gray-400 font-black uppercase tracking-[0.2em]">{t.noWithdrawals}</span>
+                    </div>
+                )}
+            </div>
+
             {/* Rejection Reason Modal */}
             {rejectionTx && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 px-6">
@@ -306,7 +289,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                 <div className="p-4 bg-red-50 border border-red-100 rounded-2xl">
                                     <div className="flex justify-between items-center mb-1">
                                         <span className="text-[9px] font-black uppercase text-red-500 tracking-widest">Amount to Refund</span>
-                                        <span className="text-sm font-black text-red-600 tabular-nums">$ {(Math.abs(Number(rejectionTx.amount))).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        <span className="text-sm font-black text-red-600 tabular-nums text-lg">$ {(Math.abs(Number(rejectionTx.amount))).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                     </div>
                                     <p className="text-[8px] font-bold text-red-400 uppercase tracking-tighter">Funds will be returned to user dividend wallet</p>
                                 </div>
@@ -343,6 +326,5 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             )}
         </div>
-    </div>
-);
+    );
 }
