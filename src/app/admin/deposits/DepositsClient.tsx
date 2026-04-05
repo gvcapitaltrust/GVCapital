@@ -153,14 +153,8 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-6">
-                                        <div className="flex flex-col">
-                                            <div className="flex items-baseline gap-2">
-                                                <span className="font-black text-emerald-500 tabular-nums text-lg leading-none">$ {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                <span className="text-[10px] font-black text-slate-400 italic">≈ RM {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate)) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                            </div>
-                                            <span className="text-[9px] text-slate-300 font-bold uppercase mt-1 tracking-widest">Rate: {forexRate.toFixed(2)}</span>
-                                        </div>
+                                    <td className="px-6 py-6 font-black text-emerald-500 tabular-nums text-lg leading-none">
+                                        $ {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </td>
                                     <td className="px-6 py-6">
                                         <div className="flex flex-col">

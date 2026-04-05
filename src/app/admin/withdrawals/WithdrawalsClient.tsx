@@ -146,9 +146,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {filteredWithdrawals.map((tx, idx) => {
-                                const payoutUSD = Number(tx.metadata?.original_usd_payout || tx.metadata?.final_payout_usd || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate)));
-                                const rateToUse = tx.metadata?.forex_rate || (forexRate - 0.4);
-                                const payoutRM = payoutUSD * rateToUse;
+                                const payoutUSD = Number(tx.metadata?.final_payout_usd || Math.abs(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))));
 
                                 return (
                                     <tr key={tx.id || idx} className="group hover:bg-slate-50/50 transition-all border-b border-slate-50 last:border-0 border-collapse">
@@ -166,19 +164,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </td>
                                         <td className="px-6 py-6">
-                                            <div className="flex flex-col">
-                                                <span className="text-slate-500 font-mono text-[11px] font-bold tabular-nums">{formatDate(tx.created_at)}</span>
-                                                <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-6">
-                                            <div className="flex flex-col">
-                                                <div className="flex items-baseline gap-2">
-                                                    <span className="font-black text-emerald-500 tabular-nums text-lg leading-none">$ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                    <span className="text-[10px] font-black text-slate-400 italic">≈ RM {payoutRM.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                </div>
-                                                <span className="text-[9px] text-slate-300 font-bold uppercase mt-1 tracking-widest">Rate: {rateToUse.toFixed(2)}</span>
-                                            </div>
+                                            <span className="font-black text-emerald-500 tabular-nums text-lg leading-none">$ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </td>
                                         <td className="px-6 py-6">
                                             <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm ${
@@ -208,7 +194,6 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="md:hidden divide-y divide-slate-50">
                         {filteredWithdrawals.map((tx, idx) => {
                             const payoutUSD = Number(tx.metadata?.final_payout_usd || Math.abs(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))));
-                            const rateToUse = tx.metadata?.forex_rate || (forexRate - 0.4);
                             const tierName = tx.profiles?.tier?.toLowerCase() || getTierByAmount(tx.profiles?.balance_usd || 0).id;
 
                             return (
