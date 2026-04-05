@@ -3,14 +3,13 @@ import { NextResponse, NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Read Supabase auth cookie (manually set in LoginClient / AuthProvider)
-    // Note: To prevent 4KB size limits on mobile, this cookie now contains 
-    // ONLY the access_token instead of the full session object.
-    const authCookie =
-        request.cookies.get('gv-auth-v1') ??
-        request.cookies.get('sb-prmeppkidipenldrrpis-auth-token');
+    // 1. Read Supabase auth cookie (Standardized)
+    const token = 
+        request.cookies.get('gv-auth-v1')?.value ??
+        request.cookies.get('sb-prmeppkidipenldrrpis-auth-token')?.value ??
+        request.headers.get('Authorization')?.split('Bearer ')[1];
 
-    const isAuthenticated = !!authCookie?.value;
+    const isAuthenticated = !!token;
 
     // Protect all dashboard & admin routes from unauthenticated users
     if (!isAuthenticated) {

@@ -20,9 +20,23 @@ export default function AuthGuard({ children, requireAdmin = false }: AuthGuardP
     }, []);
 
     useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+
         if (!loading && !user) {
-            router.push("/login");
+            // On mobile devices, the auth state can briefly toggle to null during 
+            // a session refresh or profile update. We provide a 500ms grace period 
+            // before redirecting to login to prevent 'flicker' logouts.
+            timeoutId = setTimeout(() => {
+                if (!user) { // Re-check user state after delay
+                    console.warn("[AUTH GUARD] Silent redirect to login (No active user session)");
+                    router.push("/login");
+                }
+            }, 500);
         }
+
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId);
+        };
     }, [user, loading, router]);
 
     if (!isClient || loading) {

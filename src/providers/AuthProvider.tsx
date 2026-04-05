@@ -59,8 +59,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const initSession = async () => {
             const { data: { session: s } } = await supabase.auth.getSession();
             if (s) {
-                const isSecure = typeof window !== "undefined" && window.location.protocol === "https:";
-                document.cookie = `gv-auth-v1=${encodeURIComponent(s.access_token)}; path=/; max-age=31536000; SameSite=Lax;${isSecure ? " Secure;" : ""}`;
+                // Stabilize session cookie: Use Secure flag and ensure SameSite=Lax for compatibility
+                const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+                const secureFlag = isLocalhost ? "" : " Secure;";
+                document.cookie = `gv-auth-v1=${encodeURIComponent(s.access_token)}; path=/; max-age=31536000; SameSite=Lax;${secureFlag}`;
+                
                 setLastLoginTime(Date.now()); // Set initial login time to enable the grace period after redirect
                 currentUserId.current = s.user.id;
                 setSession(s);
@@ -95,8 +98,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             // Stable Identity Check: Only trigger if the user ID changed or explicitly signed in
             if (s && (s.user.id !== currentUserId.current || event === 'SIGNED_IN')) {
-                const isSecure = typeof window !== "undefined" && window.location.protocol === "https:";
-                document.cookie = `gv-auth-v1=${encodeURIComponent(s.access_token)}; path=/; max-age=31536000; SameSite=Lax;${isSecure ? " Secure;" : ""}`;
+                const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+                const secureFlag = isLocalhost ? "" : " Secure;";
+                document.cookie = `gv-auth-v1=${encodeURIComponent(s.access_token)}; path=/; max-age=31536000; SameSite=Lax;${secureFlag}`;
                 if (event === 'SIGNED_IN') {
                     setLastLoginTime(Date.now());
                 }
@@ -131,12 +135,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 // If storage is disabled (e.g. Private Mode), every reload generates a new UUID. 
                 // We shouldn't lock users out just because their browser blocks storage.
                 const isPersistent = safeStorage.isPersistent();
-                const isWithinGracePeriod = lastLoginTime && (Date.now() - lastLoginTime < 3000); // 3-second grace period for mobile handshakes
+                
+                // On mobile devices, the 'handshake' between the reload and the storage check can take several seconds.
+                // We provide a 60-second grace period to allow the session to stabilize before enforcing limits.
+                const isWithinGracePeriod = lastLoginTime && (Date.now() - lastLoginTime < 60000); 
 
-                if (isPersistent && !activeSessions.includes(deviceId) && !isWithinGracePeriod) {
-                    console.warn("[AUTH] Device not in active sessions list. Signing out...", {
-                        deviceId,
-                        activeSessions,
+                if (isPersistent && deviceId && activeSessions.length > 0 && !activeSessions.includes(deviceId) && !isWithinGracePeriod) {
+                    console.warn("[AUTH] Device mismatch detected for persistent storage user. Signing out...", {
+                        currentDeviceId: deviceId,
+                        activeSessionsFromDB: activeSessions,
                         isWithinGracePeriod
                     });
                     document.cookie = `gv-auth-v1=; path=/; max-age=0;`;
