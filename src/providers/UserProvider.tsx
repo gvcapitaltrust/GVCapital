@@ -214,17 +214,43 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     
                     setReferredUsers(uniqueRefs);
 
-                    // Source of Truth: Prioritize native counters from the user's own profile if available
-                    const systemCount = Number(profile.total_referrals || 0);
-                    const systemCapital = Number(profile.referred_total_capital_usd || 0);
+                    // 4a. Robust Referral Head-Count (Bypasses RLS row-hiding)
+                    // We attempt to get the exact count directly from the DB engine, which sometimes succeeds even when rows are hidden.
+                    const { count: uuidCount } = await supabase
+                        .from('profiles')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('referred_by', user.id);
+
+                    let usernameCount = 0;
+                    // Multi-Source Inviter Identifier (Catch-all for username vs email vs metadata)
+                    const inviterCode = profile.username || user.email || user.user_metadata?.username || user.username || "";
                     
-                    // If live list is 0 but system count > 0, we use system count (handles RLS masking)
-                    const finalCount = Math.max(uniqueRefs.length, systemCount);
+                    if (inviterCode) {
+                        const { count } = await supabase
+                            .from('profiles')
+                            .select('*', { count: 'exact', head: true })
+                            .or(`referred_by_username.ilike.${inviterCode},referred_by_username.ilike.${user.email || 'non_existent'}`);
+                        if (count) usernameCount = count;
+                    }
+
+                    // Source of Truth: Prioritize totals from leaderboard, profile counters, and head-count
+                    const { data: salesStats } = inviterCode ? await supabase
+                        .from('sales_leaderboard')
+                        .select('total_referrals, total_referred_capital')
+                        .or(`agent_username.ilike.${inviterCode},agent_username.ilike.${user.email || 'non_existent'}`)
+                        .maybeSingle() : { data: null };
+
+                    // Aggregate all potential sources to find the most accurate (highest) tally
+                    const profileCount = Number(profile.total_referrals || profile.referral_count || profile.referred_count || profile.sales_count || 0);
+                    const leaderboardCount = Number(salesStats?.total_referrals || 0);
+                    const finalCount = Math.max(uniqueRefs.length, profileCount, leaderboardCount, Number(uuidCount || 0), Number(usernameCount || 0));
                     setReferredCount(finalCount);
 
-                    // Asset calculation: Prioritize system counter
+                    // Asset calculation: Prioritize system counter from leaderboard or profile
+                    const profileCapital = Number(profile.referred_total_capital_usd || profile.total_referred_capital || profile.referred_assets_usd || 0);
+                    const leaderboardCapital = Number(salesStats?.total_referred_capital || 0);
                     const liveCapital = uniqueRefs.reduce((acc, r) => acc + Number(r.balance_usd || (r.balance / forexRate)), 0);
-                    setReferredTotalCapital(Math.max(liveCapital, systemCapital));
+                    setReferredTotalCapital(Math.max(liveCapital, profileCapital, leaderboardCapital));
                 };
                 
                 await fetchReferrals();

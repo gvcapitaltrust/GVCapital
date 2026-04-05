@@ -35,6 +35,7 @@ export default function DashboardClient() {
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [referredCount, setReferredCount] = useState(0);
     const [referredUsers, setReferredUsers] = useState<any[]>([]);
+    const [referredTotalCapital, setReferredTotalCapital] = useState(0);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     // UI States
@@ -192,8 +193,37 @@ export default function DashboardClient() {
                 const combined = [...(refsByUuid || []), ...refsByUsername];
                 const uniqueRefs = Array.from(new Map(combined.map(item => [item.id, item])).values());
                 
-                setReferredCount(uniqueRefs.length);
+                // Definitive Head-Count Bypass (Addresses RLS restrictions for ADENTHEN)
+                const { count: uuidCount } = await supabase
+                    .from('profiles')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('referred_by', authUser.id);
+
+                // Multi-Source Inviter Identifier (Catch-all for username vs email vs metadata)
+                const inviterCode = profile.username || authUser.email || authUser.user_metadata?.username || authUser.username || "";
+                let usernameCount = 0;
+                
+                if (inviterCode) {
+                    const { count } = await supabase
+                        .from('profiles')
+                        .select('*', { count: 'exact', head: true })
+                        .or(`referred_by_username.ilike.${inviterCode},referred_by_username.ilike.${authUser.email || 'non_existent'}`);
+                    if (count) usernameCount = count;
+                }
+
+                const { data: salesStats } = inviterCode ? await supabase
+                    .from('sales_leaderboard')
+                    .select('total_referrals, total_referred_capital')
+                    .or(`agent_username.ilike.${inviterCode},agent_username.ilike.${authUser.email || 'non_existent'}`)
+                    .maybeSingle() : { data: null };
+
+                const profileCount = Number(profile.total_referrals || profile.referral_count || profile.referred_count || profile.sales_count || 0);
+                const leaderboardCount = Number(salesStats?.total_referrals || 0);
+                const finalCount = Math.max(uniqueRefs.length, profileCount, leaderboardCount, Number(uuidCount || 0), Number(usernameCount || 0));
+                
+                setReferredCount(finalCount);
                 setReferredUsers(uniqueRefs);
+                setReferredTotalCapital(Math.max(Number(profile.referred_total_capital_usd || profile.total_referred_capital || profile.referred_assets_usd || 0), Number(salesStats?.total_referred_capital || 0)));
 
                 fetchedRef.current = authUser.id;
             } catch (err) {
