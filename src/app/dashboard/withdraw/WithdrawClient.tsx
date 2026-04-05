@@ -72,7 +72,8 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             verificationDesc: "To ensure the security of your assets and comply with institutional regulations, we require all users to complete identity verification before initiating a withdrawal.",
             verifyNow: "Verify Identity",
             withdrawAll: "Withdraw All",
-            totalWithdrawal: "Total Withdrawal"
+            totalWithdrawal: "Total Withdrawal",
+            daysLeft: "Days Remaining"
         },
         zh: {
             title: "申请提款",
@@ -106,7 +107,8 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             sourceCapital: "本金资本",
             availableBalance: "可提款余额",
             withdrawAll: "提取全部",
-            totalWithdrawal: "提款总额"
+            totalWithdrawal: "提款总额",
+            daysLeft: "天剩余"
         }
     }[lang];
 
@@ -114,6 +116,11 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
     const dividendWithdrawableUSD = Number(user?.dividend_withdrawable_usd || 0);
     const totalCapitalUSD = Number(user?.balance_usd || 0);
     const availableAmountUSD = withdrawType === 'Dividends' ? dividendWithdrawableUSD : totalCapitalUSD;
+
+    // Fix Tier detection: If database has a specific tier, use it, otherwise detect via capital
+    const userTierId = (user?.tier && user?.tier !== "Standard" && user?.tier !== "No Tier") 
+        ? user.tier.toLowerCase() 
+        : getTierByAmount(totalCapitalUSD).id;
 
     const handleWithdrawInitiate = () => {
         const amountUSD = parseFloat(withdrawAmount);
@@ -132,16 +139,10 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             return;
         }
 
-        // Logic refined: Both Dividend and Capital must show Confirmation Modal
         if (withdrawType === 'Dividends') {
             setPenaltyInfo({
-                penalty: 0,
-                payout: amountUSD * withdrawalRate,
-                lockedPortion: 0,
-                penalty_usd: 0,
-                payout_usd: amountUSD,
-                lockedPortion_usd: 0,
-                isApplied: false
+                penalty: 0, payout: amountUSD * withdrawalRate, lockedPortion: 0, 
+                penalty_usd: 0, payout_usd: amountUSD, lockedPortion_usd: 0, isApplied: false
             });
             setShowWithdrawConfirm(true);
         } else {
@@ -158,25 +159,15 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 const finalPayoutUSD = totalCapitalUSD - penaltyUSD;
                 
                 setPenaltyInfo({
-                    penalty: penaltyUSD * withdrawalRate,
-                    payout: finalPayoutUSD * withdrawalRate,
-                    lockedPortion: lockedPortionUSD * withdrawalRate,
-                    penalty_usd: penaltyUSD,
-                    payout_usd: finalPayoutUSD,
-                    lockedPortion_usd: lockedPortionUSD,
-                    isApplied: true
+                    penalty: penaltyUSD * withdrawalRate, payout: finalPayoutUSD * withdrawalRate,
+                    lockedPortion: lockedPortionUSD * withdrawalRate, penalty_usd: penaltyUSD,
+                    payout_usd: finalPayoutUSD, lockedPortion_usd: lockedPortionUSD, isApplied: true
                 });
                 setShowWithdrawConfirm(true);
             } else {
-                // Mature capital withdrawal
                 setPenaltyInfo({
-                    penalty: 0,
-                    payout: amountUSD * withdrawalRate,
-                    lockedPortion: 0,
-                    penalty_usd: 0,
-                    payout_usd: amountUSD,
-                    lockedPortion_usd: 0,
-                    isApplied: false
+                    penalty: 0, payout: amountUSD * withdrawalRate, lockedPortion: 0,
+                    penalty_usd: 0, payout_usd: amountUSD, lockedPortion_usd: 0, isApplied: false
                 });
                 setShowWithdrawConfirm(true);
             }
@@ -185,8 +176,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
 
     const handleWithdrawConfirm = async () => {
         if (!user || withdrawPIN.trim().length !== 6) {
-            alert("Please enter a 6-digit Security PIN.");
-            return;
+            alert("Please enter a 6-digit Security PIN."); return;
         }
         setIsSubmitting(true);
         try {
@@ -222,10 +212,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             }]);
             
             if (error) throw error;
-            setIsPinModalOpen(false);
-            setSuccessRefId(refId);
-            setShowSuccess(true);
-            refreshData();
+            setIsPinModalOpen(false); setSuccessRefId(refId); setShowSuccess(true); refreshData();
         } catch (err: any) {
             alert(err.message);
         } finally {
@@ -247,27 +234,51 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
 
     return (
         <div className="max-w-4xl mx-auto space-y-12 pb-20">
-            {/* Header / Nav */}
             <div className="flex items-center gap-6 animate-in slide-in-from-left duration-500">
                 <button onClick={() => router.push(`/dashboard?lang=${lang}`)} className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm"><ArrowLeft className="h-6 w-6" /></button>
                 <div className="space-y-1"><h1 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">{t.title}</h1><p className="text-gray-400 text-sm font-medium">{t.desc}</p></div>
             </div>
 
-            {/* Account Quick Stats */}
-            <div className="bg-white border border-gray-100 rounded-3xl px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-8 shadow-sm group">
-                <div className="flex items-center gap-5 w-full md:w-auto">
-                    <div className="h-12 w-12 rounded-2xl bg-slate-900 flex items-center justify-center text-gv-gold shadow-lg rotate-3 group-hover:rotate-0 transition-transform"><svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                    <div className="space-y-0.5"><span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Total Capital Assets' : '总资产'}</span><p className="text-2xl font-black text-slate-900 tabular-nums leading-none tracking-tight">$ {(user?.balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p></div>
+            {/* Redesigned Quick Stats Card */}
+            <div className="bg-white border border-gray-100 rounded-[32px] px-10 py-8 flex flex-col md:flex-row items-center justify-between gap-10 shadow-lg shadow-gray-200/50">
+                <div className="flex items-center gap-6 w-full md:w-auto">
+                    <div className="relative">
+                        <TierMedal tierId={userTierId} size="lg" />
+                    </div>
+                    <div className="space-y-1">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{lang === 'en' ? 'Total Capital Assets' : '总资产'}</span>
+                        <p className="text-3xl font-black text-slate-900 tabular-nums leading-none tracking-tighter">$ {(totalCapitalUSD).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                    </div>
                 </div>
+
                 <div className="h-px w-full md:h-12 md:w-px bg-gray-100 hidden md:block"></div>
-                <div className="flex items-center gap-5 w-full md:w-auto">
-                    <div className={`h-12 w-12 rounded-2xl flex items-center justify-center shadow-md ${user?.next_maturity_date ? 'bg-amber-100 text-amber-500' : 'bg-emerald-100 text-emerald-500'}`}>{user?.next_maturity_date ? <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> : <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M5 13l4 4L19 7" /></svg>}</div>
-                    <div className="space-y-0.5"><span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Capital Status' : '资金状态'}</span><p className={`text-xl font-black uppercase tracking-tighter leading-none ${user?.next_maturity_date ? 'text-slate-900' : 'text-emerald-500'}`}>{user?.next_maturity_date ? (lang === 'zh' ? `距到期还剩 ${Math.ceil((new Date(user.next_maturity_date).getTime() - new Date().getTime()) / 86400000)} 天` : `${Math.ceil((new Date(user.next_maturity_date).getTime() - new Date().getTime()) / 86400000)} Days Remaining`) : (lang === 'en' ? 'Fully Released' : '资金已到期')}</p></div>
+
+                <div className="flex items-center gap-6 w-full md:w-auto">
+                    <div className={`h-14 w-14 rounded-2xl flex items-center justify-center shadow-inner ${user?.next_maturity_date ? 'bg-amber-50 text-amber-500' : 'bg-emerald-50 text-emerald-500'}`}>
+                        {user?.next_maturity_date ? <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> : <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M5 13l4 4L19 7" /></svg>}
+                    </div>
+                    <div className="space-y-1 flex flex-col justify-center">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{lang === 'en' ? 'Capital Status' : '资金状态'}</span>
+                        <div className="flex items-baseline gap-1.5 leading-none">
+                            {user?.next_maturity_date ? (
+                                <>
+                                    <span className="text-2xl font-black text-slate-900 tabular-nums">
+                                        {Math.ceil((new Date(user.next_maturity_date).getTime() - new Date().getTime()) / 86400000)}
+                                    </span>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                                        {t.daysLeft}
+                                    </span>
+                                </>
+                            ) : (
+                                <p className="text-xl font-black uppercase tracking-tighter text-emerald-500">{lang === 'en' ? 'Fully Matured' : '资金已到期'}</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                <div className="md:col-span-2 space-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-10">
+                <div className="space-y-10">
                     <div className="bg-white border border-gray-100 rounded-[40px] p-8 md:p-12 shadow-2xl shadow-gray-200/50 space-y-10">
                         <div className="space-y-10">
                             {/* Source Selection */}
@@ -331,20 +342,9 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                         </div>
                     </div>
                 </div>
-
-                {/* Sidebar Info */}
-                <div className="space-y-8">
-                    <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm text-center">
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 block mb-6">{t.currentTier}</span>
-                        <div className="flex flex-col items-center gap-4">
-                            <TierMedal tierId={user?.tier?.toLowerCase() || 'none'} size="lg" className="hover:scale-105 transition-transform duration-500" />
-                            <div className="space-y-1"><span className="text-2xl font-black uppercase tracking-tighter block">{user?.tier || 'Member'}</span><span className="text-[10px] font-bold text-gv-gold uppercase tracking-[0.3em]">{t.member}</span></div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            {/* General Withdrawal Confirmation Modal */}
+            {/* Confirmation Modal */}
             {showWithdrawConfirm && penaltyInfo && (
                 <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-gray-900/60 backdrop-blur-md">
                     <div className="bg-white rounded-[40px] p-8 max-w-md w-full max-h-[85vh] overflow-y-auto space-y-8 shadow-2xl animate-in zoom-in-95 duration-300">
@@ -355,44 +355,27 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                         </div>
 
                         <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 space-y-5">
-                            {/* Breakdown Rows - Only show if Capital with Penalty */}
                             {penaltyInfo.isApplied ? (
                                 <div className="space-y-3 pb-5 border-b border-dashed border-slate-200">
-                                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-gray-400 tracking-wider">
-                                        <span>Total Balance</span>
-                                        <span className="tabular-nums font-bold">$ {totalCapitalUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-gray-400 tracking-wider">
-                                        <span>{t.lockedPortion}</span>
-                                        <span className="tabular-nums font-bold">$ {penaltyInfo.lockedPortion_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-red-500 tracking-wider">
-                                        <span>{t.penaltyAmt}</span>
-                                        <span className="tabular-nums font-bold">- $ {penaltyInfo.penalty_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                    </div>
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-gray-400 tracking-wider"><span>Total Balance</span><span className="tabular-nums font-bold">$ {totalCapitalUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-gray-400 tracking-wider"><span>{t.lockedPortion}</span><span className="tabular-nums font-bold">$ {penaltyInfo.lockedPortion_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-red-500 tracking-wider"><span>{t.penaltyAmt}</span><span className="tabular-nums font-bold">- $ {penaltyInfo.penalty_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
                                 </div>
                             ) : (
-                                // Simpler Row for Dividends/Mature Capital
-                                <div className="flex justify-between items-center pb-5 border-b border-dashed border-slate-200 text-[10px] font-black uppercase text-gray-400 tracking-widest font-mono">
-                                    <span>{t.totalWithdrawal}</span>
-                                    <span className="text-slate-900 font-bold">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                </div>
+                                <div className="flex justify-between items-center pb-5 border-b border-dashed border-slate-200 text-[10px] font-black uppercase text-gray-400 tracking-widest font-mono"><span>{t.totalWithdrawal}</span><span className="text-slate-900 font-bold">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
                             )}
 
-                            {/* Final Payout Display - Simplified as requested */}
                             <div className="flex flex-col items-center justify-center text-emerald-500 space-y-1">
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">{t.estPayoutUSD}</span>
                                 <span className="text-5xl font-black tabular-nums tracking-tighter leading-tight">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                <div className="pt-2 text-center">
-                                    <span className="text-lg font-black tabular-nums tracking-tight opacity-90">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                </div>
+                                <div className="pt-2 text-center"><span className="text-lg font-black tabular-nums tracking-tight opacity-90">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
                             </div>
                             
                             <div className="text-[9px] font-black text-gray-400 text-center uppercase tracking-[0.3em] font-mono border-t border-slate-200 pt-4">Rate: $1.0 = RM {withdrawalRate.toFixed(2)}</div>
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <button onClick={() => { setShowWithdrawConfirm(false); setIsPinModalOpen(true); }} className={`w-full font-black py-5 rounded-2xl uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 active:scale-95 transition-all text-base ${penaltyInfo.isApplied ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-gv-gold text-black shadow-gv-gold/20'}`}>{t.acceptBtn}</button>
+                            <button onClick={() => { setShowWithdrawConfirm(false); setIsPinModalOpen(true); }} className={`w-full font-black py-5 rounded-2xl uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 active:scale-95 transition-all text-base ${penaltyInfo.isApplied ? 'bg-amber-500 text-white' : 'bg-gv-gold text-black'}`}>{t.acceptBtn}</button>
                             <button onClick={() => setShowWithdrawConfirm(false)} className="w-full text-slate-400 font-black hover:text-slate-900 transition-colors uppercase tracking-[0.1em] text-[10px] py-2">{t.cancelBtn}</button>
                         </div>
                     </div>
