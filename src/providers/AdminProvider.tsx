@@ -421,17 +421,30 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             }).reduce((acc: number, d: any) => acc + Number(d.original_currency_amount ?? (Number(d.amount || 0) / forexRate)), 0);
 
             const withdrawableCapitalUSD = Math.max(0, currentBalanceUSD - ledgerLockedCapitalUSD);
-            const totalWithdrawableUSD = ledgerProfitUSD + withdrawableCapitalUSD;
+            
+            // Respect the user's manual source selection (Dividends vs Capital)
+            const source = tx.metadata?.withdrawal_source || "Dividends"; 
+            const sourceLimitUSD = source === 'Dividends' ? ledgerProfitUSD : withdrawableCapitalUSD;
 
             let penaltyUSD = 0;
             let finalPayoutUSD = withdrawAmountUSD;
             let penaltyApplied = false;
 
-            if (withdrawAmountUSD > totalWithdrawableUSD) {
-                const penalizedPortionUSD = withdrawAmountUSD - totalWithdrawableUSD;
-                penaltyUSD = penalizedPortionUSD * 0.4;
-                finalPayoutUSD = withdrawAmountUSD - penaltyUSD;
-                penaltyApplied = true;
+            if (withdrawAmountUSD > (sourceLimitUSD + 0.01)) {
+                // If it's a Capital withdrawal and exceeds mature funds, apply penalty on the locked portion
+                if (source === 'Capital') {
+                    const lockedPortionUSD = withdrawAmountUSD - withdrawableCapitalUSD;
+                    penaltyUSD = lockedPortionUSD * 0.4;
+                    finalPayoutUSD = withdrawAmountUSD - penaltyUSD;
+                    penaltyApplied = true;
+                } else {
+                    // For Dividends, we technically shouldn't allow overflow, 
+                    // but if it happens due to ledger drift, we capture it as gross.
+                    // Penalty is only for Capital.
+                    penaltyUSD = 0;
+                    finalPayoutUSD = withdrawAmountUSD;
+                    penaltyApplied = false;
+                }
             }
 
             // 5. Mark transaction as Pending Release

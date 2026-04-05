@@ -37,6 +37,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
     const [successRefId, setSuccessRefId] = useState("");
     
     const [withdrawAmount, setWithdrawAmount] = useState("");
+    const [withdrawType, setWithdrawType] = useState<"Dividends" | "Capital">("Dividends");
     const [withdrawPIN, setWithdrawPIN] = useState("");
     const [isPinVisible, setIsPinVisible] = useState(false);
     const [isPinModalOpen, setIsPinModalOpen] = useState(false);
@@ -111,8 +112,23 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             verificationRequired: "需要身份验证",
             verificationDesc: "为了确保您的资产安全并遵守机构监管要求，我们要求所有用户在发起提款前完成身份验证。",
             verifyNow: "立即验证",
+            withdrawSource: "选择提款来源",
+            sourceDividends: "累计分红",
+            sourceCapital: "本金资本",
+            availableBalance: "可提款余额",
+            noLockedWarning: "锁定本金将产生 40% 的罚金。",
         }
     }[lang];
+
+    const matureCapitalUSD = Number(user?.mature_capital_usd || 0);
+    const dividendWithdrawableUSD = Number(user?.dividend_withdrawable_usd || 0);
+    const totalCapitalUSD = Number(user?.balance_usd || 0);
+    
+    // Total assets is the sum of both pools
+    const totalAssetsUSD = Number(user?.total_assets_usd || 0);
+
+    // Available amount depends on current selection
+    const availableAmountUSD = withdrawType === 'Dividends' ? dividendWithdrawableUSD : totalCapitalUSD;
 
     const handleWithdrawInitiate = () => {
         const amountUSD = parseFloat(withdrawAmount);
@@ -132,41 +148,15 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             return;
         }
         
-        const totalAssetsUSD = Number(user?.total_assets_usd || 0);
-
-        if (amountUSD > (totalAssetsUSD + 0.01)) {
-            alert(lang === 'zh' ? "金额超过总资产。" : "Requested amount exceeds total assets.");
+        // 1. Validation based on selection
+        if (amountUSD > (availableAmountUSD + 0.01)) {
+            alert(lang === 'zh' ? "金额超过可提款余额。" : `Requested amount exceeds available ${withdrawType} balance.`);
             return;
         }
 
-        const matureCapitalUSD = Number(user?.mature_capital_usd || 0);
-        const dividendWithdrawableUSD = Number(user?.dividend_withdrawable_usd || 0);
-        const totalLiquidWithdrawableUSD = matureCapitalUSD + dividendWithdrawableUSD;
-        
-        // If they want to withdraw more than is liquid (mature + profit), they must withdraw EVERYTHING (Locked Withdrawal)
-        if (amountUSD > totalLiquidWithdrawableUSD) {
-            const isTotalWithdrawal = amountUSD >= (totalAssetsUSD - 0.01);
-            if (!isTotalWithdrawal) {
-                alert(lang === 'zh' ? "不允许部分提取锁定资金。要提取锁定资金，您必须提取全部余额。" : "Partial withdrawal of locked capital is not permitted. To withdraw from your locked capital, you must withdraw your entire balance.");
-                return;
-            }
-            // Entire balance withdrawal triggers 40% penalty on the locked portion
-            const lockedPortionUSD = amountUSD - totalLiquidWithdrawableUSD;
-            const penaltyUSD = lockedPortionUSD * 0.4;
-            const finalPayoutUSD = amountUSD - penaltyUSD;
-            
-            setPenaltyInfo({
-                penalty: penaltyUSD * (withdrawalRate - 0.4),
-                payout: finalPayoutUSD * (withdrawalRate - 0.4),
-                lockedPortion: lockedPortionUSD * (withdrawalRate - 0.4),
-                penalty_usd: penaltyUSD,
-                payout_usd: finalPayoutUSD,
-                lockedPortion_usd: lockedPortionUSD,
-                isApplied: true
-            });
-            setShowPenaltyConfirm(true);
-        } else {
-            // Standard withdrawal from liquid funds (Profit or Mature Capital)
+        // 2. Penalty Logic
+        if (withdrawType === 'Dividends') {
+            // Dividends never incur a penalty
             setPenaltyInfo({
                 penalty: 0,
                 payout: amountUSD * (withdrawalRate - 0.4),
@@ -177,6 +167,44 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 isApplied: false
             });
             setIsPinModalOpen(true);
+        } else {
+            // Capital withdrawal: Check if pulling from locked funds
+            if (amountUSD > matureCapitalUSD) {
+                // To pull from locked funds, user must withdraw EVERYTHING in their capital bucket
+                // However, the requested rule "if no available capital... show warning" suggests showing the modal
+                const isTotalCapitalWithdrawal = amountUSD >= (totalCapitalUSD - 0.01);
+                if (!isTotalCapitalWithdrawal) {
+                    alert(lang === 'zh' ? "提取锁定资本必须提取全部本金金额。" : "To withdraw from your locked capital, you must withdraw your entire capital balance.");
+                    return;
+                }
+
+                const lockedPortionUSD = amountUSD - matureCapitalUSD;
+                const penaltyUSD = lockedPortionUSD * 0.4;
+                const finalPayoutUSD = amountUSD - penaltyUSD;
+                
+                setPenaltyInfo({
+                    penalty: penaltyUSD * (withdrawalRate - 0.4),
+                    payout: finalPayoutUSD * (withdrawalRate - 0.4),
+                    lockedPortion: lockedPortionUSD * (withdrawalRate - 0.4),
+                    penalty_usd: penaltyUSD,
+                    payout_usd: finalPayoutUSD,
+                    lockedPortion_usd: lockedPortionUSD,
+                    isApplied: true
+                });
+                setShowPenaltyConfirm(true);
+            } else {
+                // Mature capital withdrawal
+                setPenaltyInfo({
+                    penalty: 0,
+                    payout: amountUSD * (withdrawalRate - 0.4),
+                    lockedPortion: 0,
+                    penalty_usd: 0,
+                    payout_usd: amountUSD,
+                    lockedPortion_usd: 0,
+                    isApplied: false
+                });
+                setIsPinModalOpen(true);
+            }
         }
     };
 
@@ -243,21 +271,18 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             });
 
             const amountUSD = parseFloat(withdrawAmount);
-            const initialProfitUSD = ledgerProfitUSD; // Use Ledger instead of Column
+            const initialProfitUSD = ledgerProfitUSD; 
             const initialBalanceUSD = Number(p.balance_usd || 0);
 
-            // 2. Calculate Deductions (Profit first, then Balance)
+            // 1. Precise Source-based Deduction
             let newProfitUSD = initialProfitUSD;
             let newBalanceUSD = initialBalanceUSD;
             let remainingUSD = amountUSD;
 
-            if (remainingUSD <= newProfitUSD) {
-                newProfitUSD -= remainingUSD;
-                remainingUSD = 0;
+            if (withdrawType === 'Dividends') {
+                newProfitUSD = Math.max(0, initialProfitUSD - amountUSD);
             } else {
-                remainingUSD -= newProfitUSD;
-                newProfitUSD = 0;
-                newBalanceUSD = Math.max(0, newBalanceUSD - remainingUSD);
+                newBalanceUSD = Math.max(0, initialBalanceUSD - amountUSD);
             }
 
             const profitDeduction = initialProfitUSD - newProfitUSD;
@@ -287,6 +312,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 original_currency: 'USD',
                 metadata: {
                     description: "Withdrawal",
+                    withdrawal_source: withdrawType,
                     profit_portion: profitDeduction,
                     balance_portion: balanceDeduction,
                     original_usd_amount: withdrawAmount,
@@ -423,35 +449,71 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2 space-y-8">
                     <div className="bg-white border border-gray-200 rounded-[32px] p-8 md:p-10 shadow-2xl space-y-10">
-                        <div className="space-y-6">
-                            <div className="space-y-3">
-                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amount}</label>
-                                <div className="relative">
-                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-gray-300">$</span>
-                                    <input 
-                                        type="number" 
-                                        value={withdrawAmount} 
-                                        onChange={(e) => setWithdrawAmount(e.target.value)} 
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-5 pl-12 text-2xl font-black focus:outline-none focus:border-gv-gold focus:bg-white transition-all tabular-nums" 
-                                        placeholder="0.00" 
-                                    />
+                        <div className="space-y-10">
+                            {/* Withdrawal Source Selector */}
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">
+                                    {lang === 'en' ? "Withdrawal Source" : "提款来源"}
+                                </label>
+                                <div className="grid grid-cols-2 p-1 bg-stone-100 rounded-2xl border border-stone-200/50">
+                                    {(['Dividends', 'Capital'] as const).map((type) => (
+                                        <button
+                                            key={type}
+                                            onClick={() => {
+                                                setWithdrawType(type);
+                                                setWithdrawAmount("");
+                                            }}
+                                            className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                                                withdrawType === type 
+                                                    ? 'bg-stone-900 text-gv-gold shadow-lg shadow-black/20' 
+                                                    : 'text-gray-400 hover:text-gray-600'
+                                            }`}
+                                        >
+                                            {type === 'Dividends' ? (lang === 'en' ? "Dividends" : "提累计分红") : (lang === 'en' ? "Capital" : "提本金资本")}
+                                        </button>
+                                    ))}
                                 </div>
-                                {withdrawAmount && (
-                                    <p className="px-1 text-[11px] font-black text-gv-gold/0 uppercase tracking-tighter h-0 overflow-hidden">
-                                        ≈ RM {(parseFloat(withdrawAmount) * (withdrawalRate - 0.4)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                    </p>
-                                )}
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-6 bg-emerald-50/50 rounded-3xl border border-emerald-500/10">
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60 block mb-1">Available Dividend</span>
-                                    <p className="text-xl font-black text-emerald-600 tabular-nums">$ {(user?.dividend_withdrawable_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-end px-1">
+                                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">{t.amount}</label>
+                                    <div className="text-right">
+                                        <span className={`text-[9px] font-bold uppercase tracking-widest ${withdrawType === 'Dividends' ? 'text-emerald-500' : 'text-gv-gold'}`}>
+                                            {lang === 'en' ? `Available ${withdrawType}` : `可用${withdrawType === 'Dividends' ? '分红' : '本金'}`}: 
+                                        </span>
+                                        <span className="ml-2 text-xs font-black text-gray-900 tabular-nums">
+                                            $ {availableAmountUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div className="p-6 bg-blue-50/50 rounded-3xl border border-blue-500/10">
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-blue-600/60 block mb-1">Available Capital</span>
-                                    <p className="text-xl font-black text-blue-600 tabular-nums">$ {(user?.mature_capital_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                <div className="relative group">
+                                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 font-black text-xs">$</div>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        value={withdrawAmount}
+                                        onChange={(e) => setWithdrawAmount(e.target.value)}
+                                        className={`w-full bg-stone-50 border border-stone-200 rounded-3xl pl-10 pr-6 py-5 text-2xl font-black text-gray-900 focus:outline-none focus:border-gv-gold transition-all placeholder:text-stone-300 ${withdrawType === 'Capital' && parseFloat(withdrawAmount) > matureCapitalUSD ? 'border-red-200 bg-red-50/10' : ''}`}
+                                    />
                                 </div>
+
+                                {withdrawType === 'Capital' && parseFloat(withdrawAmount) > 0 && (
+                                    <div className="flex flex-col gap-2 px-2">
+                                        <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest">
+                                            <span className="text-gray-400">Locked Capital Threshold</span>
+                                            <span className="text-gray-900 font-black">$ {matureCapitalUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        </div>
+                                        {parseFloat(withdrawAmount) > matureCapitalUSD && (
+                                            <p className="text-[9px] text-red-500 font-bold italic leading-relaxed animate-in slide-in-from-top-1 duration-300">
+                                                ⚠️ {lang === 'en' 
+                                                    ? "Request exceeds mature capital. A 40% early withdrawal penalty will be applied to the locked portion." 
+                                                    : "请求金额超过到期本金。将对锁定部分扣除 40% 的提前结清违约金。"}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Payout Destination Selection */}
@@ -584,8 +646,15 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
 
                             <button 
                                 onClick={handleWithdrawInitiate} 
-                                disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0 || (!selectedMethodId && !isOneTime) || isSubmitting} 
-                                className="w-full bg-black text-white font-black py-5 rounded-2xl flex justify-center items-center gap-4 text-lg uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50"
+                                disabled={
+                                    !withdrawAmount || 
+                                    parseFloat(withdrawAmount) <= 0 || 
+                                    parseFloat(withdrawAmount) > (availableAmountUSD + 0.01) ||
+                                    (!selectedMethodId && !isOneTime) || 
+                                    (withdrawType === 'Capital' && parseFloat(withdrawAmount) > matureCapitalUSD && parseFloat(withdrawAmount) < (totalCapitalUSD - 0.01)) ||
+                                    isSubmitting
+                                } 
+                                className="w-full bg-black text-white font-black py-5 rounded-2xl flex justify-center items-center gap-4 text-lg uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                             >
                                 {t.continueToPin}
                             </button>
