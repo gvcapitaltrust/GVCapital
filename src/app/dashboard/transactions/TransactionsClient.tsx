@@ -464,6 +464,12 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                         </div>
                                     </div>
                                     
+                                    {selectedTx.status === 'Rejected' && selectedTx.metadata?.reason && (
+                                        <div className="p-6 bg-red-50 border border-red-100 rounded-[2rem] space-y-2 mt-auto">
+                                            <p className="text-[10px] font-black text-red-400 uppercase tracking-widest px-1">Reject Reason</p>
+                                            <p className="text-xs font-bold text-slate-900 leading-relaxed italic">"{selectedTx.metadata.reason}"</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="space-y-4">
@@ -495,6 +501,16 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                 <div className="h-4 w-4 rounded-full bg-emerald-500 absolute left-[3.5px] border-4 border-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"></div>
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] leading-none mb-2">Fund Released</span>
+                                                    <span className="text-xs font-black text-slate-900 leading-none">{formatDateTime(selectedTx.updated_at || selectedTx.created_at)}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {selectedTx.status === 'Rejected' && (
+                                            <div className="flex items-start gap-6 pl-8 relative animate-in slide-in-from-top-4 duration-500">
+                                                <div className="h-4 w-4 rounded-full bg-red-500 absolute left-[3.5px] border-4 border-white shadow-[0_0_12px_rgba(239,68,68,0.3)]"></div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] leading-none mb-2">Rejected</span>
                                                     <span className="text-xs font-black text-slate-900 leading-none">{formatDateTime(selectedTx.updated_at || selectedTx.created_at)}</span>
                                                 </div>
                                             </div>

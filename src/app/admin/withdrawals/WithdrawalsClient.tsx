@@ -354,7 +354,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                 <div className="flex items-start gap-6 pl-8 relative">
                                                     <div className="h-4 w-4 rounded-full bg-red-500 absolute left-[4px] border-4 border-white shadow-[0_0_12px_rgba(239,68,68,0.4)]"></div>
                                                     <div className="flex flex-col">
-                                                        <span className="text-[10px] font-black text-red-500 uppercase tracking-widest leading-none mb-2">Audit Exception</span>
+                                                        <span className="text-[10px] font-black text-red-500 uppercase tracking-widest leading-none mb-2">Rejected</span>
                                                         <span className="text-xs font-bold text-slate-900">{formatDateTime(selectedTx.metadata?.rejected_at || selectedTx.updated_at)}</span>
                                                     </div>
                                                 </div>
@@ -364,7 +364,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
 
                                     {selectedTx.status === 'Rejected' && selectedTx.metadata?.reason && (
                                         <div className="p-6 bg-red-50 border border-red-100 rounded-[2rem] space-y-2 mt-auto">
-                                            <p className="text-[10px] font-black text-red-400 uppercase tracking-widest px-1">Reject Basis</p>
+                                            <p className="text-[10px] font-black text-red-400 uppercase tracking-widest px-1">Reject Reason</p>
                                             <p className="text-xs font-bold text-slate-900 leading-relaxed italic">"{selectedTx.metadata.reason}"</p>
                                         </div>
                                     )}
