@@ -248,38 +248,38 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 <div className="space-y-0.5"><h1 className="text-xl font-black text-gray-900 uppercase tracking-tighter">{t.title}</h1><p className="text-gray-400 text-xs font-medium">{t.desc}</p></div>
             </div>
 
-            {/* Compact Quick Stats Card */}
-            <div className="bg-white border border-gray-100 rounded-3xl px-12 py-7 flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 shadow-lg shadow-gray-200/40 animate-in fade-in duration-1000">
-                <div className="flex flex-col items-center md:items-start gap-2 w-full md:w-auto">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{lang === 'en' ? 'Total Capital Assets' : '总资产'}</span>
-                    <div className="flex items-center gap-3">
-                        <p className="text-2xl font-black text-slate-900 tabular-nums leading-none tracking-tighter">$ {(totalCapitalUSD).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                        <TierMedal tierId={userTierId} size="sm" className="shrink-0 -mt-1" />
+            {/* Compact Quick Stats Row */}
+            <div className="flex flex-col md:flex-row items-center justify-center gap-10 md:gap-24 animate-in fade-in duration-1000 py-2">
+                <div className="flex flex-col items-center md:items-start gap-1">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Total Capital Assets' : '总资产'}</span>
+                    <div className="flex items-center gap-2">
+                        <p className="text-xl font-black text-slate-900 tabular-nums tracking-tighter">$ {(totalCapitalUSD).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                        <TierMedal tierId={userTierId} size="xs" className="shrink-0" />
                     </div>
                 </div>
 
-                <div className="h-px w-full md:h-10 md:w-px bg-gray-100 hidden md:block"></div>
+                <div className="h-8 w-px bg-gray-200 hidden md:block opacity-50"></div>
 
-                <div className="flex flex-col items-center md:items-start gap-2 w-full md:w-auto">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{lang === 'en' ? 'Capital Status' : '资金状态'}</span>
-                    <div className="flex items-center gap-3">
-                        <div className={`h-8 w-8 rounded-full flex items-center justify-center ${user?.next_maturity_date ? 'bg-amber-50 text-amber-500' : 'bg-emerald-50 text-emerald-500'}`}>
-                            {user?.next_maturity_date ? <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> : <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M5 13l4 4L19 7" /></svg>}
-                        </div>
-                        <div className="flex items-baseline gap-1.5 leading-none">
-                            {user?.next_maturity_date ? (
-                                <>
-                                    <span className="text-2xl font-black text-slate-900 tabular-nums tracking-tighter">
-                                        {Math.ceil((new Date(user.next_maturity_date).getTime() - new Date().getTime()) / 86400000)}
-                                    </span>
-                                    <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400 -ml-0.5">
-                                        {t.daysLeft}
-                                    </span>
-                                </>
-                            ) : (
-                                <p className="text-lg font-black uppercase tracking-tighter text-emerald-500">{lang === 'en' ? 'Fully Matured' : '资金已到期'}</p>
-                            )}
-                        </div>
+                <div className="flex flex-col items-center md:items-start gap-1">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Capital Status' : '资金状态'}</span>
+                    <div className="flex items-center gap-2.5">
+                        {user?.next_maturity_date ? (
+                            <div className="flex items-baseline gap-1.5 leading-none">
+                                <span className="text-xl font-black text-slate-900 tabular-nums tracking-tighter">
+                                    {Math.ceil((new Date(user.next_maturity_date).getTime() - new Date().getTime()) / 86400000)}
+                                </span>
+                                <span className="text-[8px] font-bold uppercase tracking-widest text-gray-400">
+                                    {t.daysLeft}
+                                </span>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-1.5">
+                                <div className="h-4 w-4 rounded-full bg-emerald-500 flex items-center justify-center shadow-[0_0_8px_rgba(16,185,129,0.3)]">
+                                    <svg className="h-2.5 w-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
+                                </div>
+                                <p className="text-sm font-black uppercase tracking-tighter text-emerald-500">{lang === 'en' ? 'Fully Matured' : '资金已到期'}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
