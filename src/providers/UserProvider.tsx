@@ -195,9 +195,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                userId: user.id,
                                 username: profile.username || user.user_metadata?.username || '',
-                                email: user.email || '',
                             }),
                         });
 
