@@ -231,6 +231,9 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 newBalanceUSD = Math.max(0, newBalanceUSD - remainingUSD);
             }
 
+            const profitDeduction = initialProfitUSD - newProfitUSD;
+            const balanceDeduction = initialBalanceUSD - newBalanceUSD;
+
             // 2. Perform Single Submission Deduction
             const { error: profileUpdateError } = await supabase
                 .from('profiles')
@@ -255,6 +258,8 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 original_currency: 'USD',
                 metadata: {
                     description: "Withdrawal",
+                    profit_portion: profitDeduction,
+                    balance_portion: balanceDeduction,
                     original_usd_amount: withdrawAmount,
                     forex_rate: withdrawalRate,
                     expected_payout: penaltyInfo?.payout,

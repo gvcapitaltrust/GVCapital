@@ -51,30 +51,49 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false });
 
-            // 3. Process Data
+            // 3. Process Data (Chronological Ledger Simulation)
             if (profile && txs) {
                 const now = new Date();
                 
-                // Calculate Profit/Dividends from Transaction History (More accurate than relying on a single profile field)
-                // This fix ensures that sonmus94 (and others) see the SUM of their dividends (e.g. 240+230+242 = 712)
-                const lifetimeDividendsUSD = txs.filter((t: any) => {
+                // We sort transactions by date (Oldest to Newest) to simulate a running ledger
+                // This correctly accounts for withdrawals deducting from profit FIRST.
+                const chronTxs = [...txs].sort((a, b) => 
+                    new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+                );
+
+                let virtualProfit = 0;
+                let virtualLifetimeDividends = 0;
+
+                chronTxs.forEach(t => {
                     const type = (t.type || "").toLowerCase();
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
                     const reason = (t.metadata?.reason || "").toLowerCase();
                     const isDivOrBonus = type === 'dividend' || type === 'bonus' || category === 'dividend' || category === 'bonus' || category === 'profit' || reason.includes('dividend');
-                    return isDivOrBonus && ['Approved', 'Completed'].includes(t.status);
-                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate)), 0);
+                    
+                    if (isDivOrBonus && ['Approved', 'Completed'].includes(t.status)) {
+                        const amountUSD = Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate));
+                        virtualProfit += amountUSD;
+                        virtualLifetimeDividends += amountUSD;
+                    }
 
-                const totalDividendWithdrawnUSD = txs.filter((t: any) => {
-                    const type = (t.type || "").toLowerCase();
-                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                    const isProfitWithdrawal = type === 'withdrawal' && (category === 'dividend' || category === 'profit' || category === 'bonus');
-                    return isProfitWithdrawal && ['Approved', 'Completed', 'Pending Release', 'Pending'].includes(t.status);
-                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
+                    if (type === 'withdrawal' && !['Rejected'].includes(t.status)) {
+                        const amountUSD = Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate));
+                        
+                        // If we have explicit bucket metadata (new system), use it
+                        if (t.metadata?.profit_portion !== undefined) {
+                            virtualProfit = Math.max(0, virtualProfit - Number(t.metadata.profit_portion));
+                        } else {
+                            // Legacy fallback: Deduct from profit bucket first until empty
+                            const deductionFromProfit = Math.min(virtualProfit, amountUSD);
+                            virtualProfit -= deductionFromProfit;
+                        }
+                    }
+                });
 
-                // Available Profit/Dividend is the sum of all dividends minus all dividend withdrawals
-                const profitUSD = Math.max(0, lifetimeDividendsUSD - totalDividendWithdrawnUSD);
+                const profitUSD = virtualProfit;
+                const lifetimeDividendsUSD = virtualLifetimeDividends;
 
+                // Approved Deposits for Locked Capital calculation
                 const approvedDeposits = txs.filter((tx: any) => {
                     const type = (tx.type || "").toLowerCase();
                     const category = (tx.metadata?.adjustment_category || "").toLowerCase();
