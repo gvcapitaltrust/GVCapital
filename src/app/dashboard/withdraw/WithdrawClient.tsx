@@ -11,7 +11,7 @@ import { getTierByAmount } from "@/lib/tierUtils";
 
 export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, withdrawalMethods, refreshData } = useUser();
-    const { withdrawalRate } = useSettings();
+    const { forexRate, withdrawalRate } = useSettings();
     const router = useRouter();
 
     if (!user) {
@@ -167,9 +167,10 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 const penaltyUSD = lockedPortionUSD * 0.4;
                 const finalPayoutUSD = totalCapitalUSD - penaltyUSD;
                 
+                const netRate = withdrawalRate - 0.4;
                 setPenaltyInfo({
-                    penalty: penaltyUSD * withdrawalRate, payout: finalPayoutUSD * withdrawalRate,
-                    lockedPortion: lockedPortionUSD * withdrawalRate, penalty_usd: penaltyUSD,
+                    penalty: penaltyUSD * netRate, payout: finalPayoutUSD * netRate,
+                    lockedPortion: lockedPortionUSD * netRate, penalty_usd: penaltyUSD,
                     payout_usd: finalPayoutUSD, lockedPortion_usd: lockedPortionUSD, isApplied: true
                 });
                 setShowWithdrawConfirm(true);
@@ -243,9 +244,22 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 pb-10">
-            <div className="flex items-center gap-6 animate-in slide-in-from-left duration-500">
-                <button onClick={() => router.push(`/dashboard?lang=${lang}`)} className="h-10 w-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm"><ArrowLeft className="h-5 w-5" /></button>
-                <div className="space-y-0.5"><h1 className="text-xl font-black text-gray-900 uppercase tracking-tighter">{t.title}</h1><p className="text-gray-400 text-xs font-medium">{t.desc}</p></div>
+            <div className="bg-white border border-gray-200 rounded-[2.5rem] p-8 md:p-10 flex items-center justify-between gap-8 shadow-sm animate-in fade-in duration-500">
+                <div className="flex items-center gap-6">
+                    <button onClick={() => router.push(`/dashboard?lang=${lang}`)} className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-gv-gold transition-all shadow-sm group">
+                        <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
+                    </button>
+                    <div className="space-y-3">
+                        <div className="hidden md:flex items-center gap-3">
+                            <div className="h-0.5 w-10 bg-gv-gold rounded-full"></div>
+                            <span className="text-gv-gold text-[10px] font-black uppercase tracking-[0.4em] mb-0.5">Asset Liquidation</span>
+                        </div>
+                        <div className="space-y-0.5">
+                            <h1 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">{t.title}</h1>
+                            <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest mt-1">{t.desc}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Compact Quick Stats Row */}
@@ -378,7 +392,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 <div className="pt-2 text-center"><span className="text-lg font-black tabular-nums tracking-tight opacity-90">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
                             </div>
                             
-                            <div className="text-[9px] font-black text-gray-400 text-center uppercase tracking-[0.3em] font-mono border-t border-slate-200 pt-4">Rate: $1.0 = RM {withdrawalRate.toFixed(2)}</div>
+                            <div className="text-[9px] font-black text-gray-400 text-center uppercase tracking-[0.3em] font-mono border-t border-slate-200 pt-4">Rate: $1.0 = RM {(forexRate - 0.4).toFixed(2)}</div>
                         </div>
 
                         <div className="flex flex-col gap-3">

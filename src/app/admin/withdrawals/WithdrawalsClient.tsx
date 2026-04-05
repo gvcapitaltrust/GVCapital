@@ -87,12 +87,18 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <div className="bg-white border border-gray-200 rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-8 shadow-sm">
-                <div className="space-y-2">
-                    <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 border-l-8 border-gv-gold pl-6">{t.title}</h2>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest pl-1">{t.subtitle}</p>
+            <div className="bg-white border border-gray-200 rounded-[2.5rem] p-8 md:p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-sm">
+                <div className="space-y-4">
+                    <div className="hidden md:flex items-center gap-3">
+                        <div className="h-0.5 w-10 bg-gv-gold rounded-full"></div>
+                        <span className="text-gv-gold text-[10px] font-black uppercase tracking-[0.4em] mb-0.5">Institutional Access</span>
+                    </div>
+                    <div className="space-y-1">
+                        <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-slate-900 leading-none">{t.title}</h2>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-1">{t.subtitle}</p>
+                    </div>
                 </div>
-                <div className="flex flex-col md:flex-row gap-4 min-w-[500px]">
+                <div className="flex flex-col md:flex-row gap-4 min-w-full lg:min-w-[500px]">
                     <div className="relative group flex-1">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-gv-gold transition-colors">
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -102,13 +108,13 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                             placeholder={t.searchPlaceholder}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-6 py-4 text-xs w-full focus:outline-none focus:border-gv-gold focus:bg-white focus:shadow-xl transition-all font-bold placeholder:text-slate-300"
+                            className="bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-6 py-3.5 text-xs w-full focus:outline-none focus:border-gv-gold focus:bg-white focus:shadow-xl transition-all font-bold placeholder:text-slate-300"
                         />
                     </div>
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-xs font-black uppercase tracking-widest focus:outline-none focus:border-gv-gold transition-all text-slate-900 appearance-none cursor-pointer"
+                        className="bg-slate-50 border border-slate-100 rounded-2xl px-6 py-3.5 text-xs font-black uppercase tracking-widest focus:outline-none focus:border-gv-gold transition-all text-slate-900 appearance-none cursor-pointer"
                     >
                         <option value="All">{t.statusAll}</option>
                         <option value="Pending">{t.statusPending}</option>
@@ -121,14 +127,14 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
 
             <div className="bg-white border border-gray-200 rounded-[32px] overflow-hidden shadow-2xl relative">
                 <div className="overflow-x-auto overflow-y-auto max-h-[650px] scrollbar-thin scrollbar-thumb-gray-200">
-                    <table className="w-full text-left border-collapse min-w-[1000px]">
+                    <table className="w-full text-left border-collapse min-w-[900px] lg:min-w-full">
                         <thead className="bg-slate-50/50 border-b border-slate-100 sticky top-0 z-10 backdrop-blur-md">
                             <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                <th className="px-10 py-6">Institutional Client</th>
-                                <th className="px-10 py-6">{t.date}</th>
-                                <th className="px-10 py-6">Net Payout (USD/RM)</th>
-                                <th className="px-10 py-6">Audit Status</th>
-                                <th className="px-10 py-6 text-right">Verification Hub</th>
+                                <th className="px-6 py-6 pl-10">Institutional Client</th>
+                                <th className="px-6 py-6">{t.date}</th>
+                                <th className="px-6 py-6">Net Payout (USD/RM)</th>
+                                <th className="px-6 py-6">Audit Status</th>
+                                <th className="px-6 py-6 pr-10 text-right">Verification Hub</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -138,27 +144,27 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                 const payoutRM = payoutUSD * rateToUse;
 
                                 return (
-                                    <tr key={tx.id || idx} className="group hover:bg-slate-50/50 transition-all border-b border-slate-50 last:border-0">
-                                        <td className="px-10 py-6">
+                                    <tr key={tx.id || idx} className="group hover:bg-slate-50/50 transition-all border-b border-slate-50 last:border-0 border-collapse">
+                                        <td className="px-6 py-6 pl-10">
                                             <div className="flex items-center gap-4">
                                                 <div className="h-10 w-10 flex items-center justify-center shrink-0">
                                                     <TierMedal tierId={tx.profiles?.tier?.toLowerCase() || getTierByAmount(tx.profiles?.balance_usd || 0).id} size="sm" />
                                                 </div>
-                                                <div className="flex flex-col">
-                                                    <span className="font-black text-slate-900 uppercase tracking-tight text-sm group-hover:text-gv-gold transition-colors">{tx.profiles?.full_name}</span>
+                                                <div className="flex flex-col overflow-hidden">
+                                                    <span className="font-black text-slate-900 uppercase tracking-tight text-sm group-hover:text-gv-gold transition-colors truncate max-w-[150px]">{tx.profiles?.full_name}</span>
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none">@{tx.profiles?.username}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-10 py-6">
+                                        <td className="px-6 py-6">
                                             <div className="flex flex-col">
                                                 <span className="text-slate-500 font-mono text-[11px] font-bold tabular-nums">{formatDate(tx.created_at)}</span>
                                                 <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
                                         </td>
-                                        <td className="px-10 py-6">
+                                        <td className="px-6 py-6">
                                             <div className="flex flex-col">
                                                 <div className="flex items-baseline gap-2">
                                                     <span className="font-black text-emerald-500 tabular-nums text-lg leading-none">$ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
@@ -167,7 +173,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                 <span className="text-[9px] text-slate-300 font-bold uppercase mt-1 tracking-widest">Rate: {rateToUse.toFixed(2)}</span>
                                             </div>
                                         </td>
-                                        <td className="px-10 py-6">
+                                        <td className="px-6 py-6">
                                             <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm ${
                                                 tx.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
                                                 tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
@@ -177,7 +183,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                 {tx.status}
                                             </span>
                                         </td>
-                                        <td className="px-10 py-6 text-right">
+                                        <td className="px-6 py-6 pr-10 text-right">
                                             <button 
                                                 onClick={() => { setSelectedTx(tx); setIsDetailsOpen(true); }} 
                                                 className="bg-slate-900 text-white hover:bg-slate-800 text-[10px] font-black uppercase tracking-widest px-8 py-3 rounded-2xl transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0"
