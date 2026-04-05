@@ -360,14 +360,14 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             {/* Confirmation Modal */}
             {showWithdrawConfirm && penaltyInfo && (
                 <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-gray-900/60 backdrop-blur-md">
-                    <div className="bg-white border border-slate-200 rounded-[40px] p-8 max-w-md w-full max-h-[85vh] overflow-y-auto space-y-8 shadow-2xl animate-in zoom-in-95 duration-300">
-                        <div className="text-center space-y-3">
-                            <div className={`h-16 w-16 rounded-full flex items-center justify-center mx-auto transition-colors ${penaltyInfo.isApplied ? 'bg-amber-100 text-amber-500' : 'bg-emerald-50 text-emerald-500'}`}>{penaltyInfo.isApplied ? <AlertTriangle className="h-8 w-8" /> : <ShieldCheck className="h-8 w-8" />}</div>
-                            <h3 className="text-2xl font-black uppercase tracking-tighter">{penaltyInfo.isApplied ? t.penaltyTitle : t.confirmTitle}</h3>
-                            <p className="text-gray-500 text-xs font-medium leading-relaxed px-4">{penaltyInfo.isApplied ? t.penaltyDesc : t.confirmDesc}</p>
+                    <div className="bg-white border border-slate-200 rounded-[40px] p-6 max-w-md w-full max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl animate-in zoom-in-95 duration-300">
+                        <div className="text-center space-y-2">
+                            <div className={`h-14 w-14 rounded-full flex items-center justify-center mx-auto transition-colors ${penaltyInfo.isApplied ? 'bg-amber-100 text-amber-500' : 'bg-emerald-50 text-emerald-500'}`}>{penaltyInfo.isApplied ? <AlertTriangle className="h-6 w-6" /> : <ShieldCheck className="h-6 w-6" />}</div>
+                            <h3 className="text-xl font-black uppercase tracking-tighter">{penaltyInfo.isApplied ? t.penaltyTitle : t.confirmTitle}</h3>
+                            <p className="text-gray-500 text-[10px] font-medium leading-relaxed px-4">{penaltyInfo.isApplied ? t.penaltyDesc : t.confirmDesc}</p>
                         </div>
 
-                        <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 space-y-5">
+                        <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 space-y-4">
                             {penaltyInfo.isApplied ? (
                                 <div className="space-y-3 pb-5 border-b border-dashed border-slate-200">
                                     <div className="flex justify-between items-center text-[10px] font-black uppercase text-gray-400 tracking-wider"><span>Total Balance</span><span className="tabular-nums font-bold">$ {totalCapitalUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
@@ -378,18 +378,18 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 <div className="flex justify-between items-center pb-5 border-b border-dashed border-slate-200 text-[10px] font-black uppercase text-gray-400 tracking-widest font-mono"><span>{t.totalWithdrawal}</span><span className="text-slate-900 font-bold">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span></div>
                             )}
 
-                            <div className="flex flex-col items-center justify-center text-emerald-500 space-y-1">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">{t.estPayoutUSD}</span>
-                                <span className="text-5xl font-black tabular-nums tracking-tighter leading-tight">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                <div className="pt-2 text-center"><span className="text-lg font-black tabular-nums tracking-tight opacity-90">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+                            <div className="flex flex-col items-center justify-center text-emerald-500 space-y-0.5">
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-80">{t.estPayoutUSD}</span>
+                                <span className="text-4xl font-black tabular-nums tracking-tighter leading-tight">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <div className="pt-1 text-center"><span className="text-base font-black tabular-nums tracking-tight opacity-90">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
                             </div>
                             
                             <div className="text-[9px] font-black text-gray-400 text-center uppercase tracking-[0.3em] font-mono border-t border-slate-200 pt-4">Rate: $1.0 = RM {(forexRate - 0.4).toFixed(2)}</div>
                         </div>
 
-                        <div className="flex flex-col gap-3">
-                            <button onClick={() => { setShowWithdrawConfirm(false); setIsPinModalOpen(true); }} className={`w-full font-black py-5 rounded-2xl uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 active:scale-95 transition-all text-base ${penaltyInfo.isApplied ? 'bg-amber-500 text-white' : 'bg-gv-gold text-black'}`}>{t.acceptBtn}</button>
-                            <button onClick={() => setShowWithdrawConfirm(false)} className="w-full text-slate-400 font-black hover:text-slate-900 transition-colors uppercase tracking-[0.1em] text-[10px] py-2">{t.cancelBtn}</button>
+                        <div className="flex flex-col gap-2">
+                            <button onClick={() => { setShowWithdrawConfirm(false); setIsPinModalOpen(true); }} className={`w-full font-black py-4 rounded-2xl uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 active:scale-95 transition-all text-sm ${penaltyInfo.isApplied ? 'bg-amber-500 text-white' : 'bg-gv-gold text-black'}`}>{t.acceptBtn}</button>
+                            <button onClick={() => setShowWithdrawConfirm(false)} className="w-full text-slate-400 font-black hover:text-slate-900 transition-colors uppercase tracking-[0.1em] text-[9px] py-1">{t.cancelBtn}</button>
                         </div>
                     </div>
                 </div>
