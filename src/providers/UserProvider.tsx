@@ -54,6 +54,27 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             // 3. Process Data
             if (profile && txs) {
                 const now = new Date();
+                
+                // Calculate Profit/Dividends from Transaction History (More accurate than relying on a single profile field)
+                // This fix ensures that sonmus94 (and others) see the SUM of their dividends (e.g. 240+230+242 = 712)
+                const lifetimeDividendsUSD = txs.filter((t: any) => {
+                    const type = (t.type || "").toLowerCase();
+                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                    const reason = (t.metadata?.reason || "").toLowerCase();
+                    const isDivOrBonus = type === 'dividend' || type === 'bonus' || category === 'dividend' || category === 'bonus' || category === 'profit' || reason.includes('dividend');
+                    return isDivOrBonus && ['Approved', 'Completed'].includes(t.status);
+                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate)), 0);
+
+                const totalDividendWithdrawnUSD = txs.filter((t: any) => {
+                    const type = (t.type || "").toLowerCase();
+                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                    const isProfitWithdrawal = type === 'withdrawal' && (category === 'dividend' || category === 'profit' || category === 'bonus');
+                    return isProfitWithdrawal && ['Approved', 'Completed', 'Pending Release', 'Pending'].includes(t.status);
+                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
+
+                // Available Profit/Dividend is the sum of all dividends minus all dividend withdrawals
+                const profitUSD = Math.max(0, lifetimeDividendsUSD - totalDividendWithdrawnUSD);
+
                 const approvedDeposits = txs.filter((tx: any) => {
                     const type = (tx.type || "").toLowerCase();
                     const category = (tx.metadata?.adjustment_category || "").toLowerCase();
@@ -63,22 +84,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                                                category !== 'bonus';
                     return isInvestmentCapital && ['Approved', 'Completed'].includes(tx.status);
                 });
-                const totalDepositedRaw = txs.filter((t: any) => {
-                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                    const isCapital = (t.type === 'Deposit' || t.type === 'Bonus' || t.type === 'Adjustment') && 
-                                     category !== 'dividend' && 
-                                     category !== 'profit' &&
-                                     category !== 'bonus';
-                    return isCapital && ['Approved', 'Completed'].includes(t.status);
-                }).reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0);
-
-                const totalWithdrawnRaw = txs.filter((t: any) => {
-                    const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                    const isCapitalWithdrawal = t.type === 'Withdrawal' && 
-                                               category !== 'dividend' && 
-                                               category !== 'bonus';
-                    return isCapitalWithdrawal && ['Approved', 'Completed', 'Pending Release'].includes(t.status);
-                }).reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0);
 
                 const balanceUSD = Number(profile.balance_usd || 0);
                 const currentTier = getTierByAmount(balanceUSD);
@@ -102,7 +107,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     return acc;
                 }, 0);
 
-                const profitUSD = Number(profile.profit || 0);
                 const matureCapitalUSD = Math.max(0, balanceUSD - lockedCapitalUSD);
                 const dividendWithdrawableUSD = profitUSD;
                 const withdrawableBalanceUSD = matureCapitalUSD + dividendWithdrawableUSD;
@@ -112,18 +116,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     return category !== 'dividend' && category !== 'profit' && category !== 'bonus';
                 }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate)), 0);
 
-                const totalWithdrawnUSD = txs.filter((t: any) => 
-                    t.type === 'Withdrawal' && 
-                    (t.status === 'Approved' || t.status === 'Completed' || t.status === 'Pending Release' || t.status === 'Pending')
-                ).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
-
-                const lifetimeDividendsUSD = txs.filter((t: any) => {
+                const totalWithdrawnUSD = txs.filter((t: any) => {
                     const type = (t.type || "").toLowerCase();
                     const category = (t.metadata?.adjustment_category || "").toLowerCase();
-                    const reason = (t.metadata?.reason || "").toLowerCase();
-                    const isDivOrBonus = type === 'dividend' || type === 'bonus' || category === 'dividend' || category === 'bonus' || category === 'profit' || reason.includes('dividend');
-                    return isDivOrBonus && ['Approved', 'Completed'].includes(t.status);
-                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate)), 0);
+                    const isCapitalWithdrawal = type === 'withdrawal' && category !== 'dividend' && category !== 'profit' && category !== 'bonus';
+                    return isCapitalWithdrawal && (t.status === 'Approved' || t.status === 'Completed' || t.status === 'Pending Release' || t.status === 'Pending');
+                }).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
 
                 const fullProfile = {
                     ...user,
@@ -166,27 +164,28 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                         category === 'dividend' || 
                         category === 'bonus';
                     
-                    return isDividendOrBonus && t.status === 'Approved';
+                    return isDividendOrBonus && ['Approved', 'Completed'].includes(t.status);
                 }).reverse());
 
-                // 4. Fetch Referrals using both UUID and Username (e.g. for elwin87 case)
+                // 4. Fetch Referrals using both UUID and Username (e.g. for elwin87 and sonmus94 case)
+                // Use .ilike for case-insensitive username matching to ensure robustness if username case varies
                 const { data: refs, count: refsCount } = await supabase
                     .from('profiles')
                     .select('id, full_name, username, balance, is_verified, created_at, tier', { count: 'exact' })
-                    .or(`referred_by.eq.${user.id},referred_by_username.eq.${profile.username}`);
+                    .or(`referred_by.eq.${user.id},referred_by_username.ilike.${profile.username}`);
                 
                 if (refs) setReferredUsers(refs);
                 if (refsCount !== null) setReferredCount(refsCount);
-            }
 
-            // 5. Fetch Withdrawal Methods
-            const { data: wMethods } = await supabase
-                .from('withdrawal_methods')
-                .select('*')
-                .eq('user_id', user.id)
-                .order('created_at', { ascending: false });
-            
-            if (wMethods) setWithdrawalMethods(wMethods);
+                // 5. Fetch Withdrawal Methods
+                const { data: wMethods } = await supabase
+                    .from('withdrawal_methods')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+                
+                if (wMethods) setWithdrawalMethods(wMethods);
+            }
 
         } catch (error) {
             console.error("Error fetching user dashboard data:", error);
