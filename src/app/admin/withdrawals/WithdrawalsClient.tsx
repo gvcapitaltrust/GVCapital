@@ -5,6 +5,8 @@ import { useAdmin } from "@/providers/AdminProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { formatDate } from "@/lib/dateUtils";
 import { ChevronDown, ExternalLink, ShieldCheck, History, XCircle, CheckCircle2, MoreVertical, Wallet } from "lucide-react";
+import TierMedal from "@/components/TierMedal";
+import { getTierByAmount } from "@/lib/tierUtils";
 
 export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
     const { withdrawals, loading, handleApproveWithdrawal, handleCompleteWithdrawal, handleRejectWithdrawal } = useAdmin();
@@ -129,8 +131,8 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                     className="px-8 py-6 flex flex-wrap items-center justify-between gap-4 cursor-pointer"
                                 >
                                     <div className="flex items-center gap-4 min-w-[240px]">
-                                        <div className="h-10 w-10 bg-slate-100 rounded-xl flex items-center justify-center shrink-0">
-                                            <Wallet className="h-5 w-5 text-slate-400" />
+                                        <div className="h-10 w-10 flex items-center justify-center shrink-0">
+                                            <TierMedal tierId={tx.profiles?.tier?.toLowerCase() || getTierByAmount(tx.profiles?.balance_usd || 0).id} size="sm" />
                                         </div>
                                         <div className="flex flex-col">
                                             <span className="font-black text-gray-900 uppercase tracking-tight text-sm leading-none mb-1">{tx.profiles?.full_name || "N/A"}</span>
@@ -139,14 +141,21 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                     </div>
 
                                     <div className="flex items-center gap-8 md:gap-16">
-                                        <div className="flex flex-col items-end md:items-start min-w-[100px]">
+                                        <div className="flex flex-col items-start min-w-[100px]">
                                             <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">{t.date}</span>
-                                            <span className="text-[10px] font-mono text-gray-600 font-bold">{formatDate(tx.created_at)}</span>
+                                            <span className="text-[9px] font-mono text-gray-500 font-bold">{formatDate(tx.created_at)}</span>
                                         </div>
 
-                                        <div className="hidden md:flex flex-col items-start min-w-[120px]">
+                                        <div className="flex flex-col items-start min-w-[120px]">
                                             <span className="text-[9px] font-black uppercase text-emerald-500 tracking-widest">NET PAYOUT (USD)</span>
-                                            <span className="text-sm font-black text-emerald-500 tabular-nums">$ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <div className="flex items-baseline gap-2">
+                                                <span className="text-sm font-black text-emerald-500 tabular-nums">
+                                                    $ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </span>
+                                                <span className="text-[9px] font-black text-gray-400 italic">
+                                                    ≈ RM {payoutRM.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </span>
+                                            </div>
                                         </div>
 
                                         <div className="flex items-center gap-4">
