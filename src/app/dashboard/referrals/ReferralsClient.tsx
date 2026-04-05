@@ -28,7 +28,9 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
             noReferrals: "No referrals yet",
             verified: "Verified",
             unverified: "Unverified",
-            noInvestment: "No Investment"
+            noInvestment: "No Investment",
+            teamAssets: "Team Assets (USD)",
+            capital: "Capital (USD)"
         },
         zh: {
             referTitle: "推荐好友",
@@ -45,7 +47,9 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
             noReferrals: "暂无推荐记录",
             verified: "已验证",
             unverified: "未验证",
-            noInvestment: "暂无投资"
+            noInvestment: "暂无投资",
+            teamAssets: "团队资产 (USD)",
+            capital: "资本金额 (USD)"
         }
     }[lang];
 
@@ -57,6 +61,8 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
     };
 
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
+
+    const totalTeamAssetsUSD = (referredUsers || []).reduce((acc, ref) => acc + Number(ref.balance_usd || (ref.balance / forexRate)), 0);
 
 
     return (
@@ -82,9 +88,17 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                             </button>
                         </div>
                     </div>
-                    <div className="flex flex-col items-center justify-center bg-white border border-gray-200 rounded-3xl p-6 text-center group-hover:bg-gray-100 transition-all">
-                        <p className="text-gray-400 font-black uppercase tracking-[0.3em] mb-4 text-[10px]">{t.totalReferred}</p>
-                        <h3 className="text-4xl font-bold tracking-tight text-gv-gold tabular-nums">{referredCount}</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex flex-col items-center justify-center bg-white border border-gray-200 rounded-3xl p-6 text-center group-hover:bg-gray-100 transition-all">
+                            <p className="text-gray-400 font-black uppercase tracking-[0.3em] mb-4 text-[10px]">{t.totalReferred}</p>
+                            <h3 className="text-4xl font-bold tracking-tight text-gv-gold tabular-nums">{referredCount}</h3>
+                        </div>
+                        <div className="flex flex-col items-center justify-center bg-white border border-gray-200 rounded-3xl p-6 text-center group-hover:bg-gray-100 transition-all">
+                            <p className="text-gray-400 font-black uppercase tracking-[0.3em] mb-4 text-[10px]">{t.teamAssets}</p>
+                            <h3 className="text-4xl font-bold tracking-tight text-slate-900 tabular-nums">
+                                $ {totalTeamAssetsUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </h3>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,6 +113,7 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                                 <tr>
                                     <th className="px-6 py-4">{t.username}</th>
                                     <th className="px-6 py-4">{t.registrationDate}</th>
+                                    <th className="px-6 py-4">{t.capital}</th>
                                     <th className="px-6 py-4">{t.investmentTier}</th>
                                     <th className="px-6 py-4 text-right">{t.accountStatus}</th>
                                 </tr>
@@ -116,6 +131,9 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-gray-400 font-mono text-xs">{formatDate(ref.created_at)}</td>
+                                        <td className="px-6 py-4 text-gray-900 font-black tabular-nums">
+                                            $ {Number(ref.balance_usd || (ref.balance / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        </td>
                                         <td className="px-6 py-4">
                                                 {ref.tier && ref.tier !== "Standard" 
                                                     ? ref.tier 

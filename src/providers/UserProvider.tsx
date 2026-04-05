@@ -193,7 +193,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     // Query 1: By UUID (Technical ID)
                     const { data: refsByUuid } = await supabase
                         .from('profiles')
-                        .select('id, full_name, username, balance, is_verified, created_at, tier')
+                        .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier')
                         .eq('referred_by', user.id);
 
                     // Query 2: By Username (Registration Code)
@@ -201,7 +201,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     if (profile.username) {
                         const { data } = await supabase
                             .from('profiles')
-                            .select('id, full_name, username, balance, is_verified, created_at, tier')
+                            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier')
                             .ilike('referred_by_username', profile.username);
                         if (data) refsByUsername = data;
                     }
