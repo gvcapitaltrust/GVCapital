@@ -204,8 +204,9 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                                 <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <span className="font-black text-emerald-500 tabular-nums text-sm">$ {amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                        <div className="flex flex-col items-end gap-1">
+                                            <span className="text-[10px] font-black text-emerald-500 tabular-nums text-base leading-none">$ {amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="text-[7px] font-black text-gray-300 uppercase tracking-widest">Deposit Amount</span>
                                             <div className="mt-1 flex justify-end">
                                                 <span className={`px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest border border-slate-100 ${
                                                     tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
@@ -252,8 +253,8 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                             </button>
                         </div>
                         
-                        <div className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto">
-                            <div className="aspect-[3/4] md:h-full rounded-2xl border border-gray-100 bg-gray-50 overflow-hidden relative">
+                        <div className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto custom-scrollbar">
+                            <div className="h-[280px] md:h-full rounded-2xl border border-gray-100 bg-gray-50 overflow-hidden relative shrink-0">
                                 {receiptUrl ? (
                                     <img src={receiptUrl} alt="Receipt" className="w-full h-full object-contain" />
                                 ) : (
