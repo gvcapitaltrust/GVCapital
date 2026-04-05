@@ -15,39 +15,38 @@ export async function POST(req: Request) {
     try {
         const supabaseAdmin = getAdminClient();
         if (!supabaseAdmin) {
-            console.error('[referrals-api] SUPABASE_SERVICE_ROLE_KEY is not configured');
+            console.error('[referrals-api] CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing in the environment!');
             return NextResponse.json({ error: 'Service role key missing' }, { status: 500 });
         }
 
-        const { username, userId } = await req.json();
+        const { username } = await req.json();
 
-        if (!username && !userId) {
-            return NextResponse.json({ error: 'username or userId is required' }, { status: 400 });
+        if (!username) {
+            console.error('[referrals-api] username is missing in request body');
+            return NextResponse.json({ error: 'username is required' }, { status: 400 });
         }
 
-        console.log('[referrals-api] Fetching referrals for username:', username, 'userId:', userId);
+        console.log(`[referrals-api] Querying referrals for username: "${username}"`);
 
-        // Fetch ALL profiles with service role (bypasses RLS), then filter in-memory
-        // This mirrors AdminProvider logic exactly (lines 173-176 of AdminProvider.tsx)
-        const { data: allProfiles, error } = await supabaseAdmin
+        // To perfectly match the Sales Leaderboard logic, we ONLY check referred_by_username.
+        // This avoids inconsistencies caused by manually edited UUID fields.
+        const { data: referrals, error, status } = await supabaseAdmin
             .from('profiles')
-            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier, referred_by, referred_by_username');
+            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier')
+            .ilike('referred_by_username', username);
 
         if (error) {
-            console.error('[referrals-api] query error:', error.message);
+            console.error('[referrals-api] Supabase error:', error.message);
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        // Match by referred_by_username (primary) OR referred_by UUID (fallback)
-        const referrals = (allProfiles || []).filter((u: any) => {
-            if (userId && u.referred_by === userId) return true;
-            if (username && u.referred_by_username?.toLowerCase() === username.toLowerCase()) return true;
-            return false;
+        console.log(`[referrals-api] Found ${referrals?.length || 0} referrals for "${username}" (Status: ${status})`);
+
+        return NextResponse.json({ 
+            success: true,
+            referrals: referrals || [],
+            count: referrals?.length || 0
         });
-
-        console.log('[referrals-api] Found', referrals.length, 'referrals. All profiles count:', allProfiles?.length);
-
-        return NextResponse.json({ referrals });
     } catch (error: any) {
         console.error('[referrals-api] Unhandled error:', error);
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });

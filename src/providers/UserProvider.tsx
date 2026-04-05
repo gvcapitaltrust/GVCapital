@@ -190,7 +190,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
                 // 4. Referral Fetching via server-side API (bypasses RLS)
                 const fetchReferrals = async () => {
-                    const inviterUsername = profile.username || user.user_metadata?.username || '';
+                    const inviterUsername = profile?.username || user.user_metadata?.username || '';
                     if (!inviterUsername) {
                         setReferredUsers([]);
                         setReferredCount(0);
@@ -202,15 +202,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                         const res = await fetch('/api/user/referrals', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                username: inviterUsername,
-                                userId: user.id,
-                            }),
+                            body: JSON.stringify({ username: inviterUsername.trim() }),
                         });
 
                         const json = await res.json();
                         const uniqueRefs: any[] = json.referrals || [];
 
+                        // Match logic: strictly list-based to match sales leaderboard
                         setReferredUsers(uniqueRefs);
                         setReferredCount(uniqueRefs.length);
 
