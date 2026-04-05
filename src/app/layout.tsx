@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   description: "Secure private investment platform providing trustworthy wealth management solutions in Malaysia.",
   icons: {
     icon: "/logo2.png",
+    shortcut: "/logo2.png",
+    apple: "/logo2.png",
   },
 };
 
