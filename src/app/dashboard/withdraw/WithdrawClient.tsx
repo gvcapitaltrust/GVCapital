@@ -25,7 +25,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
     const [isPinVisible, setIsPinVisible] = useState(false);
     const [isPinModalOpen, setIsPinModalOpen] = useState(false);
     
-    const [showPenaltyConfirm, setShowPenaltyConfirm] = useState(false);
+    const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
     const [penaltyInfo, setPenaltyInfo] = useState<{
         penalty: number;
         payout: number;
@@ -56,13 +56,14 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             success: "Submission Successful",
             successDesc: "Your withdrawal request will be reviewed and processed within 3 working days.",
             ref: "Reference ID",
-            penaltyTitle: "Penalty Confirmation",
+            confirmTitle: "Withdrawal Confirmation",
+            penaltyTitle: "Limited Release Notice",
+            confirmDesc: "Please review the details of your withdrawal request.",
             penaltyDesc: "Your withdrawal includes capital protected by our lock-in period.",
-            lockedPortion: "Locked Portion",
-            penaltyAmt: "Early Withdrawal Penalty (40%)",
-            estPayout: "Net Payout (RM)",
-            estPayoutUSD: "Net Payout (USD)",
-            acceptBtn: "I Accept & Continue",
+            lockedPortion: "Locked Fraction",
+            penaltyAmt: "Early Closing Penalty (40%)",
+            estPayoutUSD: "Net Payout",
+            acceptBtn: "Review & Authorize",
             cancelBtn: "Cancel and Edit",
             continueToPin: "Continue",
             currentTier: "Current Tier",
@@ -70,7 +71,8 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             verificationRequired: "Verification Required",
             verificationDesc: "To ensure the security of your assets and comply with institutional regulations, we require all users to complete identity verification before initiating a withdrawal.",
             verifyNow: "Verify Identity",
-            withdrawAll: "Withdraw All"
+            withdrawAll: "Withdraw All",
+            totalWithdrawal: "Total Withdrawal"
         },
         zh: {
             title: "申请提款",
@@ -84,14 +86,15 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             success: "提交成功",
             successDesc: "您的提款请求将在 3 个工作日内审核并处理。",
             ref: "参考编号",
+            confirmTitle: "提款确认",
             penaltyTitle: "违约金确认",
+            confirmDesc: "请核对您的提款申请。确认无误后将进行授权。",
             penaltyDesc: "您的提款包含受锁定期保护的资金。",
             lockedPortion: "锁定部分",
-            penaltyAmt: "提前取款违约金 (40%)",
-            estPayout: "实收金额 (RM)",
-            estPayoutUSD: "实收金额 (USD)",
-            acceptBtn: "我接受并继续",
-            cancelBtn: "取消并编辑",
+            penaltyAmt: "提前结清违约金 (40%)",
+            estPayoutUSD: "实收金额",
+            acceptBtn: "核实并授权",
+            cancelBtn: "取消并重试",
             continueToPin: "继续",
             currentTier: "当前等级",
             member: "会员",
@@ -102,16 +105,14 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             sourceDividends: "累计分红",
             sourceCapital: "本金资本",
             availableBalance: "可提款余额",
-            noLockedWarning: "锁定本金将产生 40% 的罚金。",
-            withdrawAll: "提取全部"
+            withdrawAll: "提取全部",
+            totalWithdrawal: "提款总额"
         }
     }[lang];
 
     const matureCapitalUSD = Number(user?.mature_capital_usd || 0);
     const dividendWithdrawableUSD = Number(user?.dividend_withdrawable_usd || 0);
     const totalCapitalUSD = Number(user?.balance_usd || 0);
-    
-    // User can always input up to their total capital, but penalty applies if touching locked funds
     const availableAmountUSD = withdrawType === 'Dividends' ? dividendWithdrawableUSD : totalCapitalUSD;
 
     const handleWithdrawInitiate = () => {
@@ -126,15 +127,13 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             return;
         }
         
-        // 1. Validation based on selection
         if (amountUSD > (availableAmountUSD + 0.01)) {
             alert(lang === 'zh' ? "金额超过总余额。" : `Requested amount exceeds your total ${withdrawType} balance.`);
             return;
         }
 
-        // 2. Penalty Logic
+        // Logic refined: Both Dividend and Capital must show Confirmation Modal
         if (withdrawType === 'Dividends') {
-            // Dividends never incur a penalty
             setPenaltyInfo({
                 penalty: 0,
                 payout: amountUSD * withdrawalRate,
@@ -144,9 +143,8 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 lockedPortion_usd: 0,
                 isApplied: false
             });
-            setIsPinModalOpen(true);
+            setShowWithdrawConfirm(true);
         } else {
-            // Capital withdrawal: Check if pulling from locked funds
             if (amountUSD > (matureCapitalUSD + 0.01)) {
                 // RULE: If touching locked funds, MUST withdraw EVERYTHING in capital bucket
                 const isTotalCapitalWithdrawal = amountUSD >= (totalCapitalUSD - 0.01);
@@ -168,9 +166,9 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                     lockedPortion_usd: lockedPortionUSD,
                     isApplied: true
                 });
-                setShowPenaltyConfirm(true);
+                setShowWithdrawConfirm(true);
             } else {
-                // Mature capital withdrawal (can be partial)
+                // Mature capital withdrawal
                 setPenaltyInfo({
                     penalty: 0,
                     payout: amountUSD * withdrawalRate,
@@ -180,7 +178,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                     lockedPortion_usd: 0,
                     isApplied: false
                 });
-                setIsPinModalOpen(true);
+                setShowWithdrawConfirm(true);
             }
         }
     };
@@ -192,85 +190,38 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
         }
         setIsSubmitting(true);
         try {
-            const { data: p, error: pinError } = await supabase
-                .from('profiles')
-                .select('security_pin, balance_usd, profit')
-                .eq('id', user.id)
-                .single();
-            
+            const { data: p, error: pinError } = await supabase.from('profiles').select('security_pin, balance_usd, profit').eq('id', user.id).single();
             if (pinError) throw pinError;
-            if ((p?.security_pin || "").toString().trim() !== withdrawPIN.trim()) {
-                throw new Error("Invalid security PIN.");
-            }
+            if ((p?.security_pin || "").toString().trim() !== withdrawPIN.trim()) throw new Error("Invalid security PIN.");
 
             const amountUSD = parseFloat(withdrawAmount);
-            const initialProfitUSD = Number(p.profit || 0); 
-            const initialBalanceUSD = Number(p.balance_usd || 0);
+            let newProfitUSD = Number(p.profit || 0); 
+            let newBalanceUSD = Number(p.balance_usd || 0);
 
-            let newProfitUSD = initialProfitUSD;
-            let newBalanceUSD = initialBalanceUSD;
+            if (withdrawType === 'Dividends') newProfitUSD = Math.max(0, newProfitUSD - amountUSD);
+            else newBalanceUSD = Math.max(0, newBalanceUSD - amountUSD);
 
-            if (withdrawType === 'Dividends') {
-                newProfitUSD = Math.max(0, initialProfitUSD - amountUSD);
-            } else {
-                newBalanceUSD = Math.max(0, initialBalanceUSD - amountUSD);
-            }
-
-            const profitDeduction = initialProfitUSD - newProfitUSD;
-            const balanceDeduction = initialBalanceUSD - newBalanceUSD;
-
-            const { error: profileUpdateError } = await supabase
-                .from('profiles')
-                .update({ 
-                    balance: 0,
-                    profit: newProfitUSD,
-                    balance_usd: newBalanceUSD
-                })
-                .eq('id', user.id);
-            
+            const { error: profileUpdateError } = await supabase.from('profiles').update({ balance: 0, profit: newProfitUSD, balance_usd: newBalanceUSD }).eq('id', user.id);
             if (profileUpdateError) throw profileUpdateError;
 
             const refId = `WDL-${Math.floor(100000 + Math.random() * 900000)}`;
             const { error } = await supabase.from('transactions').insert([{
-                user_id: user.id,
-                type: 'Withdrawal',
-                amount: -Math.abs(amountUSD),
-                status: 'Pending',
-                ref_id: refId,
-                original_currency_amount: amountUSD,
-                original_currency: 'USD',
+                user_id: user.id, type: 'Withdrawal', amount: -Math.abs(amountUSD), status: 'Pending', ref_id: refId,
+                original_currency_amount: amountUSD, original_currency: 'USD',
                 metadata: {
-                    description: "Withdrawal",
-                    withdrawal_source: withdrawType,
-                    profit_portion: profitDeduction,
-                    balance_portion: balanceDeduction,
-                    original_usd_amount: withdrawAmount,
-                    forex_rate: withdrawalRate,
-                    expected_payout: penaltyInfo?.payout,
-                    original_usd_payout: penaltyInfo?.payout_usd,
-                    locked_withdrawal: penaltyInfo?.isApplied,
+                    withdrawal_source: withdrawType, expected_payout: penaltyInfo?.payout, original_usd_payout: penaltyInfo?.payout_usd,
+                    forex_rate: withdrawalRate, locked_withdrawal: penaltyInfo?.isApplied,
                     payout_method: (() => {
-                        if (selectedMethodId === 'KYC_BANK') {
-                            return `${user.bank_name} (${user.account_number})`;
-                        }
                         const method = (withdrawalMethods || []).find((m: any) => m.id === selectedMethodId);
+                        if (selectedMethodId === 'KYC_BANK') return `${user.bank_name} (${user.account_number})`;
                         if (!method) return "Institutional Account";
-                        return method.type === 'BANK' 
-                            ? `${method.bank_name} (${method.account_number})`
-                            : `USDT TRC20 (${method.usdt_address})`;
+                        return method.type === 'BANK' ? `${method.bank_name} (${method.account_number})` : `USDT TRC20 (${method.usdt_address})`;
                     })(),
-                    ...(penaltyInfo?.isApplied ? {
-                        penalty_applied: true,
-                        penalty_amount: penaltyInfo.penalty,
-                        original_usd_penalty: penaltyInfo.penalty_usd,
-                        locked_portion: penaltyInfo.lockedPortion,
-                        penalty_rate: "40%"
-                    } : {})
+                    ...(penaltyInfo?.isApplied ? { penalty_applied: true, penalty_amount: penaltyInfo.penalty, original_usd_penalty: penaltyInfo.penalty_usd, locked_portion: penaltyInfo.lockedPortion, penalty_rate: "40%" } : {})
                 }
             }]);
             
             if (error) throw error;
-
             setIsPinModalOpen(false);
             setSuccessRefId(refId);
             setShowSuccess(true);
@@ -284,217 +235,182 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
 
     if (showSuccess) {
         return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in-95 duration-500">
-                <div className="h-24 w-24 bg-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(16,185,129,0.3)]">
-                    <CheckCircle2 className="h-12 w-12 text-white" strokeWidth={3} />
-                </div>
+            <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 animate-in zoom-in-95 duration-500 text-center">
+                <div className="h-24 w-24 bg-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-lg shadow-emerald-500/20"><CheckCircle2 className="h-12 w-12 text-white" strokeWidth={3} /></div>
                 <h2 className="text-4xl font-black uppercase text-gray-900 tracking-tighter mb-4">{t.success}</h2>
-                <p className="text-gray-500 font-medium mb-8 text-center max-w-sm">{t.successDesc}</p>
-                <div className="bg-white px-8 py-4 rounded-3xl border border-emerald-500/20 text-emerald-500 font-black text-xl mb-12">
-                    {t.ref}: {successRefId}
-                </div>
-                <button 
-                    onClick={() => router.push(`/dashboard?lang=${lang}`)}
-                    className="bg-gv-gold text-black font-black py-5 px-12 rounded-2xl uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all"
-                >
-                    {t.back}
-                </button>
+                <p className="text-gray-500 font-medium mb-8 max-w-sm">{t.successDesc}</p>
+                <div className="bg-white px-8 py-4 rounded-3xl border border-emerald-500/20 text-emerald-500 font-black text-xl mb-12">{t.ref}: {successRefId}</div>
+                <button onClick={() => router.push(`/dashboard?lang=${lang}`)} className="bg-gv-gold text-black font-black py-5 px-12 rounded-2xl uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">{t.back}</button>
             </div>
         );
     }
 
     return (
         <div className="max-w-4xl mx-auto space-y-12 pb-20">
-            <div className="flex items-center gap-6">
-                <button 
-                    onClick={() => router.push(`/dashboard?lang=${lang}`)}
-                    className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm hover:shadow-md"
-                >
-                    <ArrowLeft className="h-6 w-6" />
-                </button>
-                <div className="space-y-1">
-                    <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">{t.title}</h1>
-                    <p className="text-gray-400 text-sm font-medium">{t.desc}</p>
+            {/* Header / Nav */}
+            <div className="flex items-center gap-6 animate-in slide-in-from-left duration-500">
+                <button onClick={() => router.push(`/dashboard?lang=${lang}`)} className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm"><ArrowLeft className="h-6 w-6" /></button>
+                <div className="space-y-1"><h1 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">{t.title}</h1><p className="text-gray-400 text-sm font-medium">{t.desc}</p></div>
+            </div>
+
+            {/* Account Quick Stats */}
+            <div className="bg-white border border-gray-100 rounded-3xl px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-8 shadow-sm group">
+                <div className="flex items-center gap-5 w-full md:w-auto">
+                    <div className="h-12 w-12 rounded-2xl bg-slate-900 flex items-center justify-center text-gv-gold shadow-lg rotate-3 group-hover:rotate-0 transition-transform"><svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                    <div className="space-y-0.5"><span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Total Capital Assets' : '总资产'}</span><p className="text-2xl font-black text-slate-900 tabular-nums leading-none tracking-tight">$ {(user?.balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p></div>
+                </div>
+                <div className="h-px w-full md:h-12 md:w-px bg-gray-100 hidden md:block"></div>
+                <div className="flex items-center gap-5 w-full md:w-auto">
+                    <div className={`h-12 w-12 rounded-2xl flex items-center justify-center shadow-md ${user?.next_maturity_date ? 'bg-amber-100 text-amber-500' : 'bg-emerald-100 text-emerald-500'}`}>{user?.next_maturity_date ? <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> : <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M5 13l4 4L19 7" /></svg>}</div>
+                    <div className="space-y-0.5"><span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Capital Status' : '资金状态'}</span><p className={`text-xl font-black uppercase tracking-tighter leading-none ${user?.next_maturity_date ? 'text-slate-900' : 'text-emerald-500'}`}>{user?.next_maturity_date ? (lang === 'zh' ? `距到期还剩 ${Math.ceil((new Date(user.next_maturity_date).getTime() - new Date().getTime()) / 86400000)} 天` : `${Math.ceil((new Date(user.next_maturity_date).getTime() - new Date().getTime()) / 86400000)} Days Remaining`) : (lang === 'en' ? 'Fully Released' : '资金已到期')}</p></div>
                 </div>
             </div>
 
-            <div className="bg-gray-50/80 backdrop-blur-md border border-gray-200 rounded-2xl px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-6 animate-in slide-in-from-top-4 duration-700 shadow-sm transition-all hover:bg-white group">
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                    <div className="h-8 w-8 rounded-full bg-slate-900 flex items-center justify-center text-gv-gold shadow-lg">
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </div>
-                    <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Total Capital Assets' : '总资产'}</span>
-                        <p className="text-lg font-black text-slate-900 tabular-nums">
-                            $ {(user?.balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center ${user?.next_maturity_date ? 'bg-amber-100 text-amber-500' : 'bg-emerald-100 text-emerald-500'}`}>
-                        {user?.next_maturity_date ? <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> : <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M5 13l4 4L19 7" /></svg>}
-                    </div>
-                    <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{lang === 'en' ? 'Capital Status' : '资金状态'}</span>
-                        {user?.next_maturity_date ? (
-                            <p className="text-base font-black text-slate-900 uppercase tracking-tighter">
-                                {lang === 'zh' ? `距到期还剩 ${Math.ceil((new Date(user.next_maturity_date).getTime() - new Date().getTime()) / 86400000)} 天` : `${Math.ceil((new Date(user.next_maturity_date).getTime() - new Date().getTime()) / 86400000)} Days Left`}
-                            </p>
-                        ) : (
-                            <p className="text-base font-black text-emerald-500 uppercase tracking-tighter">{lang === 'en' ? 'Fully Matured' : '资金已到期'}</p>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="md:col-span-2 space-y-8">
-                    <div className="bg-white border border-gray-200 rounded-[32px] p-8 md:p-10 shadow-2xl space-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div className="md:col-span-2 space-y-10">
+                    <div className="bg-white border border-gray-100 rounded-[40px] p-8 md:p-12 shadow-2xl shadow-gray-200/50 space-y-10">
                         <div className="space-y-10">
+                            {/* Source Selection */}
                             <div className="space-y-4">
                                 <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest px-1">{lang === 'en' ? "Withdrawal Source" : "提款来源"}</label>
-                                <div className="grid grid-cols-2 p-1 bg-stone-100 rounded-2xl">
+                                <div className="grid grid-cols-2 p-1.5 bg-stone-100 rounded-3xl border border-stone-200/30">
                                     {(['Dividends', 'Capital'] as const).map((type) => (
-                                        <button
-                                            key={type}
-                                            onClick={() => { setWithdrawType(type); setWithdrawAmount(""); }}
-                                            className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${withdrawType === type ? 'bg-stone-900 text-gv-gold shadow-lg' : 'text-gray-400'}`}
-                                        >
+                                        <button key={type} onClick={() => { setWithdrawType(type); setWithdrawAmount(""); }} className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${withdrawType === type ? 'bg-slate-900 text-gv-gold shadow-xl' : 'text-gray-400 hover:text-gray-600'}`}>
                                             {type === 'Dividends' ? (lang === 'en' ? "Dividends" : "累计分红") : (lang === 'en' ? "Capital" : "本金资本")}
                                         </button>
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Amount Input */}
                             <div className="space-y-4">
-                                <div className="flex justify-between items-end px-1">
+                                <div className="flex justify-between items-end px-2">
                                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest">{t.amount}</label>
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400 tabular-nums">
-                                            $ {availableAmountUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                        </span>
-                                        <button 
-                                            onClick={() => setWithdrawAmount(availableAmountUSD.toFixed(2))}
-                                            className="text-[9px] font-black uppercase text-gv-gold border border-gv-gold/20 px-2 py-0.5 rounded hover:bg-gv-gold/10 transition-colors"
-                                        >
-                                            {t.withdrawAll}
-                                        </button>
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex flex-col items-end">
+                                            <span className="text-[9px] font-bold uppercase tracking-widest text-gray-300">Available:</span>
+                                            <span className="text-xs font-black text-slate-900 tabular-nums leading-none">$ {availableAmountUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        </div>
+                                        <button onClick={() => setWithdrawAmount(availableAmountUSD.toFixed(2))} className="bg-gv-gold/10 text-gv-gold hover:bg-gv-gold hover:text-black transition-all px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest">{t.withdrawAll}</button>
                                     </div>
                                 </div>
-                                <div className="relative">
-                                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 font-black text-xs">$</div>
-                                    <input
-                                        type="number"
-                                        placeholder="0.00"
-                                        value={withdrawAmount}
-                                        onChange={(e) => setWithdrawAmount(e.target.value)}
-                                        className="w-full bg-stone-50 border border-stone-200 rounded-3xl pl-10 pr-6 py-5 text-2xl font-black text-gray-900 focus:outline-none focus:border-gv-gold transition-all"
-                                    />
+                                <div className="relative group">
+                                    <div className="absolute left-8 top-1/2 -translate-y-1/2 text-gray-300 font-black text-xl">$</div>
+                                    <input type="number" placeholder="0.00" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-100 rounded-[32px] pl-12 pr-8 py-7 text-3xl font-black text-slate-900 focus:outline-none focus:border-gv-gold transition-all tabular-nums" />
                                 </div>
                                 {withdrawType === 'Capital' && parseFloat(withdrawAmount) > (matureCapitalUSD + 0.01) && (
-                                    <p className="text-[9px] text-red-500 font-bold italic px-2">
-                                        ⚠️ {lang === 'en' ? "Locked capital detected. Full withdrawal required with a 40% penalty." : "检测到锁定资本。需提取全部本金并扣除 40% 违约金。"}
-                                    </p>
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-red-50 text-red-500 rounded-xl border border-red-100 animate-in fade-in slide-in-from-top-1">
+                                        <AlertTriangle className="h-3 w-3" /><span className="text-[10px] font-black uppercase italic">{lang === 'en' ? "Full withdrawal required for locked capital." : "提取锁定资本需提取全部余额。"}</span>
+                                    </div>
                                 )}
                             </div>
-                            <div className="space-y-4 pt-4 border-t border-gray-100">
+
+                            {/* Payout Destination */}
+                            <div className="space-y-4 pt-6 border-t border-gray-100">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block px-1">{lang === 'en' ? 'Payout Destination' : '提款目标'}</label>
                                 <div className="grid grid-cols-1 gap-3">
-                                    {withdrawalMethods?.map((method: any) => (
-                                        <button key={method.id} onClick={() => setSelectedMethodId(method.id)} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${selectedMethodId === method.id ? 'bg-gv-gold/5 border-gv-gold ring-1 ring-gv-gold' : 'bg-gray-50 border-gray-100'}`}>
-                                            <div className="flex items-center gap-4">
-                                                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${selectedMethodId === method.id ? 'bg-gv-gold text-white' : 'bg-white text-gray-300'}`}>
-                                                    {method.type === 'BANK' ? <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 00-3 3z" /></svg> : <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-                                                </div>
-                                                <div>
-                                                    <p className="text-[11px] font-black uppercase text-gray-900">{method.type === 'BANK' ? method.bank_name : 'USDT TRC20'}</p>
-                                                    <p className="text-[10px] font-bold text-gray-400">{method.type === 'BANK' ? `**** ${method.account_number.slice(-4)}` : `${method.usdt_address.slice(0, 6)}...`}</p>
-                                                </div>
+                                    {(withdrawalMethods || []).map((method: any) => (
+                                        <button key={method.id} onClick={() => setSelectedMethodId(method.id)} className={`flex items-center justify-between p-5 rounded-3xl border transition-all ${selectedMethodId === method.id ? 'bg-gv-gold/5 border-gv-gold ring-1 ring-gv-gold' : 'bg-slate-50 border-slate-100 hover:border-slate-200'}`}>
+                                            <div className="flex items-center gap-5">
+                                                <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-all shadow-sm ${selectedMethodId === method.id ? 'bg-gv-gold text-white' : 'bg-white text-gray-400'}`}>{method.type === 'BANK' ? <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 00-3 3z" /></svg> : <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}</div>
+                                                <div className="space-y-0.5"><p className={`text-xs font-black uppercase tracking-tight ${selectedMethodId === method.id ? 'text-slate-900' : 'text-slate-600'}`}>{method.type === 'BANK' ? method.bank_name : 'USDT TRC20'}</p><p className="text-[10px] font-bold text-gray-400 tracking-wider font-mono">{method.type === 'BANK' ? `**** ${method.account_number.slice(-4)}` : `${method.usdt_address.slice(0, 10)}...`}</p></div>
                                             </div>
+                                            {selectedMethodId === method.id && <div className="h-6 w-6 bg-gv-gold rounded-full flex items-center justify-center text-white scale-110 shadow-lg shadow-gv-gold/30"><svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg></div>}
                                         </button>
                                     ))}
                                     {user.bank_name && (
-                                        <button onClick={() => setSelectedMethodId('KYC_BANK')} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${selectedMethodId === 'KYC_BANK' ? 'bg-gv-gold/5 border-gv-gold ring-1 ring-gv-gold' : 'bg-white border-gray-100'}`}>
-                                            <div className="flex items-center gap-4"><div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400"><ShieldCheck className="h-5 w-5" /></div><div><p className="text-[11px] font-black uppercase">Primary Bank (KYC)</p><p className="text-[10px] font-bold text-gray-400">{user.bank_name}</p></div></div>
+                                        <button onClick={() => setSelectedMethodId('KYC_BANK')} className={`flex items-center justify-between p-5 rounded-3xl border transition-all ${selectedMethodId === 'KYC_BANK' ? 'bg-gv-gold/5 border-gv-gold ring-1 ring-gv-gold' : 'bg-slate-50/50 border-slate-100 hover:border-slate-200'}`}>
+                                            <div className="flex items-center gap-5"><div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-all ${selectedMethodId === 'KYC_BANK' ? 'bg-gv-gold text-white' : 'bg-slate-100 text-slate-400'}`}><ShieldCheck className="h-6 w-6" /></div><div className="space-y-0.5"><p className="text-xs font-black uppercase tracking-tight">Primary Bank (KYC)</p><p className="text-[10px] font-bold text-gray-400 tracking-wider">{user.bank_name}</p></div></div>
+                                            {selectedMethodId === 'KYC_BANK' && <div className="h-6 w-6 bg-gv-gold rounded-full flex items-center justify-center text-white"><svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg></div>}
                                         </button>
                                     )}
                                 </div>
                             </div>
-                            <button onClick={handleWithdrawInitiate} disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0 || isSubmitting} className="w-full bg-black text-white font-black py-5 rounded-2xl text-base uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50">{t.continueToPin}</button>
+
+                            <button onClick={handleWithdrawInitiate} disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0 || !selectedMethodId || isSubmitting} className="w-full bg-slate-900 border-2 border-slate-900 text-gv-gold font-black py-6 rounded-[28px] text-lg uppercase tracking-[0.2em] shadow-2xl shadow-slate-900/20 hover:-translate-y-1 active:scale-95 transition-all disabled:opacity-50 disabled:hover:translate-y-0">{t.continueToPin}</button>
                         </div>
                     </div>
                 </div>
+
+                {/* Sidebar Info */}
                 <div className="space-y-8">
-                    <div className="bg-white border border-gray-200 rounded-[32px] p-8 shadow-sm">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-6">{t.currentTier}</span>
-                        <div className="flex items-center gap-4">
-                            <TierMedal tierId={user?.tier?.toLowerCase() || 'none'} size="lg" />
-                            <div className="flex flex-col"><span className="text-lg font-black uppercase">{user?.tier || 'Member'}</span><span className="text-[10px] font-bold text-gv-gold uppercase">{t.member}</span></div>
+                    <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-sm text-center">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 block mb-6">{t.currentTier}</span>
+                        <div className="flex flex-col items-center gap-4">
+                            <TierMedal tierId={user?.tier?.toLowerCase() || 'none'} size="lg" className="hover:scale-105 transition-transform duration-500" />
+                            <div className="space-y-1"><span className="text-2xl font-black uppercase tracking-tighter block">{user?.tier || 'Member'}</span><span className="text-[10px] font-bold text-gv-gold uppercase tracking-[0.3em]">{t.member}</span></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {showPenaltyConfirm && penaltyInfo && (
+            {/* General Withdrawal Confirmation Modal */}
+            {showWithdrawConfirm && penaltyInfo && (
                 <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-gray-900/60 backdrop-blur-md">
-                    <div className="bg-white rounded-[40px] p-10 max-w-lg w-full space-y-8 shadow-2xl animate-in zoom-in-95">
-                        <div className="text-center space-y-4">
-                            <div className="h-16 w-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto"><AlertTriangle className="h-8 w-8 text-amber-500" /></div>
-                            <h3 className="text-2xl font-black uppercase">{t.penaltyTitle}</h3>
-                            <p className="text-gray-500 text-sm">{t.penaltyDesc}</p>
+                    <div className="bg-white rounded-[40px] p-8 max-w-md w-full max-h-[85vh] overflow-y-auto space-y-8 shadow-2xl animate-in zoom-in-95 duration-300">
+                        <div className="text-center space-y-3">
+                            <div className={`h-16 w-16 rounded-full flex items-center justify-center mx-auto transition-colors ${penaltyInfo.isApplied ? 'bg-amber-100 text-amber-500' : 'bg-emerald-50 text-emerald-500'}`}>{penaltyInfo.isApplied ? <AlertTriangle className="h-8 w-8" /> : <ShieldCheck className="h-8 w-8" />}</div>
+                            <h3 className="text-2xl font-black uppercase tracking-tighter">{penaltyInfo.isApplied ? t.penaltyTitle : t.confirmTitle}</h3>
+                            <p className="text-gray-500 text-xs font-medium leading-relaxed px-4">{penaltyInfo.isApplied ? t.penaltyDesc : t.confirmDesc}</p>
                         </div>
-                        <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 space-y-5">
-                            <div className="flex justify-between items-center text-[10px] font-black uppercase text-gray-400">
-                                <span>Total Balance</span>
-                                <span>$ {totalCapitalUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-[10px] font-black uppercase text-gray-400 border-t border-gray-200 pt-3">
-                                <span>Locked Portion</span>
-                                <span>$ {penaltyInfo.lockedPortion_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-[10px] font-black uppercase text-red-500">
-                                <span>{t.penaltyAmt}</span>
-                                <span>- $ {penaltyInfo.penalty_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                            </div>
-                            <div className="flex flex-col items-center justify-center text-emerald-500 border-t border-gray-200 pt-8 pb-2 space-y-2">
-                                <span className="text-[10px] font-black uppercase tracking-widest opacity-80">{t.estPayoutUSD}</span>
-                                <span className="text-5xl font-black tabular-nums tracking-tighter">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                <div className="flex items-center gap-2 pt-2">
-                                    <span className="text-xs font-bold uppercase tracking-widest opacity-60">{t.estPayout}:</span>
-                                    <span className="text-lg font-black tabular-nums">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+
+                        <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 space-y-5">
+                            {/* Breakdown Rows - Only show if Capital with Penalty */}
+                            {penaltyInfo.isApplied ? (
+                                <div className="space-y-3 pb-5 border-b border-dashed border-slate-200">
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-gray-400 tracking-wider">
+                                        <span>Total Balance</span>
+                                        <span className="tabular-nums font-bold">$ {totalCapitalUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-gray-400 tracking-wider">
+                                        <span>{t.lockedPortion}</span>
+                                        <span className="tabular-nums font-bold">$ {penaltyInfo.lockedPortion_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-red-500 tracking-wider">
+                                        <span>{t.penaltyAmt}</span>
+                                        <span className="tabular-nums font-bold">- $ {penaltyInfo.penalty_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                // Simpler Row for Dividends/Mature Capital
+                                <div className="flex justify-between items-center pb-5 border-b border-dashed border-slate-200 text-[10px] font-black uppercase text-gray-400 tracking-widest font-mono">
+                                    <span>{t.totalWithdrawal}</span>
+                                    <span className="text-slate-900 font-bold">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                </div>
+                            )}
+
+                            {/* Final Payout Display - Simplified as requested */}
+                            <div className="flex flex-col items-center justify-center text-emerald-500 space-y-1">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">{t.estPayoutUSD}</span>
+                                <span className="text-5xl font-black tabular-nums tracking-tighter leading-tight">$ {penaltyInfo.payout_usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <div className="pt-2 text-center">
+                                    <span className="text-lg font-black tabular-nums tracking-tight opacity-90">RM {penaltyInfo.payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                             </div>
-                            <div className="text-[9px] font-black text-gray-400 text-center uppercase tracking-widest border-t border-gray-200 pt-3">
-                                Applied Rate: $1.00 = RM {withdrawalRate.toFixed(2)}
-                            </div>
+                            
+                            <div className="text-[9px] font-black text-gray-400 text-center uppercase tracking-[0.3em] font-mono border-t border-slate-200 pt-4">Rate: $1.0 = RM {withdrawalRate.toFixed(2)}</div>
                         </div>
-                        <div className="flex flex-col gap-4">
-                            <button onClick={() => { setShowPenaltyConfirm(false); setIsPinModalOpen(true); }} className="w-full bg-gv-gold text-black font-black py-5 rounded-2xl uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">{t.acceptBtn}</button>
-                            <button onClick={() => setShowPenaltyConfirm(false)} className="w-full text-gray-400 font-bold hover:text-gray-900 transition-colors uppercase tracking-widest text-[10px]">{t.cancelBtn}</button>
+
+                        <div className="flex flex-col gap-3">
+                            <button onClick={() => { setShowWithdrawConfirm(false); setIsPinModalOpen(true); }} className={`w-full font-black py-5 rounded-2xl uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 active:scale-95 transition-all text-base ${penaltyInfo.isApplied ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-gv-gold text-black shadow-gv-gold/20'}`}>{t.acceptBtn}</button>
+                            <button onClick={() => setShowWithdrawConfirm(false)} className="w-full text-slate-400 font-black hover:text-slate-900 transition-colors uppercase tracking-[0.1em] text-[10px] py-2">{t.cancelBtn}</button>
                         </div>
                     </div>
                 </div>
             )}
 
+            {/* PIN Modal */}
             {isPinModalOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-gray-900/60 backdrop-blur-xl">
-                    <div className="bg-white rounded-[40px] p-12 max-w-md w-full text-center space-y-10 shadow-2xl animate-in zoom-in-90">
-                        <div className="space-y-2"><h3 className="text-2xl font-black uppercase">{t.securityPin}</h3><p className="text-gray-400 text-sm">{t.enterPin}</p></div>
-                        <div className="relative">
-                            <input
-                                type={isPinVisible ? "text" : "password"}
-                                maxLength={6}
-                                value={withdrawPIN}
-                                onChange={(e) => setWithdrawPIN(e.target.value.replace(/\D/g, ''))}
-                                className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-8 text-5xl font-black text-center tracking-[0.4em] text-gv-gold focus:outline-none"
-                                autoFocus
-                            />
-                            <button onClick={() => setIsPinVisible(!isPinVisible)} className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400">{isPinVisible ? <EyeOff /> : <Eye />}</button>
+                    <div className="bg-white rounded-[40px] p-10 md:p-12 max-w-md w-full text-center space-y-10 shadow-2xl animate-in zoom-in-90 duration-300">
+                        <div className="space-y-3"><h3 className="text-2xl font-black uppercase tracking-tighter text-slate-900">{t.securityPin}</h3><p className="text-gray-400 font-medium text-sm leading-relaxed px-6">{t.enterPin}</p></div>
+                        <div className="relative group">
+                            <input type={isPinVisible ? "text" : "password"} maxLength={6} value={withdrawPIN} onChange={(e) => setWithdrawPIN(e.target.value.replace(/\D/g, ''))} className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-8 text-5xl font-black text-center tracking-[0.3em] text-gv-gold focus:outline-none focus:border-gv-gold transition-all" autoFocus placeholder="000000" />
+                            <button onClick={() => setIsPinVisible(!isPinVisible)} className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gv-gold transition-colors">{isPinVisible ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}</button>
                         </div>
                         <div className="flex flex-col gap-4">
-                            <button onClick={handleWithdrawConfirm} disabled={isSubmitting || withdrawPIN.length !== 6} className="w-full bg-black text-white font-black py-5 rounded-2xl uppercase tracking-widest hover:bg-gv-gold hover:text-black transition-all">
-                                {isSubmitting ? "..." : t.submit}
-                            </button>
-                            <button onClick={() => setIsPinModalOpen(false)} className="text-gray-400 font-bold uppercase text-[10px]">Cancel</button>
+                            <button onClick={handleWithdrawConfirm} disabled={isSubmitting || withdrawPIN.length !== 6} className="w-full bg-slate-900 text-white font-black py-6 rounded-[28px] uppercase tracking-[0.2em] shadow-xl hover:bg-gv-gold hover:text-black transition-all text-lg">{isSubmitting ? <div className="h-6 w-6 border-4 border-white/30 border-t-white animate-spin rounded-full mx-auto" /> : t.submit}</button>
+                            <button onClick={() => setIsPinModalOpen(false)} className="text-slate-400 font-bold uppercase text-[10px] py-1 tracking-widest">{t.cancelBtn}</button>
                         </div>
                     </div>
                 </div>
