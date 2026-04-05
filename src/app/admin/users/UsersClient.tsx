@@ -6,6 +6,7 @@ import { useSettings } from "@/providers/SettingsProvider";
 import { getTierByAmount } from "@/lib/tierUtils";
 import TierMedal from "@/components/TierMedal";
 import { formatDateTime } from "@/lib/dateUtils";
+import { CheckCircle2, ShieldCheck, AlertTriangle, Search, Info, Clock } from "lucide-react";
 
 export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
     const { users, combinedAuditLogs, loading, handleAdjustBalance, handleResetUserPassword, handleSetAdminRole, handleDeleteUser, handleToggleUserStatus, getUserWithdrawalMethods } = useAdmin();
@@ -174,7 +175,6 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                 <th className="px-4 py-4 md:px-8 md:py-6">{t.tableAssets}</th>
                                 <th className="px-4 py-4 md:px-8 md:py-6">{t.tableInvestment}</th>
                                 <th className="px-4 py-4 md:px-8 md:py-6">{t.tableWithdrawable}</th>
-                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableStatus}</th>
                                 <th className="px-4 py-4 md:px-8 md:py-6 text-right">{t.tableActions}</th>
                             </tr>
                         </thead>
@@ -188,37 +188,58 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                 size="xs" 
                                             />
                                             <div className="flex flex-col">
-                                                <span className="font-extrabold text-gray-900 uppercase tracking-tight text-[10px] md:text-xs">{user.full_name || user.username}</span>
-                                                <span className="text-[8px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest truncate max-w-[100px] md:max-w-none">{user.email}</span>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="font-extrabold text-gray-900 uppercase tracking-tight text-[10px] md:text-sm">{user.full_name || user.username}</span>
+                                                    {user.kyc_status === 'Verified' && (
+                                                        <CheckCircle2 className="h-3 w-3 md:h-3.5 md:w-3.5 text-emerald-500 fill-emerald-500/10" strokeWidth={3} />
+                                                    )}
+                                                </div>
+                                                <span className="text-[8px] md:text-[9px] text-gray-400 font-bold uppercase tracking-widest truncate max-w-[150px]">{user.email}</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-4 py-4 md:px-8 md:py-6">
                                         <div className="flex flex-col gap-0.5">
                                             <div className="flex items-baseline gap-1">
-                                                <span className="text-[11px] md:text-[14px] font-black text-gray-900 tabular-nums">$</span>
-                                                <span className="text-[12px] md:text-[16px] font-black text-gray-900 tabular-nums">{(user.total_assets_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <span className="text-[11px] md:text-[14px] font-black text-gray-900 tabular-nums leading-none">$</span>
+                                                <span className="text-[12px] md:text-[16px] font-black text-gray-900 tabular-nums leading-none">{(user.total_assets_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </div>
+                                            <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Gross Equity</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-4 md:px-8 md:py-6">
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] md:text-xs font-black text-emerald-600 tabular-nums whitespace-nowrap">$ {(user.total_investment_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[10px] md:text-sm font-black text-emerald-600 tabular-nums whitespace-nowrap leading-none">$ {(user.total_investment_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            {user.next_maturity_date ? (
+                                                <div className="flex items-center gap-1 text-[8px] font-bold text-gray-400 uppercase tracking-tight">
+                                                    <Clock className="h-2 w-2" />
+                                                    {(() => {
+                                                        const diffMs = new Date(user.next_maturity_date).getTime() - new Date().getTime();
+                                                        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                                                        return diffDays > 0 ? (lang === 'zh' ? `${diffDays} 天后到期` : `${diffDays}D to Maturity`) : (lang === 'zh' ? '已到期' : 'Fully Matured');
+                                                    })()}
+                                                </div>
+                                            ) : (
+                                                <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">{lang === 'en' ? 'Unlocked' : '未锁定'}</span>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="px-4 py-4 md:px-8 md:py-6">
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] md:text-xs font-black text-gv-gold tabular-nums whitespace-nowrap">$ {(user.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[10px] md:text-sm font-black text-gv-gold tabular-nums whitespace-nowrap leading-none">$ {(user.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">{lang === 'en' ? 'Liquid Capital' : '流动资本'}</span>
                                         </div>
-                                    </td>
-                                    <td className="px-4 py-4 md:px-8 md:py-6">
-                                        <span className={`px-1.5 py-1 rounded-lg text-[7px] md:text-[8px] font-black uppercase tracking-widest ${
-                                            user.kyc_status === 'Verified' ? 'bg-emerald-500/10 text-emerald-500' :
-                                            'bg-gray-200 text-gray-400'
-                                        }`}>{user.kyc_status}</span>
                                     </td>
                                     <td className="px-4 py-4 md:px-8 md:py-6 text-right">
-                                        <button onClick={() => openDetails(user)} className="bg-gv-gold/10 text-gv-gold hover:bg-gv-gold hover:text-black text-[7px] md:text-[8px] font-black uppercase tracking-widest px-2 md:px-3 py-1.5 rounded-lg transition-all border border-gv-gold/20">{t.tableActions}</button>
+                                        <div className="flex justify-end items-center gap-2">
+                                            <button 
+                                                onClick={() => openDetails(user)} 
+                                                className="bg-white hover:bg-gray-50 text-gray-900 text-[8px] font-black uppercase tracking-widest px-3 py-2 rounded-xl border border-gray-200 shadow-sm transition-all flex items-center gap-2 group"
+                                            >
+                                                <span>{t.tableActions}</span>
+                                                <Info className="h-3 w-3 text-gray-400 group-hover:text-gv-gold" />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
