@@ -140,7 +140,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-8 md:gap-16">
+                                    <div className="flex items-start gap-8 md:gap-16">
                                         <div className="flex flex-col items-start min-w-[100px]">
                                             <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">{t.date}</span>
                                             <span className="text-[9px] font-mono text-gray-500 font-bold">{formatDate(tx.created_at)}</span>
