@@ -9,7 +9,7 @@ import { formatDate, formatDateTime } from "@/lib/dateUtils";
 
 export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     const { userProfile: user, transactions, dividendHistory, loading } = useUser();
-    const { forexRate } = useSettings();
+    const { forexRate, withdrawalRate } = useSettings();
 
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -134,7 +134,10 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         const openingBalanceUSD = closingBalanceUSD - totalDepositsUSD + totalWithdrawalsUSD + totalPenaltiesUSD - periodProfitUSD;
 
         const formatUSD = (usd: number) => `$ ${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        const formatDual = (usd: number) => `$ ${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (RM ${(usd * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`;
+        const formatDual = (usd: number, isWithdrawal: boolean = false) => {
+            const rate = isWithdrawal ? withdrawalRate : forexRate;
+            return `$ ${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (RM ${(usd * rate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`;
+        };
 
         const summaryBody = [
             ['Opening Balance', formatUSD(openingBalanceUSD)],
@@ -162,7 +165,9 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
         // Transaction List - Detailed Breakdown
         const txBody = periodTxs.map(tx => {
             const usd = getUSD(tx);
-            const rm = usd * forexRate;
+            const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease';
+            const rateToUse = tx.metadata?.forex_rate || (isWithdrawal ? withdrawalRate : forexRate);
+            const rm = usd * rateToUse;
             let typeDesc = tx.metadata?.description || tx.type;
             const isDiv = tx.metadata?.adjustment_category === 'Dividend' || tx.type === 'Dividend';
             
@@ -326,9 +331,12 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                                         <span className="text-red-500 tabular-nums whitespace-nowrap">-$ {Number(tx.metadata?.penalty_amount_usd || tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                                     </div>
                                                                 )}
-                                                                <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2 gap-4">
+                                                                 <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2 gap-4">
                                                                     <span className="text-emerald-500 uppercase whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : (tx.type === 'Dividend' || tx.metadata?.adjustment_category === 'Dividend' ? 'Dividend Received (Net)' : 'Final Payout (Net)')}</span>
-                                                                    <span className="text-emerald-500 underline decoration-gv-gold tabular-nums whitespace-nowrap">$ {Number(tx.metadata?.final_payout_usd || tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                    <div className="flex flex-col items-end">
+                                                                        <span className="text-emerald-500 underline decoration-gv-gold tabular-nums whitespace-nowrap">$ {Number(tx.metadata?.final_payout_usd || tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                        <span className="text-[10px] text-gray-400 font-bold mt-0.5">≈ RM {(Number(tx.metadata?.final_payout_usd || tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate)) * (tx.metadata?.forex_rate || (tx.type === 'Withdrawal' ? withdrawalRate : forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -465,8 +473,11 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                 <div className="flex justify-between items-center border-t border-gray-200 pt-4">
                                                     <div className="flex flex-col">
                                                         <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Final Net Position</span>
-                                                        <span className="text-base font-black text-emerald-500 tabular-nums tracking-tighter">
+                                                         <span className="text-base font-black text-emerald-500 tabular-nums tracking-tighter">
                                                             $ {(Number(tx.metadata?.final_payout_usd || tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        </span>
+                                                        <span className="text-[10px] font-black text-gray-400 mt-0.5">
+                                                            ≈ RM {(Number(tx.metadata?.final_payout_usd || tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate)) * (tx.metadata?.forex_rate || (tx.type === 'Withdrawal' ? withdrawalRate : forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </span>
                                                     </div>
                                                     <div className="text-right">
