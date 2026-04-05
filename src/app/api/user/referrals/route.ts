@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
         // Query referrals by username (case-insensitive)
         const { data: referrals, error } = await supabaseAdmin
             .from('profiles')
-            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier, referred_by_username')
+            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, referred_by_username')
             .ilike('referred_by_username', username.trim());
 
         if (error) {
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
 
         const { data: referrals, error } = await supabaseAdmin
             .from('profiles')
-            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier, referred_by_username')
+            .select('id, full_name, username, balance, balance_usd, is_verified, created_at, referred_by_username')
             .ilike('referred_by_username', username.trim());
 
         if (error) return NextResponse.json({ error: error.message }, { status: 500 });
