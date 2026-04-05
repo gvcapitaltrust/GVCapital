@@ -14,7 +14,10 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [activeFilter, setActiveFilter] = useState<'All' | 'Capital' | 'Dividends'>('All');
-    const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [statusFilter, setStatusFilter] = useState('All');
+    const [dateRange, setDateRange] = useState({ start: "", end: "" });
+    const [selectedTx, setSelectedTx] = useState<any | null>(null);
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -58,11 +61,19 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     }[lang];
 
     const filteredTransactions = transactions.filter(tx => {
-        if (activeFilter === 'All') return true;
+        // 1. Type Filter
         const isDiv = tx.metadata?.adjustment_category === 'Dividend' || tx.metadata?.adjustment_category === 'Bonus' || tx.type?.toLowerCase().includes('dividend') || tx.type?.toLowerCase().includes('bonus');
-        if (activeFilter === 'Dividends') return isDiv;
-        if (activeFilter === 'Capital') return !isDiv;
-        return true;
+        const matchesType = activeFilter === 'All' || (activeFilter === 'Dividends' ? isDiv : !isDiv);
+        
+        // 2. Status Filter
+        const matchesStatus = statusFilter === 'All' || tx.status === statusFilter;
+
+        // 3. Date Range Filter
+        const txDate = new Date(tx.created_at || tx.transfer_date);
+        const matchesStart = !dateRange.start || txDate >= new Date(dateRange.start);
+        const matchesEnd = !dateRange.end || txDate <= new Date(dateRange.end + "T23:59:59");
+        
+        return matchesType && matchesStatus && matchesStart && matchesEnd;
     });
 
     const filteredTotalUSD = filteredTransactions
@@ -238,19 +249,64 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     return (
         <div className="space-y-12 pb-20">
             <section className="space-y-6">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div className="flex bg-white p-1 rounded-2xl border border-gray-200">
-                        {(['All', 'Capital', 'Dividends'] as const).map((f) => (
-                            <button
-                                key={f}
-                                onClick={() => setActiveFilter(f)}
-                                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                                    activeFilter === f ? 'bg-gv-gold text-black shadow-lg' : 'text-gray-400 hover:text-gray-900'
-                                }`}
+                <div className="bg-white border border-gray-200 rounded-[2rem] p-6 md:p-8 flex flex-col gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Period</label>
+                            <div className="flex gap-2">
+                                <input 
+                                    type="date" 
+                                    value={dateRange.start}
+                                    onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                                    className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-gv-gold transition-all" 
+                                />
+                                <span className="text-gray-300 self-center">-</span>
+                                <input 
+                                    type="date" 
+                                    value={dateRange.end}
+                                    onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                                    className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-gv-gold transition-all" 
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Transaction Types</label>
+                            <select 
+                                value={activeFilter}
+                                onChange={(e) => setActiveFilter(e.target.value as any)}
+                                className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-gv-gold transition-all text-gray-900"
                             >
-                                {f}
-                            </button>
-                        ))}
+                                <option value="All">All Transactions</option>
+                                <option value="Capital">Capital Flow</option>
+                                <option value="Dividends">Dividends & Bonuses</option>
+                            </select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Status</label>
+                            <select 
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-gv-gold transition-all text-gray-900"
+                            >
+                                <option value="All">All Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Pending Release">Pending Release</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+
+                        <div className="flex items-end gap-2 text-sm font-bold">
+                           <button 
+                                onClick={() => { setDateRange({ start: "", end: "" }); setStatusFilter('All'); setActiveFilter('All'); }}
+                                className="flex-1 bg-gray-50 text-gray-400 hover:text-gray-900 hover:bg-gray-100 py-2.5 rounded-xl transition-all uppercase text-[10px] font-black tracking-widest"
+                           >
+                               Clear
+                           </button>
+                        </div>
                     </div>
                 </div>
 
@@ -261,254 +317,85 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                     </span>
                 </div>
 
-                <div className="border border-gray-200 rounded-[32px] overflow-hidden bg-white backdrop-blur-md shadow-2xl">
-                    <div className="max-h-[600px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300">
-                        {/* Desktop View (Table) */}
-                        <table className="w-full text-left min-w-[700px] border-collapse hidden md:table">
-                            <thead className="bg-white border-b border-gray-200 sticky top-0 z-10 backdrop-blur-md">
-                                <tr className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">
-                                    <th className="px-6 py-4">{t.date}</th>
-                                    <th className="px-6 py-4">{t.refId}</th>
-                                    <th className="px-6 py-4">{t.type}</th>
-                                    <th className="px-6 py-4">{t.status}</th>
-                                    <th className="px-6 py-4 text-right">{t.amount}</th>
+                <div className="border border-gray-200 rounded-[32px] overflow-hidden bg-white backdrop-blur-md shadow-2xl relative">
+                    <div className="max-h-[600px] overflow-auto scrollbar-thin scrollbar-thumb-gray-300">
+                        <table className="w-full text-left border-collapse min-w-[1000px]">
+                            <thead className="bg-gray-50/50 border-b border-gray-100 sticky top-0 z-10 backdrop-blur-md">
+                                <tr className="text-[10px] text-gray-400 font-black uppercase tracking-widest">
+                                    <th className="px-8 py-5 whitespace-nowrap">{t.date}</th>
+                                    <th className="px-8 py-5 whitespace-nowrap">{t.refId}</th>
+                                    <th className="px-8 py-5 whitespace-nowrap">Category</th>
+                                    <th className="px-8 py-5 whitespace-nowrap">{t.status}</th>
+                                    <th className="px-8 py-5 text-right whitespace-nowrap">{t.amount}</th>
+                                    <th className="px-8 py-5 text-right whitespace-nowrap">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {filteredTransactions.map((tx, idx) => (
-                                    <React.Fragment key={idx}>
-                                        <tr 
-                                            onClick={() => setExpandedId(expandedId === tx.id ? null : tx.id)}
-                                            className="text-sm font-medium group hover:bg-gray-50 transition-colors border-t border-gray-100 cursor-pointer"
-                                        >
-                                            <td className="px-6 py-4 text-gray-500 font-mono text-xs">{formatDate(tx.created_at || tx.transfer_date)}</td>
-                                            <td className="px-6 py-4 text-gray-400 font-mono text-[11px] opacity-70">{tx.ref_id || "-"}</td>
-                                            <td className="px-6 py-4 uppercase tracking-widest text-[10px] font-bold text-gray-900">
-                                                <div className="flex items-center gap-2">
-                                                    {(tx.type === 'Dividend' || tx.metadata?.adjustment_category === 'Dividend') && (!tx.metadata?.description || tx.metadata?.description === 'Dividend') 
-                                                        ? "Dividend Received" 
-                                                        : (tx.metadata?.description || tx.type)}
-                                                    {(tx.type === 'Withdrawal' || tx.metadata?.is_adjustment) && (
-                                                        <svg className={`h-3 w-3 text-gray-500 transition-transform ${expandedId === tx.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
-                                                    )}
+                                {filteredTransactions.map((tx, idx) => {
+                                    const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease' || tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty');
+                                    const amountUSD = Number(tx.original_currency_amount || (Number(tx.amount) / forexRate));
+                                    const displayAmount = isWithdrawal ? -Math.abs(amountUSD) : amountUSD;
+                                    const isDiv = tx.metadata?.adjustment_category === 'Dividend' || tx.metadata?.adjustment_category === 'Bonus' || tx.type?.toLowerCase().includes('dividend') || tx.type?.toLowerCase().includes('bonus');
+                                    const rateToUse = tx.metadata?.forex_rate || (isWithdrawal ? withdrawalRate : forexRate);
+                                    const payoutRM = Math.abs(displayAmount) * rateToUse;
+
+                                    return (
+                                        <tr key={tx.id || idx} className="group hover:bg-gray-50/50 transition-colors">
+                                            <td className="px-8 py-5">
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs font-black text-gray-900 tracking-tight">{formatDate(tx.created_at || tx.transfer_date)}</span>
+                                                    <span className="text-[9px] text-gray-400 font-bold tabular-nums">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <span className={`px-3 py-1.5 rounded-lg text-[9px] uppercase font-bold tracking-widest ${
-                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                                                    tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
-                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
-                                                    'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                            <td className="px-8 py-5">
+                                                <span className="text-[10px] font-mono font-bold text-gray-500 uppercase select-all group-hover:text-gv-gold transition-colors">{tx.ref_id || "-"}</span>
+                                            </td>
+                                            <td className="px-8 py-5">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-900">
+                                                        {isDiv && (!tx.metadata?.description || tx.metadata?.description === 'Dividend') ? "Dividend Received" : (tx.metadata?.description || tx.type)}
+                                                    </span>
+                                                    <span className="text-[9px] text-gray-400 font-bold uppercase">{isDiv ? 'Fiduciary Distribution' : 'Institutional Flow'}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-5">
+                                                <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border ${
+                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                                    tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                                                    'bg-amber-500/10 text-amber-500 border-amber-500/20'
                                                 }`}>{tx.status}</span>
                                             </td>
-                                            {(() => {
-                                                const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease' || tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty');
-                                                const amountUSD = Number(tx.original_currency_amount || (Number(tx.amount) / forexRate));
-                                                const displayAmount = isWithdrawal ? -Math.abs(amountUSD) : amountUSD;
-                                                
-                                                return (
-                                                    <td className={`px-6 py-4 text-right font-black tabular-nums ${displayAmount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                        {displayAmount >= 0 ? '+' : '-'}{Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                    </td>
-                                                );
-                                            })()}
+                                            <td className="px-8 py-5 text-right">
+                                                <div className="flex flex-col items-end">
+                                                    <span className={`text-sm font-black tabular-nums tracking-tighter ${displayAmount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                        {displayAmount >= 0 ? '+' : '-'}$ {Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    </span>
+                                                    <span className="text-[9px] font-black text-gray-400 mt-0.5 tracking-tighter">
+                                                        ≈ RM {payoutRM.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-5 text-right">
+                                                <button 
+                                                    onClick={() => { setSelectedTx(tx); setIsDetailsOpen(true); }}
+                                                    className="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                                                >
+                                                    Details
+                                                </button>
+                                            </td>
                                         </tr>
-                                        {expandedId === tx.id && (
-                                            <tr>
-                                                <td colSpan={5} className="px-6 py-6 bg-white/[0.01] animate-in slide-in-from-top-2 duration-300">
-                                                    {/* Expansion content (Desktop) */}
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                                        <div className="space-y-4">
-                                                            <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Financial Breakdown</h4>
-                                                            <div className="space-y-2">
-                                                                <div className="flex justify-between text-xs font-bold gap-4">
-                                                                    <span className="text-gray-400 uppercase whitespace-nowrap">Gross Amount</span>
-                                                                    <span className="text-gray-900 tabular-nums whitespace-nowrap">$ {Number(tx.metadata?.original_request_amount_usd || tx.original_currency_amount || (Number(tx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                                </div>
-                                                                {tx.metadata?.penalty_applied && (
-                                                                    <div className="flex justify-between text-xs font-bold gap-4">
-                                                                        <span className="text-red-500 uppercase italic whitespace-nowrap">Penalty (40%)</span>
-                                                                        <span className="text-red-500 tabular-nums whitespace-nowrap">-$ {Number(tx.metadata?.penalty_amount_usd || tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                                    </div>
-                                                                )}
-                                                                 <div className="flex justify-between text-xs font-black border-t border-gray-200 pt-2 gap-4">
-                                                                    <span className="text-emerald-500 uppercase whitespace-nowrap">{tx.type === 'Deposit' ? 'Final Deposit (Net)' : (tx.type === 'Dividend' || tx.metadata?.adjustment_category === 'Dividend' ? 'Dividend Received (Net)' : 'Final Payout (Net)')}</span>
-                                                                    <div className="flex flex-col items-end">
-                                                                        <span className="text-emerald-500 underline decoration-gv-gold tabular-nums whitespace-nowrap">$ {Number(tx.metadata?.final_payout_usd || tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                                        <span className="text-[10px] text-gray-400 font-bold mt-0.5">≈ RM {(Number(tx.metadata?.final_payout_usd || tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate)) * (tx.metadata?.forex_rate || (tx.type === 'Withdrawal' ? withdrawalRate : forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="space-y-4">
-                                                            <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Target Account</h4>
-                                                            <div className="bg-white border border-gray-200 p-4 rounded-2xl space-y-2">
-                                                                <p className="text-[10px] font-black text-gv-gold uppercase">{tx.metadata?.bank_name || user?.bank_name || "Institutional Account"}</p>
-                                                                <p className="text-sm font-mono text-gray-900 select-all tracking-tighter shrink-0">{tx.metadata?.account_number || user?.account_number || "Verified on File"}</p>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="space-y-4">
-                                                            <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Processing Timeline</h4>
-                                                            <div className="space-y-3 relative before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[1px] before:bg-gray-100">
-                                                                <div className="flex items-center gap-3 pl-6 relative">
-                                                                    <div className="h-2 w-2 rounded-full bg-zinc-500 absolute left-[3.5px]"></div>
-                                                                    <div className="flex flex-col">
-                                                                        <span className="text-[10px] font-black text-gray-900 uppercase">Submitted</span>
-                                                                        <span className="text-[9px] text-gray-500 font-bold">{formatDateTime(tx.created_at)}</span>
-                                                                    </div>
-                                                                </div>
-                                                                {['Approved', 'Completed'].includes(tx.status) && (
-                                                                    <div className="flex items-center gap-3 pl-6 relative">
-                                                                        <div className="h-2 w-2 rounded-full bg-emerald-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                                                                        <div className="flex flex-col">
-                                                                            <span className="text-[10px] font-black text-emerald-500 uppercase">Successful</span>
-                                                                            <span className="text-[9px] text-gray-500 font-bold">{formatDateTime(tx.metadata?.approved_at || (tx.status === 'Completed' ? tx.updated_at : null))}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-                                                                {tx.status === 'Rejected' && (
-                                                                    <div className="flex items-center gap-3 pl-6 relative">
-                                                                        <div className="h-2 w-2 rounded-full bg-red-500 absolute left-[3.5px] shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
-                                                                        <div className="flex flex-col">
-                                                                            <span className="text-[10px] font-black text-red-500 uppercase">Rejected</span>
-                                                                            <span className="text-[9px] text-gray-500 font-bold">{formatDateTime(tx.metadata?.rejected_at || tx.updated_at)}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {tx.status === 'Rejected' && tx.metadata?.reason && (
-                                                        <div className="mt-8 p-6 bg-red-50 border border-red-100 rounded-[2rem] animate-in slide-in-from-bottom-4 duration-500">
-                                                            <div className="flex items-start gap-4">
-                                                                <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
-                                                                    <svg className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                                                </div>
-                                                                <div className="space-y-1">
-                                                                    <p className="text-[10px] font-black text-red-500 uppercase tracking-widest leading-none">Rejection Reason</p>
-                                                                    <p className="text-sm font-bold text-gray-900 leading-relaxed italic">"{tx.metadata.reason}"</p>
-                                                                    <p className="text-[8px] font-black text-red-300 uppercase tracking-tighter pt-1">Funds have been restored to your dividend wallet.</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                     )}
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </React.Fragment>
-                                ))}
+                                    );
+                                })}
                             </tbody>
                         </table>
-
-                        {/* Mobile View (Grid Cards) */}
-                        <div className="md:hidden divide-y divide-gray-100">
-                            {filteredTransactions.map((tx, idx) => {
-                                const isWithdrawal = tx.type === 'Withdrawal' || tx.metadata?.adjustment_type === 'Decrease' || tx.metadata?.is_penalty || tx.metadata?.description?.toLowerCase().includes('penalty');
-                                const amountUSD = Number(tx.original_currency_amount || (Number(tx.amount) / forexRate));
-                                const displayAmount = isWithdrawal ? -Math.abs(amountUSD) : amountUSD;
-                                const isExpanded = expandedId === tx.id;
-                                
-                                return (
-                                    <div key={idx} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
-                                        <div 
-                                            onClick={() => setExpandedId(isExpanded ? null : tx.id)}
-                                            className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors"
-                                        >
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-500 font-mono text-[10px] tracking-tight">{formatDate(tx.created_at || tx.transfer_date)}</span>
-                                                <span className={`px-2.5 py-1 rounded-lg text-[8px] uppercase font-black tracking-widest ${
-                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                                                    tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
-                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
-                                                    'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                                                }`}>{tx.status}</span>
-                                            </div>
-                                            
-                                            <div className="flex justify-between items-end">
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none">
-                                                            {(tx.type === 'Dividend' || tx.metadata?.adjustment_category === 'Dividend') && (!tx.metadata?.description || tx.metadata?.description === 'Dividend') 
-                                                                ? "Dividend Received" 
-                                                                : (tx.metadata?.description || tx.type)}
-                                                        </span>
-                                                        {(tx.type === 'Withdrawal' || tx.metadata?.is_adjustment) && (
-                                                            <svg className={`h-3 w-3 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className={`text-sm font-black tabular-nums tracking-tighter ${displayAmount >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                        {displayAmount >= 0 ? '+' : '-'}{Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                    </p>
-                                                    <p className="text-[8px] font-bold text-gray-300 uppercase italic tracking-tighter">Verified Institutional</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {isExpanded && (
-                                            <div className="bg-gray-50/50 px-6 py-6 space-y-6 border-t border-gray-100 animate-in fade-in duration-300">
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="flex flex-col gap-1">
-                                                        <span className="text-[8px] font-black uppercase text-gray-400 tracking-[0.1em]">Gross Position</span>
-                                                        <span className="text-xs font-black text-gray-700 tracking-tight">$ {Number(tx.original_currency_amount || (Number(tx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                    </div>
-                                                    {tx.metadata?.penalty_applied && (
-                                                        <div className="flex flex-col gap-1">
-                                                            <span className="text-[8px] font-black uppercase text-red-400 tracking-[0.1em]">Early Penalty</span>
-                                                            <span className="text-xs font-black text-red-500 tracking-tight">-$ {(Number(tx.metadata?.penalty_amount_usd || tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                
-                                                <div className="flex flex-col p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-                                                    <span className="text-[8px] font-black uppercase text-gv-gold tracking-[0.2em] mb-2">Institutional Payout Location</span>
-                                                    <span className="text-[10px] font-black text-gray-900 uppercase mb-1 leading-none">{tx.metadata?.bank_name || user?.bank_name || "Institutional Account"}</span>
-                                                    <span className="text-[11px] font-mono font-bold text-gray-500 select-all tracking-tighter">{tx.metadata?.account_number || user?.account_number || "Verified on File"}</span>
-                                                </div>
-
-                                                <div className="flex justify-between items-center border-t border-gray-200 pt-4">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Final Net Position</span>
-                                                         <span className="text-base font-black text-emerald-500 tabular-nums tracking-tighter">
-                                                            $ {(Number(tx.metadata?.final_payout_usd || tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                        </span>
-                                                        <span className="text-[10px] font-black text-gray-400 mt-0.5">
-                                                            ≈ RM {(Number(tx.metadata?.final_payout_usd || tx.metadata?.original_usd_payout || tx.original_currency_amount || (Number(tx.metadata?.finalized_payout || tx.amount) / forexRate)) * (tx.metadata?.forex_rate || (tx.type === 'Withdrawal' ? withdrawalRate : forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                        </span>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className="text-[8px] font-black text-gray-400 uppercase leading-none">Security Hash</p>
-                                                        <p className="text-[7px] font-mono text-gray-300 mt-1 uppercase tracking-tighter">{tx.id.split('-')[0]}...{tx.id.split('-').pop()}</p>
-                                                    </div>
-                                                </div>
-
-                                                {tx.status === 'Rejected' && tx.metadata?.reason && (
-                                                    <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-2xl">
-                                                        <div className="flex items-start gap-3">
-                                                            <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center shrink-0">
-                                                                <svg className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                                            </div>
-                                                            <div className="space-y-1">
-                                                                <p className="text-[8px] font-black text-red-500 uppercase tracking-widest leading-none">Rejection Reason</p>
-                                                                <p className="text-xs font-bold text-gray-900 italic">"{tx.metadata.reason}"</p>
-                                                                <p className="text-[7px] font-black text-red-300 uppercase tracking-tighter pt-1">Funds restored to wallet.</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                 )}
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-
                         {filteredTransactions.length === 0 && (
-                            <div className="px-8 py-20 text-center text-gray-500 font-bold uppercase tracking-widest">{t.noTxFound}</div>
+                            <div className="p-20 text-center flex flex-col items-center gap-4">
+                                <div className="h-16 w-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-200">
+                                    <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                                </div>
+                                <span className="text-gray-400 font-black uppercase tracking-widest">{t.noTxFound}</span>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -539,56 +426,112 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </section>
 
-            {/* Institutional Preview Modal */}
-            {isPreviewOpen && previewUrl && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-5xl h-full max-h-[90vh] rounded-[2rem] overflow-hidden flex flex-col shadow-2xl border border-white/20 animate-in zoom-in-95 duration-500">
-                        {/* Modal Header */}
-                        <div className="bg-slate-900 px-8 py-6 flex items-center justify-between border-b border-slate-800">
-                            <div className="flex items-center gap-4">
-                                <img src="/logo.png" alt="GV Capital" className="h-10 w-auto object-contain" />
-                                <div className="h-8 w-px bg-slate-800 mx-2 hidden sm:block"></div>
+            {/* Institutional Details Modal */}
+            {isDetailsOpen && selectedTx && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 px-6">
+                    <div className="bg-white w-full max-w-2xl rounded-[2.5rem] overflow-hidden shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-500 p-8">
+                        <div className="flex flex-col gap-8">
+                            <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-gv-gold font-bold uppercase tracking-widest text-sm">Statement Preview</h3>
-                                    <p className="text-slate-400 text-[10px] uppercase font-black tracking-tight">{t.months[selectedMonth]} {selectedYear}</p>
+                                    <h3 className="text-xl font-black uppercase tracking-tight text-gray-900">Transaction Details</h3>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Audit Ref: {selectedTx.ref_id || selectedTx.id}</p>
                                 </div>
-                            </div>
-                            <button 
-                                onClick={() => setIsPreviewOpen(false)}
-                                className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-800 text-white hover:bg-slate-700 transition-colors"
-                            >
-                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
-                        </div>
-
-                        {/* Modal Body (PDF Preview) */}
-                        <div className="flex-1 bg-slate-100 p-4 md:p-8 overflow-hidden">
-                            <iframe 
-                                src={previewUrl} 
-                                className="w-full h-full rounded-2xl shadow-inner border border-gray-200 bg-white"
-                                title="Fiduciary Statement Preview"
-                            />
-                        </div>
-
-                        {/* Modal Footer */}
-                        <div className="bg-white px-8 py-6 flex items-center justify-between border-t border-gray-100">
-                            <div className="hidden md:flex items-center gap-3 text-[10px] text-gray-400 font-bold uppercase tracking-tight">
-                                <svg className="h-4 w-4 text-gv-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                                <span>Fiduciary Hash Verified Statement</span>
-                            </div>
-                            <div className="flex items-center gap-4 w-full md:w-auto">
                                 <button 
-                                    onClick={() => setIsPreviewOpen(false)}
-                                    className="flex-1 md:flex-none px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-all duration-300"
+                                    onClick={() => setIsDetailsOpen(false)}
+                                    className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-gray-900 transition-colors"
                                 >
-                                    Cancel
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M6 18L18 6M6 6l12 12" /></svg>
                                 </button>
-                                <button 
-                                    onClick={downloadPdf}
-                                    className="flex-1 md:flex-none px-10 py-4 bg-gv-gold rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-[0_10px_30px_rgba(212,175,55,0.3)] hover:shadow-[0_15px_40px_rgba(212,175,55,0.4)] transition-all duration-500 transform hover:-translate-y-1"
-                                >
-                                    Download Final PDF
-                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-6">
+                                    <div className="space-y-4">
+                                        <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Financial Breakdown</h4>
+                                        <div className="bg-gray-50 border border-gray-100 p-6 rounded-3xl space-y-3">
+                                            <div className="flex justify-between text-xs font-bold items-center">
+                                                <span className="text-gray-400 uppercase tracking-tighter">Gross Principal</span>
+                                                <span className="text-gray-900 tabular-nums font-black">$ {Number(selectedTx.metadata?.original_request_amount_usd || selectedTx.original_currency_amount || (Number(selectedTx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            </div>
+                                            {selectedTx.metadata?.penalty_applied && (
+                                                <div className="flex justify-between text-xs font-bold items-center">
+                                                    <span className="text-red-400 uppercase italic tracking-tighter">Early Settlement (40%)</span>
+                                                    <span className="text-red-500 tabular-nums font-black">-$ {Number(selectedTx.metadata?.penalty_amount_usd || selectedTx.metadata?.original_usd_penalty || (Number(selectedTx.metadata?.finalized_penalty) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                </div>
+                                            )}
+                                            <div className="pt-3 border-t border-gray-200 flex flex-col items-end gap-1">
+                                                <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest self-start">Final Net Realized</span>
+                                                <div className="flex flex-col items-end">
+                                                    <span className="text-2xl font-black text-emerald-500 tabular-nums tracking-tighter leading-none">$ {Number(selectedTx.metadata?.final_payout_usd || selectedTx.metadata?.original_usd_payout || selectedTx.original_currency_amount || (Number(selectedTx.metadata?.finalized_payout || selectedTx.amount) / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                    <span className="text-[10px] font-black text-gray-400 mt-1">≈ RM {(Number(selectedTx.metadata?.final_payout_usd || selectedTx.metadata?.original_usd_payout || selectedTx.original_currency_amount || (Number(selectedTx.metadata?.finalized_payout || selectedTx.amount) / forexRate)) * (selectedTx.metadata?.forex_rate || (selectedTx.type === 'Withdrawal' ? withdrawalRate : forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="space-y-4">
+                                        <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Processing Location</h4>
+                                        <div className="bg-white border border-gray-100 p-5 rounded-3xl space-y-2">
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-2 w-2 rounded-full bg-gv-gold shadow-[0_0_8px_rgba(212,175,55,0.4)]"></div>
+                                                <span className="text-[10px] font-black text-gray-900 uppercase">{selectedTx.metadata?.bank_name || user?.bank_name || "Institutional Account"}</span>
+                                            </div>
+                                            <p className="text-xs font-mono font-bold text-gv-gold select-all tracking-tight break-all">{selectedTx.metadata?.account_number || user?.account_number || "Verified Account on File"}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <div className="space-y-4">
+                                        <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Execution Timeline</h4>
+                                        <div className="space-y-6 relative before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[1.5px] before:bg-gray-100 px-2 pt-1">
+                                            <div className="flex items-start gap-4 pl-6 relative">
+                                                <div className="h-3 w-3 rounded-full bg-zinc-300 absolute left-[1.5px] border-2 border-white"></div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Request Initiated</span>
+                                                    <span className="text-xs font-bold text-gray-900">{formatDateTime(selectedTx.created_at)}</span>
+                                                </div>
+                                            </div>
+
+                                            {['Approved', 'Completed', 'Pending Release'].includes(selectedTx.status) && (
+                                                <div className="flex items-start gap-4 pl-6 relative">
+                                                    <div className="h-3 w-3 rounded-full bg-blue-500 absolute left-[1.5px] border-2 border-white shadow-[0_0_8px_rgba(59,130,246,0.3)]"></div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest leading-none mb-1">Audit Approved</span>
+                                                        <span className="text-xs font-bold text-gray-900">{formatDateTime(selectedTx.metadata?.approved_at || selectedTx.updated_at)}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {['Approved', 'Completed'].includes(selectedTx.status) && (
+                                                <div className="flex items-start gap-4 pl-6 relative">
+                                                    <div className="h-3 w-3 rounded-full bg-emerald-500 absolute left-[1.5px] border-2 border-white shadow-[0_0_8px_rgba(16,185,129,0.3)]"></div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none mb-1">Funds Released</span>
+                                                        <span className="text-xs font-bold text-gray-900">{formatDateTime(selectedTx.metadata?.released_at || selectedTx.metadata?.completed_at || selectedTx.updated_at)}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {selectedTx.status === 'Rejected' && (
+                                                <div className="flex items-start gap-4 pl-6 relative">
+                                                    <div className="h-3 w-3 rounded-full bg-red-500 absolute left-[1.5px] border-2 border-white shadow-[0_0_8px_rgba(239,68,68,0.3)]"></div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[10px] font-black text-red-500 uppercase tracking-widest leading-none mb-1">Request Denied</span>
+                                                        <span className="text-xs font-bold text-gray-900">{formatDateTime(selectedTx.metadata?.rejected_at || selectedTx.updated_at)}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {selectedTx.status === 'Rejected' && selectedTx.metadata?.reason && (
+                                        <div className="p-5 bg-red-50 border border-red-100 rounded-[2rem] space-y-1">
+                                            <p className="text-[9px] font-black text-red-400 uppercase tracking-widest px-1">Rejection Basis</p>
+                                            <p className="text-[11px] font-bold text-gray-900 leading-relaxed italic">"{selectedTx.metadata.reason}"</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

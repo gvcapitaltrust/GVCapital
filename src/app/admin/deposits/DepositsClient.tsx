@@ -78,114 +78,112 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h2>
-                    <p className="text-[9px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
+            <div className="bg-white border border-gray-200 rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-8 shadow-sm">
+                <div className="space-y-2">
+                    <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 border-l-8 border-emerald-500 pl-6">{t.title}</h2>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest pl-1">{t.subtitle}</p>
                 </div>
-                <div className="flex flex-col md:flex-row gap-4">
-                    <input
-                        type="text"
-                        placeholder={t.searchPlaceholder}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs w-full md:w-64 focus:outline-none focus:border-gv-gold transition-all"
-                    />
+                <div className="flex flex-col md:flex-row gap-4 min-w-[500px]">
+                    <div className="relative group flex-1">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-500 transition-colors">
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </div>
+                        <input
+                            type="text"
+                            placeholder={t.searchPlaceholder}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-6 py-4 text-xs w-full focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-xl transition-all font-bold placeholder:text-slate-300"
+                        />
+                    </div>
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-gv-gold transition-all text-gray-900"
+                        className="bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-xs font-black uppercase tracking-widest focus:outline-none focus:border-emerald-500 transition-all text-slate-900 appearance-none cursor-pointer"
                     >
-                        <option value="All" className="bg-white">{t.statusAll}</option>
-                        <option value="Pending" className="bg-white">{t.statusPending}</option>
-                        <option value="Approved" className="bg-white">{t.statusApproved}</option>
-                        <option value="Rejected" className="bg-white">{t.statusRejected}</option>
+                        <option value="All">{t.statusAll}</option>
+                        <option value="Pending">{t.statusPending}</option>
+                        <option value="Approved">{t.statusApproved}</option>
+                        <option value="Rejected">{t.statusRejected}</option>
                     </select>
                 </div>
             </div>
 
-            <div className="bg-white backdrop-blur-md rounded-3xl border border-gray-200 overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-gray-300">
-                    {/* Desktop View (Table) */}
-                    <table className="w-full text-left min-w-[800px] hidden md:table">
-                        <thead className="bg-white border-b border-gray-200 text-[10px] font-black uppercase tracking-widest text-gray-400 sticky top-0 z-10 backdrop-blur-md">
-                            <tr>
-                                <th className="px-8 py-6">{t.tableUser}</th>
-                                <th className="px-8 py-6">{t.tableAmount}</th>
-                                <th className="px-8 py-6">{t.tableDate}</th>
-                                <th className="px-8 py-6">{t.tableStatus}</th>
-                                <th className="px-8 py-6 text-right">{t.tableActions}</th>
+            <div className="bg-white border border-gray-200 rounded-[32px] overflow-hidden shadow-2xl relative">
+                <div className="overflow-x-auto overflow-y-auto max-h-[650px] scrollbar-thin scrollbar-thumb-gray-200">
+                    <table className="w-full text-left border-collapse min-w-[900px]">
+                        <thead className="bg-slate-50/50 border-b border-slate-100 sticky top-0 z-10 backdrop-blur-md">
+                            <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                <th className="px-10 py-6">Institutional Client</th>
+                                <th className="px-10 py-6">Allocated Amount</th>
+                                <th className="px-10 py-6">{t.tableDate}</th>
+                                <th className="px-10 py-6">Audit Status</th>
+                                <th className="px-10 py-6 text-right">Verification Hub</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-slate-50">
                             {filteredDeposits.map((tx, idx) => (
-                                <tr key={idx} className="text-sm group hover:bg-gray-50 transition-all">
-                                    <td className="px-8 py-6">
+                                <tr key={tx.id || idx} className="group hover:bg-slate-50/50 transition-all border-b border-slate-50 last:border-0">
+                                    <td className="px-10 py-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center font-black text-slate-400 text-xs border border-slate-200 group-hover:bg-emerald-500/10 group-hover:text-emerald-500 group-hover:border-emerald-500/20 transition-all">
+                                                {tx.profiles?.full_name?.charAt(0)}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="font-black text-slate-900 uppercase tracking-tight text-sm group-hover:text-emerald-500 transition-colors">{tx.profiles?.full_name}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none">@{tx.profiles?.username}</span>
+                                                    <span className="h-1 w-1 rounded-full bg-slate-200"></span>
+                                                    <span className="text-[9px] text-slate-300 font-bold select-all">{tx.profiles?.email}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-10 py-6">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-gray-900 uppercase tracking-tight">{tx.profiles?.full_name}</span>
-                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
+                                            <span className="font-black text-emerald-500 tabular-nums text-lg leading-none">$ {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="text-[9px] text-slate-300 font-bold uppercase mt-1 tracking-widest">Base Currency (USD)</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
+                                    <td className="px-10 py-6">
                                         <div className="flex flex-col">
-                                            <span className="font-black text-emerald-500 tabular-nums text-lg">$ {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="text-slate-500 font-mono text-[11px] font-bold tabular-nums">{formatDate(tx.created_at)}</span>
+                                            <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6 text-gray-400 font-mono text-[10px] uppercase">
-                                        {formatDateTime(tx.created_at)}
+                                    <td className="px-10 py-6">
+                                        <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm ${
+                                            tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                            tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                                            'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                        }`}>
+                                            {tx.status}
+                                        </span>
                                     </td>
-                                    <td className="px-8 py-6">
-                                        <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${
-                                            tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
-                                            tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
-                                            'bg-amber-500/10 text-amber-500'
-                                        }`}>{tx.status}</span>
-                                    </td>
-                                    <td className="px-8 py-6 text-right">
-                                        <div className="flex items-center justify-end gap-3">
-                                            {tx.status === 'Pending' && (
-                                                <button onClick={() => openReceipt(tx)} className="bg-white hover:bg-gray-100 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all border border-gray-200">{t.viewReceipt}</button>
-                                            )}
-                                            {tx.status !== 'Pending' && <span className="text-[10px] text-gray-400 font-black uppercase italic">Processed</span>}
-                                        </div>
+                                    <td className="px-10 py-6 text-right">
+                                        {tx.status === 'Pending' ? (
+                                            <button 
+                                                onClick={() => openReceipt(tx)} 
+                                                className="bg-slate-900 text-white hover:bg-slate-800 text-[10px] font-black uppercase tracking-widest px-8 py-3 rounded-2xl transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+                                            >
+                                                {t.viewReceipt}
+                                            </button>
+                                        ) : (
+                                            <span className="text-[10px] text-slate-300 font-black uppercase italic tracking-widest px-4">Audit Finalized</span>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
 
-                    {/* Mobile View (Grid Cards) */}
-                    <div className="md:hidden divide-y divide-gray-100">
-                        {filteredDeposits.map((tx, idx) => (
-                            <div key={idx} className="px-6 py-5 space-y-4 animate-in slide-in-from-right-4 duration-300">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-500 font-mono text-[10px] uppercase">{formatDate(tx.created_at)}</span>
-                                    <span className={`px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${
-                                        tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
-                                        tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
-                                        'bg-amber-500/10 text-amber-400'
-                                    }`}>{tx.status}</span>
-                                </div>
-                                <div className="flex justify-between items-end">
-                                    <div className="space-y-1">
-                                        <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block">{tx.profiles?.full_name}</span>
-                                        <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">@{tx.profiles?.username}</span>
-                                    </div>
-                                    <div className="text-right space-y-2">
-                                        <p className="text-sm font-black text-emerald-500 tabular-nums tracking-tighter">
-                                            $ {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </p>
-                                        {tx.status === 'Pending' && (
-                                            <button onClick={() => openReceipt(tx)} className="bg-gv-gold text-black text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-lg shadow-gv-gold/20">{t.viewReceipt}</button>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
                     {filteredDeposits.length === 0 && (
-                        <div className="p-20 text-center text-gray-500 font-black uppercase tracking-[0.2em]">{t.noDeposits}</div>
+                        <div className="p-32 text-center flex flex-col items-center gap-6">
+                            <div className="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-100">
+                                <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                            </div>
+                            <span className="text-slate-300 font-black uppercase tracking-[0.3em] text-xs">{t.noDeposits}</span>
+                        </div>
                     )}
                 </div>
             </div>
