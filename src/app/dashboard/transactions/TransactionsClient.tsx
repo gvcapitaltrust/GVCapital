@@ -451,8 +451,8 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                             {(selectedTx.metadata?.penalty_applied || selectedTx.metadata?.is_penalty) && (
                                                 <div className="flex justify-between text-xs font-bold items-center">
-                                                    <span className="text-red-400 uppercase italic tracking-tighter">Early Settlement Adjustment</span>
-                                                    <span className="text-red-500 tabular-nums font-black">-$ {Number(selectedTx.metadata?.penalty_amount_usd || selectedTx.metadata?.original_usd_penalty || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                    <span className="text-red-400 uppercase italic tracking-tighter">Penalty (40%)</span>
+                                                    <span className="text-red-500 tabular-nums font-black whitespace-nowrap">-$ {Number(selectedTx.metadata?.penalty_amount_usd || selectedTx.metadata?.original_usd_penalty || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 </div>
                                             )}
                                             <div className="pt-4 border-t border-slate-200 flex flex-col items-end gap-1.5 font-black">
@@ -475,7 +475,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                         <div className="flex items-start gap-6 pl-8 relative">
                                             <div className="h-4 w-4 rounded-full bg-slate-400 absolute left-[3.5px] border-4 border-white shadow-sm"></div>
                                             <div className="flex flex-col">
-                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-2">Request Processed</span>
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-2">Submitted</span>
                                                 <span className="text-xs font-black text-slate-900 leading-none">{formatDateTime(selectedTx.created_at)}</span>
                                             </div>
                                         </div>
@@ -484,7 +484,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className="flex items-start gap-6 pl-8 relative animate-in slide-in-from-top-4 duration-500">
                                                 <div className="h-4 w-4 rounded-full bg-blue-500 absolute left-[3.5px] border-4 border-white shadow-[0_0_12px_rgba(59,130,246,0.3)]"></div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] leading-none mb-2">Institutional Clearance</span>
+                                                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] leading-none mb-2">Approved</span>
                                                     <span className="text-xs font-black text-slate-900 leading-none">{formatDateTime(selectedTx.updated_at || selectedTx.created_at)}</span>
                                                 </div>
                                             </div>
@@ -494,7 +494,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className="flex items-start gap-6 pl-8 relative animate-in slide-in-from-top-4 duration-700">
                                                 <div className="h-4 w-4 rounded-full bg-emerald-500 absolute left-[3.5px] border-4 border-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"></div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] leading-none mb-2">Capital Finalized</span>
+                                                    <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] leading-none mb-2">Fund Released</span>
                                                     <span className="text-xs font-black text-slate-900 leading-none">{formatDateTime(selectedTx.updated_at || selectedTx.created_at)}</span>
                                                 </div>
                                             </div>
