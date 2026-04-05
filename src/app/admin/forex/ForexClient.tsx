@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAdmin } from "@/providers/AdminProvider";
 import { useSettings } from "@/providers/SettingsProvider";
+import { ArrowLeft } from "lucide-react";
 
 export default function ForexClient({ lang }: { lang: "en" | "zh" }) {
+    const router = useRouter();
     const { forexHistory, loading, handleUpdateForexRate } = useAdmin();
     const { forexRate } = useSettings();
     const [newRate, setNewRate] = useState("");
@@ -54,10 +57,19 @@ export default function ForexClient({ lang }: { lang: "en" | "zh" }) {
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
 
     return (
-        <div className="space-y-12 animate-in fade-in duration-500">
-            <div>
-                <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900">{t.title}</h2>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
+        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+            {/* Standard Header */}
+            <div className="flex items-center gap-6">
+                <button 
+                    onClick={() => router.push(`/admin?lang=${lang}`)}
+                    className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm hover:shadow-md"
+                >
+                    <ArrowLeft className="h-6 w-6" />
+                </button>
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none">{t.title}</h1>
+                    <p className="text-slate-400 text-sm font-medium">{t.subtitle}</p>
+                </div>
             </div>
 
             <div className="max-w-xl bg-white border border-gray-200 rounded-[40px] p-10 space-y-8 backdrop-blur-md shadow-2xl">

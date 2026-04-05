@@ -1,14 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAdmin } from "@/providers/AdminProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { formatDate, formatDateTime } from "@/lib/dateUtils";
 import { getTierByAmount } from "@/lib/tierUtils";
+import { ArrowLeft } from "lucide-react";
 import TierMedal from "@/components/TierMedal";
 
 export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
+    const router = useRouter();
     const { deposits, loading, handleApproveDeposit, handleRejectDeposit } = useAdmin();
     const { forexRate } = useSettings();
     const [searchQuery, setSearchQuery] = useState("");
@@ -80,20 +83,25 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="bg-white border border-gray-200 rounded-[2.5rem] p-8 md:p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-sm">
-                <div className="space-y-4">
-                    <div className="hidden md:flex items-center gap-3">
-                        <div className="h-0.5 w-10 bg-gv-gold rounded-full"></div>
-                        <span className="text-gv-gold text-[10px] font-black uppercase tracking-[0.4em] mb-0.5">Institutional Access</span>
-                    </div>
-                    <div className="space-y-1">
-                        <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-slate-900 leading-none">{t.title}</h2>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-1">{t.subtitle}</p>
-                    </div>
+            {/* Standard Header */}
+            <div className="flex items-center gap-6">
+                <button 
+                    onClick={() => router.push(`/admin?lang=${lang}`)}
+                    className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm hover:shadow-md"
+                >
+                    <ArrowLeft className="h-6 w-6" />
+                </button>
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none">{t.title}</h1>
+                    <p className="text-slate-400 text-sm font-medium">{t.subtitle}</p>
                 </div>
-                <div className="flex flex-col md:flex-row gap-4 min-w-full lg:min-w-[500px]">
+            </div>
+
+            {/* Filter Controls Card - Separated from Header */}
+            <div className="bg-white border border-gray-200 rounded-[2.5rem] p-8 md:p-10 flex flex-wrap items-center gap-8 shadow-sm">
+                <div className="flex flex-col md:flex-row gap-4 min-w-full lg:min-w-[500px] flex-1">
                     <div className="relative group flex-1">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-500 transition-colors">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-300 group-focus-within:text-gv-gold transition-colors">
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                         </div>
                         <input
@@ -101,13 +109,13 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                             placeholder={t.searchPlaceholder}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-6 py-3.5 text-xs w-full focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-xl transition-all font-bold placeholder:text-slate-300"
+                            className="bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-6 py-4 text-xs w-full focus:outline-none focus:border-gv-gold focus:bg-white focus:shadow-xl transition-all font-bold placeholder:text-slate-300"
                         />
                     </div>
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-slate-50 border border-slate-100 rounded-2xl px-6 py-3.5 text-xs font-black uppercase tracking-widest focus:outline-none focus:border-emerald-500 transition-all text-slate-900 appearance-none cursor-pointer"
+                        className="bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-xs font-black uppercase tracking-widest focus:outline-none focus:border-gv-gold transition-all text-slate-900 appearance-none cursor-pointer"
                     >
                         <option value="All">{t.statusAll}</option>
                         <option value="Pending">{t.statusPending}</option>
@@ -122,11 +130,11 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                     <table className="w-full text-left border-collapse min-w-[800px] lg:min-w-full">
                         <thead className="bg-slate-50/50 border-b border-slate-100 sticky top-0 z-10 backdrop-blur-md">
                             <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                <th className="px-6 py-6 pl-10">Institutional Client</th>
-                                <th className="px-6 py-6">Allocated Amount</th>
+                                <th className="px-6 py-6 pl-10">User Info</th>
+                                <th className="px-6 py-6">Amount (USD)</th>
                                 <th className="px-6 py-6">{t.tableDate}</th>
-                                <th className="px-6 py-6">Audit Status</th>
-                                <th className="px-6 py-6 pr-10 text-right">Verification Hub</th>
+                                <th className="px-6 py-6">Status</th>
+                                <th className="px-6 py-6 pr-10 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">

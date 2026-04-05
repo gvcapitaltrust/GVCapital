@@ -75,35 +75,35 @@ export default function UserPortfolioClient({ lang }: { lang: "en" | "zh" }) {
     if (loading || !user) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-700">
-            {/* Action Bar */}
-            <div className="flex items-center justify-between">
-                <button 
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors"
-                >
-                    <ArrowLeft className="h-4 w-4" />
-                    {t.back}
-                </button>
-                <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Active Terminal Session</span>
-                </div>
-            </div>
-
-            {/* User Profile Header */}
-            <div className="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+            {/* Standard Header */}
+            <div className="flex items-center justify-between gap-6">
                 <div className="flex items-center gap-6">
-                    <TierMedal tierId={getTierByAmount(user.balance_usd || 0).name} size="lg" />
-                    <div>
-                        <h1 className="text-3xl font-black uppercase tracking-tighter text-gray-900">{user.full_name || user.username}</h1>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{user.email}</p>
+                    <button 
+                        onClick={() => router.back()}
+                        className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm hover:shadow-md"
+                    >
+                        <ArrowLeft className="h-6 w-6" />
+                    </button>
+                    <div className="flex items-center gap-6">
+                        <TierMedal tierId={getTierByAmount(user.balance_usd || 0).name} size="md" />
+                        <div className="space-y-1">
+                            <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none">{user.full_name || user.username}</h1>
+                            <p className="text-slate-400 text-sm font-medium">{user.email}</p>
+                        </div>
                     </div>
                 </div>
-                <div className="flex gap-4">
-                    <div className="bg-gray-50 px-6 py-4 rounded-3xl border border-gray-100 text-right">
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{t.assets}</p>
-                        <p className="text-2xl font-black text-gray-900">$ {(user.balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+
+                <div className="hidden md:flex items-center gap-4">
+                    <div className="bg-white px-6 py-3 rounded-2xl border border-gray-100 shadow-sm text-right">
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t.assets}</p>
+                        <p className="text-xl font-black text-slate-900 tabular-nums">
+                            $ {(user.balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">Secure Session</span>
                     </div>
                 </div>
             </div>

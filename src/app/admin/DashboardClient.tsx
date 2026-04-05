@@ -25,7 +25,7 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
         },
         zh: {
             title: "执行概览",
-            subtitle: "全球平台流动性、合规状态和运营吞吐量。",
+            subtitle: "监控全球平台流动性、合规状态和运营效率。",
             cardTotal: "总管理资产 (包含红利)",
             cardDeposits: "待处理存款",
             cardKyc: "KYC 队列",
@@ -46,9 +46,14 @@ export default function AdminDashboardClient({ lang }: { lang: "en" | "zh" }) {
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
-            <div>
-                <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-gray-900">{t.title}</h2>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
+            {/* Standard Header */}
+            <div className="flex items-center justify-between gap-6 mb-4">
+                <div className="flex items-center gap-6">
+                    <div className="space-y-1">
+                        <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none">{t.title}</h1>
+                        <p className="text-slate-400 text-sm font-medium">{t.subtitle}</p>
+                    </div>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

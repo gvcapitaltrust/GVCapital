@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useSettings } from "@/providers/SettingsProvider";
+import { ArrowLeft } from "lucide-react";
 
 export default function ApprovalsClient() {
     const router = useRouter();
@@ -161,25 +162,38 @@ export default function ApprovalsClient() {
     }
 
     return (
-        <div className="min-h-screen bg-white text-gray-700 font-sans p-4 md:p-8">
-            <header className="max-w-7xl mx-auto mb-8 md:mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                <div>
-                    <Link href="/admin" className="text-gray-500 hover:text-gray-900 transition-colors text-[9px] md:text-xs font-black uppercase tracking-widest mb-4 inline-block">← Back to Master Control</Link>
-                    <h1 className="text-2xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter">Approval Center</h1>
-                    <p className="text-gv-gold text-[8px] md:text-[10px] font-black tracking-widest uppercase mt-1">Manage pending deposits & dividend payouts</p>
+        <div className="min-h-screen bg-slate-50/30 text-slate-700 font-sans p-4 md:p-8 space-y-8 animate-in fade-in duration-500">
+            {/* Standard Header */}
+            <div className="flex items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                    <button 
+                        onClick={() => router.push(`/admin?lang=en`)} // lang is not passed but router is available
+                        className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm hover:shadow-md"
+                    >
+                        <ArrowLeft className="h-6 w-6" />
+                    </button>
+                    <div className="space-y-1">
+                        <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none">Approval Center</h1>
+                        <p className="text-slate-400 text-sm font-medium">Manage pending deposits & dividend payouts</p>
+                    </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <div className="flex items-center gap-3">
                     <button
                         onClick={handleDistributeDividends}
                         disabled={distributing}
-                        className="bg-emerald-500 hover:bg-emerald-600 text-black font-black px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl flex items-center justify-center gap-3 uppercase tracking-widest text-[9px] md:text-xs transition-all shadow-xl active:scale-95 disabled:opacity-50"
+                        className="bg-emerald-500 hover:bg-emerald-600 text-black font-black px-6 py-3.5 rounded-xl flex items-center justify-center gap-2 uppercase tracking-widest text-[10px] transition-all shadow-xl active:scale-95 disabled:opacity-50"
                     >
                         {distributing ? "Distributing..." : "Distribute 1% Monthly Dividends"}
                     </button>
-                    <button onClick={fetchPending} className="bg-white border border-gray-200 hover:bg-gray-100 text-gray-900 font-black px-6 py-3 md:py-4 rounded-xl md:rounded-2xl uppercase tracking-widest text-[9px] md:text-xs transition-all">Refresh</button>
+                    <button 
+                        onClick={fetchPending} 
+                        className="bg-white border border-gray-200 hover:bg-gray-100 text-gray-900 font-black px-6 py-3.5 rounded-xl uppercase tracking-widest text-[10px] transition-all shadow-sm"
+                    >
+                        Refresh
+                    </button>
                 </div>
-            </header>
+            </div>
 
             <main className="max-w-7xl mx-auto">
                 <div className="bg-white border border-gray-200 rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl">
