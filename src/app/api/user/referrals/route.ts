@@ -13,53 +13,52 @@ function getAdminClient() {
 
 export async function POST(req: Request) {
     try {
-        const supabaseAdmin = getAdminClient();
+        // Log environment status for Vercel logs
+        console.log('[referrals-api] Starting request...');
         
-        // Debug info to confirm if the key is actually loaded in Vercel
         const diagnostics = {
-            hasUrl: !!supabaseUrl,
-            hasServiceKey: !!supabaseServiceKey,
-            serviceKeyPrefix: supabaseServiceKey ? supabaseServiceKey.substring(0, 10) + '...' : 'NONE',
-            envKeys: Object.keys(process.env).filter(k => k.includes('SUPABASE'))
+            url: supabaseUrl ? 'FOUND' : 'MISSING',
+            key: supabaseServiceKey ? 'FOUND' : 'MISSING',
+            keyLength: supabaseServiceKey?.length || 0,
+            nodeVersion: process.version
         };
 
+        const supabaseAdmin = getAdminClient();
+
         if (!supabaseAdmin) {
-            console.error('[referrals-api] CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing!', diagnostics);
+            console.error('[referrals-api] Missing configuration:', diagnostics);
             return NextResponse.json({ 
-                error: 'Service role key missing in environment', 
+                error: 'Configuration Error: SUPABASE_SERVICE_ROLE_KEY is not defined in Vercel environment variables.', 
                 diagnostics 
             }, { status: 500 });
         }
 
-        const { username } = await req.json();
+        const body = await req.json();
+        const username = body.username;
 
         if (!username) {
-            return NextResponse.json({ error: 'username is required' }, { status: 400 });
+            return NextResponse.json({ error: 'Username is required', diagnostics }, { status: 400 });
         }
 
-        console.log(`[referrals-api] Querying for: "${username}"`);
-
+        // Direct query with service role (bypasses RLS)
         const { data: referrals, error } = await supabaseAdmin
             .from('profiles')
             .select('id, full_name, username, balance, balance_usd, is_verified, created_at, tier, referred_by_username')
             .ilike('referred_by_username', username.trim());
 
         if (error) {
-            console.error('[referrals-api] Supabase error:', error.message);
-            return NextResponse.json({ error: error.message, diagnostics }, { status: 500 });
+            console.error('[referrals-api] Database Error:', error.message);
+            return NextResponse.json({ error: `Database Error: ${error.message}`, diagnostics }, { status: 500 });
         }
-
-        console.log(`[referrals-api] Success! Found ${referrals?.length || 0} for ${username}`);
 
         return NextResponse.json({ 
             success: true,
             referrals: referrals || [],
             count: referrals?.length || 0,
-            debug_username_queried: username,
             diagnostics
         });
     } catch (error: any) {
-        console.error('[referrals-api] Unhandled error:', error);
-        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+        console.error('[referrals-api] Crash:', error.message);
+        return NextResponse.json({ error: `Server Crash: ${error.message}` }, { status: 500 });
     }
 }
