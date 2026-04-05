@@ -137,11 +137,11 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                     <table className="w-full text-left border-collapse hidden md:table">
                         <thead className="bg-slate-50/50 border-b border-slate-100 sticky top-0 z-10 backdrop-blur-md">
                             <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                <th className="px-6 py-6 pl-10">User Context</th>
+                                <th className="px-6 py-6 pl-10 whitespace-nowrap">User</th>
+                                <th className="px-6 py-6">Date</th>
                                 <th className="px-6 py-6">Net Payout</th>
                                 <th className="px-6 py-6">Status</th>
-                                <th className="px-6 py-6">{t.date}</th>
-                                <th className="px-6 py-6 pr-10 text-right">Actions Hub</th>
+                                <th className="px-6 py-6 pr-10 text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -161,6 +161,12 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                         <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none">@{tx.profiles?.username}</span>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6">
+                                            <div className="flex flex-col">
+                                                <span className="text-slate-500 font-mono text-[11px] font-bold tabular-nums">{formatDate(tx.created_at)}</span>
+                                                <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-6">
