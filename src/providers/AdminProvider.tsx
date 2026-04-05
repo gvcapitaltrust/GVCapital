@@ -93,18 +93,46 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             if (profileList && txList) {
                 const now = new Date();
                 const enrichedUsers = profileList.map((p: any) => {
-                    const userTxs = txList.filter((t: any) => t.user_id === p.id && ['Approved', 'Completed'].includes(t.status));
-                    // 1. Core Financial Markers (USD Primary)
+                    const allUserTxs = txList.filter((t: any) => t.user_id === p.id);
+                    const approvedTxs = allUserTxs.filter((t: any) => ['Approved', 'Completed', 'Pending Release'].includes(t.status));
+                    
+                    // 1. Chronological Ledger Simulation (Matches User Dashboard)
+                    const chronTxs = [...allUserTxs].sort((a, b) => 
+                        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+                    );
+
+                    let virtualProfit = 0;
+                    chronTxs.forEach(t => {
+                        const type = (t.type || "").toLowerCase();
+                        const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                        const reason = (t.metadata?.reason || "").toLowerCase();
+                        const isDivOrBonus = type === 'dividend' || type === 'bonus' || category === 'dividend' || category === 'bonus' || category === 'profit' || reason.includes('dividend');
+                        
+                        if (isDivOrBonus && ['Approved', 'Completed'].includes(t.status)) {
+                            const amt = Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate));
+                            virtualProfit += amt;
+                        }
+
+                        if (type === 'withdrawal' && !['Rejected'].includes(t.status)) {
+                            const amt = Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate));
+                            if (t.metadata?.profit_portion !== undefined) {
+                                virtualProfit = Math.max(0, virtualProfit - Number(t.metadata.profit_portion));
+                            } else {
+                                virtualProfit = Math.max(0, virtualProfit - Math.min(virtualProfit, amt));
+                            }
+                        }
+                    });
+
+                    const profitUSD = virtualProfit;
                     const balanceUSD = Number(p.balance_usd ?? 0);
-                    const profitUSD = Number(p.profit || 0); 
-                    const totalInvestmentUSD = balanceUSD; // Investment is strictly the Capital Balance
+                    const totalInvestmentUSD = balanceUSD; 
                     const totalAssetsUSD = balanceUSD + profitUSD;
                     
                     const currentTier = getTierByAmount(totalInvestmentUSD);
                     const lockPeriodDays = currentTier.lockInDays || 180;
                     
-                    // 2. Locked Capital Logic (standardized to USD-primary)
-                    const lockedCapitalUSD = userTxs.filter((t: any) => {
+                    // 2. Locked Capital Logic
+                    const lockedCapitalUSD = approvedTxs.filter((t: any) => {
                         const type = (t.type || "").toLowerCase();
                         const category = (t.metadata?.adjustment_category || "").toLowerCase();
                         const isCapital = (type === 'deposit' || type === 'adjustment') && 
@@ -128,8 +156,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     const lockedCapitalRM = lockedCapitalUSD * forexRate;
                     const totalInvestmentRM = balanceUSD * forexRate;
 
-                    const totalWithdrawnUSD = txList.filter((t: any) => 
-                        t.user_id === p.id && 
+                    const totalWithdrawnUSD = allUserTxs.filter((t: any) => 
                         t.type === 'Withdrawal' && 
                         ['Approved', 'Completed', 'Pending Release', 'Pending'].includes(t.status)
                     ).reduce((acc: number, t: any) => acc + Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate)), 0);
@@ -332,38 +359,69 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             
             if (profileFetchError) throw profileFetchError;
 
-            const withdrawAmountUSD = Number(tx.original_currency_amount ?? (Math.abs(Number(tx.amount || 0)) / forexRate));
-            const currentProfitUSD = Number(profile?.profit || 0); // Profit is now USD
-            const currentBalanceUSD = Number(profile?.balance_usd || 0);
-
-            // 2. Fetch User Capital Inflows to verify lock-in period (USD basis)
-            const { data: deposits, error: depositsError } = await supabase
+            // 2. Fetch User Transaction History for Precise Ledger Simulation
+            const { data: allUserTxs, error: txError } = await supabase
                 .from('transactions')
                 .select('*')
                 .eq('user_id', tx.user_id)
-                .in('type', ['Deposit', 'Bonus', 'Adjustment'])
-                .in('status', ['Approved', 'Completed']);
+                .order('created_at', { ascending: true });
 
-            if (depositsError) throw depositsError;
+            if (txError) throw txError;
 
             const now = new Date();
+            const currentBalanceUSD = Number(profile?.balance_usd || 0);
+            
+            // Tier-based lock period
             const currentTier = getTierByAmount(currentBalanceUSD);
             const lockPeriodDays = currentTier.lockInDays || 180;
 
-            const lockedCapitalUSD = deposits?.reduce((acc: number, d: any) => {
+            // --- Chronological Ledger Simulation ---
+            const withdrawAmountUSD = Number(tx.original_currency_amount ?? (Math.abs(Number(tx.amount || 0)) / forexRate));
+            let ledgerProfitUSD = 0;
+            let ledgerLockedCapitalUSD = 0;
+            
+            const approvedTxs = (allUserTxs || []).filter(t => ['Approved', 'Completed', 'Pending Release'].includes(t.status));
+            
+            // Calculate Profit Pool
+            (allUserTxs || []).forEach(t => {
+                const type = (t.type || "").toLowerCase();
+                const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                const isApproved = ['Approved', 'Completed', 'Pending Release'].includes(t.status);
+                const isDivOrBonus = type === 'dividend' || type === 'bonus' || category === 'dividend' || category === 'bonus' || category === 'profit';
+                
+                if (isDivOrBonus && isApproved) {
+                    ledgerProfitUSD += Number(t.original_currency_amount ?? (Number(t.amount || 0) / forexRate));
+                }
+
+                if (type === 'withdrawal' && t.status !== 'Rejected') {
+                    const amt = Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / forexRate));
+                    if (t.metadata?.profit_portion !== undefined) {
+                        ledgerProfitUSD = Math.max(0, ledgerProfitUSD - Number(t.metadata.profit_portion));
+                    } else {
+                        // Legacy fallback
+                        ledgerProfitUSD = Math.max(0, ledgerProfitUSD - Math.min(ledgerProfitUSD, amt));
+                    }
+                }
+            });
+
+            // Calculate Locked Capital Pool
+            ledgerLockedCapitalUSD = approvedTxs.filter(d => {
+                const type = (d.type || "").toLowerCase();
                 const category = (d.metadata?.adjustment_category || "").toLowerCase();
-                if (category === 'dividend' || category === 'profit') return acc;
+                // We exclude the current withdrawal itself (which might be in 'Pending' status anyway)
+                if (type === 'withdrawal' || d.id === tx.id) return false;
+                if (category === 'dividend' || category === 'profit') return false;
 
                 const rawDate = d.transfer_date || d.created_at;
                 const txDate = new Date(rawDate);
-                if (isNaN(txDate.getTime())) return acc;
+                if (isNaN(txDate.getTime())) return false;
                 
                 const diffDays = (now.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24);
-                return diffDays < lockPeriodDays ? acc + Number(d.original_currency_amount ?? (Number(d.amount || 0) / forexRate)) : acc;
-            }, 0) || 0;
+                return diffDays < lockPeriodDays;
+            }).reduce((acc: number, d: any) => acc + Number(d.original_currency_amount ?? (Number(d.amount || 0) / forexRate)), 0);
 
-            const withdrawableCapitalUSD = Math.max(0, currentBalanceUSD - lockedCapitalUSD);
-            const totalWithdrawableUSD = currentProfitUSD + withdrawableCapitalUSD;
+            const withdrawableCapitalUSD = Math.max(0, currentBalanceUSD - ledgerLockedCapitalUSD);
+            const totalWithdrawableUSD = ledgerProfitUSD + withdrawableCapitalUSD;
 
             let penaltyUSD = 0;
             let finalPayoutUSD = withdrawAmountUSD;

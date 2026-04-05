@@ -213,11 +213,40 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 throw new Error("A withdrawal request was already submitted. Please wait for it to process.");
             }
 
+            // 1. Chronological Ledger Simulation (Verify true available Profit)
+            const { data: txList } = await supabase
+                .from('transactions')
+                .select('type, amount, status, metadata, original_currency_amount, created_at')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: true });
+
+            let ledgerProfitUSD = 0;
+            (txList || []).forEach(t => {
+                const type = (t.type || "").toLowerCase();
+                const category = (t.metadata?.adjustment_category || "").toLowerCase();
+                const isApproved = ['Approved', 'Completed', 'Pending Release'].includes(t.status);
+                const isDivOrBonus = type === 'dividend' || type === 'bonus' || category === 'dividend' || category === 'bonus' || category === 'profit';
+                
+                if (isDivOrBonus && isApproved) {
+                    ledgerProfitUSD += Number(t.original_currency_amount ?? (Number(t.amount || 0) / withdrawalRate));
+                }
+
+                if (type === 'withdrawal' && t.status !== 'Rejected') {
+                    const amt = Number(t.original_currency_amount ?? (Math.abs(Number(t.amount || 0)) / withdrawalRate));
+                    if (t.metadata?.profit_portion !== undefined) {
+                        ledgerProfitUSD = Math.max(0, ledgerProfitUSD - Number(t.metadata.profit_portion));
+                    } else {
+                        // Legacy fallback: Deduct from profit until empty
+                        ledgerProfitUSD = Math.max(0, ledgerProfitUSD - Math.min(ledgerProfitUSD, amt));
+                    }
+                }
+            });
+
             const amountUSD = parseFloat(withdrawAmount);
-            const initialProfitUSD = Number(p.profit || 0);
+            const initialProfitUSD = ledgerProfitUSD; // Use Ledger instead of Column
             const initialBalanceUSD = Number(p.balance_usd || 0);
 
-            // 1. Calculate Deductions (Profit first, then Balance)
+            // 2. Calculate Deductions (Profit first, then Balance)
             let newProfitUSD = initialProfitUSD;
             let newBalanceUSD = initialBalanceUSD;
             let remainingUSD = amountUSD;

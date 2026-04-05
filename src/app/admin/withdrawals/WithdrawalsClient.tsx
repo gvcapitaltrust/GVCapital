@@ -124,9 +124,9 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                         <span className="font-black text-red-500 tabular-nums">$ {(Number(tx.original_currency_amount || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Math.abs(Number(tx.amount)) / forexRate)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                     </td>
                                     <td className="px-4 py-6">
-                                        {tx.metadata?.penalty_applied || tx.metadata?.penalty_amount ? (
+                                        {tx.metadata?.penalty_applied ? (
                                             <div className="flex flex-col">
-                                                <span className="font-bold text-red-400 tabular-nums text-xs">$ {(Number(tx.metadata?.original_usd_penalty || (Number(tx.metadata?.finalized_penalty || tx.metadata?.penalty_amount || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <span className="font-bold text-red-400 tabular-nums text-xs">$ {(Number(tx.metadata?.original_usd_penalty || tx.metadata?.penalty_amount_usd || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 <span className="text-[8px] text-gray-400 font-black uppercase tracking-widest leading-none">40% Early</span>
                                             </div>
                                         ) : "-"}
@@ -152,7 +152,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                         </div>
                                     </td>
                                     <td className="px-4 py-6 text-emerald-500 font-black tabular-nums">
-                                        $ {(Number(tx.metadata?.original_usd_payout || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        $ {(Number(tx.metadata?.original_usd_payout || tx.metadata?.final_payout_usd || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </td>
                                     <td className="px-4 py-6 text-gray-400 font-mono text-[10px] uppercase">{formatDate(tx.created_at)}</td>
                                     <td className="px-4 py-6">
@@ -209,7 +209,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                             <div className="text-right">
                                                 <p className="text-sm font-black text-emerald-500 tabular-nums tracking-tighter">
-                                                    $ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    $ {(Number(tx.metadata?.original_usd_payout || tx.metadata?.final_payout_usd || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </p>
                                                 <p className="text-[8px] font-bold text-gray-300 uppercase italic tracking-tighter shrink-0">Net Payout</p>
                                             </div>
