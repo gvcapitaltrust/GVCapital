@@ -128,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .maybeSingle();
 
             if (profile) {
-                // MULTIPLE DEVICE CHECK (Limit 2)
+                // MULTIPLE DEVICE CHECK (Limit 5)
                 const activeSessions: string[] = Array.isArray(profile.active_sessions) ? profile.active_sessions : [];
                 
                 // CRITICAL: Only enforce the logout loop if we are reasonably sure the storage is persistent.

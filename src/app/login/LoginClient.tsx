@@ -132,11 +132,11 @@ export default function LoginPage() {
 
                 let activeSessions: string[] = Array.isArray(profile?.active_sessions) ? profile.active_sessions : [];
                 
-                // Add current device if not present, and enforce limit of 2
+                // Add current device if not present, and enforce limit of 5
                 if (!activeSessions.includes(deviceId)) {
                     activeSessions.push(deviceId);
-                    while (activeSessions.length > 2) {
-                        activeSessions.shift(); // Remove oldest sessions until only 2 remain
+                    while (activeSessions.length > 5) {
+                        activeSessions.shift(); // Remove oldest sessions until only 5 remain
                     }
                     await supabase
                         .from('profiles')
@@ -198,8 +198,8 @@ export default function LoginPage() {
                                 </p>
                                 <p className="text-[9px] text-gray-400 font-medium leading-relaxed">
                                     {lang === 'en' 
-                                        ? "Our security policy allows 2 active sessions. If you've hit this limit, please ensure you've logged out from other devices." 
-                                        : "我们的安全政策允许2个活动会话。如果您已达到此限制，请确保您已从其他设备登出。"}
+                                        ? "Our security policy allows 5 active sessions. If you've hit this limit, please ensure you've logged out from other devices." 
+                                        : "我们的安全政策允许5个活动会话。如果您已达到此限制，请确保您已从其他设备登出。"}
                                 </p>
                             </div>
                         )}
