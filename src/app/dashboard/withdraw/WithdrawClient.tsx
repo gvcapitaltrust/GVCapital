@@ -15,15 +15,6 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
     const { withdrawalRate } = useSettings();
     const router = useRouter();
     const [selectedMethodId, setSelectedMethodId] = useState<string | null>(null);
-    const [isOneTime, setIsOneTime] = useState(false);
-    const [oneTimeMethod, setOneTimeMethod] = useState({
-        type: 'BANK' as 'BANK' | 'USDT',
-        bank_name: '',
-        account_number: '',
-        bank_account_holder: '',
-        usdt_address: '',
-        usdt_network: 'TRC20'
-    });
 
     const malaysianBanks = [
         "Maybank", "CIMB Bank", "Public Bank", "RHB Bank", "Hong Leong Bank", 
@@ -127,22 +118,16 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
     // Total assets is the sum of both pools
     const totalAssetsUSD = Number(user?.total_assets_usd || 0);
 
-    // Available amount depends on current selection
-    const availableAmountUSD = withdrawType === 'Dividends' ? dividendWithdrawableUSD : totalCapitalUSD;
+    // Available amount depends on current selection - Enforce maturity for Capital
+    const availableAmountUSD = withdrawType === 'Dividends' ? dividendWithdrawableUSD : matureCapitalUSD;
 
     const handleWithdrawInitiate = () => {
         const amountUSD = parseFloat(withdrawAmount);
         if (!amountUSD || amountUSD <= 0) return;
 
-        if (isOneTime) {
-            if (oneTimeMethod.type === 'BANK' && (!oneTimeMethod.bank_name || !oneTimeMethod.account_number)) {
-                alert(lang === 'en' ? "Please provide bank details for the one-time payout." : "请提供一次性提款的银行信息。");
-                return;
-            }
-            if (oneTimeMethod.type === 'USDT' && !oneTimeMethod.usdt_address) {
-                alert(lang === 'en' ? "Please provide a USDT address for the one-time payout." : "请提供一次性提款的 USDT 地址。");
-                return;
-            }
+        if (selectedMethodId === 'KYC_BANK' && (!user.bank_name || !user.account_number)) {
+            alert(lang === 'en' ? "Please provide bank details in your profile." : "请在个人资料中提供银行信息。");
+            return;
         } else if (!selectedMethodId) {
             alert(lang === 'en' ? "Please select a payout destination." : "请选择提款目标。");
             return;
@@ -321,10 +306,8 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                     original_usd_payout: penaltyInfo?.payout_usd,
                     locked_withdrawal: penaltyInfo?.isApplied,
                     payout_method: (() => {
-                        if (isOneTime) {
-                            return oneTimeMethod.type === 'BANK' 
-                                ? `[ONE-TIME] ${oneTimeMethod.bank_name} (${oneTimeMethod.account_number})`
-                                : `[ONE-TIME] USDT TRC20 (${oneTimeMethod.usdt_address})`;
+                        if (selectedMethodId === 'KYC_BANK') {
+                            return `${user.bank_name} (${user.account_number})`;
                         }
                         const method = withdrawalMethods.find(m => m.id === selectedMethodId);
                         if (!method) return "Institutional Account";
@@ -332,7 +315,12 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                             ? `${method.bank_name} (${method.account_number})`
                             : `USDT TRC20 (${method.usdt_address})`;
                     })(),
-                    method_details: isOneTime ? oneTimeMethod : withdrawalMethods.find(m => m.id === selectedMethodId),
+                    method_details: selectedMethodId === 'KYC_BANK' ? {
+                        type: 'BANK',
+                        bank_name: user.bank_name,
+                        account_number: user.account_number,
+                        bank_account_holder: user.bank_account_holder
+                    } : withdrawalMethods.find(m => m.id === selectedMethodId),
                     ...(penaltyInfo?.isApplied ? {
                         penalty_applied: true,
                         penalty_amount: penaltyInfo.penalty,
@@ -520,7 +508,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                             <div className="space-y-4 pt-4 border-t border-gray-100">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block px-1">{lang === 'en' ? 'Payout Destination' : '提款目标'}</label>
                                 <div className="grid grid-cols-1 gap-3">
-                                    {withdrawalMethods && withdrawalMethods.length > 0 && !isOneTime ? (
+                                    {withdrawalMethods && withdrawalMethods.length > 0 ? (
                                         withdrawalMethods.map((method: any) => (
                                             <button 
                                                 key={method.id}
@@ -551,96 +539,61 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                                 )}
                                             </button>
                                         ))
-                                    ) : !isOneTime ? (
-                                        <div className="bg-amber-50 border border-amber-100 p-6 rounded-[24px] text-center space-y-4">
-                                            <p className="text-[10px] font-bold text-amber-800 uppercase tracking-tight">
-                                                {lang === 'en' ? 'No payout methods added yet.' : '尚未设置提款方式。'}
-                                            </p>
-                                            <button 
-                                                onClick={() => router.push(`/dashboard/profile?lang=${lang}`)}
-                                                className="bg-white text-slate-900 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-amber-200 hover:bg-amber-100 transition-all"
-                                            >
-                                                {lang === 'en' ? 'Manage Payouts' : '管理提款方式'}
-                                            </button>
-                                        </div>
-                                    ) : null}
-
-                                    {/* One-time Option Toggle */}
-                                    <button 
-                                        onClick={() => setIsOneTime(!isOneTime)}
-                                        className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all text-left ${isOneTime ? 'bg-slate-900 border-slate-900 shadow-xl' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${isOneTime ? 'bg-gv-gold text-slate-900' : 'bg-gray-100 text-gray-400'}`}>
-                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                            </div>
-                                            <div>
-                                                <p className={`text-[11px] font-black uppercase tracking-tight ${isOneTime ? 'text-white' : 'text-gray-900'}`}>{lang === 'en' ? 'One-time Account' : '一次性提款账户'}</p>
-                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mt-0.5">{lang === 'en' ? 'Use detailed payout details for this transaction only' : '仅为此项交易提供详细提款信息'}</p>
-                                            </div>
-                                        </div>
-                                        <div className={`h-6 w-10 rounded-full relative transition-colors ${isOneTime ? 'bg-gv-gold' : 'bg-gray-200'}`}>
-                                            <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${isOneTime ? 'left-5' : 'left-1'}`}></div>
-                                        </div>
-                                    </button>
-
-                                    {/* One-time Inputs */}
-                                    {isOneTime && (
-                                        <div className="space-y-4 p-6 bg-gray-50 rounded-2xl border border-gray-200 animate-in slide-in-from-top-2 duration-300">
-                                            <div className="flex bg-white p-1 rounded-xl gap-1">
+                                    ) : (
+                                        (!user.bank_name || !user.account_number) && (
+                                            <div className="bg-amber-50 border border-amber-100 p-6 rounded-[24px] text-center space-y-4">
+                                                <p className="text-[10px] font-bold text-amber-800 uppercase tracking-tight">
+                                                    {lang === 'en' ? 'No payout methods added yet.' : '尚未设置提款方式。'}
+                                                </p>
                                                 <button 
-                                                    onClick={() => setOneTimeMethod({...oneTimeMethod, type: 'BANK'})}
-                                                    className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${oneTimeMethod.type === 'BANK' ? 'bg-slate-900 text-gv-gold' : 'text-gray-400'}`}
+                                                    onClick={() => router.push(`/dashboard/profile?lang=${lang}`)}
+                                                    className="bg-white text-slate-900 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-amber-200 hover:bg-amber-100 transition-all"
                                                 >
-                                                    Bank Account
-                                                </button>
-                                                <button 
-                                                    onClick={() => setOneTimeMethod({...oneTimeMethod, type: 'USDT'})}
-                                                    className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${oneTimeMethod.type === 'USDT' ? 'bg-slate-900 text-gv-gold' : 'text-gray-400'}`}
-                                                >
-                                                    USDT TRC20
+                                                    {lang === 'en' ? 'Manage Payouts' : '管理提款方式'}
                                                 </button>
                                             </div>
+                                        )
+                                    )}
 
-                                            {oneTimeMethod.type === 'BANK' ? (
-                                                <div className="grid grid-cols-1 gap-3">
-                                                    <select 
-                                                        value={oneTimeMethod.bank_name}
-                                                        onChange={(e) => setOneTimeMethod({...oneTimeMethod, bank_name: e.target.value})}
-                                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold"
-                                                    >
-                                                        <option value="">Select Bank...</option>
-                                                        {malaysianBanks.map(b => <option key={b} value={b}>{b}</option>)}
-                                                    </select>
-                                                    <input 
-                                                        type="text"
-                                                        value={oneTimeMethod.account_number}
-                                                        onChange={(e) => setOneTimeMethod({...oneTimeMethod, account_number: e.target.value})}
-                                                        placeholder="Account Number"
-                                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold"
-                                                    />
-                                                    <input 
-                                                        type="text"
-                                                        value={oneTimeMethod.bank_account_holder}
-                                                        onChange={(e) => setOneTimeMethod({...oneTimeMethod, bank_account_holder: e.target.value})}
-                                                        placeholder="Account Holder Name"
-                                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold"
-                                                    />
+                                    {/* Primary Bank Account from KYC */}
+                                    {user.bank_name && user.account_number && (
+                                        <button 
+                                            onClick={() => setSelectedMethodId('KYC_BANK')}
+                                            className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left group ${selectedMethodId === 'KYC_BANK' ? 'bg-gv-gold/5 border-gv-gold ring-1 ring-gv-gold shadow-md' : 'bg-white border-gray-100 hover:border-gray-200'}`}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-all ${selectedMethodId === 'KYC_BANK' ? 'bg-gv-gold text-white' : 'bg-gray-100 text-gray-400 group-hover:text-gv-gold'}`}>
+                                                    <ShieldCheck className="h-5 w-5" />
                                                 </div>
-                                            ) : (
-                                                <div className="space-y-3">
-                                                    <input 
-                                                        type="text"
-                                                        value={oneTimeMethod.usdt_address}
-                                                        onChange={(e) => setOneTimeMethod({...oneTimeMethod, usdt_address: e.target.value})}
-                                                        placeholder="USDT Wallet Address (TRC20)"
-                                                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold font-mono"
-                                                    />
-                                                    <p className="text-[10px] text-amber-600 font-bold uppercase leading-tight px-1">Ensure network is Tron (TRC20)</p>
+                                                <div>
+                                                    <p className={`text-[11px] font-black uppercase tracking-tight ${selectedMethodId === 'KYC_BANK' ? 'text-gray-900' : 'text-gray-500'}`}>Primary Bank (KYC)</p>
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mt-0.5">{user.bank_name} **** {user.account_number.slice(-4)}</p>
+                                                </div>
+                                            </div>
+                                            {selectedMethodId === 'KYC_BANK' && (
+                                                <div className="h-5 w-5 bg-gv-gold rounded-full flex items-center justify-center text-white">
+                                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path d="M5 13l4 4L19 7" /></svg>
                                                 </div>
                                             )}
-                                        </div>
+                                        </button>
                                     )}
+
+                                    {/* Link to Add/Manage Methods */}
+                                    <button 
+                                        onClick={() => router.push(`/dashboard/profile?lang=${lang}`)}
+                                        className="w-full flex items-center justify-between p-4 rounded-2xl border border-dashed border-gray-300 bg-white hover:bg-gray-50 transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 group-hover:text-gv-gold transition-all">
+                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                                            </div>
+                                            <div>
+                                                <p className="text-[11px] font-black uppercase tracking-tight text-gray-900">{lang === 'en' ? 'Add Other Account' : '添加其他账户'}</p>
+                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mt-0.5">{lang === 'en' ? 'Manage permanent payout methods in profile' : '在个人资料中管理永久提款方式'}</p>
+                                            </div>
+                                        </div>
+                                        <ArrowLeft className="h-4 w-4 text-gray-300 group-hover:text-gv-gold transition-all rotate-180" />
+                                    </button>
                                 </div>
                             </div>
 
@@ -649,9 +602,8 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                                 disabled={
                                     !withdrawAmount || 
                                     parseFloat(withdrawAmount) <= 0 || 
-                                    parseFloat(withdrawAmount) > (availableAmountUSD + 0.01) ||
-                                    (!selectedMethodId && !isOneTime) || 
-                                    (withdrawType === 'Capital' && parseFloat(withdrawAmount) > matureCapitalUSD && parseFloat(withdrawAmount) < (totalCapitalUSD - 0.01)) ||
+                                    parseFloat(withdrawAmount) > (totalAssetsUSD + 0.01) ||
+                                    !selectedMethodId || 
                                     isSubmitting
                                 } 
                                 className="w-full bg-black text-white font-black py-5 rounded-2xl flex justify-center items-center gap-4 text-lg uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
