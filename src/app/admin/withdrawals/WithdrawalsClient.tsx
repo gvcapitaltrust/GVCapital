@@ -24,7 +24,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
     const t = {
         en: {
             title: "Withdrawal Management",
-            subtitle: "Oversee and authorize outbound capital distributions to institutional client accounts.",
+            subtitle: "Oversee and authorize outbound capital distributions to our client accounts.",
             searchPlaceholder: "Search by name or email...",
             statusAll: "All Status",
             statusPending: "Pending",
@@ -36,9 +36,9 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
             reject: "Reject",
             release: "Release Funds",
             noWithdrawals: "No withdrawal records found.",
-            gross: "Gross Request",
+            gross: "Withdrawal Amount",
             penalty: "Early Penalty",
-            netPayout: "Final Net Payout",
+            netPayout: "Total Received",
             bankDetails: "Bank Details",
             reference: "Reference ID",
             date: "Request Date"
@@ -187,7 +187,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                 onClick={() => { setSelectedTx(tx); setIsDetailsOpen(true); }} 
                                                 className="bg-slate-900 text-white hover:bg-slate-800 text-[10px] font-black uppercase tracking-widest px-8 py-3 rounded-2xl transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0"
                                             >
-                                                Review Payout
+                                                Review Transaction
                                             </button>
                                         </td>
                                     </tr>
@@ -272,10 +272,10 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                 <div className="space-y-8">
                                     <div className="space-y-4">
-                                        <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Financial Reconciliation</h4>
+                                        <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Transaction Summary</h4>
                                         <div className="bg-slate-50 border border-slate-100 p-6 rounded-[2rem] space-y-4">
                                             <div className="flex justify-between items-center text-xs font-bold">
-                                                <span className="text-slate-400 uppercase tracking-tighter">Gross Request</span>
+                                                <span className="text-slate-400 uppercase tracking-tighter">Gross Amount</span>
                                                 <span className="text-slate-900 tabular-nums font-black">$ {Number(selectedTx.original_currency_amount || (selectedTx.original_currency === 'USD' ? Math.abs(Number(selectedTx.amount)) : (Math.abs(Number(selectedTx.amount)) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </div>
                                             {selectedTx.metadata?.penalty_applied && (
@@ -285,7 +285,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                 </div>
                                             )}
                                             <div className="pt-4 border-t border-slate-200 flex flex-col items-end gap-1">
-                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest self-start">Net Payout</span>
+                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest self-start">Total Received</span>
                                                 <div className="flex flex-col items-end">
                                                     <span className="text-3xl font-black text-emerald-500 tabular-nums tracking-tighter leading-none">$ {Number(selectedTx.metadata?.original_usd_payout || selectedTx.metadata?.final_payout_usd || (selectedTx.original_currency === 'USD' ? Math.abs(Number(selectedTx.amount)) : (Number(selectedTx.metadata?.finalized_payout || selectedTx.metadata?.expected_payout || Math.abs(Number(selectedTx.amount))) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 </div>
@@ -320,7 +320,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
 
                                 <div className="space-y-8 flex flex-col">
                                     <div className="space-y-4">
-                                        <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Execution Pipeline</h4>
+                                        <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Processing Status</h4>
                                         <div className="space-y-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100 px-2 pt-2">
                                             <div className="flex items-start gap-6 pl-8 relative">
                                                 <div className="h-4 w-4 rounded-full bg-slate-200 absolute left-[4px] border-4 border-white"></div>
@@ -382,7 +382,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                     onClick={() => { handleApproveWithdrawal(selectedTx); setIsDetailsOpen(false); }} 
                                                     className="px-6 py-4 bg-emerald-500 text-black rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:-translate-y-1 transition-all"
                                                 >
-                                                    Pass Audit
+                                                    Approve Payout
                                                 </button>
                                             </div>
                                         )}

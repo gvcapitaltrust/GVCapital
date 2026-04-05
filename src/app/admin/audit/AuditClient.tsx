@@ -12,26 +12,26 @@ export default function AuditClient({ lang }: { lang: "en" | "zh" }) {
 
     const t = {
         en: {
-            title: "Platform Audit Trail",
-            subtitle: "Comprehensive ledger of all administrative actions and financial approvals.",
+            title: "Activity History",
+            subtitle: "Review all management actions and financial approvals in real-time.",
             searchPlaceholder: "Search by user email or admin...",
             tableDate: "Timestamp",
             tableAction: "Action",
             tableUser: "Client",
             tableAdmin: "Processed By",
             tableDetails: "Details",
-            noLogs: "No audit logs recorded."
+            noLogs: "No activity history recorded."
         },
         zh: {
-            title: "平台审计追踪",
-            subtitle: "所有管理操作和财务批准的综合分类账。",
+            title: "活动历史",
+            subtitle: "实时查看所有管理操作和财务批准记录。",
             searchPlaceholder: "搜索用户邮箱或管理员...",
             tableDate: "时间戳",
             tableAction: "操作",
             tableUser: "客户",
             tableAdmin: "处理人",
             tableDetails: "详情",
-            noLogs: "暂无审计日志记录。"
+            noLogs: "暂无活动记录。"
         }
     }[lang];
 
@@ -100,7 +100,7 @@ export default function AuditClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className={`h-1.5 w-1.5 rounded-full ${
                                                 log.auditType === 'transaction' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-gv-gold shadow-[0_0_8px_rgba(212,175,55,0.5)]'
                                             }`}></div>
-                                            <span className="font-black text-gray-900 uppercase tracking-tight text-xs">{log.action}</span>
+                                            <span className="font-black text-gray-900 uppercase tracking-tight text-xs">{log.action === 'Identification Verification' ? 'Account Verification' : log.action}</span>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6 text-gray-500 font-bold text-xs">{log.user_email}</td>
@@ -109,7 +109,7 @@ export default function AuditClient({ lang }: { lang: "en" | "zh" }) {
                                     </td>
                                     <td className="px-8 py-6 text-right">
                                         <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter truncate max-w-[200px] ml-auto">
-                                            {log.rejection_reason || (log.amount ? `RM ${Number(log.amount).toFixed(2)}` : "System Action")}
+                                            {log.rejection_reason || (log.amount ? `$ ${Number(log.amount).toFixed(2)}` : "Admin Action")}
                                         </div>
                                     </td>
                                 </tr>
@@ -131,7 +131,7 @@ export default function AuditClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className="flex items-center gap-2">
                                                 <div className={`h-1.5 w-1.5 rounded-full ${isTransaction ? 'bg-emerald-500' : 'bg-gv-gold'}`}></div>
                                                 <span className={`text-[8px] font-black uppercase tracking-widest ${isTransaction ? 'text-emerald-500' : 'text-gv-gold'}`}>
-                                                    {log.auditType}
+                                                    {log.auditType === 'transaction' ? 'Transfer' : 'Activity'}
                                                 </span>
                                             </div>
                                         </div>

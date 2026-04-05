@@ -25,26 +25,26 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             overviewTitle: "Dashboard Overview",
             overviewSubtitle: "Monitor your assets, dividends, and fund performance in real-time.",
             verificationInProgress: "Verification In Progress",
-            verificationInProgressDesc: "Our compliance team is currently reviewing your documents. You'll receive a notification once your account is ready for full access.",
+            verificationInProgressDesc: "Our verification team is currently reviewing your documents. You'll receive a notification once your account is ready for full access.",
             verificationUnsuccessful: "Verification Unsuccessful",
             verificationUnsuccessfulDesc: "We couldn't verify your documents. Please review the reason below and re-submit your details.",
             rejectionReasonLabel: "No reason provided",
             reuploadPrompt: "Please double check your information and provide clear photos of your documents.",
             reuploadBtn: "Re-submit Verification",
             completeProfile: "Complete Your Profile",
-            completeProfileDesc: "To start investing and earn monthly dividends, please complete your identification process.",
+            completeProfileDesc: "To start investing and earn monthly earnings, please complete your identification process.",
             totalEquity: "Total Investment",
-            totalProfit: "Accumulated Dividend",
+            totalProfit: "Accumulated Earnings",
             investmentNote: "Net Flow (Deposits - Withdrawals)",
             dividendNote: "Including Bonuses",
             startVerification: "Start Verification",
             resumeVerification: "Resume Verification",
-            expectedMonthly: "Expected Monthly Dividend",
-            projectedYearly: "Projected Yearly Dividend",
-            dividendRateDesc: "based on current tier dividend rate",
+            expectedMonthly: "Monthly Earnings",
+            projectedYearly: "Yearly Earnings",
+            dividendRateDesc: "based on current tier earnings rate",
             basedOn: "Based on",
-            dividendTrends: "Dividend Trends",
-            noDividendData: "No dividend data yet",
+            dividendTrends: "Earnings Trends",
+            noDividendData: "No earnings data yet",
             latestActivity: "Latest Activity",
             noTxFound: "No transactions found",
             deposit: "Deposit",
@@ -77,16 +77,16 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             overviewTitle: "账户概览",
             overviewSubtitle: "实时监控您的资产、分红和资金表现。",
             verificationInProgress: "审核中",
-            verificationInProgressDesc: "我们的合规团队正在审核您的文档。帐户访问就绪后，您将收到通知。",
+            verificationInProgressDesc: "我们的审核团队正在审核您的文档。帐户访问就绪后，您将收到通知。",
             verificationUnsuccessful: "审核未通过",
             verificationUnsuccessfulDesc: "我们无法验证您的文档。请查看以下原因并重新提交您的详细信息。",
             rejectionReasonLabel: "未提供原因",
             reuploadPrompt: "请仔细检查您的信息并提供清晰的文档照片。",
             reuploadBtn: "重新提交验证",
             completeProfile: "完善您的资料",
-            completeProfileDesc: "要开始投资并赚取每月分红，请完成您的身份识别流程。",
+            completeProfileDesc: "要开始投资并赚取每月收益，请完成您的身份识别流程。",
             totalEquity: "总投资额",
-            totalProfit: "累计分红",
+            totalProfit: "累计收益",
             investmentNote: "净流量 (存款 - 提款)",
             dividendNote: "包括奖金",
             startVerification: "开始验证",
@@ -95,8 +95,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             projectedYearly: "预计年度分红",
             dividendRateDesc: "基于当前等级分红率",
             basedOn: "基于",
-            dividendTrends: "分红趋势",
-            noDividendData: "暂无分红数据",
+            dividendTrends: "收益趋势",
+            noDividendData: "暂无收益数据",
             latestActivity: "近期活动",
             noTxFound: "未找到交易",
             deposit: "存款",
@@ -248,7 +248,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                     <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4 group-hover:text-gv-gold transition-colors">{t.totalProfit}</p>
                                     <h2 className="text-4xl font-black tracking-tighter text-emerald-600 tabular-nums whitespace-nowrap">$ {(user?.lifetime_dividends_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
                                     <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{lang === 'en' ? 'Available Dividend' : t.walletBalance}</span>
+                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{lang === 'en' ? 'Available Earnings' : t.walletBalance}</span>
                                         <div className="text-right">
                                             <span className="block text-xs font-black text-gv-gold tabular-nums">$ {(user?.profit_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
@@ -335,7 +335,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                         {/* Identity Group */}
                                         <div className="space-y-6">
                                             <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-widest border-b border-gray-100 pb-2 flex items-center justify-between">
-                                                {lang === 'en' ? 'Identity & Contact' : '身份与联系方式'}
+                                                {lang === 'en' ? 'Personal Info' : '个人信息'}
                                                 <svg className="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                                             </h4>
                                             <div className="space-y-4">
@@ -361,7 +361,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                         {/* Financial Group */}
                                         <div className="space-y-6">
                                             <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-widest border-b border-gray-100 pb-2 flex items-center justify-between">
-                                                {lang === 'en' ? 'Financial Profile' : '财务概况'}
+                                                {lang === 'en' ? 'Investment Info' : '投资信息'}
                                                 <svg className="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                             </h4>
                                             <div className="space-y-4">
@@ -398,7 +398,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                                         {/* Banking Group */}
                                         <div className="space-y-6">
                                             <h4 className="text-[10px] font-black uppercase text-gv-gold tracking-widest border-b border-gray-100 pb-2 flex items-center justify-between">
-                                                {lang === 'en' ? 'Institutional Banking' : '机构银行业务'}
+                                                {lang === 'en' ? 'Bank Details' : '银行详情'}
                                                 <svg className="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 10h18M7 15h1m4 0h1m4 0h1m-7 4h12a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                             </h4>
                                             <div className="space-y-4">

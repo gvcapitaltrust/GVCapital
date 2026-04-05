@@ -23,8 +23,8 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
 
     const t = {
         en: {
-            title: "KYC Verification Queue",
-            subtitle: "Process and verify institutional identity documents for account activation.",
+            title: "Identification Queue",
+            subtitle: "Process and verify client identity documents for account activation.",
             searchPlaceholder: "Search by name or email...",
             tableUser: "User",
             tableDate: "Submitted",
@@ -41,8 +41,8 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
             statusRejected: "Rejected"
         },
         zh: {
-            title: "KYC 审核队列",
-            subtitle: "处理并验证机构身份文档以激活账户。",
+            title: "身份识别队列",
+            subtitle: "处理并验证客户身份文档以激活账户。",
             searchPlaceholder: "按姓名或邮箱搜索...",
             tableUser: "用户",
             tableDate: "提交日期",
@@ -51,7 +51,7 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
             viewDocs: "查看文档",
             approve: "批准用户",
             reject: "拒绝申请",
-            noKyc: "暂无待处理的 KYC 申请。",
+            noKyc: "暂无待处理的身份申请。",
             rejectReasonPlaceholder: "提供拒绝理由...",
             statusAll: "全部状态",
             statusPending: "待审核",
@@ -146,10 +146,10 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                     <table className="w-full text-left border-collapse min-w-[800px] lg:min-w-full">
                         <thead className="bg-slate-50/50 border-b border-slate-100 sticky top-0 z-10 backdrop-blur-md">
                             <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                <th className="px-6 py-6 pl-10">Institutional Client</th>
-                                <th className="px-6 py-6">ID Specification</th>
-                                <th className="px-6 py-6">Audit Status</th>
-                                <th className="px-6 py-6 pr-10 text-right">Verification Hub</th>
+                                <th className="px-6 py-6 pl-10">Client Name</th>
+                                <th className="px-6 py-6">Identity Type</th>
+                                <th className="px-6 py-6">Verification Status</th>
+                                <th className="px-6 py-6 pr-10 text-right">Review Account</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -214,7 +214,7 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="relative bg-white border border-gray-200 rounded-[40px] w-full max-w-6xl h-full flex flex-col overflow-hidden shadow-2xl">
                         <div className="p-8 border-b border-gray-200 flex items-center justify-between shrink-0">
                             <div>
-                                <h3 className="text-2xl font-black uppercase tracking-tighter text-gray-900">Identity Verification Hub</h3>
+                                <h3 className="text-2xl font-black uppercase tracking-tighter text-gray-900">Verification Review</h3>
                                 <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">UID: {selectedUser?.id}</p>
                             </div>
                             <button onClick={() => setIsDetailModalOpen(false)} className="h-12 w-12 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-all">
@@ -327,7 +327,7 @@ export default function KycClient({ lang }: { lang: "en" | "zh" }) {
                                 <div className="space-y-4">
                                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gv-gold flex items-center gap-2">
                                         <span className="h-1 w-4 bg-gv-gold rounded-full"></span>
-                                        Compliance Declarations
+                                        Official Declarations
                                     </h4>
                                     <div className="flex flex-wrap gap-3">
                                         {[

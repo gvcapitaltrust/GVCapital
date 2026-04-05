@@ -442,7 +442,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                     <div className="space-y-4">
                                         <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
                                             <div className="h-1 w-4 bg-gv-gold rounded-full"></div>
-                                            Financial Breakdown
+                                            Transaction Summary
                                         </h4>
                                         <div className="bg-slate-50 border border-slate-100 p-6 rounded-3xl space-y-4">
                                             <div className="flex justify-between text-xs font-bold items-center">
@@ -456,7 +456,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                 </div>
                                             )}
                                             <div className="pt-4 border-t border-slate-200 flex flex-col items-end gap-1.5 font-black">
-                                                <span className="text-[8px] text-emerald-500 uppercase tracking-widest self-start">Final Net Realized</span>
+                                                <span className="text-[8px] text-emerald-500 uppercase tracking-widest self-start">Total Received</span>
                                                 <div className="flex flex-col items-end leading-none">
                                                     <span className="text-3xl text-slate-900 tabular-nums tracking-tighter">$ {Number(selectedTx.metadata?.final_payout_usd || Math.abs(Number(selectedTx.original_currency_amount || (Number(selectedTx.amount) / forexRate)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                 </div>
@@ -475,7 +475,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                 <div className="space-y-4">
                                     <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
                                             <div className="h-1 w-4 bg-emerald-500 rounded-full"></div>
-                                            Execution Timeline
+                                            Processing Status
                                     </h4>
                                     <div className="space-y-8 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-200 px-2 pt-1">
                                         <div className="flex items-start gap-6 pl-8 relative">
@@ -539,7 +539,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                         </div>
                         <div className="flex-1 overflow-hidden bg-slate-800">
-                            <iframe src={previewUrl} className="w-full h-full border-none" title="PDF Preview" />
+                            <iframe src={previewUrl} className="w-full h-full border-none" title="Official Statement Preview" />
                         </div>
                     </div>
                 </div>

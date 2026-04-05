@@ -35,10 +35,10 @@ export default function UserPortfolioClient({ lang }: { lang: "en" | "zh" }) {
 
     const t = {
         en: {
-            title: "Capital Allocation Specialist",
+            title: "Asset Allocation Specialist",
             back: "Back to Portfolio",
-            header: "External Portfolio Mapping",
-            sub: "Configure secure external fund mapping and account credentials for this client.",
+            header: "External Account Allocation",
+            sub: "Configure secure external account details and credentials for this client.",
             platform: "Management Platform",
             accountId: "Account ID / Login",
             password: "Secure Password",
@@ -46,14 +46,14 @@ export default function UserPortfolioClient({ lang }: { lang: "en" | "zh" }) {
             save: "Save Allocation",
             assets: "Total Managed Assets",
             tier: "Investor Tier",
-            securityNote: "This data is encrypted and used only for internal fiduciary tracking.",
-            mappingStatus: "Mapping Status"
+            securityNote: "This data is encrypted and used only for internal account tracking.",
+            mappingStatus: "Allocation Status"
         },
         zh: {
-            title: "资金分配专家",
+            title: "资产分配专家",
             back: "返回资产概览",
-            header: "外部投资组合映射",
-            sub: "为此客户配置安全的外部基金映射和账户凭据。",
+            header: "外部账户分配",
+            sub: "为此客户配置安全的外部账户分配和凭据。",
             platform: "管理平台",
             accountId: "账户 ID / 登录名",
             password: "安全密码",
@@ -62,7 +62,7 @@ export default function UserPortfolioClient({ lang }: { lang: "en" | "zh" }) {
             assets: "管理资产总额",
             tier: "投资者等级",
             securityNote: "此数据已加密，仅用于内部信托跟踪。",
-            mappingStatus: "映射状态"
+            mappingStatus: "分配状态"
         }
     }[lang];
 
@@ -183,7 +183,7 @@ export default function UserPortfolioClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="bg-slate-900 p-8 rounded-[40px] text-white space-y-6">
                         <div className="flex items-center gap-3 text-gv-gold">
                             <Lock className="h-5 w-5" />
-                            <h4 className="text-[10px] font-black uppercase tracking-widest">Fiduciary Guard</h4>
+                            <h4 className="text-[10px] font-black uppercase tracking-widest">Data Security</h4>
                         </div>
                         <p className="text-xs text-slate-400 leading-relaxed font-medium">
                             {t.securityNote}
