@@ -8,7 +8,7 @@ import { X } from "lucide-react";
 import { formatDate } from "@/lib/dateUtils";
 
 export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
-    const { userProfile: user, referredUsers, referredCount, loading } = useUser();
+    const { userProfile: user, referredUsers, referredCount, referredTotalCapital, loading } = useUser();
     const { forexRate } = useSettings();
     const [actionToast, setActionToast] = useState<{message: string} | null>(null);
 
@@ -62,7 +62,7 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
 
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
 
-    const totalTeamAssetsUSD = (referredUsers || []).reduce((acc, ref) => acc + Number(ref.balance_usd || (ref.balance / forexRate)), 0);
+
 
 
     return (
@@ -96,7 +96,7 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                         <div className="flex flex-col items-center justify-center bg-white border border-gray-200 rounded-3xl p-6 text-center group-hover:bg-gray-100 transition-all">
                             <p className="text-gray-400 font-black uppercase tracking-[0.3em] mb-4 text-[10px]">{t.teamAssets}</p>
                             <h3 className="text-4xl font-bold tracking-tight text-slate-900 tabular-nums">
-                                $ {totalTeamAssetsUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                $ {referredTotalCapital.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </h3>
                         </div>
                     </div>

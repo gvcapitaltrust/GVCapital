@@ -12,6 +12,7 @@ interface UserContextType {
     dividendHistory: any[];
     referredUsers: any[];
     referredCount: number;
+    referredTotalCapital: number;
     withdrawalMethods: any[];
     loading: boolean;
     refreshData: () => Promise<void>;
@@ -26,6 +27,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [dividendHistory, setDividendHistory] = useState<any[]>([]);
     const [referredUsers, setReferredUsers] = useState<any[]>([]);
     const [referredCount, setReferredCount] = useState(0);
+    const [referredTotalCapital, setReferredTotalCapital] = useState(0);
     const [withdrawalMethods, setWithdrawalMethods] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -211,7 +213,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     const uniqueRefs = Array.from(new Map(combined.map(item => [item.id, item])).values());
                     
                     setReferredUsers(uniqueRefs);
-                    setReferredCount(uniqueRefs.length);
+
+                    // Source of Truth: Prioritize native counters from the user's own profile if available
+                    const systemCount = Number(profile.total_referrals || 0);
+                    const systemCapital = Number(profile.referred_total_capital_usd || 0);
+                    
+                    // If live list is 0 but system count > 0, we use system count (handles RLS masking)
+                    const finalCount = Math.max(uniqueRefs.length, systemCount);
+                    setReferredCount(finalCount);
+
+                    // Asset calculation: Prioritize system counter
+                    const liveCapital = uniqueRefs.reduce((acc, r) => acc + Number(r.balance_usd || (r.balance / forexRate)), 0);
+                    setReferredTotalCapital(Math.max(liveCapital, systemCapital));
                 };
                 
                 await fetchReferrals();
@@ -278,6 +291,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             dividendHistory, 
             referredUsers, 
             referredCount, 
+            referredTotalCapital,
             withdrawalMethods,
             loading,
             refreshData: fetchData 
