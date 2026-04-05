@@ -654,7 +654,7 @@ export default function DashboardClient() {
             investmentNote: "(Secure Capital)",
             currentPackage: "Current Tier",
             deposit: "Deposit",
-            withdraw: "Withdraw",
+            withdraw: "Withdrawal",
             comparisonTable: {
                 title: "Compare Packages",
                 feature: "Feature",
