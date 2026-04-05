@@ -22,6 +22,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
     const t = {
         en: {
+            overviewTitle: "Dashboard Overview",
+            overviewSubtitle: "Monitor your assets, dividends, and fund performance in real-time.",
             verificationInProgress: "Verification In Progress",
             verificationInProgressDesc: "Our compliance team is currently reviewing your documents. You'll receive a notification once your account is ready for full access.",
             verificationUnsuccessful: "Verification Unsuccessful",
@@ -72,6 +74,8 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
             member: "Member",
         },
         zh: {
+            overviewTitle: "账户概览",
+            overviewSubtitle: "实时监控您的资产、分红和资金表现。",
             verificationInProgress: "审核中",
             verificationInProgressDesc: "我们的合规团队正在审核您的文档。帐户访问就绪后，您将收到通知。",
             verificationUnsuccessful: "审核未通过",
@@ -147,35 +151,31 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
 
     return (
         <div className="space-y-12">
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-2 mt-4 animate-in slide-in-from-top-4 duration-700">
-                <div className="space-y-4">
-                    <div className="hidden md:flex items-center gap-3">
-                        <div className="h-0.5 w-10 bg-gv-gold rounded-full"></div>
-                        <span className="text-gv-gold text-[10px] font-black uppercase tracking-[0.4em] mb-0.5">Institutional Access</span>
-                    </div>
-                    <div className="flex items-center gap-6">
-                        <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-gray-900 leading-none">
-                            {lang === "en" ? "Overview" : "概览"}
-                        </h1>
-                        
-                        {(user?.kyc_status === 'Verified' || user?.email === 'thenja96@gmail.com') && (
-                            <div className="flex items-center gap-3 bg-white border border-gray-200 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow-xl hover:border-gv-gold/30 transition-all group scale-90 origin-left">
-                                <TierMedal 
-                                    tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
-                                    size="sm" 
-                                    className="group-hover:rotate-12 transition-transform"
-                                />
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-black uppercase tracking-tighter text-gray-900">
-                                        {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
-                                    </span>
-                                    <span className="text-[8px] font-bold text-gv-gold uppercase tracking-widest leading-none mt-0.5">{t.activeStatus}</span>
-                                </div>
-                            </div>
-                        )}
+            {/* Standard Header */}
+            <div className="flex items-center justify-between gap-6 mb-4 animate-in slide-in-from-top-4 duration-700">
+                <div className="flex items-center gap-6">
+                    <div className="space-y-1">
+                        <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none">{t.overviewTitle}</h1>
+                        <p className="text-slate-400 text-sm font-medium">{t.overviewSubtitle}</p>
                     </div>
                 </div>
-            </header>
+
+                {(user?.kyc_status === 'Verified' || user?.email === 'thenja96@gmail.com') && (
+                    <div className="flex items-center gap-3 bg-white border border-slate-200 px-5 py-3 rounded-2xl shadow-sm hover:shadow-xl transition-all group lg:scale-100 scale-90 origin-right">
+                        <TierMedal 
+                            tierId={(user?.tier && user?.tier !== "Standard") ? user.tier.toLowerCase() : getTierByAmount(Number(user?.total_investment_usd || 0)).id} 
+                            size="sm" 
+                            className="group-hover:rotate-12 transition-transform"
+                        />
+                        <div className="flex flex-col">
+                            <span className="text-xs font-black uppercase tracking-tighter text-slate-900">
+                                {(user?.tier && user?.tier !== "Standard") ? user.tier : getTierByAmount(Number(user?.total_investment_usd || 0)).name}
+                            </span>
+                            <span className="text-[8px] font-bold text-gv-gold uppercase tracking-widest leading-none mt-1">{t.activeStatus}</span>
+                        </div>
+                    </div>
+                )}
+            </div>
 
             <div className="space-y-10">
                 {(user?.kyc_status !== 'Verified' && user?.email !== "thenja96@gmail.com") ? (
