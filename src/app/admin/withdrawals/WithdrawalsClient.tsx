@@ -118,7 +118,8 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                         const payoutUSD = Number(tx.metadata?.original_usd_payout || tx.metadata?.final_payout_usd || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Number(tx.metadata?.finalized_payout || tx.metadata?.expected_payout || Math.abs(Number(tx.amount))) / forexRate)));
                         const grossUSD = Number(tx.original_currency_amount || (tx.original_currency === 'USD' ? Math.abs(Number(tx.amount)) : (Math.abs(Number(tx.amount)) / forexRate)));
                         const penaltyUSD = tx.metadata?.penalty_applied ? Number(tx.metadata?.original_usd_penalty || tx.metadata?.penalty_amount_usd || 0) : 0;
-                        const payoutRM = payoutUSD * forexRate;
+                        const rateToUse = tx.metadata?.forex_rate || (forexRate - 0.4);
+                        const payoutRM = payoutUSD * rateToUse;
 
                         return (
                             <div key={tx.id || idx} className={`flex flex-col transition-all duration-300 ${isExpanded ? 'bg-gray-50/50' : 'hover:bg-gray-50/30'}`}>
