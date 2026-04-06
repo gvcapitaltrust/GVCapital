@@ -289,13 +289,14 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                 const spreadInRMPerUSD = Math.max(0, marketRate - wdlRate);
                 const withdrawalSpreadUSD = payoutUSD * spreadInRMPerUSD / marketRate;
 
-                if (status === "Pending") {
+                // ── Stage 1: Request (Always move to Withdrawals Payable)
+                if (["Pending", "Pending Release", "Completed"].includes(status)) {
                     entries.push({
-                        id: `${tx.id}-pending`,
+                        id: `${tx.id}-request`,
                         date,
                         refId,
                         description: `Withdrawal request submitted — ${userName}`,
-                        type: "Withdrawal (Pending)",
+                        type: "Withdrawal (Request)",
                         userId: tx.user_id,
                         userName,
                         userEmail,
@@ -308,7 +309,10 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                         totalCredit: amountUSD,
                         metadata: tx.metadata,
                     });
-                } else if (["Completed", "Pending Release"].includes(status)) {
+                }
+
+                // ── Stage 2: Payout (Only when actually released/completed)
+                if (status === "Completed") {
                     const lines: JournalLine[] = [
                         { accountCode: "2200", accountName: "Withdrawals Payable", debit: amountUSD, credit: 0 },
                         { accountCode: "1000", accountName: "Cash & Bank (USD)", debit: 0, credit: payoutUSD },
@@ -321,19 +325,17 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                     }
                     
                     const totalCr = lines.reduce((s, l) => s + l.credit, 0);
-                    // Standardize: The total debit (payable reduction) should match the total credits (cash out + revenue)
-                    // If there's any mismatch due to rounding, adjust the cash line
                     const diff = amountUSD - totalCr;
                     if (Math.abs(diff) > 0.001) {
                         lines[1].credit = Math.max(0, lines[1].credit + diff);
                     }
 
                     entries.push({
-                        id: `${tx.id}-completed`,
+                        id: `${tx.id}-payout`,
                         date,
                         refId,
-                        description: `Withdrawal processed${penaltyUSD > 0 ? " (with penalty)" : ""} — ${userName}`,
-                        type: status === "Completed" ? "Withdrawal (Completed)" : "Withdrawal (Pending Release)",
+                        description: `Withdrawal payout released${penaltyUSD > 0 ? " (with penalty)" : ""} — ${userName}`,
+                        type: "Withdrawal (Payout)",
                         userId: tx.user_id,
                         userName,
                         userEmail,
