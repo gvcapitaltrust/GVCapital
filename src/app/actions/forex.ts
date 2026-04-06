@@ -86,3 +86,35 @@ export async function updateGlobalForexRate(newRate: number) {
         };
     }
 }
+
+/**
+ * Updates the global forex spread (RM) for the platform.
+ * @param newSpread - The target RM spread to be applied (e.g. 0.20)
+ */
+export async function updateForexSpread(newSpread: number) {
+    try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+            return { success: false, error: "Unauthorized access." };
+        }
+
+        const { error: updateError } = await supabase
+            .from('platform_settings')
+            .upsert({
+                key: 'forex_spread_rm',
+                value: String(newSpread),
+                updated_by: user.id
+            }, { onConflict: 'key' });
+
+        if (updateError) throw new Error("Failed to update spread in database.");
+
+        revalidatePath('/admin');
+        return {
+            success: true,
+            message: "Forex spread updated successfully.",
+            data: { current: newSpread.toFixed(3) }
+        };
+    } catch (err: any) {
+        return { success: false, error: err.message };
+    }
+}

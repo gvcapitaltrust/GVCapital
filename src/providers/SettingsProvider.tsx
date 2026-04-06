@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 interface SettingsContextType {
     forexRate: number;
+    forexSpread: number;
     depositRate: number;
     withdrawalRate: number;
     monthlyRate: number;
@@ -18,6 +19,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
     const [forexRate, setForexRate] = useState(4.0); // Safe Default
+    const [forexSpread, setForexSpread] = useState(0.20); // Default 0.20
     const [monthlyRate, setMonthlyRate] = useState(0.08); // 8% Default
     const [yearlyRate, setYearlyRate] = useState(0.96); // 96% Default
     const [maintenanceMode, setMaintenanceMode] = useState(false);
@@ -35,6 +37,17 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
             if (psRate && !psError) {
                 const rateVal = parseFloat(psRate.value);
                 setForexRate(rateVal > 0 ? rateVal : 4.4);
+            }
+
+            // 1b. Fetch Forex Spread
+            const { data: psSpread, error: sError } = await supabase
+                .from('platform_settings')
+                .select('value')
+                .eq('key', 'forex_spread_rm')
+                .maybeSingle();
+            
+            if (psSpread && !sError) {
+                setForexSpread(parseFloat(psSpread.value) || 0.20);
             }
 
             // 2. Fetch Return Rates (if stored in platform_settings)
@@ -103,11 +116,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    const depositRate = forexRate;
-    const withdrawalRate = Math.max(0, forexRate - 0.4);
+    const depositRate = forexRate + forexSpread;
+    const withdrawalRate = Math.max(0, forexRate - forexSpread);
 
     return (
-        <SettingsContext.Provider value={{ forexRate, depositRate, withdrawalRate, monthlyRate, yearlyRate, maintenanceMode, loading, refresh: fetchSettings }}>
+        <SettingsContext.Provider value={{ forexRate, forexSpread, depositRate, withdrawalRate, monthlyRate, yearlyRate, maintenanceMode, loading, refresh: fetchSettings }}>
             {children}
         </SettingsContext.Provider>
     );

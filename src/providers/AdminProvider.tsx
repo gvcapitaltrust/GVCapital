@@ -26,6 +26,7 @@ interface AdminContextType {
     combinedAuditLogs: any[];
     loading: boolean;
     forexRate: number;
+    forexSpread: number;
     showToast: (msg: string) => void;
     refreshData: () => Promise<void>;
     handleApproveDeposit: (tx: any) => Promise<void>;
@@ -39,6 +40,7 @@ interface AdminContextType {
     handleUpdatePortfolio: (userId: string, data: any) => Promise<void>;
     handleResetUserPassword: (email: string) => Promise<void>;
     handleUpdateForexRate: (newRate: number) => Promise<void>;
+    handleUpdateForexSpread: (newSpread: number) => Promise<void>;
     handleUpdatePassword: (password: string) => Promise<void>;
     handleSetAdminRole: (userId: string, makeAdmin: boolean) => Promise<void>;
     handleDeleteUser: (userId: string) => Promise<void>;
@@ -60,6 +62,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const [verificationLogs, setVerificationLogs] = useState<any[]>([]);
     const [combinedAuditLogs, setCombinedAuditLogs] = useState<any[]>([]);
     const [forexRate, setForexRate] = useState(4.0); // Default fallback
+    const [forexSpread, setForexSpread] = useState(0.20);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: "", visible: false });
 
@@ -160,8 +163,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     const matureCapitalUSD = Math.max(0, balanceUSD - lockedCapitalUSD);
                     const withdrawableBalanceUSD = matureCapitalUSD + profitUSD;
                     
-                    const withdrawableBalanceRM = withdrawableBalanceUSD * (forexRate - 0.4);
-                    const lockedCapitalRM = lockedCapitalUSD * forexRate;
+                    const withdrawableBalanceRM = withdrawableBalanceUSD * (forexRate - forexSpread);
+                    const lockedCapitalRM = lockedCapitalUSD * (forexRate + forexSpread);
                     const totalInvestmentRM = balanceUSD * forexRate;
 
                     const totalWithdrawnUSD = allUserTxs.filter((t: any) => 
@@ -284,13 +287,20 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .limit(10);
             if (fHistory) setForexHistory(fHistory);
 
-            // 8. Fetch Current Forex Rate
             const { data: fRate } = await supabase
                 .from('platform_settings')
                 .select('value')
                 .eq('key', 'usd_to_myr_rate')
                 .single();
             if (fRate) setForexRate(Number(fRate.value || 4.0));
+
+            // 9. Fetch Current Forex Spread
+            const { data: fSpread } = await supabase
+                .from('platform_settings')
+                .select('value')
+                .eq('key', 'forex_spread_rm')
+                .maybeSingle();
+            if (fSpread) setForexSpread(Number(fSpread.value || 0.20));
 
         } catch (error) {
             console.error("Error fetching admin data:", error);
@@ -470,12 +480,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                         ...tx.metadata,
                         description: "Withdrawal",
                         penalty_applied: penaltyApplied,
-                        penalty_amount: penaltyUSD * (forexRate - 0.4), // RM value for audit
+                        penalty_amount: penaltyUSD * (forexRate - forexSpread), // RM value for audit
                         penalty_amount_usd: penaltyUSD,
                         final_payout_usd: finalPayoutUSD,
-                        final_payout_rm: finalPayoutUSD * (forexRate - 0.4), // RM value for payment
+                        final_payout_rm: finalPayoutUSD * (forexRate - forexSpread), // RM value for payment
                         original_request_amount_usd: withdrawAmountUSD,
-                        original_request_amount_rm: withdrawAmountUSD * (forexRate - 0.4),
+                        original_request_amount_rm: withdrawAmountUSD * (forexRate - forexSpread),
                         approved_at: new Date().toISOString(),
                         bank_name: profile.bank_name || profile.kyc_data?.bank_name || tx.metadata?.bank_name,
                         account_number: profile.account_number || profile.kyc_data?.account_number || tx.metadata?.account_number,
@@ -760,6 +770,21 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const handleUpdateForexSpread = async (newSpread: number) => {
+        try {
+            // 1. Update Platform Settings
+            const { error: settingsError } = await supabase
+                .from('platform_settings')
+                .upsert({ key: 'forex_spread_rm', value: String(newSpread) }, { onConflict: 'key' });
+            if (settingsError) throw settingsError;
+
+            showToast(`Platform spread updated to RM ${newSpread.toFixed(3)}`);
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
     const handleSetAdminRole = async (userId: string, makeAdmin: boolean) => {
         try {
             const role = makeAdmin ? 'admin' : 'User';
@@ -901,6 +926,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             combinedAuditLogs,
             loading, 
             forexRate,
+            forexSpread,
             showToast,
             refreshData: fetchData,
             handleApproveDeposit,
@@ -914,6 +940,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             handleUpdatePortfolio,
             handleResetUserPassword,
             handleUpdateForexRate,
+            handleUpdateForexSpread,
             handleUpdatePassword,
             handleSetAdminRole,
             handleDeleteUser,

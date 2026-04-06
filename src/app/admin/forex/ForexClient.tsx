@@ -8,10 +8,12 @@ import { ArrowLeft } from "lucide-react";
 
 export default function ForexClient({ lang }: { lang: "en" | "zh" }) {
     const router = useRouter();
-    const { forexHistory, loading, handleUpdateForexRate } = useAdmin();
+    const { forexHistory, loading, forexSpread, handleUpdateForexRate, handleUpdateForexSpread } = useAdmin();
     const { forexRate } = useSettings();
     const [newRate, setNewRate] = useState("");
+    const [newSpread, setNewSpread] = useState("");
     const [isUpdating, setIsUpdating] = useState(false);
+    const [isUpdatingSpread, setIsUpdatingSpread] = useState(false);
 
     const t = {
         en: {
@@ -27,7 +29,16 @@ export default function ForexClient({ lang }: { lang: "en" | "zh" }) {
             tableNew: "New Rate",
             tableChange: "Change %",
             tableAdmin: "Admin",
-            noHistory: "No rate adjustment history found."
+            noHistory: "No rate adjustment history found.",
+            spreadTitle: "Revenue Spread Control",
+            spreadSubtitle: "Set the RM gap added to deposits and subtracted from withdrawals (Company Profit).",
+            currentSpread: "Current RM Spread",
+            newSpreadLabel: "New RM Spread (e.g. 0.20)",
+            updateSpreadBtn: "Apply New Spread",
+            previewTitle: "Live Rate Preview",
+            depPreview: "User Deposit Rate",
+            wdlPreview: "User Withdrawal Rate",
+            revenueNote: "Revenue per $1,000 Volume"
         },
         zh: {
             title: "全局定价控制",
@@ -54,6 +65,14 @@ export default function ForexClient({ lang }: { lang: "en" | "zh" }) {
         setIsUpdating(false);
     };
 
+    const handleSpreadSubmit = async () => {
+        if (!newSpread || isNaN(parseFloat(newSpread))) return;
+        setIsUpdatingSpread(true);
+        await handleUpdateForexSpread(parseFloat(newSpread));
+        setNewSpread("");
+        setIsUpdatingSpread(false);
+    };
+
     if (loading) return <div className="flex items-center justify-center p-20"><div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div></div>;
 
     return (
@@ -72,31 +91,84 @@ export default function ForexClient({ lang }: { lang: "en" | "zh" }) {
                 </div>
             </div>
 
-            <div className="max-w-xl bg-white border border-gray-200 rounded-[40px] p-10 space-y-8 backdrop-blur-md shadow-2xl">
-                <div className="space-y-2">
-                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">{t.currentRate}</p>
-                    <div className="text-5xl font-black text-gv-gold tabular-nums tracking-tighter">1 USD = RM {forexRate.toFixed(4)}</div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                <div className="bg-white border border-gray-200 rounded-[40px] p-10 space-y-8 backdrop-blur-md shadow-2xl">
+                    <div className="space-y-2">
+                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">{t.currentRate}</p>
+                        <div className="text-5xl font-black text-gv-gold tabular-nums tracking-tighter">1 USD = RM {forexRate.toFixed(4)}</div>
+                    </div>
+
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">{t.newRateLabel}</label>
+                            <input
+                                type="number"
+                                step="0.001"
+                                value={newRate}
+                                onChange={(e) => setNewRate(e.target.value)}
+                                placeholder="4.500"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-6 text-3xl font-black text-gray-900 focus:outline-none focus:border-gv-gold transition-all"
+                            />
+                        </div>
+                        <button
+                            onClick={handleSubmit}
+                            disabled={isUpdating || !newRate}
+                            className="w-full bg-gv-gold text-black font-black py-6 rounded-3xl uppercase tracking-widest text-xs shadow-2xl shadow-gv-gold/20 hover:-translate-y-1 transition-all disabled:opacity-50"
+                        >
+                            {isUpdating ? t.updatingBtn : t.updateBtn}
+                        </button>
+                    </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="bg-white border border-gray-200 rounded-[40px] p-10 space-y-8 backdrop-blur-md shadow-2xl">
                     <div className="space-y-2">
-                        <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">{t.newRateLabel}</label>
-                        <input
-                            type="number"
-                            step="0.001"
-                            value={newRate}
-                            onChange={(e) => setNewRate(e.target.value)}
-                            placeholder="4.500"
-                            className="w-full bg-gray-100 border border-gray-200 rounded-3xl p-6 text-3xl font-black text-gray-900 focus:outline-none focus:border-gv-gold transition-all"
-                        />
+                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">{t.currentSpread}</p>
+                        <div className="text-5xl font-black text-indigo-500 tabular-nums tracking-tighter">RM {forexSpread.toFixed(3)}</div>
                     </div>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isUpdating || !newRate}
-                        className="w-full bg-gv-gold text-black font-black py-6 rounded-3xl uppercase tracking-widest text-xs shadow-2xl shadow-gv-gold/20 hover:-translate-y-1 transition-all disabled:opacity-50"
-                    >
-                        {isUpdating ? t.updatingBtn : t.updateBtn}
-                    </button>
+
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest px-1">{t.newSpreadLabel}</label>
+                            <input
+                                type="number"
+                                step="0.001"
+                                value={newSpread}
+                                onChange={(e) => setNewSpread(e.target.value)}
+                                placeholder="0.200"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-6 text-3xl font-black text-gray-900 focus:outline-none focus:border-indigo-500 transition-all"
+                            />
+                        </div>
+                        <button
+                            onClick={handleSpreadSubmit}
+                            disabled={isUpdatingSpread || !newSpread}
+                            className="w-full bg-indigo-500 text-white font-black py-6 rounded-3xl uppercase tracking-widest text-xs shadow-2xl shadow-indigo-500/20 hover:-translate-y-1 transition-all disabled:opacity-50"
+                        >
+                            {isUpdatingSpread ? "Updating..." : t.updateSpreadBtn}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-slate-900 border border-slate-800 rounded-[40px] p-10 overflow-hidden relative shadow-2xl">
+                <div className="absolute top-0 right-0 p-10 opacity-10">
+                    <div className="text-8xl font-black text-white tracking-tighter uppercase leading-none">PREVIEW</div>
+                </div>
+                
+                <h3 className="text-white text-xl font-black uppercase tracking-tighter mb-8">{t.previewTitle}</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
+                    <div className="space-y-1">
+                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">{t.depPreview}</p>
+                        <p className="text-3xl font-black text-emerald-400 tabular-nums">RM {(forexRate + forexSpread).toFixed(4)}</p>
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">{t.wdlPreview}</p>
+                        <p className="text-3xl font-black text-rose-400 tabular-nums">RM {(forexRate - forexSpread).toFixed(4)}</p>
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">{t.revenueNote}</p>
+                        <p className="text-3xl font-black text-white tabular-nums">RM {(1000 * forexSpread * 2).toFixed(2)}</p>
+                    </div>
                 </div>
             </div>
 

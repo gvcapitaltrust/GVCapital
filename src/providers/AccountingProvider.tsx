@@ -124,6 +124,7 @@ interface AccountingContextType {
     fundTransactions: FundTransaction[];
     loading: boolean;
     forexRate: number;
+    forexSpread: number;
     period: PeriodFilter;
     setPeriod: (p: PeriodFilter) => void;
     getJournalEntriesForUser: (userId: string) => JournalEntry[];
@@ -142,7 +143,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
     const [rawProfiles, setRawProfiles] = useState<any[]>([]);
     const [rawFundTransactions, setRawFundTransactions] = useState<FundTransaction[]>([]);
     const [forexRate, setForexRate] = useState(4.0);
-    const [depositRate, setDepositRate] = useState(4.2);
+    const [forexSpread, setForexSpread] = useState(0.20);
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState<PeriodFilter>({ startDate: null, endDate: null, label: "All Time" });
 
@@ -150,23 +151,30 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const [txRes, profRes, fxRes, fundRes] = await Promise.all([
+            const [txRes, profRes, fundRes] = await Promise.all([
                 supabase.from("transactions").select("*, profiles(*)").order("created_at", { ascending: true }),
                 supabase.from("profiles").select("*").order("created_at", { ascending: false }),
-                supabase.from("platform_settings").select("value").eq("key", "usd_to_myr_rate").single(),
                 supabase.from("fund_transactions").select("*").order("created_at", { ascending: true }),
             ]);
+            
+            const { data: fRate } = await supabase
+                .from('platform_settings')
+                .select('value')
+                .eq('key', 'usd_to_myr_rate')
+                .single();
+            if (fRate) setForexRate(Number(fRate.value || 4.0));
+
+            const { data: fSpread } = await supabase
+                .from('platform_settings')
+                .select('value')
+                .eq('key', 'forex_spread_rm')
+                .maybeSingle();
+            if (fSpread) setForexSpread(Number(fSpread.value || 0.20));
+
             if (txRes.data) setRawTransactions(txRes.data);
             if (profRes.data) setRawProfiles(profRes.data);
             if (fundRes.data) setRawFundTransactions(fundRes.data as FundTransaction[]);
             if (fundRes.error) console.warn("[ACCOUNTING] fund_transactions table not found — run the SQL migration.");
-            if (fxRes.data) {
-                const rate = Number(fxRes.data.value || 4.0);
-                setForexRate(rate);
-                setDepositRate(rate); // depositRate = forexRate (what client pays)
-                // Market rate is approx forexRate - 0.20
-                // So spread per side = RM 0.20 per USD
-            }
         } catch (err) {
             console.error("[ACCOUNTING] Fetch error:", err);
         } finally {
@@ -180,8 +188,8 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
     const journalEntries = useMemo<JournalEntry[]>(() => {
         const entries: JournalEntry[] = [];
         const marketRate = forexRate;
-        const depRate = marketRate + 0.20; // e.g. 4.2 if market is 4.0
-        const wdlRate = marketRate - 0.20; // e.g. 3.8 if market is 4.0
+        const depRate = marketRate + forexSpread;
+        const wdlRate = marketRate - forexSpread;
 
         const filteredTx = rawTransactions.filter(tx => {
             if (!period.startDate && !period.endDate) return true;
@@ -412,7 +420,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
         });
 
         return entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    }, [rawTransactions, forexRate, depositRate, period]);
+    }, [rawTransactions, forexRate, forexSpread, period]);
 
     // ── Fund Transaction Journal Entries ──────────────────────────────────
     const fundJournalEntries = useMemo<JournalEntry[]>(() => {
@@ -706,6 +714,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
             fundTransactions: rawFundTransactions,
             loading,
             forexRate,
+            forexSpread,
             period,
             setPeriod,
             getJournalEntriesForUser,

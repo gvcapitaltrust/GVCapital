@@ -149,7 +149,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
 
         if (withdrawType === 'Dividends') {
             setPenaltyInfo({
-                penalty: 0, payout: amountUSD * (withdrawalRate - 0.4), lockedPortion: 0, 
+                penalty: 0, payout: amountUSD * (withdrawalRate), lockedPortion: 0, 
                 penalty_usd: 0, payout_usd: amountUSD, lockedPortion_usd: 0, isApplied: false
             });
             setShowWithdrawConfirm(true);
@@ -165,7 +165,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 const penaltyUSD = lockedPortionUSD * 0.4;
                 const finalPayoutUSD = totalCapitalUSD - penaltyUSD;
                 
-                const netRate = withdrawalRate - 0.4;
+                const netRate = withdrawalRate;
                 setPenaltyInfo({
                     penalty: penaltyUSD * netRate, payout: finalPayoutUSD * netRate,
                     lockedPortion: lockedPortionUSD * netRate, penalty_usd: penaltyUSD,
@@ -174,7 +174,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 setShowWithdrawConfirm(true);
             } else {
                 setPenaltyInfo({
-                    penalty: 0, payout: amountUSD * (withdrawalRate - 0.4), lockedPortion: 0,
+                    penalty: 0, payout: amountUSD * (withdrawalRate), lockedPortion: 0,
                     penalty_usd: 0, payout_usd: amountUSD, lockedPortion_usd: 0, isApplied: false
                 });
                 setShowWithdrawConfirm(true);
@@ -208,7 +208,7 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                 original_currency_amount: amountUSD, original_currency: 'USD',
                 metadata: {
                     withdrawal_source: withdrawType, expected_payout: penaltyInfo?.payout, original_usd_payout: penaltyInfo?.payout_usd,
-                    forex_rate: withdrawalRate - 0.4, locked_withdrawal: penaltyInfo?.isApplied,
+                    forex_rate: withdrawalRate, locked_withdrawal: penaltyInfo?.isApplied,
                     payout_method: (() => {
                         const method = (withdrawalMethods || []).find((m: any) => m.id === selectedMethodId);
                         if (selectedMethodId === 'KYC_BANK') return `${user.bank_name} (${user.account_number})`;
