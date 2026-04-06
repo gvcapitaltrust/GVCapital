@@ -191,17 +191,17 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                     <table className="w-full text-left hidden md:table">
                         <thead className="bg-white border-b border-gray-200 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-400">
                             <tr>
-                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableUser}</th>
-                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableAssets}</th>
-                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableInvestment}</th>
-                                <th className="px-4 py-4 md:px-8 md:py-6">{t.tableWithdrawable}</th>
-                                <th className="px-4 py-4 md:px-8 md:py-6 text-right">{t.tableActions}</th>
+                                <th className="px-4 py-3 pl-8">{t.tableUser}</th>
+                                <th className="px-4 py-3">{t.tableAssets}</th>
+                                <th className="px-4 py-3">{t.tableInvestment}</th>
+                                <th className="px-4 py-3">{t.tableWithdrawable}</th>
+                                <th className="px-4 py-3 pr-8 text-right">{t.tableActions}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {filteredUsers.map((user, idx) => (
                                 <tr key={idx} className="text-sm group hover:bg-gray-50 transition-all">
-                                    <td className="px-4 py-4 md:px-8 md:py-6">
+                                    <td className="px-4 py-3 pl-8">
                                         <div className="flex items-center gap-3 md:gap-4">
                                             <TierMedal 
                                                 tierId={(user.tier && user.tier !== "Standard") ? user.tier : getTierByAmount(user.total_investment_usd || 0).name} 
@@ -218,7 +218,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-4 md:px-8 md:py-6">
+                                    <td className="px-4 py-3">
                                         <div className="flex flex-col gap-0.5">
                                             <div className="flex items-baseline gap-1">
                                                 <span className="text-[11px] md:text-[14px] font-black text-gray-900 tabular-nums leading-none">$</span>
@@ -227,7 +227,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                             <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Gross Equity</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-4 md:px-8 md:py-6">
+                                    <td className="px-4 py-3">
                                         <div className="flex flex-col gap-1">
                                             <span className="text-[10px] md:text-sm font-black text-emerald-600 tabular-nums whitespace-nowrap leading-none">$ {(user.total_investment_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             {user.next_maturity_date ? (
@@ -244,13 +244,13 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                             )}
                                         </div>
                                     </td>
-                                    <td className="px-4 py-4 md:px-8 md:py-6">
+                                    <td className="px-4 py-3">
                                         <div className="flex flex-col gap-1">
                                             <span className="text-[10px] md:text-sm font-black text-gv-gold tabular-nums whitespace-nowrap leading-none">$ {(user.withdrawable_balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">{lang === 'en' ? 'Liquid Capital' : '流动资本'}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-4 md:px-8 md:py-6 text-right">
+                                    <td className="px-4 py-3 pr-8 text-right">
                                         <div className="flex justify-end items-center gap-2">
                                             <button 
                                                 onClick={() => openDetails(user)} 
@@ -276,7 +276,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                 <div key={user.id} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
                                     <div 
                                         onClick={() => setExpandedUserId(isExpanded ? null : user.id)}
-                                        className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors"
+                                        className="px-4 py-4 space-y-3 hover:bg-gray-50 transition-colors"
                                     >
                                         <div className="flex justify-between items-center">
                                             <div className="flex items-center gap-2">

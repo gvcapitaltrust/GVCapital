@@ -265,11 +265,11 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                     <table className="w-full text-left border-collapse hidden md:table">
                         <thead className="bg-slate-50/50 border-b border-slate-100 sticky top-0 z-10 backdrop-blur-md">
                             <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                <th className="px-6 py-6 pl-10 whitespace-nowrap">{t.tableType}</th>
-                                <th className="px-6 py-6 whitespace-nowrap">{t.tableDate}</th>
-                                <th className="px-6 py-6 whitespace-nowrap">{t.tableAmount}</th>
-                                <th className="px-6 py-6 whitespace-nowrap">{t.tableStatus}</th>
-                                <th className="px-6 py-6 pr-10 text-right whitespace-nowrap">{t.tableActions}</th>
+                                <th className="px-4 py-3 pl-8 whitespace-nowrap">{t.tableType}</th>
+                                <th className="px-4 py-3 whitespace-nowrap">{t.tableDate}</th>
+                                <th className="px-4 py-3 whitespace-nowrap">{t.tableAmount}</th>
+                                <th className="px-4 py-3 whitespace-nowrap">{t.tableStatus}</th>
+                                <th className="px-4 py-3 pr-8 text-right whitespace-nowrap">{t.tableActions}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -284,7 +284,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
 
                                 return (
                                     <tr key={tx.id || idx} className="group hover:bg-slate-50/50 transition-all border-b border-slate-50 last:border-0 border-collapse">
-                                        <td className="px-6 py-6 pl-10">
+                                        <td className="px-4 py-3 pl-8">
                                             <div className="flex items-center gap-4">
                                                 <div className={`h-10 w-10 md:h-12 md:w-12 rounded-2xl flex items-center justify-center shrink-0 border transition-all ${
                                                     isWithdrawal ? 'bg-amber-500/10 text-amber-500 border-amber-500/20 group-hover:scale-110' : 
@@ -300,21 +300,21 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-6">
+                                        <td className="px-4 py-3">
                                             <div className="flex flex-col">
                                                 <span className="text-slate-500 font-mono text-[11px] font-bold tabular-nums">{formatDate(tx.created_at || tx.transfer_date)}</span>
                                                 <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase">{new Date(tx.created_at || tx.transfer_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-6">
+                                        <td className="px-4 py-3">
                                             <div className="flex flex-col">
-                                                <span className={`font-black tabular-nums text-lg leading-none ${displayAmount < 0 ? 'text-slate-400' : 'text-emerald-500'}`}>
+                                                <span className={`font-black tabular-nums text-base leading-none ${displayAmount < 0 ? 'text-slate-400' : 'text-emerald-500'}`}>
                                                     {displayAmount < 0 ? '-' : '+'} $ {Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-6">
-                                            <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm ${
+                                        <td className="px-4 py-3">
+                                            <span className={`px-2.5 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm whitespace-nowrap ${
                                                 ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
                                                 tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
                                                 tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
@@ -323,10 +323,10 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                 {tx.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-6 pr-10 text-right">
+                                        <td className="px-4 py-3 pr-8 text-right">
                                             <button 
                                                 onClick={() => { setSelectedTx(tx); setIsDetailsOpen(true); }} 
-                                                className="bg-slate-900 text-white hover:bg-slate-800 text-[10px] font-black uppercase tracking-widest px-8 py-3 rounded-2xl transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+                                                className="bg-slate-900 text-white hover:bg-slate-800 text-[9px] font-black uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0"
                                             >
                                                 {t.details}
                                             </button>
@@ -345,7 +345,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                             const displayAmount = isWithdrawal ? -Math.abs(amountUSD) : amountUSD;
 
                             return (
-                                <div key={tx.id || idx} className="p-4 space-y-4 hover:bg-slate-50 transition-all flex flex-col" onClick={() => { setSelectedTx(tx); setIsDetailsOpen(true); }}>
+                                <div key={tx.id || idx} className="p-3 space-y-3 hover:bg-slate-50 transition-all flex flex-col" onClick={() => { setSelectedTx(tx); setIsDetailsOpen(true); }}>
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-3">
                                             <div className={`h-10 w-10 rounded-xl flex items-center justify-center border ${
