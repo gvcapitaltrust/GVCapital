@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { BookOpen, LayoutDashboard, FileText, Database, BarChart3, Users, Briefcase, LogOut, Calculator } from "lucide-react";
+import { BookOpen, LayoutDashboard, FileText, Database, BarChart3, Users, Briefcase, LogOut, Calculator, TrendingUp } from "lucide-react";
 
 interface AccountingSidebarProps {
     isCollapsed: boolean;
@@ -29,6 +29,7 @@ export default function AccountingSidebar({
         { id: "journal", path: "/accounting/journal", label: "General Journal", icon: <BookOpen className="h-5 w-5 shrink-0" /> },
         { id: "ledger", path: "/accounting/ledger", label: "General Ledger", icon: <Database className="h-5 w-5 shrink-0" /> },
         { id: "statements", path: "/accounting/statements", label: "Statements", icon: <BarChart3 className="h-5 w-5 shrink-0" /> },
+        { id: "investments", path: "/accounting/investments", label: "Investments", icon: <TrendingUp className="h-5 w-5 shrink-0" /> },
         { id: "users", path: "/accounting/users", label: "User Accounts", icon: <Users className="h-5 w-5 shrink-0" /> },
         { id: "funds", path: "/accounting/funds", label: "Fund Accounts", icon: <Briefcase className="h-5 w-5 shrink-0" /> },
     ];

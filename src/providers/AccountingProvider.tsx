@@ -84,6 +84,30 @@ export interface PeriodFilter {
     label: string;
 }
 
+export type FundTransaction = {
+    id: string;
+    fund_type: "forex" | "stock" | "other";
+    transaction_type: "allocation" | "return" | "loss" | "withdrawal" | "reallocation" | "distribution";
+    amount_usd: number;
+    description?: string;
+    target_fund_type?: "forex" | "stock" | "other";
+    created_at: string;
+    metadata?: any;
+};
+
+export interface InvestmentAccountSummary {
+    fundType: string;
+    label: string;
+    accountCode: string;
+    totalAllocated: number;
+    totalReturns: number;
+    totalLosses: number;
+    totalWithdrawn: number;
+    currentBalance: number;
+    roi: number;
+    transactions: FundTransaction[];
+}
+
 // ─── Context Type ────────────────────────────────────────────────────────────
 interface AccountingContextType {
     journalEntries: JournalEntry[];
@@ -95,12 +119,18 @@ interface AccountingContextType {
     users: any[];
     fundAccounts: { name: string; totalAUM: number; userCount: number; users: any[] }[];
     unallocatedUsers: any[];
+    investmentSummary: InvestmentAccountSummary[];
+    fundTransactions: FundTransaction[];
     loading: boolean;
     forexRate: number;
     period: PeriodFilter;
     setPeriod: (p: PeriodFilter) => void;
     getJournalEntriesForUser: (userId: string) => JournalEntry[];
     getJournalEntriesForAccount: (accountCode: string) => JournalEntry[];
+    recordFundTransaction: (tx: Omit<FundTransaction, "id" | "created_at">) => Promise<boolean>;
+    updateUserFund: (userId: string, fundName: string | null) => Promise<boolean>;
+    distributeFundProfits: (fundType: string, amount: number) => Promise<boolean>;
+    refreshData: () => Promise<void>;
 }
 
 const AccountingContext = createContext<AccountingContextType | undefined>(undefined);
@@ -109,6 +139,7 @@ const AccountingContext = createContext<AccountingContextType | undefined>(undef
 export function AccountingProvider({ children }: { children: React.ReactNode }) {
     const [rawTransactions, setRawTransactions] = useState<any[]>([]);
     const [rawProfiles, setRawProfiles] = useState<any[]>([]);
+    const [rawFundTransactions, setRawFundTransactions] = useState<FundTransaction[]>([]);
     const [forexRate, setForexRate] = useState(4.0);
     const [depositRate, setDepositRate] = useState(4.2);
     const [loading, setLoading] = useState(true);
@@ -118,13 +149,16 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const [txRes, profRes, fxRes] = await Promise.all([
+            const [txRes, profRes, fxRes, fundRes] = await Promise.all([
                 supabase.from("transactions").select("*, profiles(*)").order("created_at", { ascending: true }),
                 supabase.from("profiles").select("*").order("created_at", { ascending: false }),
                 supabase.from("platform_settings").select("value").eq("key", "usd_to_myr_rate").single(),
+                supabase.from("fund_transactions").select("*").order("created_at", { ascending: true }),
             ]);
             if (txRes.data) setRawTransactions(txRes.data);
             if (profRes.data) setRawProfiles(profRes.data);
+            if (fundRes.data) setRawFundTransactions(fundRes.data as FundTransaction[]);
+            if (fundRes.error) console.warn("[ACCOUNTING] fund_transactions table not found — run the SQL migration.");
             if (fxRes.data) {
                 const rate = Number(fxRes.data.value || 4.0);
                 setForexRate(rate);
@@ -362,14 +396,69 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
         });
 
         return entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    }, [rawTransactions, forexRate, period]);
+    }, [rawTransactions, forexRate, depositRate, period]);
+
+    // ── Fund Transaction Journal Entries ──────────────────────────────────
+    const fundJournalEntries = useMemo<JournalEntry[]>(() => {
+        const FUND_ACCOUNT_MAP: Record<string, { code: string; name: string; gainCode: string; gainName: string; lossCode: string; lossName: string }> = {
+            forex: { code: "1300", name: "Forex Trading Account", gainCode: "4300", gainName: "Forex Trading Gains", lossCode: "5300", lossName: "Forex Trading Losses" },
+            stock: { code: "1310", name: "Stock Trading Account", gainCode: "4310", gainName: "Stock Capital Gains", lossCode: "5310", lossName: "Stock Capital Losses" },
+            other: { code: "1320", name: "Other Investment Accounts", gainCode: "4320", gainName: "Other Investment Gains", lossCode: "5320", lossName: "Other Investment Losses" },
+        };
+        const entries: JournalEntry[] = [];
+        rawFundTransactions.filter(ft => {
+            if (!period.startDate && !period.endDate) return true;
+            const d = new Date(ft.created_at);
+            if (period.startDate && d < period.startDate) return false;
+            if (period.endDate && d > period.endDate) return false;
+            return true;
+        }).forEach(ft => {
+            const acc = FUND_ACCOUNT_MAP[ft.fund_type] || FUND_ACCOUNT_MAP.other;
+            const amt = Number(ft.amount_usd);
+            const desc = ft.description || `${ft.transaction_type} — ${ft.fund_type}`;
+            const refId = ft.id.substring(0, 8);
+            if (ft.transaction_type === "allocation") {
+                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Capital allocated to ${acc.name} — ${desc}`, type: "Fund Allocation", lines: [
+                    { accountCode: acc.code, accountName: acc.name, debit: amt, credit: 0 },
+                    { accountCode: "1000", accountName: "Cash & Bank (USD)", debit: 0, credit: amt },
+                ], totalDebit: amt, totalCredit: amt, metadata: ft.metadata });
+            } else if (ft.transaction_type === "return") {
+                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Investment return — ${desc}`, type: "Investment Return", lines: [
+                    { accountCode: acc.code, accountName: acc.name, debit: amt, credit: 0 },
+                    { accountCode: acc.gainCode, accountName: acc.gainName, debit: 0, credit: amt },
+                ], totalDebit: amt, totalCredit: amt, metadata: ft.metadata });
+            } else if (ft.transaction_type === "loss") {
+                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Investment loss — ${desc}`, type: "Investment Loss", lines: [
+                    { accountCode: acc.lossCode, accountName: acc.lossName, debit: amt, credit: 0 },
+                    { accountCode: acc.code, accountName: acc.name, debit: 0, credit: amt },
+                ], totalDebit: amt, totalCredit: amt, metadata: ft.metadata });
+            } else if (ft.transaction_type === "withdrawal" || ft.transaction_type === "distribution") {
+                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `${ft.transaction_type === "distribution" ? "Profit distribution withdrawal" : "Capital withdrawal"} from ${acc.name} — ${desc}`, type: "Fund Withdrawal", lines: [
+                    { accountCode: "1000", accountName: "Cash & Bank (USD)", debit: amt, credit: 0 },
+                    { accountCode: acc.code, accountName: acc.name, debit: 0, credit: amt },
+                ], totalDebit: amt, totalCredit: amt, metadata: ft.metadata });
+            } else if (ft.transaction_type === "reallocation" && ft.target_fund_type) {
+                const tgt = FUND_ACCOUNT_MAP[ft.target_fund_type] || FUND_ACCOUNT_MAP.other;
+                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Reallocation: ${acc.name} → ${tgt.name} — ${desc}`, type: "Fund Reallocation", lines: [
+                    { accountCode: tgt.code, accountName: tgt.name, debit: amt, credit: 0 },
+                    { accountCode: acc.code, accountName: acc.name, debit: 0, credit: amt },
+                ], totalDebit: amt, totalCredit: amt, metadata: ft.metadata });
+            }
+        });
+        return entries;
+    }, [rawFundTransactions, period]);
+
+    // ── Merge all journal entries ─────────────────────────────────────────
+    const allJournalEntries = useMemo(() => {
+        return [...journalEntries, ...fundJournalEntries].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }, [journalEntries, fundJournalEntries]);
 
     // ── Trial Balance ────────────────────────────────────────────────────
     const trialBalance = useMemo<AccountBalance[]>(() => {
         const balances: Record<string, { totalDebit: number; totalCredit: number }> = {};
         CHART_OF_ACCOUNTS.forEach(a => { balances[a.code] = { totalDebit: 0, totalCredit: 0 }; });
 
-        journalEntries.forEach(entry => {
+        allJournalEntries.forEach(entry => {
             entry.lines.forEach(line => {
                 if (!balances[line.accountCode]) balances[line.accountCode] = { totalDebit: 0, totalCredit: 0 };
                 balances[line.accountCode].totalDebit += line.debit;
@@ -384,7 +473,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                 : b.totalCredit - b.totalDebit;
             return { account, totalDebit: b.totalDebit, totalCredit: b.totalCredit, balance };
         }).filter(ab => ab.totalDebit > 0 || ab.totalCredit > 0 || ab.balance !== 0);
-    }, [journalEntries]);
+    }, [allJournalEntries]);
 
     // ── Profit & Loss ────────────────────────────────────────────────────
     const profitAndLoss = useMemo(() => {
@@ -444,7 +533,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
     // ── Users (enriched with accounting data) ────────────────────────────
     const users = useMemo(() => {
         return rawProfiles.map(p => {
-            const userEntries = journalEntries.filter(e => e.userId === p.id);
+            const userEntries = allJournalEntries.filter(e => e.userId === p.id);
             const totalDeposits = userEntries.filter(e => e.type.includes("Deposit") && e.type.includes("Approved")).reduce((s, e) => s + e.totalDebit, 0);
             const totalWithdrawals = userEntries.filter(e => e.type.includes("Withdrawal")).reduce((s, e) => s + e.totalDebit, 0);
             const totalDividends = userEntries.filter(e => e.type === "Dividend").reduce((s, e) => s + e.totalDebit, 0);
@@ -454,7 +543,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                 accounting: { totalDeposits, totalWithdrawals, totalDividends, totalBonuses, entryCount: userEntries.length },
             };
         });
-    }, [rawProfiles, journalEntries]);
+    }, [rawProfiles, allJournalEntries]);
 
     // ── Fund Accounts ────────────────────────────────────────────────────
     const { fundAccounts, unallocatedUsers } = useMemo(() => {
@@ -482,16 +571,113 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
 
     // ── Helpers ──────────────────────────────────────────────────────────
     const getJournalEntriesForUser = useCallback((userId: string) => {
-        return journalEntries.filter(e => e.userId === userId);
-    }, [journalEntries]);
+        return allJournalEntries.filter(e => e.userId === userId);
+    }, [allJournalEntries]);
 
     const getJournalEntriesForAccount = useCallback((accountCode: string) => {
-        return journalEntries.filter(e => e.lines.some(l => l.accountCode === accountCode));
-    }, [journalEntries]);
+        return allJournalEntries.filter(e => e.lines.some(l => l.accountCode === accountCode));
+    }, [allJournalEntries]);
+
+
+    // ── Investment Account Summaries ──────────────────────────────────────
+    const investmentSummary = useMemo<InvestmentAccountSummary[]>(() => {
+        const types = ["forex", "stock", "other"] as const;
+        const labels: Record<string, string> = { forex: "Forex Trading", stock: "Stock Trading", other: "Other Investments" };
+        const codes: Record<string, string> = { forex: "1300", stock: "1310", other: "1320" };
+
+        return types.map(t => {
+            const txs = rawFundTransactions.filter(ft => ft.fund_type === t);
+            const totalAllocated = txs.filter(ft => ft.transaction_type === "allocation").reduce((s, ft) => s + Number(ft.amount_usd), 0);
+            const totalReturns = txs.filter(ft => ft.transaction_type === "return").reduce((s, ft) => s + Number(ft.amount_usd), 0);
+            const totalLosses = txs.filter(ft => ft.transaction_type === "loss").reduce((s, ft) => s + Number(ft.amount_usd), 0);
+            const totalWithdrawn = txs.filter(ft => ft.transaction_type === "withdrawal").reduce((s, ft) => s + Number(ft.amount_usd), 0);
+            // Reallocations: subtract from source
+            const reallocOut = txs.filter(ft => ft.transaction_type === "reallocation").reduce((s, ft) => s + Number(ft.amount_usd), 0);
+            const reallocIn = rawFundTransactions.filter(ft => ft.transaction_type === "reallocation" && ft.target_fund_type === t).reduce((s, ft) => s + Number(ft.amount_usd), 0);
+            const currentBalance = totalAllocated + totalReturns - totalLosses - totalWithdrawn - reallocOut + reallocIn;
+            const roi = totalAllocated > 0 ? ((totalReturns - totalLosses) / totalAllocated) * 100 : 0;
+            return { fundType: t, label: labels[t], accountCode: codes[t], totalAllocated, totalReturns, totalLosses, totalWithdrawn, currentBalance, roi, transactions: txs };
+        });
+    }, [rawFundTransactions]);
+
+    // ── Record Fund Transaction ───────────────────────────────────────────
+    const recordFundTransaction = useCallback(async (tx: Omit<FundTransaction, "id" | "created_at">) => {
+        try {
+            const { error } = await supabase.from("fund_transactions").insert([tx]);
+            if (error) {
+                console.error("[ACCOUNTING] Error recording fund transaction:", error);
+                return false;
+            }
+            await fetchData();
+            return true;
+        } catch (err) {
+            console.error("[ACCOUNTING] Fatal error:", err);
+            return false;
+        }
+    }, [fetchData]);
+
+    const updateUserFund = useCallback(async (userId: string, fundName: string | null) => {
+        try {
+            const { error } = await supabase.from("profiles").update({ portfolio_platform_name: fundName }).eq("id", userId);
+            if (error) throw error;
+            await fetchData();
+            return true;
+        } catch (err) {
+            console.error("[ACCOUNTING] Error updating user fund:", err);
+            return false;
+        }
+    }, [fetchData]);
+
+    const distributeFundProfits = useCallback(async (fundType: string, totalAmount: number) => {
+        try {
+            if (totalAmount <= 0) return false;
+
+            // 1. Find users in this fund
+            const fundLabels: Record<string, string> = { forex: "Forex Trading", stock: "Stock Trading", other: "Other Investments" };
+            const label = fundLabels[fundType] || fundType;
+            const targetUsers = users.filter(u => u.portfolio_platform_name === label);
+            if (targetUsers.length === 0) return false;
+
+            const totalAUM = targetUsers.reduce((s, u) => s + (u.balance_usd || 0), 0);
+            if (totalAUM <= 0) return false;
+
+            // 2. Insert fund withdrawal for distribution
+            const { error: fundErr } = await supabase.from("fund_transactions").insert([{
+                fund_type: fundType as any,
+                transaction_type: "distribution" as any,
+                amount_usd: totalAmount,
+                description: `Profit distribution to ${targetUsers.length} investors`
+            }]);
+            if (fundErr) throw fundErr;
+
+            // 3. Batch insert dividends for users
+            const dividends = targetUsers.map(u => {
+                const share = ((u.balance_usd || 0) / totalAUM) * totalAmount;
+                return {
+                    user_id: u.id,
+                    amount_usd: share,
+                    type: "dividend",
+                    status: "completed",
+                    description: `Profit distribution: ${label}`
+                };
+            }).filter(d => d.amount_usd > 0.01);
+
+            if (dividends.length > 0) {
+                const { error: txErr } = await supabase.from("transactions").insert(dividends);
+                if (txErr) throw txErr;
+            }
+
+            await fetchData();
+            return true;
+        } catch (err) {
+            console.error("[ACCOUNTING] Error distributing profits:", err);
+            return false;
+        }
+    }, [users, fetchData]);
 
     return (
         <AccountingContext.Provider value={{
-            journalEntries,
+            journalEntries: allJournalEntries,
             chartOfAccounts: CHART_OF_ACCOUNTS,
             trialBalance,
             profitAndLoss,
@@ -500,12 +686,18 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
             users,
             fundAccounts,
             unallocatedUsers,
+            investmentSummary,
+            fundTransactions: rawFundTransactions,
             loading,
             forexRate,
             period,
             setPeriod,
             getJournalEntriesForUser,
             getJournalEntriesForAccount,
+            recordFundTransaction,
+            updateUserFund,
+            distributeFundProfits,
+            refreshData: fetchData,
         }}>
             {children}
         </AccountingContext.Provider>
