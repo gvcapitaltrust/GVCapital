@@ -136,7 +136,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="space-y-8">
                         <div className="space-y-3">
                             <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amount}</label>
-                            <div className="relative">
+                            <div className="relative group">
                                 <span className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-gray-300">$</span>
                                 <input 
                                     type="number" 
@@ -145,6 +145,12 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                                     className="w-full bg-gray-50 border border-gray-200 rounded-3xl p-5 pl-12 text-2xl font-black focus:outline-none focus:border-gv-gold focus:bg-white transition-all tabular-nums" 
                                     placeholder="0.00" 
                                 />
+                                {depositAmount && (
+                                    <div className="absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 opacity-40 group-focus-within:opacity-100 transition-opacity">
+                                        <span className="text-[10px] font-black text-gv-gold uppercase tracking-widest">≈ RM</span>
+                                        <span className="text-sm font-black text-slate-900 tabular-nums">{(Number(depositAmount) * depositRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

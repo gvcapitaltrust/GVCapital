@@ -86,6 +86,10 @@ export default function ProductSelection({
                   <span className="text-2xl font-black text-gv-gold tracking-tighter">
                     {formatUSD(amount)}
                   </span>
+                  <div className="flex items-center gap-1 opacity-60">
+                    <span className="text-[9px] font-black text-gv-gold uppercase tracking-widest">≈ RM</span>
+                    <span className="text-xs font-black text-slate-900 tabular-nums">{(amount * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
                 </div>
               </div>
               <input
