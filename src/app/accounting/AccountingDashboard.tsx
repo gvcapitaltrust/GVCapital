@@ -165,8 +165,8 @@ export default function AccountingDashboard() {
                             <th className="px-3 py-1.5">Ref</th>
                             <th className="px-3 py-1.5">Type</th>
                             <th className="px-3 py-1.5">Description</th>
-                            <th className="px-3 py-1.5 text-right">Debit</th>
-                            <th className="px-3 py-1.5 text-right">Credit</th>
+                            <th className="px-3 py-1.5 text-right">Amount (USD)</th>
+                            <th className="px-3 py-1.5 text-right">Activity</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
@@ -178,13 +178,17 @@ export default function AccountingDashboard() {
                                     <span className={`text-[7px] font-black uppercase tracking-widest px-1 py-0.5 rounded ${
                                         entry.type.includes("Deposit") ? "bg-emerald-50 text-emerald-600" :
                                         entry.type.includes("Withdrawal") ? "bg-red-50 text-red-500" :
-                                        entry.type.includes("Dividend") ? "bg-blue-50 text-blue-500" :
+                                        entry.type.includes("Dividend") ? "bg-blue-50 text-blue-600" :
                                         "bg-slate-50 text-slate-500"
                                     }`}>{entry.type}</span>
                                 </td>
                                 <td className="px-3 py-1.5 font-bold text-slate-700 max-w-[250px] truncate">{entry.description}</td>
-                                <td className="px-3 py-1.5 font-black tabular-nums text-right text-slate-900">{entry.totalDebit > 0 ? fmt(entry.totalDebit) : ""}</td>
-                                <td className="px-3 py-1.5 font-black tabular-nums text-right text-slate-900">{entry.totalCredit > 0 ? fmt(entry.totalCredit) : ""}</td>
+                                <td className="px-3 py-1.5 font-black tabular-nums text-right text-slate-900">$ {fmt(entry.principalAmount)}</td>
+                                <td className="px-3 py-1.5 text-right">
+                                    <span className="text-[7px] font-bold text-slate-400 uppercase tracking-tighter">
+                                        {entry.totalDebit > entry.principalAmount ? `+ $${fmt(entry.totalDebit - entry.principalAmount)} revenue` : "Standard"}
+                                    </span>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

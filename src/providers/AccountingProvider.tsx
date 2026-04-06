@@ -68,6 +68,7 @@ export interface JournalEntry {
     lines: JournalLine[];
     totalDebit: number;
     totalCredit: number;
+    principalAmount: number;
     metadata?: any;
 }
 
@@ -178,6 +179,9 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
     // ── Double-Entry Engine: Transform Transactions → Journal Entries ─────
     const journalEntries = useMemo<JournalEntry[]>(() => {
         const entries: JournalEntry[] = [];
+        const marketRate = forexRate;
+        const depRate = marketRate + 0.20; // e.g. 4.2 if market is 4.0
+        const wdlRate = marketRate - 0.20; // e.g. 3.8 if market is 4.0
 
         const filteredTx = rawTransactions.filter(tx => {
             if (!period.startDate && !period.endDate) return true;
@@ -211,6 +215,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                         userId: tx.user_id,
                         userName,
                         userEmail,
+                        principalAmount: amountUSD,
                         lines: [
                             { accountCode: "1200", accountName: "Accounts Receivable", debit: amountUSD, credit: 0 },
                             { accountCode: "2300", accountName: "Pending Deposits (Unverified)", debit: 0, credit: amountUSD },
@@ -220,10 +225,11 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                         metadata: tx.metadata,
                     });
                 } else if (["Approved", "Completed"].includes(status)) {
-                    // Forex Spread on Deposit: Client pays depositRate (e.g. 4.2), market is ~forexRate-0.2 (e.g. 4.0)
-                    // Spread per USD = RM 0.20. In USD terms: 0.20 / depositRate
-                    const depositSpreadUSD = amountUSD * 0.20 / depositRate;
-                    const netCashUSD = amountUSD + depositSpreadUSD; // Total cash received in USD equivalent
+                    // Forex Spread on Deposit: Client pays depRate (e.g. 4.2), market is marketRate (e.g. 4.0)
+                    // Spread per USD = RM 0.20. In USD terms (market value): 0.20 / marketRate
+                    const spreadInRMPerUSD = Math.max(0, depRate - marketRate);
+                    const depositSpreadUSD = amountUSD * spreadInRMPerUSD / marketRate;
+                    const netCashUSD = amountUSD + depositSpreadUSD; 
 
                     entries.push({
                         id: `${tx.id}-approved`,
@@ -234,6 +240,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                         userId: tx.user_id,
                         userName,
                         userEmail,
+                        principalAmount: amountUSD,
                         lines: [
                             { accountCode: "1000", accountName: "Cash & Bank (USD)", debit: netCashUSD, credit: 0 },
                             { accountCode: "2000", accountName: "Client Deposits Payable", debit: 0, credit: amountUSD },
@@ -253,6 +260,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                         userId: tx.user_id,
                         userName,
                         userEmail,
+                        principalAmount: amountUSD,
                         lines: [
                             { accountCode: "2300", accountName: "Pending Deposits (Unverified)", debit: amountUSD, credit: 0 },
                             { accountCode: "1200", accountName: "Accounts Receivable", debit: 0, credit: amountUSD },
@@ -268,9 +276,10 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
             if (type === "withdrawal") {
                 const penaltyUSD = Number(tx.metadata?.penalty_amount_usd || 0);
                 const payoutUSD = Number(tx.metadata?.final_payout_usd || amountUSD);
-                // Withdrawal spread: client gets forexRate-0.4 (e.g. 3.8), market ~forexRate-0.2 (e.g. 4.0)
-                // Spread per USD = RM 0.20. In USD terms: 0.20 / forexRate
-                const withdrawalSpreadUSD = payoutUSD * 0.20 / forexRate;
+                // Withdrawal spread: client gets wdlRate (e.g. 3.8), market is marketRate (e.g. 4.0)
+                // Profit per USD = RM 0.20. Market value in USD = 0.20 / marketRate
+                const spreadInRMPerUSD = Math.max(0, marketRate - wdlRate);
+                const withdrawalSpreadUSD = payoutUSD * spreadInRMPerUSD / marketRate;
 
                 if (status === "Pending") {
                     entries.push({
@@ -282,6 +291,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                         userId: tx.user_id,
                         userName,
                         userEmail,
+                        principalAmount: amountUSD,
                         lines: [
                             { accountCode: "2000", accountName: "Client Deposits Payable", debit: amountUSD, credit: 0 },
                             { accountCode: "2200", accountName: "Withdrawals Payable", debit: 0, credit: amountUSD },
@@ -301,11 +311,13 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                     if (withdrawalSpreadUSD > 0) {
                         lines.push({ accountCode: "4010", accountName: "Forex Spread Revenue (Withdrawal)", debit: 0, credit: withdrawalSpreadUSD });
                     }
+                    
                     const totalCr = lines.reduce((s, l) => s + l.credit, 0);
-                    // Balance the entry
+                    // Standardize: The total debit (payable reduction) should match the total credits (cash out + revenue)
+                    // If there's any mismatch due to rounding, adjust the cash line
                     const diff = amountUSD - totalCr;
-                    if (Math.abs(diff) > 0.01) {
-                        lines[1].credit = amountUSD - penaltyUSD - withdrawalSpreadUSD;
+                    if (Math.abs(diff) > 0.001) {
+                        lines[1].credit = Math.max(0, lines[1].credit + diff);
                     }
 
                     entries.push({
@@ -317,6 +329,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                         userId: tx.user_id,
                         userName,
                         userEmail,
+                        principalAmount: amountUSD,
                         lines,
                         totalDebit: amountUSD,
                         totalCredit: lines.reduce((s, l) => s + l.credit, 0),
@@ -337,6 +350,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                         userId: tx.user_id,
                         userName,
                         userEmail,
+                        principalAmount: amountUSD,
                         lines: [
                             { accountCode: "5000", accountName: "Dividend Distributions", debit: amountUSD, credit: 0 },
                             { accountCode: "2100", accountName: "Dividends Payable", debit: 0, credit: amountUSD },
@@ -360,6 +374,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                         userId: tx.user_id,
                         userName,
                         userEmail,
+                        principalAmount: amountUSD,
                         lines: [
                             { accountCode: "5100", accountName: "Bonus Distributions", debit: amountUSD, credit: 0 },
                             { accountCode: "2100", accountName: "Dividends Payable", debit: 0, credit: amountUSD },
@@ -383,6 +398,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
                         userId: tx.user_id,
                         userName,
                         userEmail,
+                        principalAmount: amountUSD,
                         lines: [
                             { accountCode: "2000", accountName: "Client Deposits Payable", debit: amountUSD, credit: 0 },
                             { accountCode: "4100", accountName: "Early Withdrawal Penalty Income", debit: 0, credit: amountUSD },
@@ -418,28 +434,28 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
             const desc = ft.description || `${ft.transaction_type} — ${ft.fund_type}`;
             const refId = ft.id.substring(0, 8);
             if (ft.transaction_type === "allocation") {
-                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Capital allocated to ${acc.name} — ${desc}`, type: "Fund Allocation", lines: [
+                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Capital allocated to ${acc.name} — ${desc}`, type: "Fund Allocation", principalAmount: amt, lines: [
                     { accountCode: acc.code, accountName: acc.name, debit: amt, credit: 0 },
                     { accountCode: "1000", accountName: "Cash & Bank (USD)", debit: 0, credit: amt },
                 ], totalDebit: amt, totalCredit: amt, metadata: ft.metadata });
             } else if (ft.transaction_type === "return") {
-                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Investment return — ${desc}`, type: "Investment Return", lines: [
+                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Investment return — ${desc}`, type: "Investment Return", principalAmount: amt, lines: [
                     { accountCode: acc.code, accountName: acc.name, debit: amt, credit: 0 },
                     { accountCode: acc.gainCode, accountName: acc.gainName, debit: 0, credit: amt },
                 ], totalDebit: amt, totalCredit: amt, metadata: ft.metadata });
             } else if (ft.transaction_type === "loss") {
-                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Investment loss — ${desc}`, type: "Investment Loss", lines: [
+                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Investment loss — ${desc}`, type: "Investment Loss", principalAmount: amt, lines: [
                     { accountCode: acc.lossCode, accountName: acc.lossName, debit: amt, credit: 0 },
                     { accountCode: acc.code, accountName: acc.name, debit: 0, credit: amt },
                 ], totalDebit: amt, totalCredit: amt, metadata: ft.metadata });
             } else if (ft.transaction_type === "withdrawal" || ft.transaction_type === "distribution") {
-                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `${ft.transaction_type === "distribution" ? "Profit distribution withdrawal" : "Capital withdrawal"} from ${acc.name} — ${desc}`, type: "Fund Withdrawal", lines: [
+                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `${ft.transaction_type === "distribution" ? "Profit distribution withdrawal" : "Capital withdrawal"} from ${acc.name} — ${desc}`, type: "Fund Withdrawal", principalAmount: amt, lines: [
                     { accountCode: "1000", accountName: "Cash & Bank (USD)", debit: amt, credit: 0 },
                     { accountCode: acc.code, accountName: acc.name, debit: 0, credit: amt },
                 ], totalDebit: amt, totalCredit: amt, metadata: ft.metadata });
             } else if (ft.transaction_type === "reallocation" && ft.target_fund_type) {
                 const tgt = FUND_ACCOUNT_MAP[ft.target_fund_type] || FUND_ACCOUNT_MAP.other;
-                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Reallocation: ${acc.name} → ${tgt.name} — ${desc}`, type: "Fund Reallocation", lines: [
+                entries.push({ id: `fund-${ft.id}`, date: ft.created_at, refId, description: `Reallocation: ${acc.name} → ${tgt.name} — ${desc}`, type: "Fund Reallocation", principalAmount: amt, lines: [
                     { accountCode: tgt.code, accountName: tgt.name, debit: amt, credit: 0 },
                     { accountCode: acc.code, accountName: acc.name, debit: 0, credit: amt },
                 ], totalDebit: amt, totalCredit: amt, metadata: ft.metadata });
