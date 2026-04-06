@@ -314,14 +314,22 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <span className={`px-2.5 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm whitespace-nowrap ${
-                                                ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                                                tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                                                tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                                                'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                                            }`}>
-                                                {tx.status}
-                                            </span>
+                                            <div className="flex items-center gap-2.5 px-1 whitespace-nowrap">
+                                                <div className={`h-1.5 w-1.5 rounded-full ${
+                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' :
+                                                    tx.status === 'Pending Release' ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.4)] animate-pulse' :
+                                                    tx.status === 'Rejected' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' :
+                                                    'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)] animate-pulse'
+                                                }`} />
+                                                <span className={`text-[10px] font-black uppercase tracking-widest ${
+                                                    ['Approved', 'Completed'].includes(tx.status) ? 'text-emerald-600' :
+                                                    tx.status === 'Pending Release' ? 'text-blue-600' :
+                                                    tx.status === 'Rejected' ? 'text-red-500' :
+                                                    'text-amber-600'
+                                                }`}>
+                                                    {tx.status}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td className="px-4 py-3 pr-8 text-right">
                                             <button 
@@ -367,14 +375,22 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                 {displayAmount < 0 ? '-' : '+'} $ {Math.abs(displayAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </span>
                                             <div className="mt-1 flex justify-end">
-                                                <span className={`px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest border ${
-                                                    ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                                                    tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                                                    'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                                                }`}>
-                                                    {tx.status}
-                                                </span>
+                                                <div className="flex items-center gap-2 whitespace-nowrap">
+                                                    <div className={`h-1 w-1 rounded-full ${
+                                                        ['Approved', 'Completed'].includes(tx.status) ? 'bg-emerald-500' :
+                                                        tx.status === 'Pending Release' ? 'bg-blue-500 animate-pulse' :
+                                                        tx.status === 'Rejected' ? 'bg-red-500' :
+                                                        'bg-amber-500 animate-pulse'
+                                                    }`} />
+                                                    <span className={`text-[8px] font-black uppercase tracking-[0.1em] ${
+                                                        ['Approved', 'Completed'].includes(tx.status) ? 'text-emerald-600' :
+                                                        tx.status === 'Pending Release' ? 'text-blue-600' :
+                                                        tx.status === 'Rejected' ? 'text-red-500' :
+                                                        'text-amber-600'
+                                                    }`}>
+                                                        {tx.status}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
