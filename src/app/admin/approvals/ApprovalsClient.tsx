@@ -207,30 +207,30 @@ export default function ApprovalsClient() {
                         <table className="w-full text-left border-collapse hidden md:table">
                             <thead className="bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200 sticky top-0 z-10">
                                 <tr>
-                                     <th className="px-6 py-4">Client Details</th>
-                                     <th className="px-6 py-4">Reference ID</th>
-                                     <th className="px-6 py-4">Amount (USD)</th>
-                                     <th className="px-6 py-4">Status</th>
-                                     <th className="px-6 py-4">Date</th>
-                                     <th className="px-6 py-4">Receipt</th>
-                                     <th className="px-6 py-4 text-right">Action</th>
+                                     <th className="px-4 py-3">Client Details</th>
+                                     <th className="px-4 py-3">Reference ID</th>
+                                     <th className="px-4 py-3">Amount (USD)</th>
+                                     <th className="px-4 py-3">Status</th>
+                                     <th className="px-4 py-3">Date</th>
+                                     <th className="px-4 py-3">Receipt</th>
+                                     <th className="px-4 py-3 text-right">Action</th>
                                  </tr>
                              </thead>
                              <tbody className="divide-y divide-gray-100">
                                  {pendingDeposits.map((tx) => (
                                      <tr key={tx.id} className="text-sm font-bold hover:bg-gray-50 transition-colors">
-                                         <td className="px-6 py-4">
-                                             <div className="text-gray-900 mb-0.5 uppercase tracking-tight">{tx.profiles?.full_name || tx.profiles?.email || "Unknown"}</div>
-                                             <div className="text-[10px] text-gray-500 lowercase font-medium">{tx.profiles?.email}</div>
+                                         <td className="px-4 py-3">
+                                             <div className="text-[13px] text-gray-900 mb-0.5 uppercase tracking-tight">{tx.profiles?.full_name || tx.profiles?.email || "Unknown"}</div>
+                                             <div className="text-[9px] text-gray-500 lowercase font-medium">{tx.profiles?.email}</div>
                                          </td>
-                                         <td className="px-6 py-4">
+                                         <td className="px-4 py-3">
                                              <span className="font-mono text-[10px] text-gray-400">{tx.ref_id}</span>
                                          </td>
-                                         <td className="px-6 py-4 font-black text-emerald-500 whitespace-nowrap">
+                                         <td className="px-4 py-3 font-black text-emerald-500 whitespace-nowrap text-[13px]">
                                               ${(Number(tx.original_currency_amount || (Number(tx.amount || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                          </td>
-                                         <td className="px-6 py-4">
-                                             <span className={`px-2.5 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest ${
+                                         <td className="px-4 py-3">
+                                             <span className={`px-2 py-1 rounded-lg text-[7px] font-black uppercase tracking-widest ${
                                                  tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
                                                  tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
                                                  'bg-amber-500/10 text-amber-500'
@@ -238,30 +238,30 @@ export default function ApprovalsClient() {
                                                  { (tx.status === 'Approved' || tx.status === 'Rejected') ? tx.status : 'Pending' }
                                              </span>
                                          </td>
-                                         <td className="px-6 py-4 text-gray-500 font-mono text-[10px] whitespace-nowrap">
+                                         <td className="px-4 py-3 text-gray-500 font-mono text-[9px] whitespace-nowrap">
                                              {tx.created_at ? new Date(tx.created_at).toLocaleString() : "N/A"}
                                          </td>
-                                         <td className="px-6 py-4">
+                                         <td className="px-4 py-3">
                                              <button
                                                  onClick={() => setViewingReceipt(tx.receipt_url)}
-                                                 className="bg-white hover:bg-gray-100 border border-gray-200 text-[9px] font-black uppercase px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5"
+                                                 className="bg-white hover:bg-gray-100 border border-gray-200 text-[8px] font-black uppercase px-2 py-1 rounded-lg transition-all flex items-center gap-1"
                                              >
                                                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                  View Slip
                                              </button>
                                          </td>
-                                         <td className="px-6 py-4 text-right">
+                                         <td className="px-4 py-3 text-right">
                                             {tx.status === 'Pending' && (
                                                 <div className="flex justify-end gap-2">
                                                     <button
                                                         onClick={() => handleReject(tx)}
-                                                        className="bg-white hover:bg-red-500/10 text-red-500 border border-gray-200 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all"
+                                                        className="bg-white hover:bg-red-500/10 text-red-500 border border-gray-200 px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest active:scale-95 transition-all"
                                                     >
                                                         Reject
                                                     </button>
                                                     <button
                                                         onClick={() => handleApprove(tx)}
-                                                        className="bg-gv-gold hover:bg-gv-gold/90 text-black px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-gv-gold/10 active:scale-95 transition-all"
+                                                        className="bg-gv-gold hover:bg-gv-gold/90 text-black px-4 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest shadow-xl shadow-gv-gold/10 active:scale-95 transition-all"
                                                     >
                                                         Approve
                                                     </button>
@@ -283,7 +283,7 @@ export default function ApprovalsClient() {
                                      <div key={tx.id} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
                                          <div 
                                              onClick={() => setExpandedId(isExpanded ? null : tx.id)}
-                                             className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors"
+                                             className="px-4 py-4 space-y-3 hover:bg-gray-50 transition-colors"
                                          >
                                              <div className="flex justify-between items-center">
                                                  <span className="text-gray-500 font-mono text-[9px] uppercase">{tx.created_at ? new Date(tx.created_at).toLocaleDateString() : "N/A"}</span>
@@ -297,11 +297,11 @@ export default function ApprovalsClient() {
                                              </div>
                                              <div className="flex justify-between items-end">
                                                  <div className="space-y-1">
-                                                     <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block">{tx.profiles?.full_name || tx.profiles?.email || "Unknown"}</span>
-                                                     <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none truncate w-40 block">{tx.profiles?.email}</span>
+                                                     <span className="text-[10px] font-black uppercase tracking-widest text-gray-900 leading-none block">{tx.profiles?.full_name || tx.profiles?.email || "Unknown"}</span>
+                                                     <span className="text-[7px] font-black text-gray-400 uppercase tracking-widest leading-none truncate w-40 block">{tx.profiles?.email}</span>
                                                  </div>
                                                  <div className="text-right">
-                                                     <p className="text-sm font-black text-emerald-500 tabular-nums tracking-tighter">
+                                                     <p className="text-[13px] font-black text-emerald-500 tabular-nums tracking-tighter">
                                                          $ {amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                      </p>
                                                  </div>

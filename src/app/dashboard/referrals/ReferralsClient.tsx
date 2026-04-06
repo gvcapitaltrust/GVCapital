@@ -119,9 +119,9 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                         <table className="w-full text-left hidden md:table">
                             <thead className="bg-gray-50/50 border-b border-gray-200 text-[10px] text-gray-400 font-extrabold uppercase tracking-[0.2em]">
                                 <tr>
-                                    <th className="px-8 py-5">{t.username}</th>
-                                    <th className="px-8 py-5">{t.registrationDate}</th>
-                                    <th className="px-8 py-5 text-right font-black">{t.capital}</th>
+                                    <th className="px-6 py-4">{t.username}</th>
+                                    <th className="px-6 py-4">{t.registrationDate}</th>
+                                    <th className="px-6 py-4 text-right font-black">{t.capital}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
@@ -132,14 +132,14 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
 
                                     return (
                                         <tr key={idx} className="text-sm font-medium group hover:bg-gray-50/50 transition-colors">
-                                            <td className="px-8 py-5">
+                                            <td className="px-6 py-4">
                                                 <div className="flex items-center gap-5">
                                                     <div className="relative">
                                                         <TierMedal tierId={tierId} size="md" className="group-hover:scale-110 transition-transform" />
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <div className="flex items-center gap-2">
-                                                            <span className="text-gray-900 font-black text-base tracking-tight">{ref.full_name || 'Anonymous Investor'}</span>
+                                                            <span className="text-gray-900 font-black text-[15px] tracking-tight">{ref.full_name || 'Anonymous Investor'}</span>
                                                             {ref.is_verified && (
                                                                 <CheckCircle2 className="h-4 w-4 text-emerald-500 fill-emerald-500/10" strokeWidth={2.5} />
                                                             )}
@@ -148,11 +148,11 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-5 font-bold text-gray-400 tabular-nums">
+                                            <td className="px-6 py-4 font-bold text-gray-400 tabular-nums">
                                                 {formatDate(ref.created_at)}
                                             </td>
-                                            <td className="px-8 py-5 text-right">
-                                                <span className="text-gray-900 font-black text-base tabular-nums">
+                                            <td className="px-6 py-4 text-right">
+                                                <span className="text-gray-900 font-black text-[15px] tabular-nums">
                                                     $ {Number(ref.balance_usd || (ref.balance / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                 </span>
                                             </td>
@@ -180,13 +180,13 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                                 : ((ref.balance_usd > 0 || ref.balance > 0) ? getTierByAmount(ref.balance_usd || (ref.balance / forexRate)).id : "none");
 
                             return (
-                                <div key={idx} className="p-4 space-y-4 hover:bg-slate-50 transition-all flex flex-col group">
+                                <div key={idx} className="p-3 space-y-3 hover:bg-slate-50 transition-all flex flex-col group">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-3">
                                             <TierMedal tierId={tierId} size="sm" className="group-hover:scale-110 transition-transform" />
                                             <div className="flex flex-col">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-gray-900 font-black text-sm tracking-tight">{ref.full_name || 'Anonymous Investor'}</span>
+                                                    <span className="text-gray-900 font-black text-[13px] tracking-tight">{ref.full_name || 'Anonymous Investor'}</span>
                                                     {ref.is_verified && (
                                                         <CheckCircle2 className="h-3 w-3 text-emerald-500 fill-emerald-500/10" strokeWidth={3} />
                                                     )}
@@ -195,7 +195,7 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <span className="text-gray-900 font-black text-sm tabular-nums">
+                                            <span className="text-gray-900 font-black text-[13px] tabular-nums">
                                                 $ {Number(ref.balance_usd || (ref.balance / forexRate)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </span>
                                             <div className="mt-1 flex justify-end">

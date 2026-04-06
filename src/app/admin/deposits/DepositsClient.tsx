@@ -130,46 +130,46 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                     <table className="w-full text-left border-collapse hidden md:table">
                         <thead className="bg-slate-50/50 border-b border-slate-100 sticky top-0 z-10 backdrop-blur-md">
                             <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                <th className="px-6 py-6 pl-10">User Info</th>
-                                <th className="px-6 py-6">Amount (USD)</th>
-                                <th className="px-6 py-6">{t.tableDate}</th>
-                                <th className="px-6 py-6">Status</th>
-                                <th className="px-6 py-6 pr-10 text-right">Actions</th>
+                                <th className="px-4 py-4 pl-8">User Info</th>
+                                <th className="px-4 py-4">Amount (USD)</th>
+                                <th className="px-4 py-4">{t.tableDate}</th>
+                                <th className="px-4 py-4">Status</th>
+                                <th className="px-4 py-4 pr-8 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {filteredDeposits.map((tx, idx) => (
                                 <tr key={tx.id || idx} className="group hover:bg-slate-50/50 transition-all border-b border-slate-50 last:border-0 border-collapse">
-                                    <td className="px-6 py-6 pl-10">
+                                    <td className="px-4 py-4 pl-8">
                                         <div className="flex items-center gap-4">
                                             <div className="h-10 w-10 flex items-center justify-center shrink-0">
                                                 <TierMedal tierId={tx.profiles?.tier?.toLowerCase() || getTierByAmount(tx.profiles?.balance_usd || 0).id} size="sm" />
                                             </div>
                                             <div className="flex flex-col overflow-hidden">
-                                                <span className="font-black text-slate-900 uppercase tracking-tight text-sm group-hover:text-gv-gold transition-colors truncate max-w-[150px]">{tx.profiles?.full_name}</span>
+                                                <span className="font-black text-slate-900 uppercase tracking-tight text-[13px] group-hover:text-gv-gold transition-colors truncate max-w-[150px]">{tx.profiles?.full_name}</span>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-none">@{tx.profiles?.username}</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-6 font-black text-emerald-500 tabular-nums text-lg leading-none whitespace-nowrap">
+                                    <td className="px-4 py-4 font-black text-emerald-500 tabular-nums text-base leading-none whitespace-nowrap">
                                         $ {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </td>
-                                    <td className="px-6 py-6">
+                                    <td className="px-4 py-4">
                                         <div className="flex items-center gap-2">
                                             <span className="text-slate-500 font-mono text-[11px] font-bold tabular-nums whitespace-nowrap">{formatDate(tx.created_at)}</span>
                                             <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase whitespace-nowrap opacity-60">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-6">
+                                    <td className="px-4 py-4">
                                         <div className="flex items-center gap-2.5 px-1">
                                             <div className={`h-1.5 w-1.5 rounded-full ${
                                                 tx.status === 'Approved' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' :
                                                 tx.status === 'Rejected' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' :
                                                 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)] animate-pulse'
                                             }`} />
-                                            <span className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${
+                                            <span className={`text-[9px] font-black uppercase tracking-widest whitespace-nowrap ${
                                                 tx.status === 'Approved' ? 'text-emerald-600' :
                                                 tx.status === 'Rejected' ? 'text-red-500' :
                                                 'text-amber-600'
@@ -178,11 +178,11 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                             </span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-6 pr-10 text-right">
+                                    <td className="px-4 py-4 pr-8 text-right">
                                         {tx.status === 'Pending' ? (
                                             <button 
                                                 onClick={() => openReceipt(tx)} 
-                                                className="bg-slate-900 text-white hover:bg-slate-800 text-[10px] font-black uppercase tracking-widest px-8 py-3 rounded-2xl transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0 text-center"
+                                                className="bg-slate-900 text-white hover:bg-slate-800 text-[9px] font-black uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0 text-center"
                                             >
                                                 {t.viewReceipt}
                                             </button>
@@ -202,18 +202,17 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                             const tierName = tx.profiles?.tier?.toLowerCase() || getTierByAmount(tx.profiles?.balance_usd || 0).id;
 
                             return (
-                                <div key={tx.id || idx} className="p-4 space-y-4 hover:bg-slate-50 transition-all flex flex-col" onClick={() => openReceipt(tx)}>
+                                <div key={tx.id || idx} className="p-3 space-y-3 hover:bg-slate-50 transition-all flex flex-col" onClick={() => openReceipt(tx)}>
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-3">
                                             <TierMedal tierId={tierName} size="xs" />
-                                            <div className="flex flex-col">
-                                                <span className="font-black text-slate-900 uppercase tracking-tight text-[11px] truncate max-w-[150px]">{tx.profiles?.full_name}</span>
+                                             <div className="flex flex-col">
+                                                <span className="font-black text-slate-900 uppercase tracking-tight text-[10px] truncate max-w-[150px]">{tx.profiles?.full_name}</span>
                                                 <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-end gap-1">
-                                            <span className="text-[10px] font-black text-emerald-500 tabular-nums text-base leading-none">$ {amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                            <span className="text-[7px] font-black text-gray-300 uppercase tracking-widest">Deposit Amount</span>
+                                            <span className="text-[9px] font-black text-emerald-500 tabular-nums text-[13px] leading-none">$ {amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             <div className="mt-1 flex justify-end">
                                                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
                                                     <div className={`h-1.5 w-1.5 rounded-full ${
