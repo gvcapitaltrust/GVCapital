@@ -8,7 +8,6 @@ export default function JournalClient() {
     const { journalEntries, loading } = useAccounting();
     const [searchQuery, setSearchQuery] = useState("");
     const [typeFilter, setTypeFilter] = useState("All");
-    const [expandedId, setExpandedId] = useState<string | null>(null);
 
     const types = useMemo(() => {
         const s = new Set<string>();
@@ -87,102 +86,73 @@ export default function JournalClient() {
             </div>
 
             {/* Journal Table */}
-            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                <div className="overflow-x-auto max-h-[70vh] overflow-y-auto">
-                    {/* Desktop Table */}
-                    <table className="w-full text-left hidden md:table">
-                        <thead className="bg-slate-50 text-[9px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 sticky top-0 z-10">
+            <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+                <div className="overflow-x-auto max-h-[75vh] overflow-y-auto scrollbar-thin">
+                    <table className="w-full text-left border-collapse">
+                        <thead className="bg-slate-50 text-[8px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 sticky top-0 z-20">
                             <tr>
-                                <th className="px-5 py-3 w-8"></th>
-                                <th className="px-5 py-3">Date</th>
-                                <th className="px-5 py-3">Ref</th>
-                                <th className="px-5 py-3">Type</th>
-                                <th className="px-5 py-3">Description</th>
-                                <th className="px-5 py-3 text-right">Debit (USD)</th>
-                                <th className="px-5 py-3 text-right">Credit (USD)</th>
+                                <th className="px-3 py-1.5 border-r border-slate-100">Date</th>
+                                <th className="px-3 py-1.5 border-r border-slate-100">Ref ID</th>
+                                <th className="px-3 py-1.5 border-r border-slate-100">Type</th>
+                                <th className="px-3 py-1.5 border-r border-slate-100">Account</th>
+                                <th className="px-3 py-1.5 border-r border-slate-100">Description</th>
+                                <th className="px-3 py-1.5 border-r border-slate-100">User / Audit Info</th>
+                                <th className="px-3 py-1.5 text-right border-r border-slate-100">Debit (USD)</th>
+                                <th className="px-3 py-1.5 text-right">Credit (USD)</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
-                            {filtered.map(entry => {
-                                const isExpanded = expandedId === entry.id;
-                                return (
-                                    <React.Fragment key={entry.id}>
-                                        <tr
-                                            className="hover:bg-slate-50/50 transition-colors cursor-pointer"
-                                            onClick={() => setExpandedId(isExpanded ? null : entry.id)}
-                                        >
-                                            <td className="px-5 py-3 text-slate-300">{isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}</td>
-                                            <td className="px-5 py-3 text-[10px] font-mono font-bold text-slate-400 whitespace-nowrap">{new Date(entry.date).toLocaleDateString()}</td>
-                                            <td className="px-5 py-3 text-[10px] font-mono font-black text-indigo-500">{entry.refId}</td>
-                                            <td className="px-5 py-3">
-                                                <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${
-                                                    entry.type.includes("Deposit") ? "bg-emerald-50 text-emerald-600" :
-                                                    entry.type.includes("Withdrawal") ? "bg-red-50 text-red-500" :
-                                                    entry.type.includes("Dividend") ? "bg-blue-50 text-blue-500" :
-                                                    entry.type.includes("Bonus") ? "bg-violet-50 text-violet-500" :
-                                                    "bg-slate-50 text-slate-500"
-                                                }`}>{entry.type}</span>
-                                            </td>
-                                            <td className="px-5 py-3 text-[11px] font-bold text-slate-700 max-w-[250px] truncate">{entry.description}</td>
-                                            <td className="px-5 py-3 text-[11px] font-black text-slate-900 tabular-nums text-right">$ {entry.totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                            <td className="px-5 py-3 text-[11px] font-black text-slate-900 tabular-nums text-right">$ {entry.totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        </tr>
-                                        {isExpanded && (
-                                            <tr>
-                                                <td colSpan={7} className="bg-indigo-50/30 px-5 py-0">
-                                                    <div className="py-3 pl-12 space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                        {entry.lines.map((line, i) => (
-                                                            <div key={i} className="flex items-center gap-4 text-[10px]">
-                                                                <span className="font-mono font-bold text-indigo-400 w-12">{line.accountCode}</span>
-                                                                <span className={`font-bold ${line.credit > 0 ? "pl-8" : ""} text-slate-700 flex-1`}>{line.accountName}</span>
-                                                                <span className="font-black tabular-nums text-slate-900 w-28 text-right">{line.debit > 0 ? `$ ${line.debit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}</span>
-                                                                <span className="font-black tabular-nums text-slate-900 w-28 text-right">{line.credit > 0 ? `$ ${line.credit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}</span>
-                                                            </div>
-                                                        ))}
-                                                        {entry.userName && <p className="text-[9px] font-bold text-slate-400 pt-2 border-t border-indigo-100 mt-2">User: {entry.userName} ({entry.userEmail})</p>}
+                            {filtered.map((entry, entryIdx) => (
+                                <React.Fragment key={entry.id}>
+                                    {entry.lines.map((line, lineIdx) => {
+                                        const isFirstLine = lineIdx === 0;
+                                        return (
+                                            <tr key={`${entry.id}-${lineIdx}`} className={`hover:bg-slate-50/50 transition-colors ${isFirstLine ? "border-t-[1.5px] border-slate-100" : ""}`}>
+                                                <td className="px-3 py-1 text-[9px] font-mono font-bold text-slate-400 whitespace-nowrap">
+                                                    {isFirstLine && new Date(entry.date).toLocaleDateString()}
+                                                </td>
+                                                <td className="px-3 py-1 text-[9px] font-mono font-black text-indigo-500">
+                                                    {isFirstLine && entry.refId}
+                                                </td>
+                                                <td className="px-3 py-1">
+                                                    {isFirstLine && (
+                                                        <span className={`text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${
+                                                            entry.type.includes("Deposit") ? "bg-emerald-50 text-emerald-600" :
+                                                            entry.type.includes("Withdrawal") ? "bg-red-50 text-red-500" :
+                                                            entry.type.includes("Dividend") ? "bg-blue-50 text-blue-500" :
+                                                            "bg-slate-50 text-slate-500"
+                                                        }`}>{entry.type}</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-3 py-1 border-r border-slate-50 whitespace-nowrap">
+                                                    <div className={`flex items-center gap-2 ${line.credit > 0 ? "pl-4 opacity-75" : ""}`}>
+                                                        <span className="text-[9px] font-mono font-bold text-indigo-400">{line.accountCode}</span>
+                                                        <span className="text-[10px] font-bold text-slate-700">{line.accountName}</span>
                                                     </div>
                                                 </td>
+                                                <td className="px-3 py-1 text-[10px] font-medium text-slate-500 max-w-[200px] truncate">
+                                                    {isFirstLine ? entry.description : ""}
+                                                </td>
+                                                <td className="px-3 py-1">
+                                                    {isFirstLine && entry.userName && (
+                                                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter truncate max-w-[120px] block">
+                                                            {entry.userName}
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className="px-3 py-1 text-[10px] font-black text-slate-900 tabular-nums text-right border-r border-slate-50">
+                                                    {line.debit > 0 ? `$ ${line.debit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}
+                                                </td>
+                                                <td className="px-3 py-1 text-[10px] font-black text-slate-900 tabular-nums text-right">
+                                                    {line.credit > 0 ? `$ ${line.credit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}
+                                                </td>
                                             </tr>
-                                        )}
-                                    </React.Fragment>
-                                );
-                            })}
+                                        );
+                                    })}
+                                </React.Fragment>
+                            ))}
                         </tbody>
                     </table>
-
-                    {/* Mobile Cards */}
-                    <div className="md:hidden divide-y divide-slate-100">
-                        {filtered.slice(0, 50).map(entry => (
-                            <div key={entry.id} className="p-4 space-y-2" onClick={() => setExpandedId(expandedId === entry.id ? null : entry.id)}>
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <span className={`text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
-                                            entry.type.includes("Deposit") ? "bg-emerald-50 text-emerald-600" :
-                                            entry.type.includes("Withdrawal") ? "bg-red-50 text-red-500" :
-                                            "bg-slate-50 text-slate-500"
-                                        }`}>{entry.type}</span>
-                                        <p className="text-[10px] font-bold text-slate-700 mt-1 leading-tight">{entry.description}</p>
-                                    </div>
-                                    <span className="text-[9px] font-mono font-bold text-slate-400">{new Date(entry.date).toLocaleDateString()}</span>
-                                </div>
-                                <div className="flex justify-between text-[10px] font-black tabular-nums">
-                                    <span className="text-slate-500">DR $ {entry.totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                    <span className="text-slate-500">CR $ {entry.totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                </div>
-                                {expandedId === entry.id && (
-                                    <div className="bg-indigo-50/50 rounded-lg p-3 space-y-1 animate-in fade-in duration-200">
-                                        {entry.lines.map((l, i) => (
-                                            <div key={i} className="flex justify-between text-[9px]">
-                                                <span className={`font-bold text-slate-600 ${l.credit > 0 ? "pl-4" : ""}`}>{l.accountCode} {l.accountName}</span>
-                                                <span className="font-black tabular-nums">{l.debit > 0 ? `DR ${l.debit.toFixed(2)}` : `CR ${l.credit.toFixed(2)}`}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-
                     {filtered.length === 0 && <div className="p-16 text-center text-slate-400 font-black uppercase tracking-widest text-xs">No entries found.</div>}
                 </div>
             </div>
