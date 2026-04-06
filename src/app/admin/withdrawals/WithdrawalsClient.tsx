@@ -164,23 +164,31 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </td>
                                         <td className="px-6 py-6">
-                                            <div className="flex flex-col">
-                                                <span className="text-slate-500 font-mono text-[11px] font-bold tabular-nums">{formatDate(tx.created_at)}</span>
-                                                <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-slate-500 font-mono text-[11px] font-bold tabular-nums whitespace-nowrap">{formatDate(tx.created_at)}</span>
+                                                <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase whitespace-nowrap opacity-60">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-6">
                                             <span className="font-black text-emerald-500 tabular-nums text-lg leading-none">$ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </td>
                                         <td className="px-6 py-6">
-                                            <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm ${
-                                                tx.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                                                tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                                                tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                                                'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                                            }`}>
-                                                {tx.status}
-                                            </span>
+                                            <div className="flex items-center gap-2.5 px-1">
+                                                <div className={`h-1.5 w-1.5 rounded-full ${
+                                                    tx.status === 'Completed' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' :
+                                                    tx.status === 'Pending Release' ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.4)] animate-pulse' :
+                                                    tx.status === 'Rejected' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' :
+                                                    'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)] animate-pulse'
+                                                }`} />
+                                                <span className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${
+                                                    tx.status === 'Completed' ? 'text-emerald-600' :
+                                                    tx.status === 'Pending Release' ? 'text-blue-600' :
+                                                    tx.status === 'Rejected' ? 'text-red-500' :
+                                                    'text-amber-600'
+                                                }`}>
+                                                    {tx.status}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-6 pr-10 text-right">
                                             <button 
@@ -215,14 +223,22 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                         <div className="text-right">
                                             <span className="font-black text-emerald-500 tabular-nums text-sm">$ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             <div className="mt-1 flex justify-end">
-                                                <span className={`px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest border ${
-                                                    tx.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                                                    tx.status === 'Pending Release' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                                                    'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                                                }`}>
-                                                    {tx.status}
-                                                </span>
+                                                <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
+                                                    <div className={`h-1.5 w-1.5 rounded-full ${
+                                                        tx.status === 'Completed' ? 'bg-emerald-500' :
+                                                        tx.status === 'Pending Release' ? 'bg-blue-500 animate-pulse' :
+                                                        tx.status === 'Rejected' ? 'bg-red-500' :
+                                                        'bg-amber-500 animate-pulse'
+                                                    }`} />
+                                                    <span className={`text-[8px] font-black uppercase tracking-widest ${
+                                                        tx.status === 'Completed' ? 'text-emerald-500' :
+                                                        tx.status === 'Pending Release' ? 'text-blue-500' :
+                                                        tx.status === 'Rejected' ? 'text-red-500' :
+                                                        'text-amber-500'
+                                                    }`}>
+                                                        {tx.status}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

@@ -157,19 +157,26 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                         $ {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </td>
                                     <td className="px-6 py-6">
-                                        <div className="flex flex-col">
-                                            <span className="text-slate-500 font-mono text-[11px] font-bold tabular-nums">{formatDate(tx.created_at)}</span>
-                                            <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-slate-500 font-mono text-[11px] font-bold tabular-nums whitespace-nowrap">{formatDate(tx.created_at)}</span>
+                                            <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase whitespace-nowrap opacity-60">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-6">
-                                        <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm ${
-                                            tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                                            tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                                            'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                                        }`}>
-                                            {tx.status}
-                                        </span>
+                                        <div className="flex items-center gap-2.5 px-1">
+                                            <div className={`h-1.5 w-1.5 rounded-full ${
+                                                tx.status === 'Approved' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' :
+                                                tx.status === 'Rejected' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' :
+                                                'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)] animate-pulse'
+                                            }`} />
+                                            <span className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${
+                                                tx.status === 'Approved' ? 'text-emerald-600' :
+                                                tx.status === 'Rejected' ? 'text-red-500' :
+                                                'text-amber-600'
+                                            }`}>
+                                                {tx.status}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-6 pr-10 text-right">
                                         {tx.status === 'Pending' ? (
@@ -208,13 +215,20 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                             <span className="text-[10px] font-black text-emerald-500 tabular-nums text-base leading-none">$ {amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             <span className="text-[7px] font-black text-gray-300 uppercase tracking-widest">Deposit Amount</span>
                                             <div className="mt-1 flex justify-end">
-                                                <span className={`px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest border border-slate-100 ${
-                                                    tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
-                                                    tx.status === 'Rejected' ? 'bg-red-500/10 text-red-500' :
-                                                    'bg-amber-500/10 text-amber-500'
-                                                }`}>
-                                                    {tx.status}
-                                                </span>
+                                                <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
+                                                    <div className={`h-1.5 w-1.5 rounded-full ${
+                                                        tx.status === 'Approved' ? 'bg-emerald-500' :
+                                                        tx.status === 'Rejected' ? 'bg-red-500' :
+                                                        'bg-amber-500 animate-pulse'
+                                                    }`} />
+                                                    <span className={`text-[8px] font-black uppercase tracking-widest ${
+                                                        tx.status === 'Approved' ? 'text-emerald-500' :
+                                                        tx.status === 'Rejected' ? 'text-red-500' :
+                                                        'text-amber-500'
+                                                    }`}>
+                                                        {tx.status}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
