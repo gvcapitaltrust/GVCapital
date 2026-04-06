@@ -153,7 +153,7 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-6 font-black text-emerald-500 tabular-nums text-lg leading-none">
+                                    <td className="px-6 py-6 font-black text-emerald-500 tabular-nums text-lg leading-none whitespace-nowrap">
                                         $ {(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </td>
                                     <td className="px-6 py-6">

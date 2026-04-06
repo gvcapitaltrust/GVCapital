@@ -226,9 +226,9 @@ export default function ApprovalsClient() {
                                          <td className="px-6 py-4">
                                              <span className="font-mono text-[10px] text-gray-400">{tx.ref_id}</span>
                                          </td>
-                                          <td className="px-6 py-4 font-black text-emerald-500">
-                                               ${(Number(tx.original_currency_amount || (Number(tx.amount || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                          </td>
+                                         <td className="px-6 py-4 font-black text-emerald-500 whitespace-nowrap">
+                                              ${(Number(tx.original_currency_amount || (Number(tx.amount || 0) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                         </td>
                                          <td className="px-6 py-4">
                                              <span className={`px-2.5 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest ${
                                                  tx.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
