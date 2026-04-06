@@ -91,14 +91,13 @@ export default function JournalClient() {
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-slate-50 text-[8px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 sticky top-0 z-20">
                             <tr>
-                                <th className="px-3 py-1.5 border-r border-slate-100">Date</th>
-                                <th className="px-3 py-1.5 border-r border-slate-100">Ref ID</th>
-                                <th className="px-3 py-1.5 border-r border-slate-100">Type</th>
+                                <th className="px-3 py-1.5 border-r border-slate-100 w-[80px] md:w-[100px]">Info</th>
+                                <th className="px-3 py-1.5 border-r border-slate-100 hidden md:table-cell">Type</th>
                                 <th className="px-3 py-1.5 border-r border-slate-100">Account</th>
-                                <th className="px-3 py-1.5 border-r border-slate-100">Description</th>
-                                <th className="px-3 py-1.5 border-r border-slate-100">User / Audit Info</th>
-                                <th className="px-3 py-1.5 text-right border-r border-slate-100">Debit (USD)</th>
-                                <th className="px-3 py-1.5 text-right">Credit (USD)</th>
+                                <th className="px-3 py-1.5 border-r border-slate-100 hidden lg:table-cell w-[200px]">Description</th>
+                                <th className="px-3 py-1.5 border-r border-slate-100 hidden xl:table-cell">User / Audit</th>
+                                <th className="px-3 py-1.5 text-right border-r border-slate-100 w-[70px] md:w-[100px]">Debit</th>
+                                <th className="px-3 py-1.5 text-right w-[70px] md:w-[100px]">Credit</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -108,13 +107,27 @@ export default function JournalClient() {
                                         const isFirstLine = lineIdx === 0;
                                         return (
                                             <tr key={`${entry.id}-${lineIdx}`} className={`hover:bg-slate-50/50 transition-colors ${isFirstLine ? "border-t-[1.5px] border-slate-100" : ""}`}>
-                                                <td className="px-3 py-1 text-[9px] font-mono font-bold text-slate-400 whitespace-nowrap">
-                                                    {isFirstLine && new Date(entry.date).toLocaleDateString()}
+                                                <td className="px-3 py-1 border-r border-slate-50 align-top">
+                                                    {isFirstLine && (
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[8px] md:text-[9px] font-mono font-bold text-slate-400 whitespace-nowrap leading-tight">
+                                                                {new Date(entry.date).toLocaleDateString()}
+                                                            </span>
+                                                            <span className="text-[9px] md:text-[10px] font-mono font-black text-indigo-500 leading-tight">
+                                                                {entry.refId}
+                                                            </span>
+                                                            <div className="md:hidden mt-0.5">
+                                                                <span className={`text-[6px] font-black uppercase tracking-widest px-1 py-0.5 rounded ${
+                                                                    entry.type.includes("Deposit") ? "bg-emerald-50 text-emerald-600" :
+                                                                    entry.type.includes("Withdrawal") ? "bg-red-50 text-red-500" :
+                                                                    entry.type.includes("Dividend") ? "bg-blue-50 text-blue-500" :
+                                                                    "bg-slate-50 text-slate-500"
+                                                                }`}>{entry.type}</span>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </td>
-                                                <td className="px-3 py-1 text-[9px] font-mono font-black text-indigo-500">
-                                                    {isFirstLine && entry.refId}
-                                                </td>
-                                                <td className="px-3 py-1">
+                                                <td className="px-3 py-1 hidden md:table-cell align-top">
                                                     {isFirstLine && (
                                                         <span className={`text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${
                                                             entry.type.includes("Deposit") ? "bg-emerald-50 text-emerald-600" :
@@ -124,27 +137,27 @@ export default function JournalClient() {
                                                         }`}>{entry.type}</span>
                                                     )}
                                                 </td>
-                                                <td className="px-3 py-1 border-r border-slate-50 whitespace-nowrap">
-                                                    <div className={`flex items-center gap-2 ${line.credit > 0 ? "pl-4 opacity-75" : ""}`}>
-                                                        <span className="text-[9px] font-mono font-bold text-indigo-400">{line.accountCode}</span>
-                                                        <span className="text-[10px] font-bold text-slate-700">{line.accountName}</span>
+                                                <td className="px-3 py-1 border-r border-slate-50 align-top min-w-[120px]">
+                                                    <div className={`flex flex-col md:flex-row md:items-center gap-1 md:gap-2 ${line.credit > 0 ? "pl-3 md:pl-4 opacity-75" : ""}`}>
+                                                        <span className="text-[8px] md:text-[9px] font-mono font-bold text-indigo-400">{line.accountCode}</span>
+                                                        <span className="text-[9px] md:text-[10px] font-bold text-slate-700 leading-tight break-words">{line.accountName}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-3 py-1 text-[10px] font-medium text-slate-500 max-w-[200px] truncate">
+                                                <td className="px-3 py-1 text-[9px] font-medium text-slate-500 hidden lg:table-cell align-top">
                                                     {isFirstLine ? entry.description : ""}
                                                 </td>
-                                                <td className="px-3 py-1">
+                                                <td className="px-3 py-1 hidden xl:table-cell align-top">
                                                     {isFirstLine && entry.userName && (
                                                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter truncate max-w-[120px] block">
                                                             {entry.userName}
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="px-3 py-1 text-[10px] font-black text-slate-900 tabular-nums text-right border-r border-slate-50">
-                                                    {line.debit > 0 ? `$ ${line.debit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}
+                                                <td className="px-3 py-1 text-[9px] md:text-[10px] font-black text-slate-900 tabular-nums text-right border-r border-slate-50 align-top">
+                                                    {line.debit > 0 ? `$${line.debit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}
                                                 </td>
-                                                <td className="px-3 py-1 text-[10px] font-black text-slate-900 tabular-nums text-right">
-                                                    {line.credit > 0 ? `$ ${line.credit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}
+                                                <td className="px-3 py-1 text-[9px] md:text-[10px] font-black text-slate-900 tabular-nums text-right align-top">
+                                                    {line.credit > 0 ? `$${line.credit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}
                                                 </td>
                                             </tr>
                                         );
