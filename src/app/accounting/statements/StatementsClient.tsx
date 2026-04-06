@@ -65,9 +65,12 @@ export default function StatementsClient() {
                         {profitAndLoss.revenue.length > 0 ? (
                             <div className="space-y-0.5 pl-3">
                                 {profitAndLoss.revenue.map(ab => (
-                                    <div key={ab.account.code} className="flex justify-between text-[10px] py-0.5">
-                                        <span className="font-bold text-slate-600"><span className="font-mono text-slate-400 mr-1.5">{ab.account.code}</span>{ab.account.name}</span>
-                                        <span className="font-black tabular-nums text-emerald-600">{formatUSD(ab.balance)}</span>
+                                    <div key={ab.account.code} className="flex justify-between text-[9px] md:text-[10px] py-1 border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors px-1">
+                                        <span className="font-bold text-slate-600 truncate max-w-[200px] md:max-w-none">
+                                            <span className="font-mono text-slate-400 mr-1.5 hidden sm:inline">{ab.account.code}</span>
+                                            {ab.account.name}
+                                        </span>
+                                        <span className="font-black tabular-nums text-emerald-600 whitespace-nowrap ml-2">{formatUSD(ab.balance)}</span>
                                     </div>
                                 ))}
                                 <div className="flex justify-between text-[10px] pt-1 border-t border-slate-100 mt-1 font-black">
@@ -82,9 +85,12 @@ export default function StatementsClient() {
                         {profitAndLoss.expenses.length > 0 ? (
                             <div className="space-y-0.5 pl-3">
                                 {profitAndLoss.expenses.map(ab => (
-                                    <div key={ab.account.code} className="flex justify-between text-[10px] py-0.5">
-                                        <span className="font-bold text-slate-600"><span className="font-mono text-slate-400 mr-1.5">{ab.account.code}</span>{ab.account.name}</span>
-                                        <span className="font-black tabular-nums text-red-500">({formatUSD(ab.balance)})</span>
+                                    <div key={ab.account.code} className="flex justify-between text-[9px] md:text-[10px] py-1 border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors px-1">
+                                        <span className="font-bold text-slate-600 truncate max-w-[200px] md:max-w-none">
+                                            <span className="font-mono text-slate-400 mr-1.5 hidden sm:inline">{ab.account.code}</span>
+                                            {ab.account.name}
+                                        </span>
+                                        <span className="font-black tabular-nums text-red-500 whitespace-nowrap ml-2">({formatUSD(ab.balance)})</span>
                                     </div>
                                 ))}
                                 <div className="flex justify-between text-[10px] pt-1 border-t border-slate-100 mt-1 font-black">
@@ -112,9 +118,12 @@ export default function StatementsClient() {
                         </div>
                         <div className="px-4 py-2 space-y-0.5">
                             {balanceSheet.assets.map(ab => (
-                                <div key={ab.account.code} className="flex justify-between text-[10px] py-0.5">
-                                    <span className="font-bold text-slate-600"><span className="font-mono text-slate-400 mr-1.5">{ab.account.code}</span>{ab.account.name}</span>
-                                    <span className="font-black tabular-nums text-slate-900">{formatUSD(ab.balance)}</span>
+                                <div key={ab.account.code} className="flex justify-between text-[9px] md:text-[10px] py-1 border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors px-1">
+                                    <span className="font-bold text-slate-600 truncate max-w-[200px] md:max-w-none">
+                                        <span className="font-mono text-slate-400 mr-1.5 hidden sm:inline">{ab.account.code}</span>
+                                        {ab.account.name}
+                                    </span>
+                                    <span className="font-black tabular-nums text-slate-900 whitespace-nowrap ml-2">{formatUSD(ab.balance)}</span>
                                 </div>
                             ))}
                             {balanceSheet.assets.length === 0 && <p className="text-[9px] text-slate-400 italic">No asset accounts.</p>}
@@ -130,9 +139,12 @@ export default function StatementsClient() {
                         </div>
                         <div className="px-4 py-2 space-y-0.5">
                             {balanceSheet.liabilities.map(ab => (
-                                <div key={ab.account.code} className="flex justify-between text-[10px] py-0.5">
-                                    <span className="font-bold text-slate-600"><span className="font-mono text-slate-400 mr-1.5">{ab.account.code}</span>{ab.account.name}</span>
-                                    <span className="font-black tabular-nums text-slate-900">{formatUSD(ab.balance)}</span>
+                                <div key={ab.account.code} className="flex justify-between text-[9px] md:text-[10px] py-1 border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors px-1">
+                                    <span className="font-bold text-slate-600 truncate max-w-[200px] md:max-w-none">
+                                        <span className="font-mono text-slate-400 mr-1.5 hidden sm:inline">{ab.account.code}</span>
+                                        {ab.account.name}
+                                    </span>
+                                    <span className="font-black tabular-nums text-slate-900 whitespace-nowrap ml-2">{formatUSD(ab.balance)}</span>
                                 </div>
                             ))}
                         </div>
@@ -143,9 +155,12 @@ export default function StatementsClient() {
                         </div>
                         <div className="px-4 py-2 space-y-0.5">
                             {balanceSheet.equity.map(ab => (
-                                <div key={ab.account.code} className="flex justify-between text-[10px] py-0.5">
-                                    <span className="font-bold text-slate-600"><span className="font-mono text-slate-400 mr-1.5">{ab.account.code}</span>{ab.account.name}</span>
-                                    <span className="font-black tabular-nums text-slate-900">{formatUSD(ab.balance)}</span>
+                                <div key={ab.account.code} className="flex justify-between text-[9px] md:text-[10px] py-1 border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors px-1">
+                                    <span className="font-bold text-slate-600 truncate max-w-[200px] md:max-w-none">
+                                        <span className="font-mono text-slate-400 mr-1.5 hidden sm:inline">{ab.account.code}</span>
+                                        {ab.account.name}
+                                    </span>
+                                    <span className="font-black tabular-nums text-slate-900 whitespace-nowrap ml-2">{formatUSD(ab.balance)}</span>
                                 </div>
                             ))}
                             <div className="flex justify-between text-[10px] pt-1 border-t border-slate-100 mt-1">
@@ -154,8 +169,14 @@ export default function StatementsClient() {
                             </div>
                         </div>
                     </div>
-                    <div className={`border rounded-lg px-4 py-2 flex items-center justify-between text-[10px] ${Math.abs(balanceSheet.totalAssets - balanceSheet.totalLiabilitiesEquity) < 0.01 ? "bg-emerald-50 border-emerald-200" : "bg-red-50 border-red-200"}`}>
-                        <span className="font-bold text-slate-500">A = L + E &nbsp;|&nbsp; Assets {formatUSD(balanceSheet.totalAssets)} = L+E {formatUSD(balanceSheet.totalLiabilitiesEquity)}</span>
+                    <div className={`border rounded-lg px-3 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[9px] md:text-[10px] ${Math.abs(balanceSheet.totalAssets - balanceSheet.totalLiabilitiesEquity) < 0.01 ? "bg-emerald-50 border-emerald-200" : "bg-red-50 border-red-200"}`}>
+                        <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 font-bold text-slate-500">
+                            <span>A = L + E</span>
+                            <span className="hidden md:inline">|</span>
+                            <span>Assets: {formatUSD(balanceSheet.totalAssets)}</span>
+                            <span className="hidden md:inline">=</span>
+                            <span>L+E: {formatUSD(balanceSheet.totalLiabilitiesEquity)}</span>
+                        </div>
                         <span className={`font-black uppercase tracking-widest ${Math.abs(balanceSheet.totalAssets - balanceSheet.totalLiabilitiesEquity) < 0.01 ? "text-emerald-600" : "text-red-500"}`}>
                             {Math.abs(balanceSheet.totalAssets - balanceSheet.totalLiabilitiesEquity) < 0.01 ? "✓ OK" : "✗ ERR"}
                         </span>

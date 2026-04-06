@@ -76,11 +76,11 @@ export default function UsersAccountingClient() {
                         <tr>
                             <th className="px-4 py-2 w-8"></th>
                             <th className="px-4 py-2">Investor</th>
-                            <th className="px-4 py-2">Account Fund</th>
-                            <th className="px-4 py-2 text-right">Capital (USD)</th>
-                            <th className="px-4 py-2 text-right">Dividends</th>
-                            <th className="px-4 py-2 text-right">Withdrawals</th>
-                            <th className="px-4 py-2 text-right">Activity</th>
+                            <th className="px-4 py-2 hidden sm:table-cell">Account Fund</th>
+                            <th className="px-4 py-2 text-right">Capital</th>
+                            <th className="px-4 py-2 text-right hidden md:table-cell">Dividends</th>
+                            <th className="px-4 py-2 text-right hidden lg:table-cell">Withdrawals</th>
+                            <th className="px-4 py-2 text-right hidden xl:table-cell">Activity</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -102,7 +102,7 @@ export default function UsersAccountingClient() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-2">
+                                        <td className="px-4 py-2 hidden sm:table-cell">
                                             <select 
                                                 value={u.portfolio_platform_name || "unallocated"}
                                                 disabled={updatingId === u.id}
@@ -118,9 +118,9 @@ export default function UsersAccountingClient() {
                                             </select>
                                         </td>
                                         <td className="px-4 py-2 text-right text-[10px] font-black tabular-nums text-slate-900">$ {(u.balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="px-4 py-2 text-right text-[10px] font-black tabular-nums text-emerald-600">$ {(u.accounting.totalDividends || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="px-4 py-2 text-right text-[10px] font-black tabular-nums text-red-500">$ {(u.accounting.totalWithdrawals || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="px-4 py-2 text-right">
+                                        <td className="px-4 py-2 text-right text-[10px] font-black tabular-nums text-emerald-600 hidden md:table-cell">$ {(u.accounting.totalDividends || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                        <td className="px-4 py-2 text-right text-[10px] font-black tabular-nums text-red-500 hidden lg:table-cell">$ {(u.accounting.totalWithdrawals || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                        <td className="px-4 py-2 text-right hidden xl:table-cell">
                                             <span className="text-[8px] font-black bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md">{u.accounting.entryCount} txns</span>
                                         </td>
                                     </tr>
@@ -136,9 +136,9 @@ export default function UsersAccountingClient() {
                                                         <table className="w-full text-left">
                                                             <thead className="bg-slate-50 text-[7px] font-black uppercase tracking-[0.2em] text-slate-400 sticky top-0">
                                                                 <tr>
-                                                                    <th className="px-3 py-1.5">Date</th>
-                                                                    <th className="px-3 py-1.5">Type</th>
-                                                                    <th className="px-3 py-1.5">Description</th>
+                                                                    <th className="px-3 py-1.5">Info</th>
+                                                                    <th className="px-3 py-1.5 hidden md:table-cell">Type</th>
+                                                                    <th className="px-3 py-1.5 hidden lg:table-cell">Description</th>
                                                                     <th className="px-3 py-1.5 text-right">Debit</th>
                                                                     <th className="px-3 py-1.5 text-right">Credit</th>
                                                                 </tr>
@@ -146,8 +146,20 @@ export default function UsersAccountingClient() {
                                                             <tbody className="divide-y divide-slate-50 text-[9px]">
                                                                 {expandedEntries.map((e, i) => (
                                                                     <tr key={i} className="hover:bg-slate-50/50">
-                                                                        <td className="px-3 py-1.5 font-mono font-bold text-slate-400 whitespace-nowrap">{new Date(e.date).toLocaleDateString()}</td>
-                                                                        <td className="px-3 py-1.5">
+                                                                        <td className="px-3 py-1.5 align-top">
+                                                                            <div className="flex flex-col">
+                                                                                <span className="font-mono font-bold text-slate-400 whitespace-nowrap leading-tight">{new Date(e.date).toLocaleDateString()}</span>
+                                                                                <div className="md:hidden mt-0.5">
+                                                                                    <span className={`text-[6px] font-black uppercase tracking-widest px-1 py-0.5 rounded ${
+                                                                                        e.type.includes("Deposit") ? "bg-emerald-50 text-emerald-600" :
+                                                                                        e.type.includes("Withdrawal") ? "bg-red-50 text-red-500" :
+                                                                                        e.type.includes("Dividend") ? "bg-blue-50 text-blue-500" :
+                                                                                        "bg-slate-50 text-slate-500"
+                                                                                    }`}>{e.type}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="px-3 py-1.5 hidden md:table-cell align-top">
                                                                             <span className={`text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${
                                                                                 e.type.includes("Deposit") ? "bg-emerald-50 text-emerald-600" :
                                                                                 e.type.includes("Withdrawal") ? "bg-red-50 text-red-500" :
@@ -155,9 +167,9 @@ export default function UsersAccountingClient() {
                                                                                 "bg-slate-50 text-slate-500"
                                                                             }`}>{e.type}</span>
                                                                         </td>
-                                                                        <td className="px-3 py-1.5 font-bold text-slate-700 max-w-[200px] truncate">{e.description}</td>
-                                                                        <td className="px-3 py-1.5 text-right font-black tabular-nums">$ {e.totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                                                        <td className="px-3 py-1.5 text-right font-black tabular-nums">$ {e.totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                                        <td className="px-3 py-1.5 font-bold text-slate-700 max-w-[200px] truncate hidden lg:table-cell align-top">{e.description}</td>
+                                                                        <td className="px-3 py-1.5 text-right font-black tabular-nums align-top">$ {e.totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                                        <td className="px-3 py-1.5 text-right font-black tabular-nums align-top">$ {e.totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                                                     </tr>
                                                                 ))}
                                                                 {expandedEntries.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-slate-400 text-[10px] font-bold">No ledger entries for this user.</td></tr>}

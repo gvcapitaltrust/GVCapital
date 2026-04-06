@@ -116,18 +116,18 @@ export default function LedgerClient() {
                                             <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">{account?.name}</h2>
                                             <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{account?.type} • Normal {account?.normalBalance}</span>
                                         </div>
-                                        <div className="flex items-center gap-6">
-                                            <div className="text-right">
+                                        <div className="flex flex-wrap md:flex-nowrap items-center gap-4 md:gap-6">
+                                            <div className="text-right flex-1 md:flex-none">
                                                 <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Total Debit</p>
-                                                <p className="text-sm font-black tabular-nums text-slate-900">$ {(tb?.totalDebit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                                <p className="text-[10px] md:text-sm font-black tabular-nums text-slate-900">$ {(tb?.totalDebit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                             </div>
-                                            <div className="text-right">
+                                            <div className="text-right flex-1 md:flex-none cursor-pointer">
                                                 <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Total Credit</p>
-                                                <p className="text-sm font-black tabular-nums text-slate-900">$ {(tb?.totalCredit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                                <p className="text-[10px] md:text-sm font-black tabular-nums text-slate-900">$ {(tb?.totalCredit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                             </div>
-                                            <div className="text-right border-l border-slate-200 pl-6">
+                                            <div className="text-right border-l border-slate-200 pl-4 md:pl-6 flex-1 md:flex-none">
                                                 <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Balance</p>
-                                                <p className={`text-lg font-black tabular-nums ${(tb?.balance || 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+                                                <p className={`text-sm md:text-lg font-black tabular-nums ${(tb?.balance || 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
                                                     $ {(tb?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                 </p>
                                             </div>
@@ -142,9 +142,8 @@ export default function LedgerClient() {
                                     <table className="w-full text-left">
                                         <thead className="bg-slate-50 text-[9px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 sticky top-0">
                                             <tr>
-                                                <th className="px-5 py-3">Date</th>
-                                                <th className="px-5 py-3">Ref</th>
-                                                <th className="px-5 py-3">Description</th>
+                                                <th className="px-5 py-3">Info</th>
+                                                <th className="px-5 py-3 hidden md:table-cell">Description</th>
                                                 <th className="px-5 py-3 text-right">Debit</th>
                                                 <th className="px-5 py-3 text-right">Credit</th>
                                                 <th className="px-5 py-3 text-right">Balance</th>
@@ -152,13 +151,17 @@ export default function LedgerClient() {
                                         </thead>
                                         <tbody className="divide-y divide-slate-50">
                                             {ledgerRows.map((row: any, i: number) => (
-                                                <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                                                    <td className="px-5 py-3 text-[10px] font-mono font-bold text-slate-400 whitespace-nowrap">{new Date(row.date).toLocaleDateString()}</td>
-                                                    <td className="px-5 py-3 text-[10px] font-mono font-black text-indigo-500">{row.refId}</td>
-                                                    <td className="px-5 py-3 text-[10px] font-bold text-slate-700 max-w-[250px] truncate">{row.description}</td>
-                                                    <td className="px-5 py-3 text-[10px] font-black tabular-nums text-right text-slate-900">{row.lineDebit > 0 ? `$ ${row.lineDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}</td>
-                                                    <td className="px-5 py-3 text-[10px] font-black tabular-nums text-right text-slate-900">{row.lineCredit > 0 ? `$ ${row.lineCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}</td>
-                                                    <td className={`px-5 py-3 text-[10px] font-black tabular-nums text-right ${row.runningBalance >= 0 ? "text-emerald-600" : "text-red-500"}`}>$ {row.runningBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                <tr key={i} className="hover:bg-slate-50/50 transition-colors text-[10px]">
+                                                    <td className="px-5 py-3 align-top">
+                                                        <div className="flex flex-col">
+                                                            <span className="font-mono font-bold text-slate-400 whitespace-nowrap leading-tight">{new Date(row.date).toLocaleDateString()}</span>
+                                                            <span className="font-mono font-black text-indigo-500 leading-tight">{row.refId}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-5 py-3 font-bold text-slate-700 max-w-[200px] truncate hidden md:table-cell align-top">{row.description}</td>
+                                                    <td className="px-5 py-3 font-black tabular-nums text-right text-slate-900 align-top">{row.lineDebit > 0 ? `$${row.lineDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}</td>
+                                                    <td className="px-5 py-3 font-black tabular-nums text-right text-slate-900 align-top">{row.lineCredit > 0 ? `$${row.lineCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : ""}</td>
+                                                    <td className={`px-5 py-3 font-black tabular-nums text-right align-top ${row.runningBalance >= 0 ? "text-emerald-600" : "text-red-500"}`}>$ {row.runningBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                                 </tr>
                                             ))}
                                         </tbody>

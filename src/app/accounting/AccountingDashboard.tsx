@@ -81,29 +81,33 @@ export default function AccountingDashboard() {
                         <table className="w-full text-left">
                             <thead className="bg-slate-50/50 text-[8px] font-black uppercase tracking-widest text-slate-400 sticky top-0">
                                 <tr>
-                                    <th className="px-3 py-1.5">Code</th>
+                                    <th className="px-3 py-1.5 hidden md:table-cell">Code</th>
                                     <th className="px-3 py-1.5">Account</th>
-                                    <th className="px-3 py-1.5 text-right">Debit</th>
-                                    <th className="px-3 py-1.5 text-right">Credit</th>
+                                    <th className="px-3 py-1.5 text-right hidden md:table-cell">Debit</th>
+                                    <th className="px-3 py-1.5 text-right hidden md:table-cell">Credit</th>
                                     <th className="px-3 py-1.5 text-right">Balance</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
                                 {trialBalance.map(ab => (
                                     <tr key={ab.account.code} className="hover:bg-slate-50/50 text-[10px]">
-                                        <td className="px-3 py-1.5 font-mono font-bold text-slate-400">{ab.account.code}</td>
-                                        <td className="px-3 py-1.5 font-bold text-slate-700 truncate max-w-[140px]">{ab.account.name}</td>
-                                        <td className="px-3 py-1.5 font-black tabular-nums text-right text-slate-900">{ab.totalDebit > 0 ? fmt(ab.totalDebit) : ""}</td>
-                                        <td className="px-3 py-1.5 font-black tabular-nums text-right text-slate-900">{ab.totalCredit > 0 ? fmt(ab.totalCredit) : ""}</td>
+                                        <td className="px-3 py-1.5 font-mono font-bold text-slate-400 hidden md:table-cell">{ab.account.code}</td>
+                                        <td className="px-3 py-1.5 font-bold text-slate-700 truncate max-w-[140px]">
+                                            <span className="md:hidden font-mono text-[8px] text-slate-400 mr-1">{ab.account.code}</span>
+                                            {ab.account.name}
+                                        </td>
+                                        <td className="px-3 py-1.5 font-black tabular-nums text-right text-slate-900 hidden md:table-cell">{ab.totalDebit > 0 ? fmt(ab.totalDebit) : ""}</td>
+                                        <td className="px-3 py-1.5 font-black tabular-nums text-right text-slate-900 hidden md:table-cell">{ab.totalCredit > 0 ? fmt(ab.totalCredit) : ""}</td>
                                         <td className={`px-3 py-1.5 font-black tabular-nums text-right ${ab.balance >= 0 ? "text-slate-900" : "text-red-500"}`}>{fmt(ab.balance)}</td>
                                     </tr>
                                 ))}
                             </tbody>
                             <tfoot className="bg-slate-50 text-[10px] font-black border-t border-slate-200">
                                 <tr>
-                                    <td className="px-3 py-2" colSpan={2}>TOTALS</td>
-                                    <td className="px-3 py-2 text-right tabular-nums">{fmt(totalDebits)}</td>
-                                    <td className="px-3 py-2 text-right tabular-nums">{fmt(totalCredits)}</td>
+                                    <td className="px-3 py-2 hidden md:table-cell">TOTALS</td>
+                                    <td className="px-3 py-2 md:hidden">TOTAL</td>
+                                    <td className="px-3 py-2 md:table-cell hidden text-right tabular-nums">{fmt(totalDebits)}</td>
+                                    <td className="px-3 py-2 md:table-cell hidden text-right tabular-nums">{fmt(totalCredits)}</td>
                                     <td className={`px-3 py-2 text-right tabular-nums ${isBalanced ? "text-emerald-600" : "text-red-500"}`}>{isBalanced ? "✓" : `Δ ${fmt(Math.abs(totalDebits - totalCredits))}`}</td>
                                 </tr>
                             </tfoot>
@@ -161,20 +165,23 @@ export default function AccountingDashboard() {
                 <table className="w-full text-left">
                     <thead className="bg-slate-50/50 text-[8px] font-black uppercase tracking-widest text-slate-400">
                         <tr>
-                            <th className="px-3 py-1.5">Date</th>
-                            <th className="px-3 py-1.5">Ref</th>
-                            <th className="px-3 py-1.5">Type</th>
+                            <th className="px-3 py-1.5">Info</th>
+                            <th className="px-3 py-1.5 hidden md:table-cell">Type</th>
                             <th className="px-3 py-1.5">Description</th>
-                            <th className="px-3 py-1.5 text-right">Amount (USD)</th>
-                            <th className="px-3 py-1.5 text-right">Activity</th>
+                            <th className="px-3 py-1.5 text-right w-24">Amount</th>
+                            <th className="px-3 py-1.5 text-right hidden lg:table-cell">Activity</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                         {journalEntries.slice(0, 15).map((entry, i) => (
                             <tr key={i} className="hover:bg-slate-50/50 text-[10px]">
-                                <td className="px-3 py-1.5 font-mono font-bold text-slate-400 whitespace-nowrap">{new Date(entry.date).toLocaleDateString()}</td>
-                                <td className="px-3 py-1.5 font-mono font-black text-indigo-500">{entry.refId}</td>
-                                <td className="px-3 py-1.5">
+                                <td className="px-3 py-1.5 align-top">
+                                    <div className="flex flex-col">
+                                        <span className="text-[8px] font-mono font-bold text-slate-400 whitespace-nowrap">{new Date(entry.date).toLocaleDateString()}</span>
+                                        <span className="text-[9px] font-mono font-black text-indigo-500">{entry.refId}</span>
+                                    </div>
+                                </td>
+                                <td className="px-3 py-1.5 hidden md:table-cell">
                                     <span className={`text-[7px] font-black uppercase tracking-widest px-1 py-0.5 rounded ${
                                         entry.type.includes("Deposit") ? "bg-emerald-50 text-emerald-600" :
                                         entry.type.includes("Withdrawal") ? "bg-red-50 text-red-500" :
@@ -182,11 +189,11 @@ export default function AccountingDashboard() {
                                         "bg-slate-50 text-slate-500"
                                     }`}>{entry.type}</span>
                                 </td>
-                                <td className="px-3 py-1.5 font-bold text-slate-700 max-w-[250px] truncate">{entry.description}</td>
-                                <td className="px-3 py-1.5 font-black tabular-nums text-right text-slate-900">$ {fmt(entry.principalAmount)}</td>
-                                <td className="px-3 py-1.5 text-right">
+                                <td className="px-3 py-1.5 font-bold text-slate-700 max-w-[200px] truncate align-top">{entry.description}</td>
+                                <td className="px-3 py-1.5 font-black tabular-nums text-right text-slate-900 align-top">$ {fmt(entry.principalAmount)}</td>
+                                <td className="px-3 py-1.5 text-right hidden lg:table-cell align-top">
                                     <span className="text-[7px] font-bold text-slate-400 uppercase tracking-tighter">
-                                        {entry.totalDebit > entry.principalAmount ? `+ $${fmt(entry.totalDebit - entry.principalAmount)} revenue` : "Standard"}
+                                        {entry.totalDebit > entry.principalAmount ? `+ $${fmt(entry.totalDebit - entry.principalAmount)} rev` : "Std"}
                                     </span>
                                 </td>
                             </tr>

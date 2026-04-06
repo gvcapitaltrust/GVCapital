@@ -216,10 +216,10 @@ export default function InvestmentsClient() {
                     <thead className="bg-slate-50/50 text-[8px] font-black uppercase tracking-widest text-slate-400">
                         <tr>
                             <th className="px-3 py-1.5">Account</th>
-                            <th className="px-3 py-1.5 text-right">Allocated</th>
-                            <th className="px-3 py-1.5 text-right">Returns</th>
-                            <th className="px-3 py-1.5 text-right">Losses</th>
-                            <th className="px-3 py-1.5 text-right">Withdrawn/Dist</th>
+                            <th className="px-3 py-1.5 text-right hidden md:table-cell">Allocated</th>
+                            <th className="px-3 py-1.5 text-right hidden md:table-cell">Returns</th>
+                            <th className="px-3 py-1.5 text-right hidden md:table-cell">Losses</th>
+                            <th className="px-3 py-1.5 text-right">Withdrawn</th>
                             <th className="px-3 py-1.5 text-right">Balance</th>
                             <th className="px-3 py-1.5 text-right">ROI</th>
                         </tr>
@@ -229,26 +229,25 @@ export default function InvestmentsClient() {
                             <tr key={acc.fundType} className="hover:bg-slate-50/50 text-[10px]">
                                 <td className="px-3 py-2">
                                     <div className="flex items-center gap-2">
-                                        <span className="font-mono text-[9px] font-bold text-slate-400">{acc.accountCode}</span>
+                                        <span className="font-mono text-[9px] font-bold text-slate-400 hidden sm:inline">{acc.accountCode}</span>
                                         <span className="font-black text-slate-900">{acc.label}</span>
-                                        <span className="text-[7px] font-bold text-slate-400">({acc.transactions.length} txns)</span>
                                     </div>
                                 </td>
-                                <td className="px-3 py-2 text-right font-black tabular-nums text-slate-900">{acc.totalAllocated > 0 ? fmt(acc.totalAllocated) : "—"}</td>
-                                <td className="px-3 py-2 text-right font-black tabular-nums text-emerald-600">{acc.totalReturns > 0 ? `+${fmt(acc.totalReturns)}` : "—"}</td>
-                                <td className="px-3 py-2 text-right font-black tabular-nums text-red-500">{acc.totalLosses > 0 ? `(${fmt(acc.totalLosses)})` : "—"}</td>
+                                <td className="px-3 py-2 text-right font-black tabular-nums text-slate-900 hidden md:table-cell">{acc.totalAllocated > 0 ? fmt(acc.totalAllocated) : "—"}</td>
+                                <td className="px-3 py-2 text-right font-black tabular-nums text-emerald-600 hidden md:table-cell">{acc.totalReturns > 0 ? `+${fmt(acc.totalReturns)}` : "—"}</td>
+                                <td className="px-3 py-2 text-right font-black tabular-nums text-red-500 hidden md:table-cell">{acc.totalLosses > 0 ? `(${fmt(acc.totalLosses)})` : "—"}</td>
                                 <td className="px-3 py-2 text-right font-black tabular-nums text-slate-500">{acc.totalWithdrawn > 0 ? fmt(acc.totalWithdrawn) : "—"}</td>
                                 <td className={`px-3 py-2 text-right font-black tabular-nums ${acc.currentBalance >= 0 ? "text-slate-900" : "text-red-500"}`}>{fmt(acc.currentBalance)}</td>
-                                <td className={`px-3 py-2 text-right font-black tabular-nums ${acc.roi >= 0 ? "text-emerald-600" : "text-red-500"}`}>{acc.roi.toFixed(2)}%</td>
+                                <td className={`px-3 py-2 text-right font-black tabular-nums ${acc.roi >= 0 ? "text-emerald-600" : "text-red-500"}`}>{acc.roi.toFixed(1)}%</td>
                             </tr>
                         ))}
                     </tbody>
                     <tfoot className="bg-slate-50 text-[10px] font-black border-t border-slate-200">
                         <tr>
                             <td className="px-3 py-2 uppercase tracking-widest text-[9px]">Totals</td>
-                            <td className="px-3 py-2 text-right tabular-nums">{fmt(totalAllocated)}</td>
-                            <td className="px-3 py-2 text-right tabular-nums text-emerald-600">{totalReturns > 0 ? `+${fmt(totalReturns)}` : "—"}</td>
-                            <td className="px-3 py-2 text-right tabular-nums text-red-500">{totalLosses > 0 ? `(${fmt(totalLosses)})` : "—"}</td>
+                            <td className="px-3 py-2 text-right tabular-nums hidden md:table-cell">{fmt(totalAllocated)}</td>
+                            <td className="px-3 py-2 text-right tabular-nums text-emerald-600 hidden md:table-cell">{totalReturns > 0 ? `+${fmt(totalReturns)}` : "—"}</td>
+                            <td className="px-3 py-2 text-right tabular-nums text-red-500 hidden md:table-cell">{totalLosses > 0 ? `(${fmt(totalLosses)})` : "—"}</td>
                             <td className="px-3 py-2 text-right tabular-nums text-slate-500">{fmt(investmentSummary.reduce((s, a) => s + a.totalWithdrawn, 0))}</td>
                             <td className={`px-3 py-2 text-right tabular-nums ${totalBalance >= 0 ? "text-slate-900" : "text-red-500"}`}>{fmt(totalBalance)}</td>
                             <td className={`px-3 py-2 text-right tabular-nums ${parseFloat(netROI) >= 0 ? "text-emerald-600" : "text-red-500"}`}>{netROI}%</td>
@@ -266,18 +265,30 @@ export default function InvestmentsClient() {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50/50 text-[8px] font-black uppercase tracking-widest text-slate-400">
                             <tr>
-                                <th className="px-3 py-1.5">Date</th>
-                                <th className="px-3 py-1.5">Type</th>
+                                <th className="px-3 py-1.5">Info</th>
+                                <th className="px-3 py-1.5 hidden md:table-cell">Type</th>
                                 <th className="px-3 py-1.5">Account</th>
-                                <th className="px-3 py-1.5">Description</th>
-                                <th className="px-3 py-1.5 text-right">Amount</th>
+                                <th className="px-3 py-1.5 hidden lg:table-cell">Description</th>
+                                <th className="px-3 py-1.5 text-right w-24">Amount</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {[...fundTransactions].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map(ft => (
                                 <tr key={ft.id} className="hover:bg-slate-50/50 text-[10px]">
-                                    <td className="px-3 py-1.5 font-mono font-bold text-slate-400 whitespace-nowrap">{new Date(ft.created_at).toLocaleDateString()}</td>
-                                    <td className="px-3 py-1.5">
+                                    <td className="px-3 py-1.5 align-top">
+                                        <div className="flex flex-col">
+                                            <span className="font-mono font-bold text-slate-400 whitespace-nowrap">{new Date(ft.created_at).toLocaleDateString()}</span>
+                                            <div className="md:hidden mt-0.5">
+                                                <span className={`text-[6px] font-black uppercase tracking-widest px-1 py-0.5 rounded ${
+                                                    ft.transaction_type === "allocation" ? "bg-blue-50 text-blue-600" :
+                                                    ft.transaction_type === "return" ? "bg-emerald-50 text-emerald-600" :
+                                                    ft.transaction_type === "loss" ? "bg-red-50 text-red-500" :
+                                                    "bg-slate-50 text-slate-500"
+                                                }`}>{ft.transaction_type}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-3 py-1.5 hidden md:table-cell">
                                         <span className={`text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${
                                             ft.transaction_type === "allocation" ? "bg-blue-50 text-blue-600" :
                                             ft.transaction_type === "return" ? "bg-emerald-50 text-emerald-600" :
@@ -286,25 +297,17 @@ export default function InvestmentsClient() {
                                             ft.transaction_type === "distribution" ? "bg-indigo-50 text-indigo-600" :
                                             "bg-amber-50 text-amber-600"
                                         }`}>
-                                            {ft.transaction_type === "reallocation" ? (
-                                                <span className="flex items-center gap-0.5"><ArrowRightLeft className="h-2.5 w-2.5" /> Realloc</span>
-                                            ) : ft.transaction_type === "return" ? (
-                                                <span className="flex items-center gap-0.5"><TrendingUp className="h-2.5 w-2.5" /> Return</span>
-                                            ) : ft.transaction_type === "loss" ? (
-                                                <span className="flex items-center gap-0.5"><TrendingDown className="h-2.5 w-2.5" /> Loss</span>
-                                            ) : ft.transaction_type === "distribution" ? (
-                                                <span className="flex items-center gap-0.5"><Users className="h-2.5 w-2.5" /> Distribution</span>
-                                            ) : ft.transaction_type}
+                                            {ft.transaction_type}
                                         </span>
                                     </td>
-                                    <td className="px-3 py-1.5 font-bold text-slate-700">
+                                    <td className="px-3 py-1.5 font-bold text-slate-700 align-top">
                                         {FUND_LABELS[ft.fund_type as FundType] || ft.fund_type}
                                         {ft.transaction_type === "reallocation" && ft.target_fund_type && (
-                                            <span className="text-slate-400"> → {FUND_LABELS[ft.target_fund_type as FundType] || ft.target_fund_type}</span>
+                                            <span className="text-slate-400 block sm:inline"> → {FUND_LABELS[ft.target_fund_type as FundType] || ft.target_fund_type}</span>
                                         )}
                                     </td>
-                                    <td className="px-3 py-1.5 font-bold text-slate-500 max-w-[200px] truncate">{ft.description || "—"}</td>
-                                    <td className={`px-3 py-1.5 text-right font-black tabular-nums ${
+                                    <td className="px-3 py-1.5 font-bold text-slate-500 max-w-[200px] truncate hidden lg:table-cell align-top">{ft.description || "—"}</td>
+                                    <td className={`px-3 py-1.5 text-right font-black tabular-nums align-top ${
                                         ft.transaction_type === "return" ? "text-emerald-600" :
                                         ft.transaction_type === "loss" ? "text-red-500" : "text-slate-900"
                                     }`}>{fmt(Number(ft.amount_usd))}</td>

@@ -32,9 +32,9 @@ export default function FundsClient() {
                 <table className="w-full text-left">
                     <thead className="bg-slate-50 text-[8px] font-black uppercase tracking-widest text-slate-400">
                         <tr>
-                            <th className="px-4 py-2">Total AUM (USD)</th>
+                            <th className="px-4 py-2">Total AUM</th>
                             <th className="px-4 py-2">Funds</th>
-                            <th className="px-4 py-2">Investors</th>
+                            <th className="px-4 py-2 hidden sm:table-cell">Investors</th>
                             <th className={`px-4 py-2 ${unallocatedUsers.length > 0 ? "text-amber-500" : "text-emerald-500"}`}>Unallocated</th>
                         </tr>
                     </thead>
@@ -42,10 +42,10 @@ export default function FundsClient() {
                         <tr>
                             <td className="px-4 py-2.5 text-slate-900">$ {totalAUM.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                             <td className="px-4 py-2.5 text-slate-700">{fundAccounts.length}</td>
-                            <td className="px-4 py-2.5 text-slate-700">{totalUsers}</td>
+                            <td className="px-4 py-2.5 text-slate-700 hidden sm:table-cell">{totalUsers}</td>
                             <td className="px-4 py-2.5">
                                 <span className={unallocatedUsers.length > 0 ? "text-amber-600" : "text-emerald-600"}>
-                                    {unallocatedUsers.length} Users ($ {unallocAUM.toLocaleString(undefined, { minimumFractionDigits: 2 })})
+                                    {unallocatedUsers.length} <span className="hidden sm:inline">Users</span> ($ {unallocAUM.toLocaleString(undefined, { minimumFractionDigits: 2 })})
                                 </span>
                             </td>
                         </tr>
@@ -56,13 +56,13 @@ export default function FundsClient() {
             {/* Fund List Table */}
             <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
                 <table className="w-full text-left">
-                    <thead className="bg-slate-50 text-[8px) font-black uppercase tracking-widest text-slate-400">
+                    <thead className="bg-slate-50 text-[8px] font-black uppercase tracking-widest text-slate-400">
                         <tr>
                             <th className="px-4 py-2 w-10"></th>
                             <th className="px-4 py-2">Fund Name</th>
                             <th className="px-4 py-2 text-right">AUM (USD)</th>
-                            <th className="px-4 py-2 text-right">Market Share</th>
-                            <th className="px-4 py-2 text-right">Investors</th>
+                            <th className="px-4 py-2 text-right hidden sm:table-cell">Market Share</th>
+                            <th className="px-4 py-2 text-right hidden md:table-cell">Investors</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -103,11 +103,11 @@ export default function FundsClient() {
                                                     <table className="w-full text-left">
                                                         <thead className="text-[7px] font-black uppercase tracking-[0.2em] text-slate-400 bg-white/50">
                                                             <tr>
-                                                                <th className="px-10 py-1.5">Investor Name</th>
-                                                                <th className="px-4 py-1.5">Tier</th>
-                                                                <th className="px-4 py-1.5">Account ID</th>
-                                                                <th className="px-4 py-1.5 text-right">Capital (USD)</th>
-                                                                <th className="px-4 py-1.5 text-right">% Fund</th>
+                                                                <th className="px-10 py-1.5">Investor</th>
+                                                                <th className="px-4 py-1.5 hidden md:table-cell">Tier</th>
+                                                                <th className="px-4 py-1.5 hidden lg:table-cell">Account ID</th>
+                                                                <th className="px-4 py-1.5 text-right">Capital</th>
+                                                                <th className="px-4 py-1.5 text-right hidden sm:table-cell">% Fund</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody className="divide-y divide-slate-50">
@@ -120,15 +120,15 @@ export default function FundsClient() {
                                                                             <div className="flex items-center gap-2">
                                                                                 <TierMedal tierId={tier.id} size="xs" />
                                                                                 <div className="flex flex-col">
-                                                                                    <span className="text-[9px] font-bold text-slate-700">{u.full_name || u.username}</span>
-                                                                                    <span className="text-[7px] font-medium text-slate-400">{u.email}</span>
+                                                                                    <span className="text-[9px] font-bold text-slate-700 leading-tight">{u.full_name || u.username}</span>
+                                                                                    <span className="text-[7px] font-medium text-slate-400 leading-tight">{u.email}</span>
                                                                                 </div>
                                                                             </div>
                                                                         </td>
-                                                                        <td className="px-4 py-2 text-[8px] font-black uppercase tracking-widest text-slate-500">{tier.name}</td>
-                                                                        <td className="px-4 py-2 text-[8px] font-mono font-bold text-indigo-500">{u.portfolio_account_id || "—"}</td>
+                                                                        <td className="px-4 py-2 text-[8px] font-black uppercase tracking-widest text-slate-500 hidden md:table-cell">{tier.name}</td>
+                                                                        <td className="px-4 py-2 text-[8px] font-mono font-bold text-indigo-500 hidden lg:table-cell">{u.portfolio_account_id || "—"}</td>
                                                                         <td className="px-4 py-2 text-right text-[9px] font-black tabular-nums text-slate-900">$ {(u.balance_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                                                        <td className="px-4 py-2 text-right text-[9px] font-black tabular-nums text-slate-400">{pct}%</td>
+                                                                        <td className="px-4 py-2 text-right text-[9px] font-black tabular-nums text-slate-400 hidden sm:table-cell">{pct}%</td>
                                                                     </tr>
                                                                 );
                                                             })}
