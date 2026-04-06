@@ -169,8 +169,8 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                                 <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase whitespace-nowrap opacity-60">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-6">
-                                            <span className="font-black text-emerald-500 tabular-nums text-lg leading-none">$ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                        <td className="px-6 py-6 font-black text-emerald-500 tabular-nums text-lg leading-none whitespace-nowrap">
+                                            $ {payoutUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </td>
                                         <td className="px-6 py-6">
                                             <div className="flex items-center gap-2.5 px-1">
