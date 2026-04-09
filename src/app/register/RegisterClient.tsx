@@ -29,10 +29,7 @@ export default function RegisterPage() {
     const [referralCheckMsg, setReferralCheckMsg] = useState("");
     const [inviterId, setInviterId] = useState<string | null>(null);
     const [securityPin, setSecurityPin] = useState("");
-    const [ownUsername, setOwnUsername] = useState("");
-    const [isUsernameValid, setIsUsernameValid] = useState(false);
-    const [isValidatingUsername, setIsValidatingUsername] = useState(false);
-    const [usernameCheckMsg, setUsernameCheckMsg] = useState("");
+    const [securityPin, setSecurityPin] = useState("");
 
     useEffect(() => {
         const l = searchParams?.get("lang");
@@ -81,34 +78,6 @@ export default function RegisterPage() {
         }
     };
 
-    const validateOwnUsername = async (username: string) => {
-        if (!username || username.length < 3) {
-            setIsUsernameValid(false);
-            setUsernameCheckMsg("");
-            return;
-        }
-
-        setIsValidatingUsername(true);
-        try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('username')
-                .eq('username', username)
-                .maybeSingle();
-
-            if (data) {
-                setIsUsernameValid(false);
-                setUsernameCheckMsg(lang === "en" ? "Username already taken." : "用户名已被占用。");
-            } else {
-                setIsUsernameValid(true);
-                setUsernameCheckMsg("");
-            }
-        } catch (err) {
-            setIsUsernameValid(true); // Assume ok if error
-        } finally {
-            setIsValidatingUsername(false);
-        }
-    };
 
     useEffect(() => {
         if (!isRefReadOnly) {
@@ -117,10 +86,6 @@ export default function RegisterPage() {
         }
     }, [referralCode, isRefReadOnly]);
 
-    useEffect(() => {
-        const timer = setTimeout(() => validateOwnUsername(ownUsername), 500);
-        return () => clearTimeout(timer);
-    }, [ownUsername]);
 
     interface ContentItem {
         title: string;
@@ -131,8 +96,6 @@ export default function RegisterPage() {
         female: string;
         emailLabel: string;
         passwordLabel: string;
-        usernameLabel: string;
-        usernamePlaceholder: string;
         agreementPrefix: string;
         agreementLink: string;
         button: string;
@@ -166,8 +129,6 @@ export default function RegisterPage() {
             female: "Female",
             emailLabel: "Email Address",
             passwordLabel: "Password",
-            usernameLabel: "Create Your Unique Username",
-            usernamePlaceholder: "This will be your referral code",
             agreementPrefix: "I agree to the ",
             agreementLink: "Private Investment Agreement",
             button: "Create Account",
@@ -221,8 +182,6 @@ export default function RegisterPage() {
             female: "女",
             emailLabel: "电子邮件地址",
             passwordLabel: "密码",
-            usernameLabel: "创建您的唯一用户名",
-            usernamePlaceholder: "这将是您的推荐码",
             agreementPrefix: "我同意 ",
             agreementLink: "私人投资协议",
             button: "创建账户",
@@ -273,8 +232,8 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isAgreed || !isReferralValid || !isUsernameValid || !gender || !dob) {
-            setErrorMsg(lang === 'en' ? "Please complete all required fields including Date of Birth." : "请填写所有必填字段，包括出生日期。");
+        if (!isAgreed || !isReferralValid || !gender || !dob || !fullName) {
+            setErrorMsg(lang === 'en' ? "Please complete all required fields including Full Name and Date of Birth." : "请填写所有必填字段，包括全名和出生日期。");
             return;
         }
         if (password !== confirmPassword) {
@@ -285,13 +244,45 @@ export default function RegisterPage() {
         setErrorMsg("");
 
         try {
+            // Generate system username: First word + initials of others + last 2 digits of YOB
+            const generateBaseUsername = () => {
+                const parts = fullName.trim().split(/\s+/);
+                if (parts.length === 0) return "user";
+                const first = parts[0].toLowerCase();
+                const initials = parts.slice(1).map(p => p.charAt(0).toLowerCase()).join("");
+                const year = new Date(dob).getFullYear().toString().slice(-2);
+                return `${first}${initials}${year}`;
+            };
+
+            const baseUsername = generateBaseUsername();
+            
+            // Ensure uniqueness
+            let finalUsername = baseUsername;
+            let counter = 1;
+            let isUnique = false;
+            
+            while (!isUnique) {
+                const { data } = await supabase
+                    .from('profiles')
+                    .select('username')
+                    .eq('username', finalUsername)
+                    .maybeSingle();
+                
+                if (!data) {
+                    isUnique = true;
+                } else {
+                    counter++;
+                    finalUsername = `${baseUsername}${counter}`;
+                }
+            }
+
             const { data: { user }, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
                     data: {
                         full_name: fullName,
-                        username: ownUsername.toLowerCase(),
+                        username: finalUsername,
                         kyc_completed: false,
                         role: 'User'
                     }
@@ -318,7 +309,7 @@ export default function RegisterPage() {
                     id: user.id,
                     email: email,
                     full_name: fullName,
-                    username: ownUsername.toLowerCase(),
+                    username: finalUsername,
                     balance: 0,
                     profit: 0,
                     kyc_completed: false,
@@ -463,20 +454,6 @@ export default function RegisterPage() {
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="username" className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.usernameLabel}</label>
-                        <input
-                            id="username"
-                            name="username"
-                            type="text"
-                            required
-                            value={ownUsername}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOwnUsername(e.target.value.replace(/\s+/g, '').toLowerCase())}
-                            className={`w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 transition-all font-medium ${!isUsernameValid ? 'border-red-500/50 ring-red-500/20' : 'focus:ring-gv-gold/50'}`}
-                            placeholder={t.usernamePlaceholder}
-                        />
-                        {usernameCheckMsg && <p className="text-[10px] text-red-500 font-bold px-1 uppercase tracking-widest">{usernameCheckMsg}</p>}
-                    </div>
 
                     <div className="space-y-2">
                         <label htmlFor="security_pin" className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.securityPinLabel}</label>
@@ -541,10 +518,10 @@ export default function RegisterPage() {
 
                     <button
                         type="submit"
-                        disabled={isLoading || !isAgreed || !isReferralValid || isValidatingReferral || !isUsernameValid || isValidatingUsername || !ownUsername || password !== confirmPassword || !dob}
+                        disabled={isLoading || !isAgreed || !isReferralValid || isValidatingReferral || password !== confirmPassword || !dob || !fullName}
                         className="w-full bg-gv-gold text-black font-black text-lg py-5 rounded-2xl hover:bg-gv-gold/90 transition-all shadow-[0_10px_30px_rgba(212,175,55,0.2)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest flex items-center justify-center gap-2"
                     >
-                        {isLoading || isValidatingReferral || isValidatingUsername ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
+                        {isLoading || isValidatingReferral ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
                     </button>
                 </form>
 
