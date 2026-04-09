@@ -132,7 +132,7 @@ export default function TransactionEditorClient() {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-700 pb-20">
+        <div className="space-y-8 animate-in fade-in duration-700 pb-32">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-2">
@@ -212,14 +212,14 @@ export default function TransactionEditorClient() {
                 <div className="hidden xl:block overflow-x-auto pb-4">
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-slate-50/50 border-b border-slate-100 italic">
-                            <tr className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                <th className="px-6 py-5">Transaction Info</th>
-                                <th className="px-3 py-5">Create Date</th>
-                                <th className="px-3 py-5">Approve Date</th>
-                                <th className="px-3 py-5">Release Date</th>
-                                <th className="px-3 py-5">Completed Date</th>
-                                <th className="px-3 py-5">Transfer Date</th>
-                                <th className="px-6 py-5 text-right">Action</th>
+                            <tr className="text-[8px] font-black uppercase tracking-widest text-slate-400">
+                                <th className="px-4 py-5">Info</th>
+                                <th className="px-2 py-5">Created</th>
+                                <th className="px-2 py-5">Approved</th>
+                                <th className="px-2 py-5">Released</th>
+                                <th className="px-2 py-5">Completed</th>
+                                <th className="px-2 py-5">Transfer</th>
+                                <th className="px-4 py-5 text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -437,51 +437,65 @@ export default function TransactionEditorClient() {
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                                    <div className="space-y-1.5">
-                                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Created Date</label>
-                                        <input 
-                                            type="datetime-local" 
-                                            value={tx.created_at ? new Date(tx.created_at).toISOString().slice(0, 16) : ""}
-                                            onChange={(e) => handleUpdateDate(tx.id, "created_at", new Date(e.target.value).toISOString())}
-                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Approved Date</label>
-                                        <input 
-                                            type="datetime-local" 
-                                            value={tx.metadata?.approved_at ? new Date(tx.metadata.approved_at).toISOString().slice(0, 16) : ""}
-                                            onChange={(e) => handleUpdateDate(tx.id, "approved_at", new Date(e.target.value).toISOString())}
-                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Released Date</label>
-                                        <input 
-                                            type="datetime-local" 
-                                            value={tx.metadata?.released_at ? new Date(tx.metadata.released_at).toISOString().slice(0, 16) : ""}
-                                            onChange={(e) => handleUpdateDate(tx.id, "released_at", new Date(e.target.value).toISOString())}
-                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Completed Date</label>
-                                        <input 
-                                            type="datetime-local" 
-                                            value={tx.metadata?.completed_at ? new Date(tx.metadata.completed_at).toISOString().slice(0, 16) : ""}
-                                            onChange={(e) => handleUpdateDate(tx.id, "completed_at", new Date(e.target.value).toISOString())}
-                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Transfer Date</label>
-                                        <input 
-                                            type="datetime-local" 
-                                            value={tx.transfer_date ? new Date(tx.transfer_date).toISOString().slice(0, 16) : ""}
-                                            onChange={(e) => handleUpdateDate(tx.id, "transfer_date", new Date(e.target.value).toISOString())}
-                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
-                                        />
-                                    </div>
+                                    {/* Helper to format for datetime-local (local time) */}
+                                    {(() => {
+                                        const toLocalValue = (dateStr?: string) => {
+                                            if (!dateStr) return "";
+                                            const d = new Date(dateStr);
+                                            const offset = d.getTimezoneOffset() * 60000;
+                                            return new Date(d.getTime() - offset).toISOString().slice(0, 16);
+                                        };
+
+                                        return (
+                                            <>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Created Date</label>
+                                                    <input 
+                                                        type="datetime-local" 
+                                                        value={toLocalValue(tx.created_at)}
+                                                        onChange={(e) => handleUpdateDate(tx.id, "created_at", new Date(e.target.value).toISOString())}
+                                                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Approved Date</label>
+                                                    <input 
+                                                        type="datetime-local" 
+                                                        value={toLocalValue(tx.metadata?.approved_at)}
+                                                        onChange={(e) => handleUpdateDate(tx.id, "approved_at", new Date(e.target.value).toISOString())}
+                                                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Released Date</label>
+                                                    <input 
+                                                        type="datetime-local" 
+                                                        value={toLocalValue(tx.metadata?.released_at)}
+                                                        onChange={(e) => handleUpdateDate(tx.id, "released_at", new Date(e.target.value).toISOString())}
+                                                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Completed Date</label>
+                                                    <input 
+                                                        type="datetime-local" 
+                                                        value={toLocalValue(tx.metadata?.completed_at)}
+                                                        onChange={(e) => handleUpdateDate(tx.id, "completed_at", new Date(e.target.value).toISOString())}
+                                                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Transfer Date</label>
+                                                    <input 
+                                                        type="datetime-local" 
+                                                        value={toLocalValue(tx.transfer_date)}
+                                                        onChange={(e) => handleUpdateDate(tx.id, "transfer_date", new Date(e.target.value).toISOString())}
+                                                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+                                                    />
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         );

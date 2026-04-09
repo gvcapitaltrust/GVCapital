@@ -25,10 +25,10 @@ export default function AccountingSidebar({
     const router = useRouter();
 
     const menuItems = [
-        { id: "dashboard", path: "/accounting", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5 shrink-0" /> },
-        { id: "journal", path: "/accounting/journal", label: "General Journal", icon: <BookOpen className="h-5 w-5 shrink-0" /> },
-        { id: "ledger", path: "/accounting/ledger", label: "General Ledger", icon: <Database className="h-5 w-5 shrink-0" /> },
-        { id: "statements", path: "/accounting/statements", label: "Statements", icon: <BarChart3 className="h-5 w-5 shrink-0" /> },
+        { id: "dashboard", path: "/accounting", label: "Dashboard", shortLabel: "HOME", icon: <LayoutDashboard className="h-5 w-5 shrink-0" /> },
+        { id: "journal", path: "/accounting/journal", label: "General Journal", shortLabel: "JOURNAL", icon: <BookOpen className="h-5 w-5 shrink-0" /> },
+        { id: "ledger", path: "/accounting/ledger", label: "General Ledger", shortLabel: "LEDGER", icon: <Database className="h-5 w-5 shrink-0" /> },
+        { id: "statements", path: "/accounting/statements", label: "Statements", shortLabel: "STATS", icon: <BarChart3 className="h-5 w-5 shrink-0" /> },
         { id: "investments", path: "/accounting/investments", label: "Investments", icon: <TrendingUp className="h-5 w-5 shrink-0" /> },
         { id: "users", path: "/accounting/users", label: "User Accounts", icon: <Users className="h-5 w-5 shrink-0" /> },
         { id: "funds", path: "/accounting/funds", label: "Fund Accounts", icon: <Briefcase className="h-5 w-5 shrink-0" /> },
@@ -178,7 +178,7 @@ export default function AccountingSidebar({
                             {active && <div className="absolute -top-px left-1/2 -translate-x-1/2 w-8 h-0.5 bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)] rounded-full" />}
                             <span className={`transition-transform duration-300 ${active ? "scale-110 -translate-y-1 block" : ""}`}>{item.icon}</span>
                             <span className={`text-[7px] font-black uppercase tracking-widest mt-1 ${active ? "opacity-100" : "opacity-60"}`}>
-                                {item.id === "dashboard" ? "HOME" : item.label.split(" ")[0]}
+                                {(item as any).shortLabel || item.label.split(" ")[0]}
                             </span>
                         </Link>
                     );
