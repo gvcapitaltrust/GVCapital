@@ -207,19 +207,19 @@ export default function TransactionEditorClient() {
             </div>
 
             {/* Transactions List */}
-            <div className="bg-white border border-slate-200 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl">
-                {/* Desktop View (Table) */}
-                <div className="hidden md:block overflow-x-auto">
+            <div className="bg-white border border-slate-200 rounded-[2rem] xl:rounded-[2.5rem] overflow-hidden shadow-2xl">
+                {/* Desktop View (Table) - Only on large screens */}
+                <div className="hidden xl:block overflow-x-auto pb-4">
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-slate-50/50 border-b border-slate-100 italic">
                             <tr className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                <th className="px-8 py-5">Transaction Info</th>
-                                <th className="px-6 py-5">Create Date</th>
-                                <th className="px-6 py-5">Approve Date</th>
-                                <th className="px-6 py-5">Release Date</th>
-                                <th className="px-6 py-5">Completed Date</th>
-                                <th className="px-6 py-5">Transfer Date</th>
-                                <th className="px-8 py-5 text-right">Action</th>
+                                <th className="px-6 py-5">Transaction Info</th>
+                                <th className="px-3 py-5">Create Date</th>
+                                <th className="px-3 py-5">Approve Date</th>
+                                <th className="px-3 py-5">Release Date</th>
+                                <th className="px-3 py-5">Completed Date</th>
+                                <th className="px-3 py-5">Transfer Date</th>
+                                <th className="px-6 py-5 text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -228,7 +228,7 @@ export default function TransactionEditorClient() {
                                 
                                 return (
                                     <tr key={tx.id} className="group hover:bg-slate-50/50 transition-all">
-                                        <td className="px-8 py-6">
+                                        <td className="px-6 py-6">
                                             <div className="flex flex-col">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
@@ -246,47 +246,47 @@ export default function TransactionEditorClient() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-6">
+                                        <td className="px-3 py-6">
                                             <input 
                                                 type="datetime-local" 
                                                 value={tx.created_at ? new Date(tx.created_at).toISOString().slice(0, 16) : ""}
                                                 onChange={(e) => handleUpdateDate(tx.id, "created_at", new Date(e.target.value).toISOString())}
-                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[10px] font-bold text-slate-600 focus:outline-none transition-all"
+                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-[140px]"
                                             />
                                         </td>
-                                        <td className="px-6 py-6">
+                                        <td className="px-3 py-6">
                                             <input 
                                                 type="datetime-local" 
                                                 value={tx.metadata?.approved_at ? new Date(tx.metadata.approved_at).toISOString().slice(0, 16) : ""}
                                                 onChange={(e) => handleUpdateDate(tx.id, "approved_at", new Date(e.target.value).toISOString())}
-                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[10px] font-bold text-slate-600 focus:outline-none transition-all"
+                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-[140px]"
                                             />
                                         </td>
-                                        <td className="px-6 py-6">
+                                        <td className="px-3 py-6">
                                             <input 
                                                 type="datetime-local" 
                                                 value={tx.metadata?.released_at ? new Date(tx.metadata.released_at).toISOString().slice(0, 16) : ""}
                                                 onChange={(e) => handleUpdateDate(tx.id, "released_at", new Date(e.target.value).toISOString())}
-                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[10px] font-bold text-slate-600 focus:outline-none transition-all"
+                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-[140px]"
                                             />
                                         </td>
-                                        <td className="px-6 py-6">
+                                        <td className="px-3 py-6">
                                             <input 
                                                 type="datetime-local" 
                                                 value={tx.metadata?.completed_at ? new Date(tx.metadata.completed_at).toISOString().slice(0, 16) : ""}
                                                 onChange={(e) => handleUpdateDate(tx.id, "completed_at", new Date(e.target.value).toISOString())}
-                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[10px] font-bold text-slate-600 focus:outline-none transition-all"
+                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-[140px]"
                                             />
                                         </td>
-                                        <td className="px-6 py-6">
+                                        <td className="px-3 py-6">
                                             <input 
                                                 type="datetime-local" 
                                                 value={tx.transfer_date ? new Date(tx.transfer_date).toISOString().slice(0, 16) : ""}
                                                 onChange={(e) => handleUpdateDate(tx.id, "transfer_date", new Date(e.target.value).toISOString())}
-                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[10px] font-bold text-slate-600 focus:outline-none transition-all placeholder:text-slate-200"
+                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-[140px] placeholder:text-slate-200"
                                             />
                                         </td>
-                                        <td className="px-8 py-6 text-right">
+                                        <td className="px-6 py-6 text-right">
                                             <button 
                                                 onClick={() => handleSaveRow(tx)}
                                                 disabled={status === "saving"}
@@ -310,8 +310,8 @@ export default function TransactionEditorClient() {
                     </table>
                 </div>
 
-                {/* Mobile View (Cards) */}
-                <div className="md:hidden divide-y divide-slate-100">
+                {/* Mobile & Mid-size View (Cards) - Shown on all screens smaller than XL */}
+                <div className="xl:hidden divide-y divide-slate-100">
                     {filteredTransactions.map(tx => {
                         const status = saveStatus.find(s => s.id === tx.id)?.status || "idle";
                         
