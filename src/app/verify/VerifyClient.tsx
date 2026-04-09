@@ -441,7 +441,7 @@ export default function VerifyPage() {
                     </div>
                 </header>
 
-                <main className="bg-[#141414] border border-gray-200 rounded-[48px] p-8 md:p-12 shadow-2xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <main className="bg-[#141414] border border-gray-200 rounded-[32px] md:rounded-[48px] p-5 md:p-12 shadow-2xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     
                     {/* Step 1: Personal Information */}
                     {currentStep === 1 && (
@@ -458,7 +458,7 @@ export default function VerifyPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t.dob}</label>
-                                    <input type="date" value={formData.dob} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, dob: e.target.value})} className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all [color-scheme:dark]" />
+                                    <input type="date" value={formData.dob} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({...formData, dob: e.target.value})} className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-gv-gold/50 transition-all [color-scheme:dark] appearance-none" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{t.gender}</label>

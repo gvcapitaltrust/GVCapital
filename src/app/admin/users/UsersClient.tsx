@@ -315,7 +315,12 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                 </div>
                                             </div>
                                             <div className="flex flex-col gap-3">
-                                                <button onClick={() => openDetails(user)} className="w-full bg-black text-white text-[9px] font-black uppercase tracking-widest py-3.5 rounded-xl shadow-lg shadow-black/10">Manage Profile</button>
+                                                <button 
+                                                    onClick={() => openDetails(user)} 
+                                                    className="w-full bg-black text-white text-[12px] font-black uppercase tracking-widest py-5 rounded-2xl shadow-xl shadow-black/10 active:scale-[0.98] transition-all"
+                                                >
+                                                    {lang === 'en' ? 'Access Client Profile' : '访问客户资料'}
+                                                </button>
                                             </div>
                                         </div>
                                     )}
@@ -327,10 +332,10 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
             </div>
 
             {isDetailModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-500">
-                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-2xl" onClick={() => setIsDetailModalOpen(false)}></div>
-                    <div className="relative bg-white border border-gray-200 rounded-[40px] w-full max-w-7xl max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.5)]">
-                        <div className="p-4 md:p-8 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between bg-gray-50 gap-4">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-8 lg:p-12 animate-in fade-in duration-500">
+                    <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-xl" onClick={() => setIsDetailModalOpen(false)}></div>
+                    <div className="relative bg-white border border-gray-200 rounded-none md:rounded-[40px] w-full h-full md:max-w-7xl md:max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+                        <div className="p-5 md:p-8 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between bg-gray-50/50 gap-4 shrink-0">
                             <div className="flex items-center gap-4 md:gap-6">
                                 <TierMedal 
                                     tierId={(selectedUser?.tier && selectedUser?.tier !== "Standard") ? selectedUser.tier : getTierByAmount(selectedUser?.total_investment_usd || 0).name} 
@@ -355,26 +360,26 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                     }}
                                     className="bg-black text-white text-[8px] md:text-[9px] font-black uppercase tracking-widest px-4 md:px-6 py-2.5 md:py-3 rounded-2xl transition-all shadow-xl hover:bg-gv-gold hover:text-black flex items-center gap-2"
                                 >
-                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
-                                    Manage Portfolio
+                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3.5"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+                                    Portfolio
                                 </button>
                                 <button 
                                     onClick={executeToggleStatus} 
                                     disabled={isProcessingAction}
-                                    className="bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-gray-900 text-[8px] md:text-[9px] font-black uppercase tracking-widest px-4 md:px-6 py-2.5 md:py-3 rounded-2xl transition-all border border-orange-500/20 disabled:opacity-50"
+                                    className="bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest px-4 md:px-6 py-3.5 md:py-3.5 rounded-2xl transition-all border border-orange-500/20 disabled:opacity-50"
                                 >
                                     {isProcessingAction ? "..." : (selectedUser?.kyc_status === 'Suspended' ? t.reactivateUser : t.deactivateUser)}
                                 </button>
                                 <button 
                                     onClick={executeDeleteUser} 
                                     disabled={isProcessingAction}
-                                    className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-gray-900 text-[8px] md:text-[9px] font-black uppercase tracking-widest px-4 md:px-6 py-2.5 md:py-3 rounded-2xl transition-all border border-red-500/20 disabled:opacity-50"
+                                    className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest px-4 md:px-6 py-3.5 md:py-3.5 rounded-2xl transition-all border border-red-500/20 disabled:opacity-50"
                                 >
                                     {isProcessingAction ? "..." : t.deleteUser}
                                 </button>
-                                <button onClick={() => handleResetUserPassword(selectedUser.email)} className="bg-white hover:bg-gray-100 text-[8px] md:text-[9px] font-black uppercase tracking-widest px-4 md:px-6 py-2.5 md:py-3 rounded-2xl transition-all border border-gray-200">{t.resetPassword}</button>
-                                <button onClick={() => setIsDetailModalOpen(false)} className="h-10 w-10 md:h-12 md:w-12 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-all">
-                                    <svg className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                                <button onClick={() => handleResetUserPassword(selectedUser.email)} className="bg-white hover:bg-gray-100 text-[9px] md:text-[10px] font-black uppercase tracking-widest px-4 md:px-6 py-3.5 md:py-3.5 rounded-2xl transition-all border border-gray-200">{t.resetPassword}</button>
+                                <button onClick={() => setIsDetailModalOpen(false)} className="h-12 w-12 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-all active:scale-95">
+                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
                             </div>
                         </div>
