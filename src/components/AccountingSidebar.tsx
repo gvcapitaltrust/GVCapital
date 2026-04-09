@@ -32,6 +32,7 @@ export default function AccountingSidebar({
         { id: "investments", path: "/accounting/investments", label: "Investments", icon: <TrendingUp className="h-5 w-5 shrink-0" /> },
         { id: "users", path: "/accounting/users", label: "User Accounts", icon: <Users className="h-5 w-5 shrink-0" /> },
         { id: "funds", path: "/accounting/funds", label: "Fund Accounts", icon: <Briefcase className="h-5 w-5 shrink-0" /> },
+        { id: "transactions", path: "/accounting/transactions", label: "Transaction Dates", icon: <Calculator className="h-5 w-5 shrink-0" /> },
     ];
 
     const bottomNavItems = menuItems.slice(0, 4);
