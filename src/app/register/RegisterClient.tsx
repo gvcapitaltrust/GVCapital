@@ -15,6 +15,8 @@ export default function RegisterPage() {
     const [gender, setGender] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [dob, setDob] = useState("");
     const [isAgreed, setIsAgreed] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -149,6 +151,9 @@ export default function RegisterPage() {
         agreementBody: string;
         securityPinLabel: string;
         securityPinPlaceholder: string;
+        dobLabel: string;
+        confirmPasswordLabel: string;
+        passMismatch: string;
     }
 
     const content: Record<"en" | "zh", ContentItem> = {
@@ -202,7 +207,10 @@ export default function RegisterPage() {
                 By clicking "I Agree", The Client executes this binding digital contract, acknowledging full comprehension and unconditional acceptance of all terms herein.
             `,
             securityPinLabel: "Security PIN (6 Digits)",
-            securityPinPlaceholder: "Used for withdrawals"
+            securityPinPlaceholder: "Used for withdrawals",
+            dobLabel: "Date of Birth",
+            confirmPasswordLabel: "Confirm Password",
+            passMismatch: "Passwords do not match."
         },
         zh: {
             title: "开通账户",
@@ -254,7 +262,10 @@ export default function RegisterPage() {
                 点击“我同意”，即表示客户签署此具有约束力的数字合同，确认全面理解并无条件接受此处的全部条款。
             `,
             securityPinLabel: "安全密码 (6 位数字)",
-            securityPinPlaceholder: "用于提款验证"
+            securityPinPlaceholder: "用于提款验证",
+            dobLabel: "出生日期",
+            confirmPasswordLabel: "确认密码",
+            passMismatch: "两次输入的密码不一致。"
         },
     };
 
@@ -262,8 +273,12 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isAgreed || !isReferralValid || !isUsernameValid || !gender) {
-            setErrorMsg("Please complete all required fields including Gender.");
+        if (!isAgreed || !isReferralValid || !isUsernameValid || !gender || !dob) {
+            setErrorMsg(lang === 'en' ? "Please complete all required fields including Date of Birth." : "请填写所有必填字段，包括出生日期。");
+            return;
+        }
+        if (password !== confirmPassword) {
+            setErrorMsg(t.passMismatch);
             return;
         }
         setIsLoading(true);
@@ -311,6 +326,7 @@ export default function RegisterPage() {
                     referred_by_username: inviterUsername || null,
                     security_pin: securityPin,
                     gender: gender,
+                    dob: dob,
                     active_sessions: deviceId ? [deviceId] : []
                 };
 
@@ -393,6 +409,19 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="space-y-2">
+                        <label htmlFor="dob" className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.dobLabel}</label>
+                        <input
+                            id="dob"
+                            name="dob"
+                            type="date"
+                            required
+                            value={dob}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDob(e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium [color-scheme:light]"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
                         <label htmlFor="email" className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.emailLabel}</label>
                         <input
                             id="email"
@@ -416,6 +445,20 @@ export default function RegisterPage() {
                             value={password}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                             className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gv-gold/50 transition-all font-medium"
+                            placeholder={t.placeholder_pass}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label htmlFor="confirm_password" className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.confirmPasswordLabel}</label>
+                        <input
+                            id="confirm_password"
+                            name="confirm_password"
+                            type="password"
+                            required
+                            value={confirmPassword}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+                            className={`w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 transition-all font-medium ${confirmPassword && password !== confirmPassword ? 'border-red-500/50 ring-red-500/20' : 'focus:ring-gv-gold/50'}`}
                             placeholder={t.placeholder_pass}
                         />
                     </div>
@@ -498,7 +541,7 @@ export default function RegisterPage() {
 
                     <button
                         type="submit"
-                        disabled={isLoading || !isAgreed || !isReferralValid || isValidatingReferral || !isUsernameValid || isValidatingUsername || !ownUsername}
+                        disabled={isLoading || !isAgreed || !isReferralValid || isValidatingReferral || !isUsernameValid || isValidatingUsername || !ownUsername || password !== confirmPassword || !dob}
                         className="w-full bg-gv-gold text-black font-black text-lg py-5 rounded-2xl hover:bg-gv-gold/90 transition-all shadow-[0_10px_30px_rgba(212,175,55,0.2)] disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest flex items-center justify-center gap-2"
                     >
                         {isLoading || isValidatingReferral || isValidatingUsername ? <div className="h-5 w-5 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
