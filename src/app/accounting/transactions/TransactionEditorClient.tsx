@@ -206,9 +206,10 @@ export default function TransactionEditorClient() {
                 </div>
             </div>
 
-            {/* Table */}
-            <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto">
+            {/* Transactions List */}
+            <div className="bg-white border border-slate-200 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl">
+                {/* Desktop View (Table) */}
+                <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-slate-50/50 border-b border-slate-100 italic">
                             <tr className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
@@ -307,16 +308,108 @@ export default function TransactionEditorClient() {
                             })}
                         </tbody>
                     </table>
-                    
-                    {filteredTransactions.length === 0 && (
-                        <div className="p-24 text-center space-y-4">
-                            <div className="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
-                                <Search className="h-8 w-8 text-slate-200" />
-                            </div>
-                            <p className="text-slate-400 text-xs font-black uppercase tracking-[0.3em]">No matching transactions found</p>
-                        </div>
-                    )}
                 </div>
+
+                {/* Mobile View (Cards) */}
+                <div className="md:hidden divide-y divide-slate-100">
+                    {filteredTransactions.map(tx => {
+                        const status = saveStatus.find(s => s.id === tx.id)?.status || "idle";
+                        
+                        return (
+                            <div key={tx.id} className="p-6 space-y-6">
+                                <div className="flex justify-between items-start">
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-400 tracking-widest italic group">
+                                            <span className={`px-2 py-0.5 rounded ${
+                                                tx.type === 'Deposit' ? 'bg-emerald-50 text-emerald-600' :
+                                                tx.type === 'Withdrawal' ? 'bg-amber-50 text-amber-600' :
+                                                'bg-indigo-50 text-indigo-600'
+                                            }`}>{tx.type}</span>
+                                            <span>{tx.status}</span>
+                                        </div>
+                                        <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">{tx.profiles?.full_name}</h3>
+                                        <div className="flex items-center gap-1.5 text-slate-400">
+                                            <Hash className="h-3 w-3" />
+                                            <span className="text-[10px] font-mono font-bold tracking-tighter uppercase">{tx.ref_id || tx.id.substring(0, 8)}</span>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={() => handleSaveRow(tx)}
+                                        disabled={status === "saving"}
+                                        className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-all shadow-xl active:scale-95 ${
+                                            status === "saving" ? "bg-slate-100 text-slate-400" :
+                                            status === "success" ? "bg-emerald-500 text-white shadow-emerald-500/20" :
+                                            status === "error" ? "bg-red-500 text-white shadow-red-500/20" :
+                                            "bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-600/30"
+                                        }`}
+                                    >
+                                        {status === "saving" ? <RefreshCcw className="h-5 w-5 animate-spin" /> :
+                                         status === "success" ? <CheckCircle2 className="h-6 w-6" /> :
+                                         status === "error" ? <AlertCircle className="h-6 w-6" /> :
+                                         <Save className="h-5 w-5" />}
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Created Date</label>
+                                        <input 
+                                            type="datetime-local" 
+                                            value={tx.created_at ? new Date(tx.created_at).toISOString().slice(0, 16) : ""}
+                                            onChange={(e) => handleUpdateDate(tx.id, "created_at", new Date(e.target.value).toISOString())}
+                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Approved Date</label>
+                                        <input 
+                                            type="datetime-local" 
+                                            value={tx.metadata?.approved_at ? new Date(tx.metadata.approved_at).toISOString().slice(0, 16) : ""}
+                                            onChange={(e) => handleUpdateDate(tx.id, "approved_at", new Date(e.target.value).toISOString())}
+                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Released Date</label>
+                                        <input 
+                                            type="datetime-local" 
+                                            value={tx.metadata?.released_at ? new Date(tx.metadata.released_at).toISOString().slice(0, 16) : ""}
+                                            onChange={(e) => handleUpdateDate(tx.id, "released_at", new Date(e.target.value).toISOString())}
+                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Completed Date</label>
+                                        <input 
+                                            type="datetime-local" 
+                                            value={tx.metadata?.completed_at ? new Date(tx.metadata.completed_at).toISOString().slice(0, 16) : ""}
+                                            onChange={(e) => handleUpdateDate(tx.id, "completed_at", new Date(e.target.value).toISOString())}
+                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Transfer Date</label>
+                                        <input 
+                                            type="datetime-local" 
+                                            value={tx.transfer_date ? new Date(tx.transfer_date).toISOString().slice(0, 16) : ""}
+                                            onChange={(e) => handleUpdateDate(tx.id, "transfer_date", new Date(e.target.value).toISOString())}
+                                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+                
+                {filteredTransactions.length === 0 && (
+                    <div className="p-24 text-center space-y-4">
+                        <div className="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
+                            <Search className="h-8 w-8 text-slate-200" />
+                        </div>
+                        <p className="text-slate-400 text-xs font-black uppercase tracking-[0.3em]">No matching transactions found</p>
+                    </div>
+                )}
             </div>
             
             {/* Audit Note */}
