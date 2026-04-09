@@ -84,40 +84,40 @@ export default function ReferralsClient({ lang }: { lang: "en" | "zh" }) {
             </div>
 
             {/* Header / Share Section - Simplified & Professional */}
-            <div className="bg-white border border-gray-100 p-8 rounded-[32px] shadow-sm relative overflow-hidden group">
+            <div className="bg-white border border-gray-100 p-6 rounded-[32px] shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-1000"></div>
-                <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
-                    <div className="space-y-2 max-w-xl">
-                        <h2 className="text-xl font-bold uppercase tracking-tight text-gray-900">{t.referTitle}</h2>
-                        <p className="text-gray-400 font-medium text-sm leading-relaxed">{t.referSubtitle}</p>
+                <div className="relative z-10 flex flex-col md:flex-row gap-6 items-center justify-between">
+                    <div className="space-y-1 max-w-xl">
+                        <h2 className="text-lg font-bold uppercase tracking-tight text-gray-900">{t.referTitle}</h2>
+                        <p className="text-gray-400 font-medium text-[13px] leading-relaxed">{t.referSubtitle}</p>
                     </div>
                     
                     <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                        <div className="bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 flex items-center justify-between gap-6 min-w-[200px]">
+                        <div className="bg-gray-50 border border-gray-200 rounded-2xl px-5 py-3 flex items-center justify-between gap-6 min-w-[180px]">
                             <div className="flex flex-col">
-                                <span className="text-gray-400 text-[9px] font-black uppercase tracking-widest leading-none mb-1">{lang === 'en' ? 'Your Referral Code' : '您的推荐码'}</span>
-                                <span className="text-gv-gold font-black tracking-widest uppercase text-sm leading-none">{user?.username}</span>
+                                <span className="text-gray-400 text-[8px] font-black uppercase tracking-widest leading-none mb-1">{lang === 'en' ? 'Your Referral Code' : '您的推荐码'}</span>
+                                <span className="text-gv-gold font-black tracking-widest uppercase text-xs leading-none">{user?.username}</span>
                             </div>
                             <button onClick={copyToClipboard} className="text-gray-400 hover:text-gv-gold transition-colors flex items-center gap-2" title={t.copyCode}>
-                                <Copy className="h-4 w-4" />
+                                <Copy className="h-3.5 w-3.5" />
                             </button>
                         </div>
                         <button 
                             onClick={copyLinkToClipboard}
-                            className="bg-white border border-gray-200 hover:border-gv-gold text-gray-900 font-bold px-6 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-sm"
+                            className="bg-white border border-gray-200 hover:border-gv-gold text-gray-900 font-bold px-5 py-3 rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-sm"
                         >
-                            <Copy className="h-5 w-5 text-gv-gold" />
-                            <span className="text-sm uppercase tracking-wider">{t.copyLink}</span>
+                            <Copy className="h-4 w-4 text-gv-gold" />
+                            <span className="text-[12px] uppercase tracking-wider">{t.copyLink}</span>
                         </button>
                         <button 
                             onClick={() => {
                                 const link = `${window.location.origin}/register?ref=${user?.username}`;
                                 window.open(`https://wa.me/?text=Join%20GV%20Capital%20Trust%20using%20my%20link:%20${encodeURIComponent(link)}`, '_blank');
                             }}
-                            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-emerald-500/20"
+                            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-3 rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-emerald-500/20"
                         >
-                            <Share2 className="h-5 w-5" />
-                            <span className="text-sm uppercase tracking-wider">{t.shareWA}</span>
+                            <Share2 className="h-4 w-4" />
+                            <span className="text-[12px] uppercase tracking-wider">{t.shareWA}</span>
                         </button>
                     </div>
                 </div>
