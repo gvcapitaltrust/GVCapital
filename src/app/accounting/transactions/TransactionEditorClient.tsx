@@ -228,63 +228,149 @@ export default function TransactionEditorClient() {
                                 
                                 return (
                                     <tr key={tx.id} className="group hover:bg-slate-50/50 transition-all">
-                                        <td className="px-6 py-6">
-                                            <div className="flex flex-col">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
-                                                        tx.type === 'Deposit' ? 'bg-emerald-50 text-emerald-600' :
-                                                        tx.type === 'Withdrawal' ? 'bg-amber-50 text-amber-600' :
-                                                        'bg-indigo-50 text-indigo-600'
-                                                    }`}>
-                                                        {tx.type}
-                                                    </span>
-                                                    <span className="text-[10px] font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{tx.profiles?.full_name}</span>
-                                                </div>
-                                                <div className="flex items-center gap-1.5 text-slate-400">
-                                                    <Hash className="h-2.5 w-2.5" />
-                                                    <span className="text-[9px] font-mono font-bold">{tx.ref_id || tx.id.substring(0, 8)}</span>
-                                                </div>
+                                        <td className="px-6 py-6 items-start">
+                                            <div className="flex flex-col gap-1">
+                                                <span className={`w-fit text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
+                                                    tx.type === 'Deposit' ? 'bg-emerald-50 text-emerald-600' :
+                                                    tx.type === 'Withdrawal' ? 'bg-amber-50 text-amber-600' :
+                                                    'bg-indigo-50 text-indigo-600'
+                                                }`}>
+                                                    {tx.type}
+                                                </span>
+                                                <span className="text-[10px] font-bold text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-tight">
+                                                    {tx.profiles?.full_name}
+                                                </span>
                                             </div>
                                         </td>
                                         <td className="px-3 py-6">
-                                            <input 
-                                                type="datetime-local" 
-                                                value={tx.created_at ? new Date(tx.created_at).toISOString().slice(0, 16) : ""}
-                                                onChange={(e) => handleUpdateDate(tx.id, "created_at", new Date(e.target.value).toISOString())}
-                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-[140px]"
-                                            />
+                                            <div className="flex flex-col gap-1">
+                                                <input 
+                                                    type="date" 
+                                                    value={tx.created_at ? new Date(tx.created_at).toISOString().slice(0, 10) : ""}
+                                                    onChange={(e) => {
+                                                        const d = new Date(tx.created_at || new Date());
+                                                        const [ny, nm, nd] = e.target.value.split('-').map(Number);
+                                                        d.setFullYear(ny, nm-1, nd);
+                                                        handleUpdateDate(tx.id, "created_at", d.toISOString());
+                                                    }}
+                                                    className="bg-slate-50 border border-slate-100 focus:border-indigo-400 rounded px-1.5 py-0.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-full"
+                                                />
+                                                <input 
+                                                    type="time" 
+                                                    value={tx.created_at ? new Date(tx.created_at).toTimeString().slice(0, 5) : ""}
+                                                    onChange={(e) => {
+                                                        const d = new Date(tx.created_at || new Date());
+                                                        const [nh, nmin] = e.target.value.split(':').map(Number);
+                                                        d.setHours(nh, nmin);
+                                                        handleUpdateDate(tx.id, "created_at", d.toISOString());
+                                                    }}
+                                                    className="bg-transparent border border-transparent hover:border-slate-100 focus:border-indigo-400 rounded px-1.5 py-0.5 text-[8px] font-medium text-slate-400 focus:outline-none transition-all w-full"
+                                                />
+                                            </div>
                                         </td>
                                         <td className="px-3 py-6">
-                                            <input 
-                                                type="datetime-local" 
-                                                value={tx.metadata?.approved_at ? new Date(tx.metadata.approved_at).toISOString().slice(0, 16) : ""}
-                                                onChange={(e) => handleUpdateDate(tx.id, "approved_at", new Date(e.target.value).toISOString())}
-                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-[140px]"
-                                            />
+                                            <div className="flex flex-col gap-1">
+                                                <input 
+                                                    type="date" 
+                                                    value={tx.metadata?.approved_at ? new Date(tx.metadata.approved_at).toISOString().slice(0, 10) : ""}
+                                                    onChange={(e) => {
+                                                        const d = new Date(tx.metadata?.approved_at || new Date());
+                                                        const [ny, nm, nd] = e.target.value.split('-').map(Number);
+                                                        d.setFullYear(ny, nm-1, nd);
+                                                        handleUpdateDate(tx.id, "approved_at", d.toISOString());
+                                                    }}
+                                                    className="bg-slate-50 border border-slate-100 focus:border-indigo-400 rounded px-1.5 py-0.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-full"
+                                                />
+                                                <input 
+                                                    type="time" 
+                                                    value={tx.metadata?.approved_at ? new Date(tx.metadata.approved_at).toTimeString().slice(0, 5) : ""}
+                                                    onChange={(e) => {
+                                                        const d = new Date(tx.metadata?.approved_at || new Date());
+                                                        const [nh, nmin] = e.target.value.split(':').map(Number);
+                                                        d.setHours(nh, nmin);
+                                                        handleUpdateDate(tx.id, "approved_at", d.toISOString());
+                                                    }}
+                                                    className="bg-transparent border border-transparent hover:border-slate-100 focus:border-indigo-400 rounded px-1.5 py-0.5 text-[8px] font-medium text-slate-400 focus:outline-none transition-all w-full"
+                                                />
+                                            </div>
                                         </td>
                                         <td className="px-3 py-6">
-                                            <input 
-                                                type="datetime-local" 
-                                                value={tx.metadata?.released_at ? new Date(tx.metadata.released_at).toISOString().slice(0, 16) : ""}
-                                                onChange={(e) => handleUpdateDate(tx.id, "released_at", new Date(e.target.value).toISOString())}
-                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-[140px]"
-                                            />
+                                            <div className="flex flex-col gap-1">
+                                                <input 
+                                                    type="date" 
+                                                    value={tx.metadata?.released_at ? new Date(tx.metadata.released_at).toISOString().slice(0, 10) : ""}
+                                                    onChange={(e) => {
+                                                        const d = new Date(tx.metadata?.released_at || new Date());
+                                                        const [ny, nm, nd] = e.target.value.split('-').map(Number);
+                                                        d.setFullYear(ny, nm-1, nd);
+                                                        handleUpdateDate(tx.id, "released_at", d.toISOString());
+                                                    }}
+                                                    className="bg-slate-50 border border-slate-100 focus:border-indigo-400 rounded px-1.5 py-0.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-full"
+                                                />
+                                                <input 
+                                                    type="time" 
+                                                    value={tx.metadata?.released_at ? new Date(tx.metadata.released_at).toTimeString().slice(0, 5) : ""}
+                                                    onChange={(e) => {
+                                                        const d = new Date(tx.metadata?.released_at || new Date());
+                                                        const [nh, nmin] = e.target.value.split(':').map(Number);
+                                                        d.setHours(nh, nmin);
+                                                        handleUpdateDate(tx.id, "released_at", d.toISOString());
+                                                    }}
+                                                    className="bg-transparent border border-transparent hover:border-slate-100 focus:border-indigo-400 rounded px-1.5 py-0.5 text-[8px] font-medium text-slate-400 focus:outline-none transition-all w-full"
+                                                />
+                                            </div>
                                         </td>
                                         <td className="px-3 py-6">
-                                            <input 
-                                                type="datetime-local" 
-                                                value={tx.metadata?.completed_at ? new Date(tx.metadata.completed_at).toISOString().slice(0, 16) : ""}
-                                                onChange={(e) => handleUpdateDate(tx.id, "completed_at", new Date(e.target.value).toISOString())}
-                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-[140px]"
-                                            />
+                                            <div className="flex flex-col gap-1">
+                                                <input 
+                                                    type="date" 
+                                                    value={tx.metadata?.completed_at ? new Date(tx.metadata.completed_at).toISOString().slice(0, 10) : ""}
+                                                    onChange={(e) => {
+                                                        const d = new Date(tx.metadata?.completed_at || new Date());
+                                                        const [ny, nm, nd] = e.target.value.split('-').map(Number);
+                                                        d.setFullYear(ny, nm-1, nd);
+                                                        handleUpdateDate(tx.id, "completed_at", d.toISOString());
+                                                    }}
+                                                    className="bg-slate-50 border border-slate-100 focus:border-indigo-400 rounded px-1.5 py-0.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-full"
+                                                />
+                                                <input 
+                                                    type="time" 
+                                                    value={tx.metadata?.completed_at ? new Date(tx.metadata.completed_at).toTimeString().slice(0, 5) : ""}
+                                                    onChange={(e) => {
+                                                        const d = new Date(tx.metadata?.completed_at || new Date());
+                                                        const [nh, nmin] = e.target.value.split(':').map(Number);
+                                                        d.setHours(nh, nmin);
+                                                        handleUpdateDate(tx.id, "completed_at", d.toISOString());
+                                                    }}
+                                                    className="bg-transparent border border-transparent hover:border-slate-100 focus:border-indigo-400 rounded px-1.5 py-0.5 text-[8px] font-medium text-slate-400 focus:outline-none transition-all w-full"
+                                                />
+                                            </div>
                                         </td>
                                         <td className="px-3 py-6">
-                                            <input 
-                                                type="datetime-local" 
-                                                value={tx.transfer_date ? new Date(tx.transfer_date).toISOString().slice(0, 16) : ""}
-                                                onChange={(e) => handleUpdateDate(tx.id, "transfer_date", new Date(e.target.value).toISOString())}
-                                                className="bg-transparent border border-transparent hover:border-slate-200 focus:border-indigo-400 hover:bg-white focus:bg-white rounded-lg px-2 py-1.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-[140px] placeholder:text-slate-200"
-                                            />
+                                            <div className="flex flex-col gap-1">
+                                                <input 
+                                                    type="date" 
+                                                    value={tx.transfer_date ? new Date(tx.transfer_date).toISOString().slice(0, 10) : ""}
+                                                    onChange={(e) => {
+                                                        const d = new Date(tx.transfer_date || new Date());
+                                                        const [ny, nm, nd] = e.target.value.split('-').map(Number);
+                                                        d.setFullYear(ny, nm-1, nd);
+                                                        handleUpdateDate(tx.id, "transfer_date", d.toISOString());
+                                                    }}
+                                                    className="bg-slate-50 border border-slate-100 focus:border-indigo-400 rounded px-1.5 py-0.5 text-[9px] font-bold text-slate-600 focus:outline-none transition-all w-full"
+                                                />
+                                                <input 
+                                                    type="time" 
+                                                    value={tx.transfer_date ? new Date(tx.transfer_date).toTimeString().slice(0, 5) : ""}
+                                                    onChange={(e) => {
+                                                        const d = new Date(tx.transfer_date || new Date());
+                                                        const [nh, nmin] = e.target.value.split(':').map(Number);
+                                                        d.setHours(nh, nmin);
+                                                        handleUpdateDate(tx.id, "transfer_date", d.toISOString());
+                                                    }}
+                                                    className="bg-transparent border border-transparent hover:border-slate-100 focus:border-indigo-400 rounded px-1.5 py-0.5 text-[8px] font-medium text-slate-400 focus:outline-none transition-all w-full"
+                                                />
+                                            </div>
                                         </td>
                                         <td className="px-6 py-6 text-right">
                                             <button 
