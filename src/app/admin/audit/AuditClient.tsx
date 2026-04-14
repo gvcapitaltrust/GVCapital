@@ -122,7 +122,7 @@ export default function AuditClient({ lang }: { lang: "en" | "zh" }) {
                     <div className="md:hidden divide-y divide-gray-100">
                         {filteredLogs.map((log, i) => {
                             const isTransaction = log.auditType === 'transaction';
-                            const detailText = log.rejection_reason || (log.amount ? `RM ${Number(log.amount).toFixed(2)}` : "System Profile Update");
+                            const detailText = log.rejection_reason || (log.amount ? `$ ${Number(log.amount).toFixed(2)}` : "System Profile Update");
                             const logId = `${log.created_at}-${i}`;
                             const isExpanded = expandedLogId === logId;
                             

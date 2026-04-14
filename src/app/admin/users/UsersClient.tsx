@@ -399,7 +399,7 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                     className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 text-gray-900 font-black text-xl focus:outline-none focus:border-gv-gold transition-all"
                                                     placeholder="0.00"
                                                 />
-                                                {adjustmentAmount && (
+                                                {adjustmentAmount && adjustmentType === 'balance' && (
                                                     <p className="mt-1 text-[9px] text-gv-gold font-bold px-1 uppercase tracking-tighter">
                                                         ≈ RM {(parseFloat(adjustmentAmount) * forexRate).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                     </p>
