@@ -29,7 +29,6 @@ export default function RegisterPage() {
     const [referralCheckMsg, setReferralCheckMsg] = useState("");
     const [inviterId, setInviterId] = useState<string | null>(null);
     const [securityPin, setSecurityPin] = useState("");
-    const [securityPin, setSecurityPin] = useState("");
 
     useEffect(() => {
         const l = searchParams?.get("lang");
