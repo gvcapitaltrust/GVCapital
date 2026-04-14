@@ -503,11 +503,34 @@ export default function UsersClient({ lang }: { lang: "en" | "zh" }) {
                                                                             $ {(Number(log.original_currency_amount || (Number(log.amount) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                                         </span>
                                                                     </div>
+                                                                    </div>
+                                                                    
+                                                                    {isExpanded && (
+                                                                        <div className="bg-gray-100/50 px-6 py-5 space-y-4 border-t border-gray-100 animate-in fade-in duration-300">
+                                                                            <div className="grid grid-cols-1 gap-4">
+                                                                                <div className="space-y-1">
+                                                                                    <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Full Action Note</span>
+                                                                                    <p className="text-[10px] font-bold text-gray-700 leading-relaxed">
+                                                                                        {log.rejection_reason || "System verified and processed the transaction automatically."}
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div className="flex justify-between items-center pt-2 border-t border-gray-200/50">
+                                                                                    <div>
+                                                                                        <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Processed By</span>
+                                                                                        <p className="text-[10px] font-black text-gv-gold uppercase tracking-tighter">{log.admin_username || "System Agent"}</p>
+                                                                                    </div>
+                                                                                    <div className="text-right">
+                                                                                        <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Original Reference</span>
+                                                                                        <p className="text-[10px] font-mono font-bold text-gray-500">{log.tx_id?.slice(0, 12) || "DIRECT_LEDGER"}</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
-                                                            </div>
-                                                        );
-                                                    })}
-                                            </div>
+                                                            );
+                                                        })}
+                                                </div>
 
                                             {combinedAuditLogs.filter(log => log.user_email === selectedUser?.email && log.auditType === 'transaction').length === 0 && (
                                                 <div className="p-20 text-center text-gray-400 font-black uppercase tracking-widest text-[9px]">{t.noTx}</div>

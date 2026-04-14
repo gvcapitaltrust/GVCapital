@@ -9,6 +9,7 @@ export default function AuditClient({ lang }: { lang: "en" | "zh" }) {
     const router = useRouter();
     const { combinedAuditLogs, loading } = useAdmin();
     const [searchQuery, setSearchQuery] = useState("");
+    const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
     const t = {
         en: {
@@ -122,22 +123,27 @@ export default function AuditClient({ lang }: { lang: "en" | "zh" }) {
                         {filteredLogs.map((log, i) => {
                             const isTransaction = log.auditType === 'transaction';
                             const detailText = log.rejection_reason || (log.amount ? `RM ${Number(log.amount).toFixed(2)}` : "System Profile Update");
+                            const logId = `${log.created_at}-${i}`;
+                            const isExpanded = expandedLogId === logId;
                             
                             return (
                                 <div key={i} className="flex flex-col animate-in slide-in-from-right-4 duration-300">
-                                    <div className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors">
+                                    <div 
+                                        onClick={() => setExpandedLogId(isExpanded ? null : logId)}
+                                        className="px-6 py-5 space-y-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                                    >
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-400 font-mono text-[9px] uppercase">{new Date(log.created_at).toLocaleDateString()}</span>
                                             <div className="flex items-center gap-2">
                                                 <div className={`h-1.5 w-1.5 rounded-full ${isTransaction ? 'bg-emerald-500' : 'bg-gv-gold'}`}></div>
                                                 <span className={`text-[8px] font-black uppercase tracking-widest ${isTransaction ? 'text-emerald-500' : 'text-gv-gold'}`}>
-                                                    {log.auditType === 'transaction' ? 'Transfer' : 'Activity'}
+                                                    {isTransaction ? 'Transfer' : 'Activity'}
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="flex justify-between items-end">
                                             <div className="space-y-1">
-                                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block">{log.action}</span>
+                                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 leading-none block">{log.action === 'Identification Verification' ? 'Account Verification' : log.action}</span>
                                                 <span className="text-[8px] font-black text-gray-300 uppercase italic tracking-tighter truncate w-40 block">{log.user_email}</span>
                                             </div>
                                             <div className="text-right">
@@ -148,6 +154,35 @@ export default function AuditClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {isExpanded && (
+                                        <div className="bg-gray-50 px-6 py-6 space-y-6 border-t border-gray-100 animate-in fade-in duration-300">
+                                            <div className="grid grid-cols-1 gap-5">
+                                                <div className="space-y-1.5">
+                                                    <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Full Action Details</span>
+                                                    <p className="text-[10px] font-bold text-gray-700 leading-relaxed bg-white p-3 rounded-xl border border-gray-200/50 shadow-sm">
+                                                        {log.rejection_reason || detailText}
+                                                    </p>
+                                                </div>
+                                                
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-1">
+                                                        <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Complete Timestamp</span>
+                                                        <p className="text-[10px] font-mono font-bold text-gray-900 uppercase tracking-tighter">{new Date(log.created_at).toLocaleString()}</p>
+                                                    </div>
+                                                    <div className="space-y-1 text-right">
+                                                        <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Processed By</span>
+                                                        <p className="text-[10px] font-black text-gv-gold uppercase tracking-tighter">{log.admin_username || "System"}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-1 pt-2 border-t border-gray-100">
+                                                    <span className="text-[8px] font-black uppercase text-gray-400 tracking-widest">Target Client</span>
+                                                    <p className="text-[10px] font-bold text-gray-600 truncate">{log.user_email}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
