@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X, Eye } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatDate, formatDateTime } from "@/lib/dateUtils";
@@ -25,6 +26,8 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
+    const [isReceiptOpen, setIsReceiptOpen] = useState(false);
 
     const t = {
         en: {
@@ -53,6 +56,11 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             typeLabel: "Type",
             statusLabel: "Status",
             dateRange: "Date Range",
+            paymentInfo: "Payment Information",
+            network: "Network",
+            sentTo: "Sent To Address",
+            viewReceipt: "View Uploaded Receipt",
+            remark: "My Remark"
         },
         zh: {
             history: "交易历史",
@@ -80,6 +88,11 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             typeLabel: "类型",
             statusLabel: "状态",
             dateRange: "日期范围",
+            paymentInfo: "支付信息",
+            network: "网络",
+            sentTo: "发送至地址",
+            viewReceipt: "查看已上传凭证",
+            remark: "我的备注"
         }
     }[lang];
 
@@ -115,6 +128,19 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
             if (isWithdrawal) return acc - Math.abs(amountUSD);
             return acc + amountUSD;
         }, 0);
+    
+    const handleViewReceipt = async (tx: any) => {
+        if (!tx.receipt_url) return;
+        setReceiptUrl(null);
+        setIsReceiptOpen(true);
+        try {
+            const { data, error } = await supabase.storage.from('agreements').createSignedUrl(tx.receipt_url, 3600);
+            if (error || !data) throw error;
+            setReceiptUrl(data.signedUrl);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const generateStatement = () => {
         if (!user) return;
@@ -532,6 +558,51 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                             </div>
                                         )}
                                     </div>
+                                    
+                                    {selectedTx.type === 'Deposit' && (
+                                        <div className="space-y-4 pt-4 border-t border-slate-100 italic">
+                                            <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2 italic">
+                                                <div className="h-1 w-4 bg-gv-gold rounded-full italic"></div>
+                                                {t.paymentInfo}
+                                            </h4>
+                                            <div className="grid grid-cols-1 gap-4">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{t.network}</span>
+                                                    <span className="text-xs font-black text-slate-900 uppercase">
+                                                        {selectedTx.metadata?.payment_method?.startsWith('usdt') 
+                                                            ? `USDT (${selectedTx.metadata?.payment_method.split('_')[1].toUpperCase()})` 
+                                                            : "FPX Online Banking"}
+                                                    </span>
+                                                </div>
+                                                {selectedTx.metadata?.payment_method?.startsWith('usdt') && (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{t.sentTo}</span>
+                                                        <span className="text-[10px] font-mono font-bold text-gv-gold break-all">
+                                                            {selectedTx.metadata?.payment_method === 'usdt_sol' ? '5x786gH4cTUzhoSpa8AD5XiWubNu2bfpR5PjHkYjP9i9' :
+                                                            selectedTx.metadata?.payment_method === 'usdt_tron' ? 'TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE' : 
+                                                            '0x9b891193b672fd4293a775a0c58f402d256ebd79'}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                {selectedTx.metadata?.remark && (
+                                                    <div className="flex flex-col bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                                        <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">{t.remark}</span>
+                                                        <span className="text-[10px] font-bold text-slate-500 whitespace-pre-wrap leading-relaxed">{selectedTx.metadata.remark}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {selectedTx.receipt_url && (
+                                                <button 
+                                                    onClick={() => handleViewReceipt(selectedTx)}
+                                                    className="w-full mt-4 flex items-center justify-center gap-2 bg-slate-900 text-white font-black py-3 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all border border-slate-900"
+                                                >
+                                                    <Eye className="h-3.5 w-3.5" />
+                                                    {t.viewReceipt}
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -556,6 +627,33 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                         </div>
                         <div className="flex-1 overflow-hidden bg-slate-800">
                             <iframe src={previewUrl} className="w-full h-full border-none" title="Official Statement Preview" />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isReceiptOpen && (
+                <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-3xl animate-in fade-in duration-300">
+                    <div className="absolute inset-0" onClick={() => setIsReceiptOpen(false)}></div>
+                    <div className="relative bg-white w-full max-w-2xl rounded-[3rem] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-500 max-h-[90vh]">
+                        <div className="p-6 md:p-8 flex items-center justify-between border-b border-slate-100 bg-slate-50/50">
+                            <div>
+                                <h3 className="text-base font-black uppercase text-slate-900 tracking-tight">Receipt Verification</h3>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Uploaded Proof of Payment</p>
+                            </div>
+                            <button onClick={() => setIsReceiptOpen(false)} className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white text-slate-400 border border-slate-200 hover:text-red-500 transition-all">
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-4 bg-slate-50 min-h-[400px] flex items-center justify-center">
+                            {receiptUrl ? (
+                                <img src={receiptUrl} alt="Receipt" className="max-w-full h-auto rounded-xl shadow-lg border border-slate-200" />
+                            ) : (
+                                <div className="flex flex-col items-center gap-4">
+                                    <div className="h-10 w-10 border-4 border-gv-gold border-t-transparent animate-spin rounded-full"></div>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Retrieving Secure Link...</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
