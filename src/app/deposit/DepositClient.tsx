@@ -410,28 +410,6 @@ export default function DepositClient() {
                                     </div>
                                 </div>
                             )}
-                                    <input
-                                        type="file"
-                                        required
-                                        onChange={(e) => setReceipt(e.target.files?.[0] || null)}
-                                        className="absolute inset-0 opacity-0 cursor-pointer"
-                                        accept="image/*,.pdf"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="pt-4">
-                                <p className="text-gray-400 text-[10px] font-bold text-center mb-6 leading-relaxed italic border-l-2 border-gv-gold/30 pl-4 py-2 bg-white rounded-r-lg">
-                                    {t.note}
-                                </p>
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="w-full bg-gv-gold text-black font-black py-6 rounded-2xl flex justify-center items-center gap-3 uppercase tracking-widest shadow-xl hover:shadow-gv-gold/20 hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50"
-                                >
-                                    {isSubmitting ? <div className="h-6 w-6 border-2 border-black border-t-transparent animate-spin rounded-full"></div> : t.button}
-                                </button>
-                            </div>
                         </form>
                     </div>
                 </div>
