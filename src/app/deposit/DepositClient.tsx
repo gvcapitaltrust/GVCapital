@@ -16,6 +16,7 @@ export default function DepositClient() {
     const [lang, setLang] = useState<"en" | "zh">("en");
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
     const [successRefId, setSuccessRefId] = useState("");
     const [step, setStep] = useState(1);
     const [remark, setRemark] = useState("");
