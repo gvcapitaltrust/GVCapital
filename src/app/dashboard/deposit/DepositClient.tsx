@@ -357,7 +357,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                             >
                                 {isSubmitting ? (
                                     <div className="flex items-center justify-center gap-3">
-                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                        <div className="h-5 w-5 border-4 border-slate-900 border-t-transparent animate-spin rounded-full"></div>
                                         <span>{t.submit}...</span>
                                     </div>
                                 ) : t.submit}
