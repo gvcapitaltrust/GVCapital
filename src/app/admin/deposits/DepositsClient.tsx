@@ -37,7 +37,11 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
             viewReceipt: "View Receipt",
             approve: "Approve",
             reject: "Reject",
-            noDeposits: "No deposit records found."
+            noDeposits: "No deposit records found.",
+            method: "Method",
+            paymentTitle: "Payment Method",
+            remark: "User Remark",
+            payTo: "Paid To Address"
         },
         zh: {
             title: "入金管理",
@@ -55,7 +59,11 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
             viewReceipt: "查看凭证",
             approve: "批准",
             reject: "拒绝",
-            noDeposits: "未发现入金记录。"
+            noDeposits: "未发现入金记录。",
+            method: "支付方式",
+            paymentTitle: "支付方式",
+            remark: "用户备注",
+            payTo: "支付地址"
         }
     }[lang];
 
@@ -133,6 +141,7 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                 <th className="px-4 py-4 pl-8">User Info</th>
                                 <th className="px-4 py-4">Amount (USD)</th>
                                 <th className="px-4 py-4">{t.tableDate}</th>
+                                <th className="px-4 py-4">{t.method}</th>
                                 <th className="px-4 py-4">Status</th>
                                 <th className="px-4 py-4 pr-8 text-right">Actions</th>
                             </tr>
@@ -161,6 +170,19 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                             <span className="text-slate-500 font-mono text-[11px] font-bold tabular-nums whitespace-nowrap">{formatDate(tx.created_at)}</span>
                                             <span className="text-[9px] text-slate-300 font-bold tabular-nums uppercase whitespace-nowrap opacity-60">{new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
+                                    </td>
+                                    <td className="px-4 py-4">
+                                        {(() => {
+                                            const method = tx.metadata?.payment_method || 'bank';
+                                            if (method === 'bank') return <span className="text-[10px] font-black uppercase text-slate-400">FPX Bank</span>;
+                                            const network = method.split('_')[1]?.toUpperCase() || 'TRON';
+                                            return (
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-black uppercase text-gv-gold">USDT</span>
+                                                    <span className="text-[8px] font-bold text-slate-400 leading-none">{network}</span>
+                                                </div>
+                                            );
+                                        })()}
                                     </td>
                                     <td className="px-4 py-4">
                                         <div className="flex items-center gap-2.5 px-1">
@@ -213,6 +235,9 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                         </div>
                                         <div className="flex flex-col items-end gap-1">
                                             <span className="text-[9px] font-black text-emerald-500 tabular-nums text-[13px] leading-none">$ {amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                                                {tx.metadata?.payment_method?.startsWith('usdt') ? `USDT - ${tx.metadata?.payment_method.split('_')[1].toUpperCase()}` : 'FPX Bank'}
+                                            </span>
                                             <div className="mt-1 flex justify-end">
                                                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
                                                     <div className={`h-1.5 w-1.5 rounded-full ${
@@ -290,9 +315,29 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                             <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">Client Identity</span>
                                             <span className="text-base font-black text-gray-900 uppercase">{selectedTx?.profiles?.full_name}</span>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">Transfer Reference</span>
-                                            <span className="text-base font-black text-gray-500 font-mono italic">{selectedTx?.metadata?.bank_reference || "None Provided"}</span>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="flex flex-col">
+                                                <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{t.paymentTitle}</span>
+                                                <span className="text-sm font-black text-slate-900 uppercase">
+                                                    {selectedTx?.metadata?.payment_method?.startsWith('usdt') 
+                                                        ? `USDT (${selectedTx?.metadata?.payment_method.split('_')[1].toUpperCase()})` 
+                                                        : "FPX Online Banking"}
+                                                </span>
+                                            </div>
+                                            {selectedTx?.metadata?.payment_method?.startsWith('usdt') && (
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{t.payTo}</span>
+                                                    <span className="text-[10px] font-mono font-bold text-gv-gold break-all">
+                                                        {selectedTx?.metadata?.payment_method === 'usdt_sol' ? '5x786gH4cTUzhoSpa8AD5XiWubNu2bfpR5PjHkYjP9i9' :
+                                                         selectedTx?.metadata?.payment_method === 'usdt_tron' ? 'TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE' : 
+                                                         '0x9b891193b672fd4293a775a0c58f402d256ebd79'}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col bg-slate-50 p-4 rounded-2xl border border-slate-100 italic">
+                                            <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">{t.remark}</span>
+                                            <span className="text-xs font-bold text-slate-500 whitespace-pre-wrap">{selectedTx?.metadata?.remark || "None Provided"}</span>
                                         </div>
                                     </div>
                                 </div>
