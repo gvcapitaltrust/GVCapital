@@ -20,6 +20,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
     const [depositAmount, setDepositAmount] = useState("");
     const [depositReceipt, setDepositReceipt] = useState<File | null>(null);
     const [remark, setRemark] = useState("");
+    const [paymentMethod, setPaymentMethod] = useState<"bank" | "usdt">("bank");
 
     const t = {
         en: {
@@ -34,6 +35,14 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
             successDesc: "Your deposit request has been received and is being verified by our finance team.",
             ref: "Reference ID",
             selectFile: "Select Receipt Image",
+            method: "Deposit Method",
+            bank: "FPX Online Banking",
+            usdt: "USDT (TRON)",
+            network: "Network",
+            address: "Deposit Address",
+            copy: "Copy",
+            copied: "Copied!",
+            usdtNote: "Please send only USDT to this address via the TRON (TRC20) network.",
         },
         zh: {
             title: "资金存款",
@@ -47,6 +56,14 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
             successDesc: "您的存款请求已收到，财务团队正在核实中。",
             ref: "参考编号",
             selectFile: "选择收据图片",
+            method: "存款方式",
+            bank: "FPX 在线转账",
+            usdt: "USDT (TRON)",
+            network: "网络",
+            address: "存款地址",
+            copy: "复制",
+            copied: "已复制！",
+            usdtNote: "请确保仅通过 TRON (TRC20) 网络向此地址发送 USDT。",
         }
     }[lang];
 
@@ -79,7 +96,8 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                     metadata: {
                         remark: remark,
                         forex_rate: depositRate,
-                        original_usd_amount: depositAmount
+                        original_usd_amount: depositAmount,
+                        payment_method: paymentMethod
                     }
                 }]);
             if (insertError) throw insertError;
@@ -132,6 +150,60 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
             </div>
 
             <div className="bg-white border border-gray-200 rounded-[32px] p-8 md:p-10 shadow-2xl space-y-8 transition-all duration-500">
+                <div className="space-y-4">
+                    <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.method}</label>
+                    <div className="flex p-1 bg-gray-100 rounded-2xl w-fit">
+                        <button 
+                            onClick={() => setPaymentMethod("bank")}
+                            className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${paymentMethod === "bank" ? "bg-white text-black shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                        >
+                            {t.bank}
+                        </button>
+                        <button 
+                            onClick={() => setPaymentMethod("usdt")}
+                            className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${paymentMethod === "usdt" ? "bg-white text-black shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                        >
+                            {t.usdt}
+                        </button>
+                    </div>
+                </div>
+
+                {paymentMethod === "usdt" && (
+                    <div className="bg-slate-900 rounded-[32px] p-8 text-white relative overflow-hidden group/usdt">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                        
+                        <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
+                            <div className="h-40 w-40 bg-white p-3 rounded-2xl shadow-2xl shrink-0">
+                                <img src="/usdt-qr.png" alt="USDT QR" className="w-full h-full object-contain" />
+                            </div>
+                            
+                            <div className="flex-1 space-y-4 w-full text-center md:text-left">
+                                <div>
+                                    <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">{t.network}</p>
+                                    <p className="text-lg font-black tracking-tight">TRON (TRC20)</p>
+                                </div>
+                                
+                                <div className="space-y-2">
+                                    <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest leading-none">{t.address}</p>
+                                    <div className="flex items-center gap-3 bg-white/5 border border-white/10 p-4 rounded-2xl group-hover/usdt:border-emerald-500/30 transition-colors">
+                                        <p className="text-sm font-mono font-bold break-all flex-1 text-emerald-50">TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE</p>
+                                        <button 
+                                            onClick={() => {
+                                                navigator.clipboard.writeText("TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE");
+                                                alert(t.copied);
+                                            }}
+                                            className="shrink-0 h-10 w-10 bg-emerald-500 text-black rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg shadow-emerald-500/20"
+                                        >
+                                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p className="text-[9px] text-white/40 font-medium italic">{t.usdtNote}</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div className="space-y-8">
                         <div className="space-y-3">

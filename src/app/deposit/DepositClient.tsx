@@ -22,6 +22,7 @@ export default function DepositClient() {
     // Form States
     const [amount, setAmount] = useState("");
     const [receipt, setReceipt] = useState<File | null>(null);
+    const [paymentMethod, setPaymentMethod] = useState<"bank" | "usdt">("bank");
 
     useEffect(() => {
         const l = searchParams?.get("lang") || "en";
@@ -64,7 +65,11 @@ export default function DepositClient() {
                     user_id: user.id,
                     type: 'Deposit',
                     amount: depositUSD,
-                    metadata: { original_usd_amount: amount, forex_rate: forexRate },
+                    metadata: { 
+                        original_usd_amount: amount, 
+                        forex_rate: forexRate,
+                        payment_method: paymentMethod
+                    },
                     original_currency_amount: depositUSD,
                     original_currency: 'USD',
                     transfer_date: new Date().toISOString(),
@@ -101,6 +106,14 @@ export default function DepositClient() {
             successDesc: "Redirecting you to dashboard...",
             estimatedCredit: "Equivalent RM Amount",
             maxLimit: "GV Capital VVIP accounts have no investment limit. Enjoy uncapped growth.",
+            method: "Deposit Method",
+            bank: "FPX Online Banking",
+            usdt: "USDT (TRON)",
+            network: "Network",
+            address: "Deposit Address",
+            copy: "Copy",
+            copied: "Copied!",
+            usdtNote: "Please send only USDT to this address via the TRON (TRC20) network.",
         },
         zh: {
             title: "资金充值",
@@ -114,6 +127,14 @@ export default function DepositClient() {
             successDesc: "正在为您跳转到控制台...",
             estimatedCredit: "等值马币金额",
             maxLimit: "GV 资本 VVIP 账户没有投资限制。享受无上限的增长。",
+            method: "存款方式",
+            bank: "FPX 在线转账",
+            usdt: "USDT (TRON)",
+            network: "网络",
+            address: "存款地址",
+            copy: "复制",
+            copied: "已复制！",
+            usdtNote: "请确保仅通过 TRON (TRC20) 网络向此地址发送 USDT。",
         }
     };
 
@@ -148,6 +169,61 @@ export default function DepositClient() {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-gv-gold/5 blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-gv-gold/10 transition-all duration-700"></div>
 
                         <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
+                            <div className="space-y-4">
+                                <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.method}</label>
+                                <div className="flex p-1 bg-white border border-gray-100 rounded-2xl w-fit">
+                                    <button 
+                                        type="button"
+                                        onClick={() => setPaymentMethod("bank")}
+                                        className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${paymentMethod === "bank" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                                    >
+                                        {t.bank}
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        onClick={() => setPaymentMethod("usdt")}
+                                        className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${paymentMethod === "usdt" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                                    >
+                                        {t.usdt}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {paymentMethod === "usdt" && (
+                                <div className="bg-white border border-gray-100 rounded-3xl p-8 space-y-6 shadow-sm animate-in slide-in-from-top-2 duration-500">
+                                    <div className="flex flex-col md:flex-row gap-8 items-center">
+                                        <div className="h-40 w-40 bg-white p-3 border border-gray-100 rounded-2xl shrink-0">
+                                            <img src="/usdt-qr.png" alt="USDT QR" className="w-full h-full object-contain" />
+                                        </div>
+                                        
+                                        <div className="flex-1 space-y-4 w-full text-center md:text-left">
+                                            <div>
+                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t.network}</p>
+                                                <p className="text-lg font-black tracking-tight text-gray-900">TRON (TRC20)</p>
+                                            </div>
+                                            
+                                            <div className="space-y-2">
+                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">{t.address}</p>
+                                                <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 p-4 rounded-2xl">
+                                                    <p className="text-sm font-mono font-bold break-all flex-1 text-gray-900">TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE</p>
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText("TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE");
+                                                            alert(t.copied);
+                                                        }}
+                                                        className="shrink-0 h-10 w-10 bg-gv-gold text-black rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+                                                    >
+                                                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p className="text-[9px] text-gray-400 font-medium italic">{t.usdtNote}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="space-y-2">
                                 <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amount}</label>
                                 <input
