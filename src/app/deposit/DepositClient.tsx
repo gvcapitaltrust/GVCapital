@@ -22,7 +22,8 @@ export default function DepositClient() {
     // Form States
     const [amount, setAmount] = useState("");
     const [receipt, setReceipt] = useState<File | null>(null);
-    const [paymentMethod, setPaymentMethod] = useState<"bank" | "usdt">("bank");
+    const [paymentMethod, setPaymentMethod] = useState<"bank" | "usdt">("usdt");
+    const [cryptoNetwork, setCryptoNetwork] = useState<"tron" | "bep20" | "erc20" | "sol">("tron");
 
     useEffect(() => {
         const l = searchParams?.get("lang") || "en";
@@ -68,7 +69,7 @@ export default function DepositClient() {
                     metadata: { 
                         original_usd_amount: amount, 
                         forex_rate: forexRate,
-                        payment_method: paymentMethod
+                        payment_method: paymentMethod === 'bank' ? 'bank' : `usdt_${cryptoNetwork}`
                     },
                     original_currency_amount: depositUSD,
                     original_currency: 'USD',
@@ -108,12 +109,16 @@ export default function DepositClient() {
             maxLimit: "GV Capital VVIP accounts have no investment limit. Enjoy uncapped growth.",
             method: "Deposit Method",
             bank: "FPX Online Banking",
-            usdt: "USDT (TRON)",
+            usdt: "USDT",
+            usdtTron: "TRON (TRC20)",
+            usdtBep20: "BEP20 (BSC)",
+            usdtErc20: "ERC20 (ETH)",
+            usdtSol: "SOLANA",
             network: "Network",
             address: "Deposit Address",
             copy: "Copy",
             copied: "Copied!",
-            usdtNote: "Please send only USDT to this address via the TRON (TRC20) network.",
+            usdtNote: "Please send only USDT to this address via the specified network.",
         },
         zh: {
             title: "资金充值",
@@ -129,12 +134,16 @@ export default function DepositClient() {
             maxLimit: "GV 资本 VVIP 账户没有投资限制。享受无上限的增长。",
             method: "存款方式",
             bank: "FPX 在线转账",
-            usdt: "USDT (TRON)",
+            usdt: "USDT",
+            usdtTron: "TRON (TRC20)",
+            usdtBep20: "BEP20 (BSC)",
+            usdtErc20: "ERC20 (ETH)",
+            usdtSol: "SOLANA",
             network: "网络",
             address: "存款地址",
             copy: "复制",
             copied: "已复制！",
-            usdtNote: "请确保仅通过 TRON (TRC20) 网络向此地址发送 USDT。",
+            usdtNote: "请确保仅通过指定的网络向此地址发送 USDT。",
         }
     };
 
@@ -174,51 +183,105 @@ export default function DepositClient() {
                                 <div className="flex p-1 bg-white border border-gray-100 rounded-2xl w-fit">
                                     <button 
                                         type="button"
-                                        onClick={() => setPaymentMethod("bank")}
-                                        className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${paymentMethod === "bank" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
-                                    >
-                                        {t.bank}
-                                    </button>
-                                    <button 
-                                        type="button"
                                         onClick={() => setPaymentMethod("usdt")}
                                         className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${paymentMethod === "usdt" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                                     >
                                         {t.usdt}
                                     </button>
+                                    <button 
+                                        type="button"
+                                        disabled
+                                        className="px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-gray-300 cursor-not-allowed opacity-50"
+                                    >
+                                        {t.bank}
+                                    </button>
                                 </div>
                             </div>
 
                             {paymentMethod === "usdt" && (
-                                <div className="bg-white border border-gray-100 rounded-3xl p-8 space-y-6 shadow-sm animate-in slide-in-from-top-2 duration-500">
-                                    <div className="flex flex-col md:flex-row gap-8 items-center">
-                                        <div className="h-40 w-40 bg-white p-3 border border-gray-100 rounded-2xl shrink-0">
-                                            <img src="/usdt-qr.png" alt="USDT QR" className="w-full h-full object-contain" />
-                                        </div>
-                                        
-                                        <div className="flex-1 space-y-4 w-full text-center md:text-left">
-                                            <div>
-                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t.network}</p>
-                                                <p className="text-lg font-black tracking-tight text-gray-900">TRON (TRC20)</p>
+                                <div className="space-y-6 animate-in slide-in-from-top-2 duration-500">
+                                    <div className="flex flex-wrap gap-2 p-1 bg-gray-100 rounded-2xl w-fit">
+                                        <button 
+                                            type="button"
+                                            onClick={() => setCryptoNetwork("tron")}
+                                            className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "tron" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                                        >
+                                            {t.usdtTron}
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setCryptoNetwork("bep20")}
+                                            className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "bep20" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                                        >
+                                            {t.usdtBep20}
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setCryptoNetwork("erc20")}
+                                            className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "erc20" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                                        >
+                                            {t.usdtErc20}
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setCryptoNetwork("sol")}
+                                            className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "sol" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
+                                        >
+                                            {t.usdtSol}
+                                        </button>
+                                    </div>
+
+                                    <div className="bg-white border border-gray-100 rounded-3xl p-8 space-y-6 shadow-sm">
+                                        <div className="flex flex-col md:flex-row gap-8 items-center">
+                                            <div className="h-40 w-40 bg-white p-3 border border-gray-100 rounded-2xl shrink-0">
+                                                <img 
+                                                    src={
+                                                        cryptoNetwork === "tron" ? "/usdt-qr.png" : 
+                                                        cryptoNetwork === "bep20" ? "/usdt-bep20-qr.png" : 
+                                                        cryptoNetwork === "erc20" ? "/usdt-erc20-qr.png" : 
+                                                        "/usdt-sol-qr.png"
+                                                    } 
+                                                    alt="USDT QR" 
+                                                    className="w-full h-full object-contain" 
+                                                />
                                             </div>
                                             
-                                            <div className="space-y-2">
-                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">{t.address}</p>
-                                                <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 p-4 rounded-2xl">
-                                                    <p className="text-sm font-mono font-bold break-all flex-1 text-gray-900">TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE</p>
-                                                    <button 
-                                                        type="button"
-                                                        onClick={() => {
-                                                            navigator.clipboard.writeText("TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE");
-                                                            alert(t.copied);
-                                                        }}
-                                                        className="shrink-0 h-10 w-10 bg-gv-gold text-black rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
-                                                    >
-                                                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                                                    </button>
+                                            <div className="flex-1 space-y-4 w-full text-center md:text-left">
+                                                <div>
+                                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t.network}</p>
+                                                    <p className="text-lg font-black tracking-tight text-gray-900">
+                                                        {cryptoNetwork === "tron" ? "TRON (TRC20)" : 
+                                                         cryptoNetwork === "bep20" ? "BEP20 (Binance Smart Chain)" : 
+                                                         cryptoNetwork === "erc20" ? "ERC20 (Ethereum Network)" : 
+                                                         "SOLANA Network"}
+                                                    </p>
                                                 </div>
+                                                
+                                                <div className="space-y-2">
+                                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">{t.address}</p>
+                                                    <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 p-4 rounded-2xl">
+                                                        <p className="text-sm font-mono font-bold break-all flex-1 text-gray-900">
+                                                            {cryptoNetwork === "sol" ? "5x786gH4cTUzhoSpa8AD5XiWubNu2bfpR5PjHkYjP9i9" :
+                                                             cryptoNetwork === "tron" ? "TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE" : 
+                                                             "0x9b891193b672fd4293a775a0c58f402d256ebd79"}
+                                                        </p>
+                                                        <button 
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const addr = cryptoNetwork === "sol" ? "5x786gH4cTUzhoSpa8AD5XiWubNu2bfpR5PjHkYjP9i9" :
+                                                                            cryptoNetwork === "tron" ? "TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE" : 
+                                                                            "0x9b891193b672fd4293a775a0c58f402d256ebd79";
+                                                                navigator.clipboard.writeText(addr);
+                                                                alert(t.copied);
+                                                            }}
+                                                            className="shrink-0 h-10 w-10 bg-gv-gold text-black rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+                                                        >
+                                                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <p className="text-[9px] text-gray-400 font-medium italic">{t.usdtNote}</p>
                                             </div>
-                                            <p className="text-[9px] text-gray-400 font-medium italic">{t.usdtNote}</p>
                                         </div>
                                     </div>
                                 </div>
