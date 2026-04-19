@@ -12,15 +12,16 @@ interface MobileSideMenuProps {
     isOpen: boolean;
     onClose: () => void;
     currentTab: string; // Keep for highlighting or use pathname
+    isPublicPage?: boolean; // When true, always show guest navigation (used on public pages like homepage)
 }
 
-export default function MobileSideMenu({ lang, isOpen, onClose, currentTab }: MobileSideMenuProps) {
+export default function MobileSideMenu({ lang, isOpen, onClose, currentTab, isPublicPage = false }: MobileSideMenuProps) {
     const { user, totalAssets, balance, balanceUSD, loading: authLoading } = useAuth();
     const { forexRate } = useSettings();
     const router = useRouter();
 
     // Stricter check to prevent showing dashboard items to stale sessions
-    const isReallyLoggedIn = !!(user && user.id && (user.email || user.fullName));
+    const isReallyLoggedIn = !!(user && user.id && (user.email || user.fullName)) && !isPublicPage;
 
     const t = {
         en: {

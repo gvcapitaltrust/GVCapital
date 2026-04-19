@@ -100,6 +100,7 @@ export default function Navigation({ lang, setLang }: NavigationProps) {
         onClose={() => setIsMenuOpen(false)}
         lang={lang}
         currentTab=""
+        isPublicPage={true}
       />
     </>
   );

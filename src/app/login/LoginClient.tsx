@@ -32,31 +32,7 @@ export default function LoginPage() {
                 ? "This account no longer exists. Please contact support if you believe this is an error."
                 : "此账号已不存在。如果您认为这是错误，请联系支持人员。");
         }
-
-        // Use onAuthStateChange for more stable session detection
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            // Break the flashing loop: Don't auto-redirect if there's an account error in the URL
-            const hasError = searchParams?.get('error') === 'account_deleted' || searchParams?.get('error') === 'multiple_devices';
-            
-            if (session && !hasError && !isLoggingIn) {
-                console.log("[AUTH] Auto-redirecting via listener...");
-                // Sync session to cookie so Next.js middleware can read it before redirecting
-                // Storing only access_token to keep cookie size under the 4KB browser limit (especially on mobile)
-                const isSecure = window.location.protocol === "https:";
-                document.cookie = `gv-auth-v1=${encodeURIComponent(session.access_token)}; path=/; max-age=31536000; SameSite=Lax;${isSecure ? " Secure;" : ""}`;
-                const user = session.user;
-                const isAdmin = user.user_metadata?.role?.toLowerCase() === "admin" || user.email === "thenja96@gmail.com";
-                const redirectPath = isAdmin ? "/admin" : `/dashboard?lang=${urlLang || lang}`;
-
-                // Only redirect if we are authenticated and NOT on the target page
-                if (window.location.pathname === "/login") {
-                    window.location.href = redirectPath;
-                }
-            }
-        });
-
-        return () => subscription.unsubscribe();
-    }, [searchParams, router, lang]);
+    }, [searchParams, lang]);
 
     const content = {
         en: {
@@ -100,6 +76,7 @@ export default function LoginPage() {
             return;
         }
 
+        let redirecting = false;
         try {
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
@@ -149,12 +126,16 @@ export default function LoginPage() {
                 const user = data.session.user;
                 const isAdmin = user.user_metadata?.role?.toLowerCase() === "admin" || user.email === "thenja96@gmail.com";
                 console.log("[AUTH] Handshake verified. Redirecting...");
+                redirecting = true; // Mark as redirecting — keep spinner alive through navigation
                 window.location.href = isAdmin ? "/admin" : `/dashboard?lang=${lang}`;
             }
         } catch (error: any) {
             setErrorMsg(error.message);
         } finally {
-            setIsLoggingIn(false);
+            // Only reset spinner if we are NOT navigating away (e.g. on error)
+            if (!redirecting) {
+                setIsLoggingIn(false);
+            }
         }
     };
     
