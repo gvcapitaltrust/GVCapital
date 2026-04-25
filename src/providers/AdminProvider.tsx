@@ -56,6 +56,7 @@ interface AdminContextType {
     handleAssignUserToFundAccount: (fundAccountId: string, userId: string, allocatedAmountUsd: number) => Promise<void>;
     handleRemoveUserFromFundAccount: (memberId: string) => Promise<void>;
     handleAddPerformanceSnapshot: (fundAccountId: string, data: any) => Promise<void>;
+    handleEditPerformanceSnapshot: (snapshotId: string, fundAccountId: string, data: any) => Promise<void>;
     handleDeletePerformanceSnapshot: (snapshotId: string) => Promise<void>;
 }
 
@@ -927,6 +928,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 description: data.description || null,
                 initial_capital: Number(data.initial_capital || 0),
                 current_capital: Number(data.initial_capital || 0),
+                fund_start_date: data.fund_start_date || null,
+                base_currency: data.base_currency || 'USD',
                 is_active: true
             });
             if (error) throw error;
@@ -945,6 +948,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 platform_name: data.platform_name || null,
                 description: data.description || null,
                 current_capital: Number(data.current_capital),
+                fund_start_date: data.fund_start_date || null,
+                base_currency: data.base_currency || 'USD',
                 is_active: data.is_active
             }).eq('id', id);
             if (error) throw error;
@@ -986,6 +991,22 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         try {
             const openingCapital = Number(data.opening_capital || 0);
             const closingCapital = Number(data.closing_capital || 0);
+
+            // Validation
+            if (!data.snapshot_date) throw new Error('Snapshot date is required.');
+            if (openingCapital <= 0) throw new Error('Opening capital must be greater than 0.');
+            if (closingCapital <= 0) throw new Error('Closing capital must be greater than 0.');
+            if (new Date(data.snapshot_date) > new Date()) throw new Error('Snapshot date cannot be in the future.');
+
+            // Duplicate check
+            const duplicate = fundAccountPerformance.find(
+                p => p.fund_account_id === fundAccountId
+                    && p.snapshot_date === data.snapshot_date
+                    && p.snapshot_type === data.snapshot_type
+                    && !p.is_deleted
+            );
+            if (duplicate) throw new Error(`A ${data.snapshot_type} snapshot already exists for ${data.snapshot_date}. Edit the existing entry or choose a different date.`);
+
             const gainLossAmount = closingCapital - openingCapital;
             const gainLossPercent = openingCapital !== 0 ? (gainLossAmount / openingCapital) * 100 : 0;
 
@@ -997,7 +1018,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 closing_capital: closingCapital,
                 gain_loss_amount: gainLossAmount,
                 gain_loss_percent: gainLossPercent,
-                notes: data.notes || null
+                notes: data.notes || null,
+                entered_by_id: authUser?.id || null,
+                entered_by_name: authUser?.user_metadata?.full_name || authUser?.email || 'Admin',
             });
             if (error) throw error;
 
@@ -1011,12 +1034,58 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const handleEditPerformanceSnapshot = async (snapshotId: string, fundAccountId: string, data: any) => {
+        try {
+            const openingCapital = Number(data.opening_capital || 0);
+            const closingCapital = Number(data.closing_capital || 0);
+
+            if (openingCapital <= 0) throw new Error('Opening capital must be greater than 0.');
+            if (closingCapital <= 0) throw new Error('Closing capital must be greater than 0.');
+
+            const gainLossAmount = closingCapital - openingCapital;
+            const gainLossPercent = openingCapital !== 0 ? (gainLossAmount / openingCapital) * 100 : 0;
+
+            // Preserve original values on first edit
+            const existing = fundAccountPerformance.find(p => p.id === snapshotId);
+            const preserveOriginals = !existing?.original_opening_capital ? {
+                original_opening_capital: existing?.opening_capital,
+                original_closing_capital: existing?.closing_capital,
+            } : {};
+
+            const { error } = await supabase.from('fund_account_performance').update({
+                opening_capital: openingCapital,
+                closing_capital: closingCapital,
+                gain_loss_amount: gainLossAmount,
+                gain_loss_percent: gainLossPercent,
+                notes: data.notes || null,
+                snapshot_date: data.snapshot_date,
+                snapshot_type: data.snapshot_type,
+                edited_at: new Date().toISOString(),
+                edited_by: authUser?.user_metadata?.full_name || authUser?.email || 'Admin',
+                ...preserveOriginals,
+            }).eq('id', snapshotId);
+            if (error) throw error;
+
+            // Update fund account current_capital to latest closing capital
+            await supabase.from('fund_accounts').update({ current_capital: closingCapital }).eq('id', fundAccountId);
+
+            showToast('Snapshot updated.');
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
     const handleDeletePerformanceSnapshot = async (snapshotId: string) => {
         try {
-            if (!confirm('Delete this performance snapshot?')) return;
-            const { error } = await supabase.from('fund_account_performance').delete().eq('id', snapshotId);
+            if (!confirm('Delete this performance snapshot? The record will be preserved in the audit trail.')) return;
+            const { error } = await supabase.from('fund_account_performance').update({
+                is_deleted: true,
+                deleted_by: authUser?.user_metadata?.full_name || authUser?.email || 'Admin',
+                deleted_at: new Date().toISOString(),
+            }).eq('id', snapshotId);
             if (error) throw error;
-            showToast('Snapshot deleted.');
+            showToast('Snapshot removed from view.');
             fetchData();
         } catch (err: any) {
             alert(err.message);
@@ -1094,6 +1163,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             handleAssignUserToFundAccount,
             handleRemoveUserFromFundAccount,
             handleAddPerformanceSnapshot,
+            handleEditPerformanceSnapshot,
             handleDeletePerformanceSnapshot
         }}>
             {children}

@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "@/providers/AdminProvider";
-import { ArrowLeft, Plus, X, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, X, Trash2, Edit2, CheckCircle, AlertCircle } from "lucide-react";
 
 type Lang = "en" | "zh";
 
@@ -21,9 +21,6 @@ const t = {
         latestCapital: "Current Capital",
         initialCapital: "Initial Capital",
         platform: "Platform",
-        accountCode: "Account Code",
-        manageBtn: "Manage",
-        // Account form
         formCreateTitle: "Create Fund Account",
         formEditTitle: "Edit Fund Account",
         fieldAccountName: "Account Name",
@@ -32,20 +29,20 @@ const t = {
         fieldDescription: "Description",
         fieldInitialCapital: "Initial Capital (USD)",
         fieldCurrentCapital: "Current Capital (USD)",
+        fieldFundStartDate: "Fund Start Date",
+        fieldCurrency: "Base Currency",
         fieldIsActive: "Active",
         save: "Save",
         cancel: "Cancel",
-        // Members panel
         membersTitle: "Assigned Members",
         assignUser: "Assign User",
         selectUser: "Select User",
         allocatedAmount: "Allocated Amount (USD)",
         assignBtn: "Assign",
-        removeBtn: "Remove",
         noMembers: "No members assigned yet.",
-        // Performance panel
         performanceTitle: "Performance Snapshots",
         addSnapshot: "Add Snapshot",
+        editSnapshot: "Edit Snapshot",
         snapshotDate: "Date",
         snapshotType: "Type",
         daily: "Daily",
@@ -55,8 +52,9 @@ const t = {
         gainLossAmt: "Gain/Loss (USD)",
         gainLossPct: "Gain/Loss (%)",
         notes: "Notes",
+        enteredBy: "Entered By",
+        editedBy: "Edited",
         noSnapshots: "No snapshots yet.",
-        deleteSnapshot: "Delete",
     },
     zh: {
         title: "基金账户",
@@ -71,8 +69,6 @@ const t = {
         latestCapital: "当前资本",
         initialCapital: "初始资本",
         platform: "平台",
-        accountCode: "账户代码",
-        manageBtn: "管理",
         formCreateTitle: "创建基金账户",
         formEditTitle: "编辑基金账户",
         fieldAccountName: "账户名称",
@@ -81,6 +77,8 @@ const t = {
         fieldDescription: "描述",
         fieldInitialCapital: "初始资本 (USD)",
         fieldCurrentCapital: "当前资本 (USD)",
+        fieldFundStartDate: "基金成立日期",
+        fieldCurrency: "基础货币",
         fieldIsActive: "活跃",
         save: "保存",
         cancel: "取消",
@@ -89,10 +87,10 @@ const t = {
         selectUser: "选择用户",
         allocatedAmount: "分配金额 (USD)",
         assignBtn: "分配",
-        removeBtn: "移除",
         noMembers: "暂无已分配成员。",
         performanceTitle: "业绩快照",
         addSnapshot: "添加快照",
+        editSnapshot: "编辑快照",
         snapshotDate: "日期",
         snapshotType: "类型",
         daily: "日报",
@@ -102,13 +100,32 @@ const t = {
         gainLossAmt: "盈亏 (USD)",
         gainLossPct: "盈亏 (%)",
         notes: "备注",
+        enteredBy: "录入人",
+        editedBy: "已编辑",
         noSnapshots: "暂无快照。",
-        deleteSnapshot: "删除",
     }
 };
 
 const USD = (n: number) => `$${Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const PCT = (n: number) => `${Number(n || 0) >= 0 ? "+" : ""}${Number(n || 0).toFixed(2)}%`;
+
+type SnapForm = { snapshot_date: string; snapshot_type: string; opening_capital: string; closing_capital: string; notes: string; };
+const emptySnapForm = (): SnapForm => ({ snapshot_date: new Date().toISOString().split("T")[0], snapshot_type: "daily", opening_capital: "", closing_capital: "", notes: "" });
+
+const CalcPreview = ({ open, close }: { open: string; close: string }) => {
+    const o = Number(open), c = Number(close);
+    if (!o || !c) return null;
+    const diff = c - o;
+    const pct = o !== 0 ? (diff / o) * 100 : 0;
+    const pos = diff >= 0;
+    return (
+        <div className={`rounded-xl p-3 border flex flex-col justify-center ${pos ? "bg-emerald-50 border-emerald-100" : "bg-red-50 border-red-100"}`}>
+            <p className="text-[7px] font-black uppercase tracking-widest text-slate-400">Calc. Gain/Loss</p>
+            <p className={`text-sm font-black tabular-nums ${pos ? "text-emerald-600" : "text-red-500"}`}>{diff >= 0 ? "+" : ""}{USD(diff)}</p>
+            <p className={`text-[9px] font-bold ${pos ? "text-emerald-500" : "text-red-400"}`}>{o !== 0 ? PCT(pct) : "—"}</p>
+        </div>
+    );
+};
 
 export default function FundAccountsClient({ lang }: { lang: Lang }) {
     const router = useRouter();
@@ -117,73 +134,61 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
         users,
         handleCreateFundAccount, handleUpdateFundAccount,
         handleAssignUserToFundAccount, handleRemoveUserFromFundAccount,
-        handleAddPerformanceSnapshot, handleDeletePerformanceSnapshot,
+        handleAddPerformanceSnapshot, handleEditPerformanceSnapshot, handleDeletePerformanceSnapshot,
         loading,
     } = useAdmin();
 
     const tx = t[lang];
 
-    // ── UI State ────────────────────────────────────────────────────
+    // ── UI State ──────────────────────────────────────────────────────
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [selectedAccount, setSelectedAccount] = useState<any>(null);
     const [showForm, setShowForm] = useState(false);
     const [editingAccount, setEditingAccount] = useState<any>(null);
-
-    // Panel tabs
     const [activePanel, setActivePanel] = useState<"members" | "performance">("performance");
 
-    // Form state
-    const [form, setForm] = useState({ account_name: "", account_code: "", platform_name: "", description: "", initial_capital: "", current_capital: "", is_active: true });
+    // Account form
+    const [form, setForm] = useState({ account_name: "", account_code: "", platform_name: "", description: "", initial_capital: "", current_capital: "", is_active: true, fund_start_date: "", base_currency: "USD" });
 
-    // Member assign state
+    // Member assign
     const [assignUserId, setAssignUserId] = useState("");
     const [assignAmount, setAssignAmount] = useState("");
 
-    // Snapshot form state
-    const [snapForm, setSnapForm] = useState({ snapshot_date: new Date().toISOString().split("T")[0], snapshot_type: "daily", opening_capital: "", closing_capital: "", notes: "" });
+    // Snapshot form (shared for add + edit)
+    const [snapForm, setSnapForm] = useState<SnapForm>(emptySnapForm());
     const [showSnapForm, setShowSnapForm] = useState(false);
+    const [editingSnap, setEditingSnap] = useState<any>(null); // null = adding new
 
-    // ── Derived data ─────────────────────────────────────────────────
-    const filtered = useMemo(() => {
-        return fundAccounts.filter(fa => {
-            const matchSearch = fa.account_name?.toLowerCase().includes(search.toLowerCase()) || fa.account_code?.toLowerCase().includes(search.toLowerCase());
-            const matchStatus = statusFilter === "all" || (statusFilter === "active" ? fa.is_active : !fa.is_active);
-            return matchSearch && matchStatus;
-        });
-    }, [fundAccounts, search, statusFilter]);
+    // ── Derived data ──────────────────────────────────────────────────
+    const filtered = useMemo(() => fundAccounts.filter(fa => {
+        const matchSearch = fa.account_name?.toLowerCase().includes(search.toLowerCase()) || fa.account_code?.toLowerCase().includes(search.toLowerCase());
+        const matchStatus = statusFilter === "all" || (statusFilter === "active" ? fa.is_active : !fa.is_active);
+        return matchSearch && matchStatus;
+    }), [fundAccounts, search, statusFilter]);
 
     const accountMembers = (faId: string) => fundAccountMembers.filter(m => m.fund_account_id === faId);
-    const accountPerf = (faId: string) => fundAccountPerformance.filter(p => p.fund_account_id === faId);
+    const accountPerf = (faId: string) => fundAccountPerformance.filter(p => p.fund_account_id === faId && !p.is_deleted);
+    const latestGain = (faId: string, type: "daily" | "monthly") => accountPerf(faId).find(p => p.snapshot_type === type) || null;
 
-    // Latest daily/monthly gain for a given account
-    const latestGain = (faId: string, type: "daily" | "monthly") => {
-        const snaps = accountPerf(faId).filter(p => p.snapshot_type === type);
-        return snaps.length > 0 ? snaps[0] : null;
-    };
-
-    // ── Handlers ─────────────────────────────────────────────────────
+    // ── Account form handlers ─────────────────────────────────────────
     const openCreate = () => {
         setEditingAccount(null);
-        setForm({ account_name: "", account_code: "", platform_name: "", description: "", initial_capital: "", current_capital: "", is_active: true });
+        setForm({ account_name: "", account_code: "", platform_name: "", description: "", initial_capital: "", current_capital: "", is_active: true, fund_start_date: "", base_currency: "USD" });
         setShowForm(true);
     };
-
     const openEdit = (fa: any) => {
         setEditingAccount(fa);
-        setForm({ account_name: fa.account_name, account_code: fa.account_code, platform_name: fa.platform_name || "", description: fa.description || "", initial_capital: String(fa.initial_capital), current_capital: String(fa.current_capital), is_active: fa.is_active });
+        setForm({ account_name: fa.account_name, account_code: fa.account_code, platform_name: fa.platform_name || "", description: fa.description || "", initial_capital: String(fa.initial_capital), current_capital: String(fa.current_capital), is_active: fa.is_active, fund_start_date: fa.fund_start_date || "", base_currency: fa.base_currency || "USD" });
         setShowForm(true);
     };
-
     const handleSubmitForm = async () => {
-        if (editingAccount) {
-            await handleUpdateFundAccount(editingAccount.id, form);
-        } else {
-            await handleCreateFundAccount(form);
-        }
+        if (editingAccount) await handleUpdateFundAccount(editingAccount.id, form);
+        else await handleCreateFundAccount(form);
         setShowForm(false);
     };
 
+    // ── Member handlers ───────────────────────────────────────────────
     const handleAssign = async () => {
         if (!selectedAccount || !assignUserId) return;
         await handleAssignUserToFundAccount(selectedAccount.id, assignUserId, Number(assignAmount || 0));
@@ -191,11 +196,26 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
         setAssignAmount("");
     };
 
-    const handleAddSnap = async () => {
+    // ── Snapshot handlers ─────────────────────────────────────────────
+    const openAddSnap = () => {
+        setEditingSnap(null);
+        setSnapForm(emptySnapForm());
+        setShowSnapForm(true);
+    };
+    const openEditSnap = (snap: any) => {
+        setEditingSnap(snap);
+        setSnapForm({ snapshot_date: snap.snapshot_date, snapshot_type: snap.snapshot_type, opening_capital: String(snap.opening_capital), closing_capital: String(snap.closing_capital), notes: snap.notes || "" });
+        setShowSnapForm(true);
+    };
+    const handleSubmitSnap = async () => {
         if (!selectedAccount) return;
-        await handleAddPerformanceSnapshot(selectedAccount.id, snapForm);
-        setSnapForm({ snapshot_date: new Date().toISOString().split("T")[0], snapshot_type: "daily", opening_capital: "", closing_capital: "", notes: "" });
+        if (editingSnap) {
+            await handleEditPerformanceSnapshot(editingSnap.id, selectedAccount.id, snapForm);
+        } else {
+            await handleAddPerformanceSnapshot(selectedAccount.id, snapForm);
+        }
         setShowSnapForm(false);
+        setEditingSnap(null);
     };
 
     const unassignedUsers = useMemo(() => {
@@ -249,69 +269,65 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
                             </div>
                             <p className="text-slate-300 font-black uppercase tracking-[0.3em] text-xs">{tx.noAccounts}</p>
                         </div>
-                    ) : (
-                        filtered.map(fa => {
-                            const isSelected = selectedAccount?.id === fa.id;
-                            const members = accountMembers(fa.id);
-                            const daily = latestGain(fa.id, "daily");
-                            const monthly = latestGain(fa.id, "monthly");
-                            return (
-                                <div key={fa.id} onClick={() => { setSelectedAccount(fa); setShowSnapForm(false); }} className={`cursor-pointer bg-white border rounded-[2rem] p-6 space-y-4 transition-all hover:shadow-lg ${isSelected ? "border-gv-gold shadow-lg shadow-gv-gold/10" : "border-gray-200 shadow-sm"}`}>
-                                    <div className="flex items-start justify-between gap-3">
-                                        <div>
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className={`h-2 w-2 rounded-full ${fa.is_active ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "bg-gray-300"}`}></span>
-                                                <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{fa.account_code}</span>
-                                            </div>
-                                            <h3 className="text-base font-black text-slate-900 uppercase tracking-tight leading-none">{fa.account_name}</h3>
-                                            {fa.platform_name && <p className="text-[10px] text-gv-gold font-bold mt-1">{fa.platform_name}</p>}
+                    ) : filtered.map(fa => {
+                        const isSelected = selectedAccount?.id === fa.id;
+                        const members = accountMembers(fa.id);
+                        const daily = latestGain(fa.id, "daily");
+                        const monthly = latestGain(fa.id, "monthly");
+                        return (
+                            <div key={fa.id} onClick={() => { setSelectedAccount(fa); setShowSnapForm(false); }} className={`cursor-pointer bg-white border rounded-[2rem] p-6 space-y-4 transition-all hover:shadow-lg ${isSelected ? "border-gv-gold shadow-lg shadow-gv-gold/10" : "border-gray-200 shadow-sm"}`}>
+                                <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className={`h-2 w-2 rounded-full ${fa.is_active ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "bg-gray-300"}`}></span>
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{fa.account_code}</span>
+                                            {fa.base_currency && fa.base_currency !== "USD" && <span className="text-[8px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md font-black">{fa.base_currency}</span>}
                                         </div>
-                                        <button onClick={e => { e.stopPropagation(); openEdit(fa); }} className="h-8 w-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-colors shrink-0">
-                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                        </button>
+                                        <h3 className="text-base font-black text-slate-900 uppercase tracking-tight leading-none">{fa.account_name}</h3>
+                                        {fa.platform_name && <p className="text-[10px] text-gv-gold font-bold mt-1">{fa.platform_name}</p>}
                                     </div>
+                                    <button onClick={e => { e.stopPropagation(); openEdit(fa); }} className="h-8 w-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-colors shrink-0">
+                                        <Edit2 className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
 
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100">
-                                            <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">{tx.latestCapital}</p>
-                                            <p className="text-sm font-black text-slate-900 tabular-nums">{USD(fa.current_capital)}</p>
-                                        </div>
-                                        <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100">
-                                            <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">{tx.members}</p>
-                                            <p className="text-sm font-black text-slate-900">{members.length}</p>
-                                        </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100">
+                                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">{tx.latestCapital}</p>
+                                        <p className="text-sm font-black text-slate-900 tabular-nums">{USD(fa.current_capital)}</p>
                                     </div>
-
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {daily && (
-                                            <div className={`rounded-2xl p-3 border ${Number(daily.gain_loss_amount) >= 0 ? "bg-emerald-50 border-emerald-100" : "bg-red-50 border-red-100"}`}>
-                                                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Daily</p>
-                                                <p className={`text-xs font-black tabular-nums ${Number(daily.gain_loss_amount) >= 0 ? "text-emerald-600" : "text-red-500"}`}>{PCT(daily.gain_loss_percent)}</p>
-                                                <p className={`text-[9px] font-bold tabular-nums ${Number(daily.gain_loss_amount) >= 0 ? "text-emerald-500" : "text-red-400"}`}>{USD(daily.gain_loss_amount)}</p>
-                                            </div>
-                                        )}
-                                        {monthly && (
-                                            <div className={`rounded-2xl p-3 border ${Number(monthly.gain_loss_amount) >= 0 ? "bg-emerald-50 border-emerald-100" : "bg-red-50 border-red-100"}`}>
-                                                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Monthly</p>
-                                                <p className={`text-xs font-black tabular-nums ${Number(monthly.gain_loss_amount) >= 0 ? "text-emerald-600" : "text-red-500"}`}>{PCT(monthly.gain_loss_percent)}</p>
-                                                <p className={`text-[9px] font-bold tabular-nums ${Number(monthly.gain_loss_amount) >= 0 ? "text-emerald-500" : "text-red-400"}`}>{USD(monthly.gain_loss_amount)}</p>
-                                            </div>
-                                        )}
+                                    <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100">
+                                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">{tx.members}</p>
+                                        <p className="text-sm font-black text-slate-900">{members.length}</p>
                                     </div>
                                 </div>
-                            );
-                        })
-                    )}
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    {daily && <div className={`rounded-2xl p-3 border ${Number(daily.gain_loss_amount) >= 0 ? "bg-emerald-50 border-emerald-100" : "bg-red-50 border-red-100"}`}>
+                                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Daily</p>
+                                        <p className={`text-xs font-black tabular-nums ${Number(daily.gain_loss_amount) >= 0 ? "text-emerald-600" : "text-red-500"}`}>{PCT(daily.gain_loss_percent)}</p>
+                                        <p className={`text-[9px] font-bold tabular-nums ${Number(daily.gain_loss_amount) >= 0 ? "text-emerald-500" : "text-red-400"}`}>{USD(daily.gain_loss_amount)}</p>
+                                    </div>}
+                                    {monthly && <div className={`rounded-2xl p-3 border ${Number(monthly.gain_loss_amount) >= 0 ? "bg-emerald-50 border-emerald-100" : "bg-red-50 border-red-100"}`}>
+                                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Monthly</p>
+                                        <p className={`text-xs font-black tabular-nums ${Number(monthly.gain_loss_amount) >= 0 ? "text-emerald-600" : "text-red-500"}`}>{PCT(monthly.gain_loss_percent)}</p>
+                                        <p className={`text-[9px] font-bold tabular-nums ${Number(monthly.gain_loss_amount) >= 0 ? "text-emerald-500" : "text-red-400"}`}>{USD(monthly.gain_loss_amount)}</p>
+                                    </div>}
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
 
                 {/* Management Panel */}
                 {selectedAccount ? (
                     <div className="xl:col-span-2 bg-white border border-gray-200 rounded-[2rem] overflow-hidden shadow-sm">
                         {/* Panel Header */}
-                        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                        <div className="p-6 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
                             <div>
                                 <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">{selectedAccount.account_code}</p>
                                 <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">{selectedAccount.account_name}</h3>
+                                {selectedAccount.fund_start_date && <p className="text-[9px] text-slate-400 font-medium mt-0.5">Since {selectedAccount.fund_start_date}</p>}
                             </div>
                             <div className="flex gap-2">
                                 <button onClick={() => setActivePanel("performance")} className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${activePanel === "performance" ? "bg-gv-gold text-black" : "bg-slate-50 text-slate-400 border border-slate-100 hover:text-slate-900"}`}>📊 {lang === "en" ? "Performance" : "业绩"}</button>
@@ -324,16 +340,22 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
                             <div className="p-6 space-y-6">
                                 <div className="flex items-center justify-between">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tx.performanceTitle}</p>
-                                    <button onClick={() => setShowSnapForm(!showSnapForm)} className="flex items-center gap-1.5 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-xl hover:-translate-y-0.5 transition-all">
+                                    <button onClick={openAddSnap} className="flex items-center gap-1.5 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-xl hover:-translate-y-0.5 transition-all">
                                         <Plus className="h-3.5 w-3.5" />
                                         {tx.addSnapshot}
                                     </button>
                                 </div>
 
-                                {/* Snapshot Form */}
+                                {/* Snapshot Form (add or edit) */}
                                 {showSnapForm && (
                                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">{tx.addSnapshot}</p>
+                                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">{editingSnap ? tx.editSnapshot : tx.addSnapshot}</p>
+                                        {editingSnap && (
+                                            <div className="flex items-center gap-2 p-2 bg-amber-50 border border-amber-200 rounded-xl text-[9px] font-bold text-amber-700">
+                                                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                                                Editing will preserve original values in audit trail. Entered by: <strong>{editingSnap.entered_by_name || "—"}</strong>
+                                            </div>
+                                        )}
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                             <div>
                                                 <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">{tx.snapshotDate}</label>
@@ -354,25 +376,15 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
                                                 <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">{tx.closingCapital}</label>
                                                 <input type="number" step="0.01" placeholder="0.00" value={snapForm.closing_capital} onChange={e => setSnapForm(p => ({...p, closing_capital: e.target.value}))} className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-bold focus:outline-none focus:border-gv-gold transition-all" />
                                             </div>
-                                            {snapForm.opening_capital && snapForm.closing_capital && (
-                                                <div className={`rounded-xl p-3 border flex flex-col justify-center ${Number(snapForm.closing_capital) - Number(snapForm.opening_capital) >= 0 ? "bg-emerald-50 border-emerald-100" : "bg-red-50 border-red-100"}`}>
-                                                    <p className="text-[7px] font-black uppercase tracking-widest text-slate-400">Calc. Gain/Loss</p>
-                                                    <p className={`text-sm font-black tabular-nums ${Number(snapForm.closing_capital) - Number(snapForm.opening_capital) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
-                                                        {USD(Number(snapForm.closing_capital) - Number(snapForm.opening_capital))}
-                                                    </p>
-                                                    <p className={`text-[9px] font-bold ${Number(snapForm.closing_capital) - Number(snapForm.opening_capital) >= 0 ? "text-emerald-500" : "text-red-400"}`}>
-                                                        {Number(snapForm.opening_capital) !== 0 ? PCT((Number(snapForm.closing_capital) - Number(snapForm.opening_capital)) / Number(snapForm.opening_capital) * 100) : "—"}
-                                                    </p>
-                                                </div>
-                                            )}
+                                            <CalcPreview open={snapForm.opening_capital} close={snapForm.closing_capital} />
                                             <div className="col-span-2 md:col-span-3">
                                                 <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">{tx.notes}</label>
                                                 <input type="text" placeholder="Optional notes..." value={snapForm.notes} onChange={e => setSnapForm(p => ({...p, notes: e.target.value}))} className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-bold focus:outline-none focus:border-gv-gold transition-all" />
                                             </div>
                                         </div>
                                         <div className="flex gap-3 pt-2">
-                                            <button onClick={handleAddSnap} className="bg-gv-gold text-black font-black text-[9px] uppercase tracking-widest px-6 py-2.5 rounded-xl hover:-translate-y-0.5 transition-all shadow-md">{tx.save}</button>
-                                            <button onClick={() => setShowSnapForm(false)} className="bg-slate-100 text-slate-500 font-black text-[9px] uppercase tracking-widest px-6 py-2.5 rounded-xl hover:bg-slate-200 transition-all">{tx.cancel}</button>
+                                            <button onClick={handleSubmitSnap} className="bg-gv-gold text-black font-black text-[9px] uppercase tracking-widest px-6 py-2.5 rounded-xl hover:-translate-y-0.5 transition-all shadow-md">{tx.save}</button>
+                                            <button onClick={() => { setShowSnapForm(false); setEditingSnap(null); }} className="bg-slate-100 text-slate-500 font-black text-[9px] uppercase tracking-widest px-6 py-2.5 rounded-xl hover:bg-slate-200 transition-all">{tx.cancel}</button>
                                         </div>
                                     </div>
                                 )}
@@ -384,7 +396,7 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
                                             <p className="text-[10px] text-slate-300 font-black uppercase tracking-widest">{tx.noSnapshots}</p>
                                         </div>
                                     ) : (
-                                        <table className="w-full text-left">
+                                        <table className="w-full text-left min-w-[700px]">
                                             <thead className="bg-slate-50 border-b border-slate-100">
                                                 <tr className="text-[9px] font-black uppercase tracking-widest text-slate-400">
                                                     <th className="px-4 py-3">{tx.snapshotDate}</th>
@@ -393,32 +405,53 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
                                                     <th className="px-4 py-3">{tx.closingCapital}</th>
                                                     <th className="px-4 py-3">{tx.gainLossAmt}</th>
                                                     <th className="px-4 py-3">{tx.gainLossPct}</th>
-                                                    <th className="px-4 py-3">{tx.notes}</th>
+                                                    <th className="px-4 py-3">{tx.enteredBy}</th>
                                                     <th className="px-4 py-3"></th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-50">
                                                 {accountPerf(selectedAccount.id).map(snap => (
                                                     <tr key={snap.id} className="hover:bg-slate-50/50 transition-colors">
-                                                        <td className="px-4 py-3 text-xs font-bold text-slate-600 tabular-nums whitespace-nowrap">{snap.snapshot_date}</td>
+                                                        <td className="px-4 py-3 text-xs font-bold text-slate-600 tabular-nums whitespace-nowrap font-mono">
+                                                            {snap.snapshot_date}
+                                                            {snap.edited_at && (
+                                                                <div className="flex items-center gap-1 mt-0.5">
+                                                                    <AlertCircle className="h-2.5 w-2.5 text-amber-400" />
+                                                                    <span className="text-[7px] text-amber-500 font-bold">{tx.editedBy} {snap.edited_by}</span>
+                                                                </div>
+                                                            )}
+                                                        </td>
                                                         <td className="px-4 py-3">
                                                             <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-lg ${snap.snapshot_type === "daily" ? "bg-blue-50 text-blue-600" : "bg-purple-50 text-purple-600"}`}>
                                                                 {snap.snapshot_type === "daily" ? tx.daily : tx.monthly}
                                                             </span>
                                                         </td>
-                                                        <td className="px-4 py-3 text-xs font-bold text-slate-600 tabular-nums">{USD(snap.opening_capital)}</td>
-                                                        <td className="px-4 py-3 text-xs font-bold text-slate-900 tabular-nums">{USD(snap.closing_capital)}</td>
+                                                        <td className="px-4 py-3 text-xs font-bold text-slate-600 tabular-nums">
+                                                            {USD(snap.opening_capital)}
+                                                            {snap.original_opening_capital && <div className="text-[7px] text-slate-300 line-through">{USD(snap.original_opening_capital)}</div>}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-xs font-bold text-slate-900 tabular-nums">
+                                                            {USD(snap.closing_capital)}
+                                                            {snap.original_closing_capital && <div className="text-[7px] text-slate-300 line-through">{USD(snap.original_closing_capital)}</div>}
+                                                        </td>
                                                         <td className={`px-4 py-3 text-xs font-black tabular-nums ${Number(snap.gain_loss_amount) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
                                                             {Number(snap.gain_loss_amount) >= 0 ? "+" : ""}{USD(snap.gain_loss_amount)}
                                                         </td>
                                                         <td className={`px-4 py-3 text-xs font-black tabular-nums ${Number(snap.gain_loss_percent) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
                                                             {PCT(snap.gain_loss_percent)}
                                                         </td>
-                                                        <td className="px-4 py-3 text-[10px] text-slate-400 max-w-[120px] truncate">{snap.notes || "—"}</td>
+                                                        <td className="px-4 py-3 text-[9px] text-slate-400 font-medium max-w-[100px] truncate">
+                                                            {snap.entered_by_name || "—"}
+                                                        </td>
                                                         <td className="px-4 py-3">
-                                                            <button onClick={() => handleDeletePerformanceSnapshot(snap.id)} className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors">
-                                                                <Trash2 className="h-3.5 w-3.5" />
-                                                            </button>
+                                                            <div className="flex items-center gap-1">
+                                                                <button onClick={() => openEditSnap(snap)} className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-gv-gold hover:bg-amber-50 transition-colors">
+                                                                    <Edit2 className="h-3.5 w-3.5" />
+                                                                </button>
+                                                                <button onClick={() => handleDeletePerformanceSnapshot(snap.id)} className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors">
+                                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                                </button>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -434,7 +467,6 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
                             <div className="p-6 space-y-6">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tx.membersTitle}</p>
 
-                                {/* Assign Form */}
                                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
                                     <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">{tx.assignUser}</p>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -455,7 +487,6 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
                                     <button onClick={handleAssign} disabled={!assignUserId} className="bg-gv-gold disabled:opacity-40 disabled:cursor-not-allowed text-black font-black text-[9px] uppercase tracking-widest px-6 py-2.5 rounded-xl hover:-translate-y-0.5 transition-all shadow-md">{tx.assignBtn}</button>
                                 </div>
 
-                                {/* Members List */}
                                 {accountMembers(selectedAccount.id).length === 0 ? (
                                     <div className="rounded-2xl border border-dashed border-slate-200 p-12 text-center">
                                         <p className="text-[10px] text-slate-300 font-black uppercase tracking-widest">{tx.noMembers}</p>
@@ -475,7 +506,7 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
                                                 </div>
                                                 <div className="flex items-center gap-4">
                                                     <div className="text-right">
-                                                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">{tx.allocatedAmount.split(" ")[0]}</p>
+                                                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Allocated</p>
                                                         <p className="text-sm font-black text-gv-gold tabular-nums">{USD(m.allocated_amount_usd)}</p>
                                                     </div>
                                                     <button onClick={() => handleRemoveUserFromFundAccount(m.id)} className="h-8 w-8 flex items-center justify-center rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors border border-gray-100">
@@ -499,7 +530,7 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
                 )}
             </div>
 
-            {/* Create/Edit Modal */}
+            {/* Create/Edit Account Modal */}
             {showForm && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-xl" onClick={() => setShowForm(false)}></div>
@@ -510,7 +541,7 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
                                 <X className="h-4 w-4" />
                             </button>
                         </div>
-                        <div className="p-6 space-y-4">
+                        <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">{tx.fieldAccountName}</label>
@@ -523,6 +554,21 @@ export default function FundAccountsClient({ lang }: { lang: Lang }) {
                                 <div>
                                     <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">{tx.fieldPlatform}</label>
                                     <input type="text" value={form.platform_name} onChange={e => setForm(p => ({...p, platform_name: e.target.value}))} className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold transition-all" placeholder="MetaTrader 5" />
+                                </div>
+                                <div>
+                                    <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">{tx.fieldCurrency}</label>
+                                    <select value={form.base_currency} onChange={e => setForm(p => ({...p, base_currency: e.target.value}))} className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold transition-all appearance-none cursor-pointer">
+                                        <option value="USD">USD</option>
+                                        <option value="MYR">MYR</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="SGD">SGD</option>
+                                        <option value="USDT">USDT</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">{tx.fieldFundStartDate}</label>
+                                    <input type="date" value={form.fund_start_date} onChange={e => setForm(p => ({...p, fund_start_date: e.target.value}))} className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-gv-gold transition-all" />
                                 </div>
                                 <div>
                                     <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">{editingAccount ? tx.fieldCurrentCapital : tx.fieldInitialCapital}</label>
