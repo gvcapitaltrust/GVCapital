@@ -27,6 +27,10 @@ interface AdminContextType {
     loading: boolean;
     forexRate: number;
     forexSpread: number;
+    // Fund Accounts
+    fundAccounts: any[];
+    fundAccountMembers: any[];
+    fundAccountPerformance: any[];
     showToast: (msg: string) => void;
     refreshData: () => Promise<void>;
     handleApproveDeposit: (tx: any) => Promise<void>;
@@ -46,6 +50,13 @@ interface AdminContextType {
     handleDeleteUser: (userId: string) => Promise<void>;
     handleToggleUserStatus: (userId: string, isDeactivated: boolean) => Promise<void>;
     getUserWithdrawalMethods: (userId: string) => Promise<any[]>;
+    // Fund Account CRUD
+    handleCreateFundAccount: (data: any) => Promise<void>;
+    handleUpdateFundAccount: (id: string, data: any) => Promise<void>;
+    handleAssignUserToFundAccount: (fundAccountId: string, userId: string, allocatedAmountUsd: number) => Promise<void>;
+    handleRemoveUserFromFundAccount: (memberId: string) => Promise<void>;
+    handleAddPerformanceSnapshot: (fundAccountId: string, data: any) => Promise<void>;
+    handleDeletePerformanceSnapshot: (snapshotId: string) => Promise<void>;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -65,6 +76,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const [forexSpread, setForexSpread] = useState(0.20);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: "", visible: false });
+    // Fund Accounts
+    const [fundAccounts, setFundAccounts] = useState<any[]>([]);
+    const [fundAccountMembers, setFundAccountMembers] = useState<any[]>([]);
+    const [fundAccountPerformance, setFundAccountPerformance] = useState<any[]>([]);
 
     const showToast = useCallback((msg: string) => {
         setToast({ message: msg, visible: true });
@@ -301,6 +316,25 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 .eq('key', 'forex_spread_rm')
                 .maybeSingle();
             if (fSpread) setForexSpread(Number(fSpread.value || 0.20));
+
+            // 10. Fetch Fund Accounts
+            const { data: faList } = await supabase
+                .from('fund_accounts')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (faList) setFundAccounts(faList);
+
+            const { data: famList } = await supabase
+                .from('fund_account_members')
+                .select('*, profiles(id, full_name, email, username, balance_usd)')
+                .order('joined_at', { ascending: false });
+            if (famList) setFundAccountMembers(famList);
+
+            const { data: fapList } = await supabase
+                .from('fund_account_performance')
+                .select('*')
+                .order('snapshot_date', { ascending: false });
+            if (fapList) setFundAccountPerformance(fapList);
 
         } catch (error) {
             console.error("Error fetching admin data:", error);
@@ -883,6 +917,112 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    // ── Fund Account CRUD ────────────────────────────────────────────
+    const handleCreateFundAccount = async (data: any) => {
+        try {
+            const { error } = await supabase.from('fund_accounts').insert({
+                account_name: data.account_name,
+                account_code: data.account_code,
+                platform_name: data.platform_name || null,
+                description: data.description || null,
+                initial_capital: Number(data.initial_capital || 0),
+                current_capital: Number(data.initial_capital || 0),
+                is_active: true
+            });
+            if (error) throw error;
+            showToast('Fund account created successfully.');
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleUpdateFundAccount = async (id: string, data: any) => {
+        try {
+            const { error } = await supabase.from('fund_accounts').update({
+                account_name: data.account_name,
+                account_code: data.account_code,
+                platform_name: data.platform_name || null,
+                description: data.description || null,
+                current_capital: Number(data.current_capital),
+                is_active: data.is_active
+            }).eq('id', id);
+            if (error) throw error;
+            showToast('Fund account updated successfully.');
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleAssignUserToFundAccount = async (fundAccountId: string, userId: string, allocatedAmountUsd: number) => {
+        try {
+            const { error } = await supabase.from('fund_account_members').upsert({
+                fund_account_id: fundAccountId,
+                user_id: userId,
+                allocated_amount_usd: Number(allocatedAmountUsd)
+            }, { onConflict: 'fund_account_id,user_id' });
+            if (error) throw error;
+            showToast('User assigned to fund account.');
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleRemoveUserFromFundAccount = async (memberId: string) => {
+        try {
+            if (!confirm('Remove this user from the fund account?')) return;
+            const { error } = await supabase.from('fund_account_members').delete().eq('id', memberId);
+            if (error) throw error;
+            showToast('User removed from fund account.');
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleAddPerformanceSnapshot = async (fundAccountId: string, data: any) => {
+        try {
+            const openingCapital = Number(data.opening_capital || 0);
+            const closingCapital = Number(data.closing_capital || 0);
+            const gainLossAmount = closingCapital - openingCapital;
+            const gainLossPercent = openingCapital !== 0 ? (gainLossAmount / openingCapital) * 100 : 0;
+
+            const { error } = await supabase.from('fund_account_performance').insert({
+                fund_account_id: fundAccountId,
+                snapshot_date: data.snapshot_date,
+                snapshot_type: data.snapshot_type,
+                opening_capital: openingCapital,
+                closing_capital: closingCapital,
+                gain_loss_amount: gainLossAmount,
+                gain_loss_percent: gainLossPercent,
+                notes: data.notes || null
+            });
+            if (error) throw error;
+
+            // Also update the fund account's current_capital
+            await supabase.from('fund_accounts').update({ current_capital: closingCapital }).eq('id', fundAccountId);
+
+            showToast('Performance snapshot added.');
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleDeletePerformanceSnapshot = async (snapshotId: string) => {
+        try {
+            if (!confirm('Delete this performance snapshot?')) return;
+            const { error } = await supabase.from('fund_account_performance').delete().eq('id', snapshotId);
+            if (error) throw error;
+            showToast('Snapshot deleted.');
+            fetchData();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
     useEffect(() => {
         fetchData();
 
@@ -927,6 +1067,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             loading, 
             forexRate,
             forexSpread,
+            fundAccounts,
+            fundAccountMembers,
+            fundAccountPerformance,
             showToast,
             refreshData: fetchData,
             handleApproveDeposit,
@@ -945,7 +1088,13 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             handleSetAdminRole,
             handleDeleteUser,
             handleToggleUserStatus,
-            getUserWithdrawalMethods
+            getUserWithdrawalMethods,
+            handleCreateFundAccount,
+            handleUpdateFundAccount,
+            handleAssignUserToFundAccount,
+            handleRemoveUserFromFundAccount,
+            handleAddPerformanceSnapshot,
+            handleDeletePerformanceSnapshot
         }}>
             {children}
             

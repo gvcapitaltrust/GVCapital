@@ -14,6 +14,7 @@ interface UserContextType {
     referredCount: number;
     referredTotalCapital: number;
     withdrawalMethods: any[];
+    fundAccounts: any[];
     loading: boolean;
     refreshData: () => Promise<void>;
 }
@@ -29,6 +30,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [referredCount, setReferredCount] = useState(0);
     const [referredTotalCapital, setReferredTotalCapital] = useState(0);
     const [withdrawalMethods, setWithdrawalMethods] = useState<any[]>([]);
+    const [fundAccounts, setFundAccounts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     const { forexRate: rawForexRate } = useSettings();
@@ -233,6 +235,33 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     .order('created_at', { ascending: false });
                 
                 if (wMethods) setWithdrawalMethods(wMethods);
+
+                // 6. Fetch Fund Accounts assigned to this user
+                const { data: memberRows } = await supabase
+                    .from('fund_account_members')
+                    .select('*, fund_accounts(*)')
+                    .eq('user_id', user.id);
+
+                if (memberRows && memberRows.length > 0) {
+                    const faIds = memberRows.map((m: any) => m.fund_account_id);
+
+                    const { data: perfRows } = await supabase
+                        .from('fund_account_performance')
+                        .select('*')
+                        .in('fund_account_id', faIds)
+                        .order('snapshot_date', { ascending: false });
+
+                    const enriched = memberRows.map((m: any) => ({
+                        ...m.fund_accounts,
+                        allocated_amount_usd: m.allocated_amount_usd,
+                        member_id: m.id,
+                        joined_at: m.joined_at,
+                        performance: (perfRows || []).filter((p: any) => p.fund_account_id === m.fund_account_id)
+                    }));
+                    setFundAccounts(enriched);
+                } else {
+                    setFundAccounts([]);
+                }
             }
 
         } catch (error) {
@@ -289,6 +318,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             referredCount, 
             referredTotalCapital,
             withdrawalMethods,
+            fundAccounts,
             loading,
             refreshData: fetchData 
         }}>
