@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
 
         // 3. Send the Email
         const { data, error } = await resend.emails.send({
-            from: 'onboarding@resend.dev',
-            to: 'gvcapitaltrust@gmail.com',
+            from: 'GV Capital Trust <noreply@gvcapital.asia>',
+            to: 'support@gvcapital.asia',
             subject: `🔔 KYC Alert: Step 3 Completed`,
             html: `
         <h3>KYC Update</h3>

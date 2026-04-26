@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "./AuthProvider";
 import { getTierByAmount } from "@/lib/tierUtils";
+import { sendKYCVerificationEmails, sendDividendEmail, sendDepositEmails, sendWithdrawalEmails } from "@/lib/email";
 
 interface AdminContextType {
     users: any[];
@@ -371,6 +372,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 }
             }).eq('id', tx.id);
             
+            
+            // Send Email for Deposit Success
+            const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
+            sendDepositEmails(adminEmail, tx.profiles?.email, tx.profiles?.full_name || tx.profiles?.email, amountUSD.toString(), "USD").catch(e => console.error("Email Error:", e));
+
             showToast("Deposit approved successfully.");
             fetchData();
         } catch (error: any) {
@@ -531,6 +537,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             
             if (txUpdateError) throw txUpdateError;
             
+            // Send Email for Withdrawal Success (Accepted)
+            const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
+            sendWithdrawalEmails(adminEmail, profile.email, profile.full_name || profile.email, withdrawAmountUSD.toString(), "USD").catch(e => console.error("Email Error:", e));
+
             showToast("Withdrawal accepted. Awaiting final release.");
             fetchData();
         } catch (error: any) {
@@ -671,6 +681,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 });
             if (txError) throw txError;
 
+            // Send Email for Dividend
+            if (isDividendOrBonus) {
+                sendDividendEmail(user.email, user.full_name || user.email, amountUSD.toString(), "USD").catch(e => console.error("Email Error:", e));
+            }
+
             showToast(`Successfully adjusted ${targetField} by $${amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
             fetchData();
         } catch (err: any) {
@@ -701,6 +716,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     admin_username: authUser?.user_metadata?.full_name || "Admin",
                     action_taken: 'KYC Verified'
                 });
+
+            // Send Email for KYC Approval
+            if (user) {
+                sendKYCVerificationEmails(user.email, null, user.full_name || user.email, null).catch(e => console.error("Email Error:", e));
+            }
 
             showToast(`User successfully verified.`);
             fetchData();

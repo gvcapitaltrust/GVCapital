@@ -83,12 +83,12 @@ export default function GlobalFooter() {
             </div>
             {/* Floating Email Support */}
             <a
-                href="mailto:cs@gvcapital.asia"
+                href="mailto:support@gvcapital.asia"
                 className="fixed bottom-10 right-10 h-16 w-16 bg-[#C9A84C] rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(201,168,76,0.4)] hover:scale-110 active:scale-95 transition-all z-[90] group"
                 aria-label="Contact Support via Email"
             >
                 <div className="absolute right-full mr-4 bg-white text-black text-[10px] font-black uppercase tracking-widest py-2 px-4 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl border border-black/5 whitespace-nowrap mb-2">
-                    {lang === "en" ? "Email Support: cs@gvcapital.asia" : "发送邮件至 cs@gvcapital.asia"}
+                    {lang === "en" ? "Email Support: support@gvcapital.asia" : "发送邮件至 support@gvcapital.asia"}
                 </div>
                 <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />

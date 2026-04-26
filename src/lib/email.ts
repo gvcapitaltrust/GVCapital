@@ -113,7 +113,7 @@ const getBaseTemplate = (content: string, previewText: string = "Update from GV 
 export async function sendEmail({ to, subject, content, previewText }: { to: string | string[], subject: string, content: string, previewText?: string }) {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'GV Capital Trust <notifications@gvcapital.com>', // Replace with your verified domain
+      from: 'GV Capital Trust <noreply@gvcapital.asia>', // Official domain sender
       to,
       subject,
       html: getBaseTemplate(content, previewText || subject),
