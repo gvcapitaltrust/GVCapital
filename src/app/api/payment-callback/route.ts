@@ -1,21 +1,61 @@
 import { NextResponse } from 'next/server';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { supabase } from '@/lib/supabaseClient';
+
+function verifySignature(rawBody: string, headers: Headers, payload: any): boolean {
+    const secret = process.env.PAYMENT_WEBHOOK_SECRET;
+    if (!secret) return false;
+
+    // 1. Header HMAC: providers like Billplz send x-signature = HMAC-SHA256(raw body, secret)
+    const headerSig = headers.get('x-signature') || headers.get('x-billplz-signature');
+    if (headerSig) {
+        const expected = createHmac('sha256', secret).update(rawBody).digest('hex');
+        try {
+            const a = Buffer.from(headerSig, 'hex');
+            const b = Buffer.from(expected, 'hex');
+            if (a.length === b.length && timingSafeEqual(a, b)) return true;
+        } catch {
+            // fall through
+        }
+    }
+
+    // 2. Inline secret: ToyyibPay-style includes the secret as a payload field
+    const inlineSecret = payload?.userSecretKey || payload?.secret_key || payload?.webhook_secret;
+    if (inlineSecret && typeof inlineSecret === 'string') {
+        const a = Buffer.from(inlineSecret);
+        const b = Buffer.from(secret);
+        if (a.length === b.length && timingSafeEqual(a, b)) return true;
+    }
+
+    return false;
+}
 
 export async function POST(request: Request) {
     try {
-        // Support both JSON and Form Data (different gateways use different formats)
-        let payload: any;
+        if (!process.env.PAYMENT_WEBHOOK_SECRET) {
+            console.error('Payment Callback: PAYMENT_WEBHOOK_SECRET is not configured.');
+            return NextResponse.json(
+                { success: false, message: 'Payment webhook not configured' },
+                { status: 503 }
+            );
+        }
+
+        const rawBody = await request.text();
         const contentType = request.headers.get('content-type') || '';
 
+        let payload: any;
         if (contentType.includes('application/json')) {
-            payload = await request.json();
+            payload = rawBody ? JSON.parse(rawBody) : {};
         } else {
-            const formData = await request.formData();
-            payload = Object.fromEntries(formData.entries());
+            payload = Object.fromEntries(new URLSearchParams(rawBody).entries());
+        }
+
+        if (!verifySignature(rawBody, request.headers, payload)) {
+            console.warn('Payment Callback: Signature verification failed.');
+            return NextResponse.json({ success: false, message: 'Invalid signature' }, { status: 401 });
         }
 
         // ToyyibPay / Billplz style fields
-        // Map common fields to our logic
         const status = payload.status || payload.state || payload.billpaymentStatus;
         const amount_myr = parseFloat(payload.amount || payload.billAmount || payload.paid_amount);
         const userId = payload.order_id || payload.billExternalReferenceNo || payload.msg;
@@ -26,6 +66,9 @@ export async function POST(request: Request) {
         if (status === 'Success' || status === '1' || status === 'paid') {
             if (!userId) {
                 return NextResponse.json({ success: false, message: 'Missing User ID' }, { status: 400 });
+            }
+            if (!Number.isFinite(amount_myr) || amount_myr <= 0) {
+                return NextResponse.json({ success: false, message: 'Invalid amount' }, { status: 400 });
             }
 
             // 1. Fetch the current usd_to_myr_rate from platform_settings
@@ -62,6 +105,7 @@ export async function POST(request: Request) {
             if (updateError) throw updateError;
 
             // 4. Save the transaction record (RM is the primary amount)
+            const finalRefId = refId || `PAY-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
             const { error: txError } = await supabase
                 .from('transactions')
                 .insert([{
@@ -70,7 +114,7 @@ export async function POST(request: Request) {
                     amount: amount_myr,
                     amount_usd: amount_usd,
                     status: 'Approved',
-                    ref_id: refId || `PAY-${Date.now()}`,
+                    ref_id: finalRefId,
                     metadata: { description: `Automated Deposit (RM ${amount_myr}) - USD Equiv: $${amount_usd.toFixed(2)}` }
                 }]);
 
