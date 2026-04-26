@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "./AuthProvider";
 import { getTierByAmount } from "@/lib/tierUtils";
-import { sendKYCVerificationEmails, sendDividendEmail, sendDepositEmails, sendWithdrawalEmails } from "@/lib/email";
+import { sendKYCVerificationEmailsAction, sendDividendEmailAction, sendDepositEmailsAction, sendWithdrawalEmailsAction } from "@/app/actions/email";
 
 interface AdminContextType {
     users: any[];
@@ -375,7 +375,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             
             // Send Email for Deposit Success
             const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
-            sendDepositEmails(adminEmail, tx.profiles?.email, tx.profiles?.full_name || tx.profiles?.email, amountUSD.toString(), "USD").catch(e => console.error("Email Error:", e));
+            sendDepositEmailsAction(adminEmail, tx.profiles?.email, tx.profiles?.full_name || tx.profiles?.email, amountUSD.toString(), "USD").catch(e => console.error("Email Error:", e));
 
             showToast("Deposit approved successfully.");
             fetchData();
@@ -539,7 +539,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             
             // Send Email for Withdrawal Success (Accepted)
             const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
-            sendWithdrawalEmails(adminEmail, profile.email, profile.full_name || profile.email, withdrawAmountUSD.toString(), "USD").catch(e => console.error("Email Error:", e));
+            sendWithdrawalEmailsAction(adminEmail, profile.email, profile.full_name || profile.email, withdrawAmountUSD.toString(), "USD").catch(e => console.error("Email Error:", e));
 
             showToast("Withdrawal accepted. Awaiting final release.");
             fetchData();
@@ -683,7 +683,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
             // Send Email for Dividend
             if (isDividendOrBonus) {
-                sendDividendEmail(user.email, user.full_name || user.email, amountUSD.toString(), "USD").catch(e => console.error("Email Error:", e));
+                sendDividendEmailAction(user.email, user.full_name || user.email, amountUSD.toString(), "USD").catch(e => console.error("Email Error:", e));
             }
 
             showToast(`Successfully adjusted ${targetField} by $${amountUSD.toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
@@ -719,7 +719,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
             // Send Email for KYC Approval
             if (user) {
-                sendKYCVerificationEmails(user.email, null, user.full_name || user.email, null).catch(e => console.error("Email Error:", e));
+                sendKYCVerificationEmailsAction(user.email, null, user.full_name || user.email, null).catch(e => console.error("Email Error:", e));
             }
 
             showToast(`User successfully verified.`);

@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
 import { generateUUID, safeStorage } from "@/lib/authUtils";
-import { sendRegistrationEmails } from "@/lib/email";
+import { sendRegistrationEmailsAction } from "@/app/actions/email";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -332,7 +332,7 @@ export default function RegisterPage() {
 
                 // Send Emails
                 const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
-                sendRegistrationEmails(adminEmail, email, null, fullName, null).catch(err => console.error("Email Error:", err));
+                sendRegistrationEmailsAction(adminEmail, email, null, fullName, null).catch(err => console.error("Email Error:", err));
 
                 // Immediate redirect to dashboard
                 router.push(`/dashboard?lang=${lang}`);
