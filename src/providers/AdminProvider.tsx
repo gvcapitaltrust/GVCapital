@@ -413,7 +413,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             // 1. Fetch current user balance/profit to calculate deduction
             const { data: profile, error: profileFetchError } = await supabase
                 .from('profiles')
-                .select('balance, balance_usd, profit, bank_name, account_number, bank_account_holder, kyc_data')
+                .select('email, full_name, balance, balance_usd, profit, bank_name, account_number, bank_account_holder, kyc_data')
                 .eq('id', tx.user_id)
                 .single();
             
