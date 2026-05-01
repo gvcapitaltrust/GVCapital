@@ -86,23 +86,19 @@ CREATE INDEX IF NOT EXISTS idx_profiles_kyc_status ON public.profiles(kyc_status
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
+-- NOTE: Admin check uses public.is_admin() (see supabase_fix_rls_recursion.sql)
+-- to avoid infinite recursion when policies reference profiles from profiles.
 DROP POLICY IF EXISTS "profiles_self_read" ON public.profiles;
 CREATE POLICY "profiles_self_read" ON public.profiles
-    FOR SELECT USING (
-        id = auth.uid()
-        OR EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin')
-    );
+    FOR SELECT USING (id = auth.uid() OR public.is_admin());
 
 DROP POLICY IF EXISTS "profiles_self_update" ON public.profiles;
 CREATE POLICY "profiles_self_update" ON public.profiles
-    FOR UPDATE USING (
-        id = auth.uid()
-        OR EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin')
-    );
+    FOR UPDATE USING (id = auth.uid() OR public.is_admin());
 
 DROP POLICY IF EXISTS "profiles_self_insert" ON public.profiles;
 CREATE POLICY "profiles_self_insert" ON public.profiles
-    FOR INSERT WITH CHECK (id = auth.uid());
+    FOR INSERT WITH CHECK (id = auth.uid() OR public.is_admin());
 
 -- ============================================================
 -- 2. transactions
