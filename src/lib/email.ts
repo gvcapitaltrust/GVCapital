@@ -8,6 +8,8 @@ const SMTP_PORT = Number(process.env.SMTP_PORT || 465);
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_FROM = process.env.SMTP_FROM || 'GV Capital Trust <noreply@gvcapital.asia>';
+const REPLY_TO = process.env.SMTP_REPLY_TO || 'support@gvcapital.asia';
+const UNSUBSCRIBE_EMAIL = process.env.SMTP_UNSUBSCRIBE_EMAIL || 'support@gvcapital.asia';
 
 let cachedTransporter: Transporter | null = null;
 function getTransporter(): Transporter {
@@ -134,11 +136,19 @@ const getBaseTemplate = (content: string, previewText: string = "Update from GV 
  */
 export async function sendEmail({ to, subject, content, previewText }: { to: string | string[], subject: string, content: string, previewText?: string }) {
   try {
+    const unsubscribeUrl = `${APP_URL}/dashboard/profile`;
     const info = await getTransporter().sendMail({
       from: SMTP_FROM,
       to: Array.isArray(to) ? to.join(', ') : to,
+      replyTo: REPLY_TO,
       subject,
       html: getBaseTemplate(content, previewText || subject),
+      headers: {
+        // RFC 2369 / 8058 — gives Gmail/Outlook a real unsubscribe target,
+        // which both inboxes weight heavily when ranking deliverability.
+        'List-Unsubscribe': `<mailto:${UNSUBSCRIBE_EMAIL}?subject=unsubscribe>, <${unsubscribeUrl}>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
     });
     return { success: true, data: { messageId: info.messageId } };
   } catch (err) {
