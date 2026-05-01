@@ -30,8 +30,11 @@ export async function POST(req: Request) {
         }
 
         // 1. Audit Log Entry (Before Deletion)
+        // user_id is set to adminId so the audit row survives the user being
+        // deleted (transactions cascade-delete on user_id).
         if (adminId) {
             await supabaseAdmin.from('transactions').insert({
+                user_id: adminId,
                 type: 'Audit',
                 amount: 0,
                 status: 'Approved',
@@ -39,6 +42,7 @@ export async function POST(req: Request) {
                 metadata: {
                     is_audit: true,
                     action: 'User Deleted',
+                    target_user_id: userId,
                     description: `Admin ${adminName} deleted user ${userId}`,
                     processed_by_name: adminName || "Admin",
                     processed_by_id: adminId,
