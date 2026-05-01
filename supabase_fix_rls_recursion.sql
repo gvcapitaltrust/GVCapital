@@ -1,19 +1,44 @@
 -- ============================================================
--- Fix: infinite recursion in profiles RLS policies
+-- Definitive fix for: "infinite recursion detected in policy
+-- for relation profiles" causing 500s on every authenticated
+-- read.
 --
--- The previous policies inlined `EXISTS (SELECT 1 FROM profiles
--- WHERE id = auth.uid() AND role = 'admin')`. Because that
--- subquery reads from profiles, Postgres re-applies the same
--- policy, recurses, and aborts every read.
---
--- The fix is a SECURITY DEFINER helper that bypasses RLS while
--- doing the admin check, then policies that call the helper.
---
--- Idempotent. Run in the Supabase SQL Editor.
+-- Run this in the Supabase SQL Editor. Idempotent.
 -- ============================================================
 
--- 1. Helper: returns true if the current auth.uid() is an admin.
---    SECURITY DEFINER bypasses RLS inside the function body.
+-- ------------------------------------------------------------
+-- 1. Drop ALL existing policies that touch profiles or call
+--    the recursive admin EXISTS pattern. We rebuild cleanly
+--    below.
+-- ------------------------------------------------------------
+DO $$
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN
+        SELECT polname, polrelid::regclass AS tbl
+        FROM pg_policy
+        WHERE polrelid IN (
+            'public.profiles'::regclass,
+            'public.transactions'::regclass,
+            'public.platform_settings'::regclass,
+            'public.verification_logs'::regclass,
+            'public.withdrawal_methods'::regclass,
+            'public.forex_history'::regclass,
+            'public.notifications'::regclass,
+            'public.fund_transactions'::regclass
+        )
+    LOOP
+        EXECUTE format('DROP POLICY IF EXISTS %I ON %s', r.polname, r.tbl);
+    END LOOP;
+END $$;
+
+-- ------------------------------------------------------------
+-- 2. Helper function. SECURITY DEFINER + owned by postgres
+--    means the body bypasses RLS (postgres has BYPASSRLS in
+--    Supabase), so reading profiles inside the function does
+--    NOT re-enter the policy.
+-- ------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
 LANGUAGE sql
@@ -27,66 +52,84 @@ AS $$
     );
 $$;
 
+ALTER FUNCTION public.is_admin() OWNER TO postgres;
 REVOKE ALL ON FUNCTION public.is_admin() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, anon;
 
--- 2. Replace recursive profiles policies
-DROP POLICY IF EXISTS "profiles_self_read" ON public.profiles;
+-- ------------------------------------------------------------
+-- 3. profiles — split into two simple policies that OR together
+-- ------------------------------------------------------------
 CREATE POLICY "profiles_self_read" ON public.profiles
-    FOR SELECT USING (id = auth.uid() OR public.is_admin());
+    FOR SELECT USING (id = auth.uid());
 
-DROP POLICY IF EXISTS "profiles_self_update" ON public.profiles;
+CREATE POLICY "profiles_admin_read" ON public.profiles
+    FOR SELECT USING (public.is_admin());
+
 CREATE POLICY "profiles_self_update" ON public.profiles
-    FOR UPDATE USING (id = auth.uid() OR public.is_admin());
+    FOR UPDATE USING (id = auth.uid());
 
-DROP POLICY IF EXISTS "profiles_self_insert" ON public.profiles;
+CREATE POLICY "profiles_admin_update" ON public.profiles
+    FOR UPDATE USING (public.is_admin());
+
 CREATE POLICY "profiles_self_insert" ON public.profiles
     FOR INSERT WITH CHECK (id = auth.uid() OR public.is_admin());
 
--- 3. Replace the same pattern on other tables for consistency.
---    (These weren't recursive — they only read from profiles —
---     but using is_admin() is cleaner and safer.)
-
--- transactions
-DROP POLICY IF EXISTS "transactions_self_read" ON public.transactions;
+-- ------------------------------------------------------------
+-- 4. transactions
+-- ------------------------------------------------------------
 CREATE POLICY "transactions_self_read" ON public.transactions
     FOR SELECT USING (user_id = auth.uid() OR public.is_admin());
 
-DROP POLICY IF EXISTS "transactions_self_insert" ON public.transactions;
 CREATE POLICY "transactions_self_insert" ON public.transactions
     FOR INSERT WITH CHECK (user_id = auth.uid() OR public.is_admin());
 
-DROP POLICY IF EXISTS "transactions_admin_update" ON public.transactions;
 CREATE POLICY "transactions_admin_update" ON public.transactions
     FOR UPDATE USING (public.is_admin());
 
--- platform_settings
-DROP POLICY IF EXISTS "platform_settings_admin_write" ON public.platform_settings;
+-- ------------------------------------------------------------
+-- 5. platform_settings — public read, admin write
+-- ------------------------------------------------------------
+CREATE POLICY "platform_settings_public_read" ON public.platform_settings
+    FOR SELECT USING (true);
+
 CREATE POLICY "platform_settings_admin_write" ON public.platform_settings
-    FOR ALL USING (public.is_admin());
+    FOR INSERT WITH CHECK (public.is_admin());
 
--- verification_logs
-DROP POLICY IF EXISTS "verification_logs_admin_only" ON public.verification_logs;
+CREATE POLICY "platform_settings_admin_update" ON public.platform_settings
+    FOR UPDATE USING (public.is_admin());
+
+CREATE POLICY "platform_settings_admin_delete" ON public.platform_settings
+    FOR DELETE USING (public.is_admin());
+
+-- ------------------------------------------------------------
+-- 6. Other tables
+-- ------------------------------------------------------------
 CREATE POLICY "verification_logs_admin_only" ON public.verification_logs
-    FOR ALL USING (public.is_admin());
+    FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
--- withdrawal_methods
-DROP POLICY IF EXISTS "withdrawal_methods_owner" ON public.withdrawal_methods;
 CREATE POLICY "withdrawal_methods_owner" ON public.withdrawal_methods
-    FOR ALL USING (user_id = auth.uid() OR public.is_admin());
+    FOR ALL
+    USING (user_id = auth.uid() OR public.is_admin())
+    WITH CHECK (user_id = auth.uid() OR public.is_admin());
 
--- forex_history
-DROP POLICY IF EXISTS "forex_history_admin_only" ON public.forex_history;
 CREATE POLICY "forex_history_admin_only" ON public.forex_history
-    FOR ALL USING (public.is_admin());
+    FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
--- notifications
-DROP POLICY IF EXISTS "notifications_owner" ON public.notifications;
 CREATE POLICY "notifications_owner" ON public.notifications
-    FOR ALL USING (user_id = auth.uid() OR public.is_admin());
+    FOR ALL
+    USING (user_id = auth.uid() OR public.is_admin())
+    WITH CHECK (user_id = auth.uid() OR public.is_admin());
 
--- agreements storage bucket
+CREATE POLICY "fund_transactions_admin_only" ON public.fund_transactions
+    FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- ------------------------------------------------------------
+-- 7. Storage: agreements bucket
+-- ------------------------------------------------------------
 DROP POLICY IF EXISTS "agreements_owner_upload" ON storage.objects;
+DROP POLICY IF EXISTS "agreements_owner_read" ON storage.objects;
+DROP POLICY IF EXISTS "agreements_admin_all" ON storage.objects;
+
 CREATE POLICY "agreements_owner_upload" ON storage.objects
     FOR INSERT
     WITH CHECK (
@@ -98,7 +141,6 @@ CREATE POLICY "agreements_owner_upload" ON storage.objects
         )
     );
 
-DROP POLICY IF EXISTS "agreements_owner_read" ON storage.objects;
 CREATE POLICY "agreements_owner_read" ON storage.objects
     FOR SELECT USING (
         bucket_id = 'agreements'
@@ -109,19 +151,21 @@ CREATE POLICY "agreements_owner_read" ON storage.objects
         )
     );
 
-DROP POLICY IF EXISTS "agreements_admin_all" ON storage.objects;
 CREATE POLICY "agreements_admin_all" ON storage.objects
-    FOR ALL USING (bucket_id = 'agreements' AND public.is_admin());
-
--- fund_transactions
-DROP POLICY IF EXISTS "fund_transactions_admin_only" ON public.fund_transactions;
-CREATE POLICY "fund_transactions_admin_only" ON public.fund_transactions
     FOR ALL
-    USING (public.is_admin())
-    WITH CHECK (public.is_admin());
+    USING (bucket_id = 'agreements' AND public.is_admin())
+    WITH CHECK (bucket_id = 'agreements' AND public.is_admin());
 
 -- ============================================================
--- Verify (run this after the migration to sanity-check):
---   SELECT * FROM public.profiles WHERE id = auth.uid();
--- Should return your row, not an error.
+-- SMOKE TEST — run these and check the results
 -- ============================================================
+
+-- A. Confirm the helper is non-recursive (should return a bool, not error)
+SELECT public.is_admin() AS is_admin_test;
+
+-- B. List the live policies on profiles (should show 5 rows, none with
+--    inline EXISTS on profiles — only is_admin() calls or auth.uid())
+SELECT polname, pg_get_expr(polqual, polrelid) AS using_clause
+FROM pg_policy
+WHERE polrelid = 'public.profiles'::regclass
+ORDER BY polname;
