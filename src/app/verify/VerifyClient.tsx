@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
+import { sendKYCSubmissionEmailAction } from "@/app/actions/email";
 
 export default function VerifyPage() {
     const router = useRouter();
@@ -377,6 +378,14 @@ export default function VerifyPage() {
             if (updateError) throw updateError;
 
             if (status === 'Pending') {
+                // Notify admin and confirm to user — only when actually submitted, not on Save & Close
+                const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
+                sendKYCSubmissionEmailAction(
+                    adminEmail,
+                    String(formData.full_name || user.email || "User"),
+                    String(user.email || "")
+                ).catch(e => console.error("Email Error:", e));
+
                 setShowSuccess(true);
                 setTimeout(() => router.push(`/dashboard?lang=${lang}`), 3000);
             } else {
