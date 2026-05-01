@@ -54,13 +54,10 @@ export default function RegisterPage() {
 
         setIsValidatingReferral(true);
         try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('id, username')
-                .eq('username', cleanCode)
-                .single();
+            const res = await fetch(`/api/auth/lookup-user?username=${encodeURIComponent(cleanCode)}`);
+            const data = await res.json();
 
-            if (error || !data) {
+            if (!res.ok || !data?.found) {
                 setIsReferralValid(false);
                 setInviterUsername("");
                 setInviterId(null);
@@ -262,13 +259,10 @@ export default function RegisterPage() {
             let isUnique = false;
             
             while (!isUnique) {
-                const { data } = await supabase
-                    .from('profiles')
-                    .select('username')
-                    .eq('username', finalUsername)
-                    .maybeSingle();
-                
-                if (!data) {
+                const res = await fetch(`/api/auth/lookup-user?username=${encodeURIComponent(finalUsername)}`);
+                const data = await res.json();
+
+                if (!data?.found) {
                     isUnique = true;
                 } else {
                     counter++;
