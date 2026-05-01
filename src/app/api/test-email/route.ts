@@ -5,11 +5,14 @@ import { sendEmail } from '@/lib/email';
 // Restricted to your own domain to prevent abuse. Delete this file once email is verified.
 export async function GET(req: NextRequest) {
     const to = req.nextUrl.searchParams.get('to') || 'support@gvcapital.asia';
+    const key = req.nextUrl.searchParams.get('key');
 
-    // Safety: only allow sending to your own domain
-    if (!to.toLowerCase().endsWith('@gvcapital.asia')) {
+    // Safety: own domain is unrestricted; external addresses require a key
+    const TEST_KEY = 'gv-debug-2026';
+    const isOwnDomain = to.toLowerCase().endsWith('@gvcapital.asia');
+    if (!isOwnDomain && key !== TEST_KEY) {
         return NextResponse.json(
-            { ok: false, error: 'Recipient must be an @gvcapital.asia address' },
+            { ok: false, error: 'External recipients require ?key=' + TEST_KEY },
             { status: 400 }
         );
     }
