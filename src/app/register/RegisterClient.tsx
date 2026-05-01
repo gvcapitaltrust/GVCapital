@@ -324,9 +324,10 @@ export default function RegisterPage() {
                     throw new Error(profileError.message || "Failed to create user profile.");
                 }
 
-                // Send Emails
+                // Send Emails — pass inviterId so the server action can look
+                // up the referrer's email/name and send the third email.
                 const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
-                sendRegistrationEmailsAction(adminEmail, email, null, fullName, null).catch(err => console.error("Email Error:", err));
+                sendRegistrationEmailsAction(adminEmail, email, resolvedReferralId, fullName).catch(err => console.error("Email Error:", err));
 
                 // Immediate redirect to dashboard
                 router.push(`/dashboard?lang=${lang}`);
