@@ -1,6 +1,7 @@
 import nodemailer, { type Transporter } from 'nodemailer';
 
-const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+// Fallback is the live domain — emails go to real users, never to localhost
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://gvcapital.asia').replace(/\/$/, '');
 const link = (path: string) => `${APP_URL}${path.startsWith('/') ? path : `/${path}`}`;
 
 const SMTP_HOST = process.env.SMTP_HOST;
