@@ -1,9 +1,28 @@
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import nodemailer, { type Transporter } from 'nodemailer';
 
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
 const link = (path: string) => `${APP_URL}${path.startsWith('/') ? path : `/${path}`}`;
+
+const SMTP_HOST = process.env.SMTP_HOST;
+const SMTP_PORT = Number(process.env.SMTP_PORT || 465);
+const SMTP_USER = process.env.SMTP_USER;
+const SMTP_PASS = process.env.SMTP_PASS;
+const SMTP_FROM = process.env.SMTP_FROM || 'GV Capital Trust <noreply@gvcapital.asia>';
+
+let cachedTransporter: Transporter | null = null;
+function getTransporter(): Transporter {
+    if (cachedTransporter) return cachedTransporter;
+    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+        throw new Error('SMTP credentials not configured (SMTP_HOST / SMTP_USER / SMTP_PASS)');
+    }
+    cachedTransporter = nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: SMTP_PORT,
+        secure: SMTP_PORT === 465, // true for 465, false for 587/STARTTLS
+        auth: { user: SMTP_USER, pass: SMTP_PASS },
+    });
+    return cachedTransporter;
+}
 
 const BRAND_COLOR = '#9A7D2E'; // GV Gold
 const BG_COLOR = '#FAFAF8';
@@ -115,18 +134,13 @@ const getBaseTemplate = (content: string, previewText: string = "Update from GV 
  */
 export async function sendEmail({ to, subject, content, previewText }: { to: string | string[], subject: string, content: string, previewText?: string }) {
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'GV Capital Trust <noreply@gvcapital.asia>', // Official domain sender
-      to,
+    const info = await getTransporter().sendMail({
+      from: SMTP_FROM,
+      to: Array.isArray(to) ? to.join(', ') : to,
       subject,
       html: getBaseTemplate(content, previewText || subject),
     });
-
-    if (error) {
-      console.error('RESEND_ERROR:', error);
-      return { success: false, error };
-    }
-    return { success: true, data };
+    return { success: true, data: { messageId: info.messageId } };
   } catch (err) {
     console.error('EMAIL_SEND_FAILURE:', err);
     return { success: false, error: err };

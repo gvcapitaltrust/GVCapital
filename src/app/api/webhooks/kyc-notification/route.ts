@@ -1,14 +1,11 @@
-import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
+import { sendEmail } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
-    // Move the constructor inside the function to prevent build errors
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
     try {
         // 1. Check Secret
         const secret = req.headers.get('x-webhook-secret');
-        if (secret !== process.env.KYC_WEBHOOK_SECRET) {
+        if (!process.env.KYC_WEBHOOK_SECRET || secret !== process.env.KYC_WEBHOOK_SECRET) {
             console.error("Auth Failed");
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -18,21 +15,20 @@ export async function POST(req: NextRequest) {
         const email = body?.email || "no-email-found@gvcapital.com";
         const userId = body?.user_id || "no-id";
 
-        // 3. Send the Email
-        const { data, error } = await resend.emails.send({
-            from: 'GV Capital Trust <noreply@gvcapital.asia>',
+        // 3. Send the Email via SMTP
+        const result = await sendEmail({
             to: 'support@gvcapital.asia',
             subject: `🔔 KYC Alert: Step 3 Completed`,
-            html: `
-        <h3>KYC Update</h3>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>User ID:</strong> ${userId}</p>
-      `
+            content: `
+                <h3>KYC Update</h3>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>User ID:</strong> ${userId}</p>
+            `,
         });
 
-        if (error) {
-            console.error("Resend Error:", error);
-            return NextResponse.json({ error }, { status: 500 });
+        if (!result.success) {
+            console.error('SMTP Error:', result.error);
+            return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
         }
 
         return NextResponse.json({ success: true });

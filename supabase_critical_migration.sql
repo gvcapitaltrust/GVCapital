@@ -233,29 +233,42 @@ CREATE POLICY "withdrawal_methods_owner" ON public.withdrawal_methods
 
 -- ============================================================
 -- 6. sales_leaderboard
+-- May already exist as a VIEW derived from profiles. If so,
+-- skip table creation and RLS — views inherit security from
+-- their underlying tables.
 -- ============================================================
-CREATE TABLE IF NOT EXISTS public.sales_leaderboard (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    agent_username TEXT NOT NULL UNIQUE,
-    agent_full_name TEXT,
-    total_referred_capital NUMERIC(18, 2) DEFAULT 0,
-    total_referred_capital_usd NUMERIC(18, 2) DEFAULT 0,
-    referred_count INT DEFAULT 0,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+DO $$
+DECLARE
+    rel_kind CHAR;
+BEGIN
+    SELECT relkind INTO rel_kind
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public' AND c.relname = 'sales_leaderboard';
 
-ALTER TABLE public.sales_leaderboard ENABLE ROW LEVEL SECURITY;
+    IF rel_kind IS NULL THEN
+        -- Doesn't exist — create as a real table
+        CREATE TABLE public.sales_leaderboard (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            agent_username TEXT NOT NULL UNIQUE,
+            agent_full_name TEXT,
+            total_referred_capital NUMERIC(18, 2) DEFAULT 0,
+            total_referred_capital_usd NUMERIC(18, 2) DEFAULT 0,
+            referred_count INT DEFAULT 0,
+            created_at TIMESTAMPTZ DEFAULT NOW(),
+            updated_at TIMESTAMPTZ DEFAULT NOW()
+        );
 
-DROP POLICY IF EXISTS "sales_leaderboard_authenticated_read" ON public.sales_leaderboard;
-CREATE POLICY "sales_leaderboard_authenticated_read" ON public.sales_leaderboard
-    FOR SELECT USING (auth.role() = 'authenticated');
+        ALTER TABLE public.sales_leaderboard ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "sales_leaderboard_admin_write" ON public.sales_leaderboard;
-CREATE POLICY "sales_leaderboard_admin_write" ON public.sales_leaderboard
-    FOR ALL USING (
-        EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin')
-    );
+        EXECUTE 'CREATE POLICY "sales_leaderboard_authenticated_read" ON public.sales_leaderboard FOR SELECT USING (auth.role() = ''authenticated'')';
+        EXECUTE 'CREATE POLICY "sales_leaderboard_admin_write" ON public.sales_leaderboard FOR ALL USING (EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = ''admin''))';
+    ELSIF rel_kind = 'v' OR rel_kind = 'm' THEN
+        RAISE NOTICE 'sales_leaderboard already exists as a view — skipping table/RLS creation. View security is inherited from its underlying tables.';
+    ELSE
+        RAISE NOTICE 'sales_leaderboard already exists as a table — leaving as-is.';
+    END IF;
+END $$;
 
 -- ============================================================
 -- 7. forex_history
@@ -302,11 +315,14 @@ CREATE POLICY "notifications_owner" ON public.notifications
         OR EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role = 'admin')
     );
 
--- Realtime
-ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.transactions;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.platform_settings;
+-- Realtime — ignore "already member" errors so the migration is re-runnable
+DO $$
+BEGIN
+    BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;     EXCEPTION WHEN duplicate_object THEN NULL; END;
+    BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE public.transactions;      EXCEPTION WHEN duplicate_object THEN NULL; END;
+    BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;          EXCEPTION WHEN duplicate_object THEN NULL; END;
+    BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE public.platform_settings; EXCEPTION WHEN duplicate_object THEN NULL; END;
+END $$;
 
 -- ============================================================
 -- 9. RPC: approve_deposit
