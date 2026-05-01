@@ -5,8 +5,13 @@ import {
     sendRegistrationEmails as libSendRegistrationEmails,
     sendKYCSubmissionEmail as libSendKYCSubmissionEmail,
     sendKYCVerificationEmails as libSendKYCVerificationEmails,
+    sendKYCRejectionEmail as libSendKYCRejectionEmail,
     sendDepositEmails as libSendDepositEmails,
+    sendDepositApprovedEmail as libSendDepositApprovedEmail,
+    sendDepositRejectedEmail as libSendDepositRejectedEmail,
     sendWithdrawalEmails as libSendWithdrawalEmails,
+    sendWithdrawalCompletedEmail as libSendWithdrawalCompletedEmail,
+    sendWithdrawalRejectedEmail as libSendWithdrawalRejectedEmail,
     sendDividendEmail as libSendDividendEmail
 } from "@/lib/email";
 
@@ -47,16 +52,42 @@ export async function sendKYCSubmissionEmailAction(adminEmail: string, userName:
     return await libSendKYCSubmissionEmail(adminEmail, userName, userEmail);
 }
 
-export async function sendKYCVerificationEmailsAction(userEmail: string, referralEmail: string | null, userName: string, referralName: string | null) {
-    return await libSendKYCVerificationEmails(userEmail, referralEmail, userName, referralName);
+export async function sendKYCVerificationEmailsAction(
+    userEmail: string,
+    inviterId: string | null,
+    userName: string,
+    _legacyReferralName?: string | null
+) {
+    const inviter = await lookupInviter(inviterId);
+    return await libSendKYCVerificationEmails(userEmail, inviter.email, userName, inviter.name);
+}
+
+export async function sendKYCRejectionEmailAction(userEmail: string, userName: string, reason: string) {
+    return await libSendKYCRejectionEmail(userEmail, userName, reason);
 }
 
 export async function sendDepositEmailsAction(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string) {
     return await libSendDepositEmails(adminEmail, userEmail, userName, amount, currency);
 }
 
+export async function sendDepositApprovedEmailAction(userEmail: string, userName: string, amount: string, currency: string) {
+    return await libSendDepositApprovedEmail(userEmail, userName, amount, currency);
+}
+
+export async function sendDepositRejectedEmailAction(userEmail: string, userName: string, amount: string, currency: string, reason: string) {
+    return await libSendDepositRejectedEmail(userEmail, userName, amount, currency, reason);
+}
+
 export async function sendWithdrawalEmailsAction(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string) {
     return await libSendWithdrawalEmails(adminEmail, userEmail, userName, amount, currency);
+}
+
+export async function sendWithdrawalCompletedEmailAction(userEmail: string, userName: string, amount: string, currency: string) {
+    return await libSendWithdrawalCompletedEmail(userEmail, userName, amount, currency);
+}
+
+export async function sendWithdrawalRejectedEmailAction(userEmail: string, userName: string, amount: string, currency: string, reason: string) {
+    return await libSendWithdrawalRejectedEmail(userEmail, userName, amount, currency, reason);
 }
 
 export async function sendDividendEmailAction(userEmail: string, userName: string, amount: string, currency: string) {

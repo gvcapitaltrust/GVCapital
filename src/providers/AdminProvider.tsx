@@ -4,7 +4,16 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "./AuthProvider";
 import { getTierByAmount } from "@/lib/tierUtils";
-import { sendKYCVerificationEmailsAction, sendDividendEmailAction, sendDepositEmailsAction, sendWithdrawalEmailsAction } from "@/app/actions/email";
+import {
+    sendKYCVerificationEmailsAction,
+    sendKYCRejectionEmailAction,
+    sendDividendEmailAction,
+    sendDepositApprovedEmailAction,
+    sendDepositRejectedEmailAction,
+    sendWithdrawalEmailsAction,
+    sendWithdrawalCompletedEmailAction,
+    sendWithdrawalRejectedEmailAction,
+} from "@/app/actions/email";
 
 interface AdminContextType {
     users: any[];
@@ -373,9 +382,13 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             }).eq('id', tx.id);
             
             
-            // Send Email for Deposit Success
-            const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
-            sendDepositEmailsAction(adminEmail, tx.profiles?.email, tx.profiles?.full_name || tx.profiles?.email, amountUSD.toString(), "USD").catch(e => console.error("Email Error:", e));
+            // Send Email for Deposit Approved (credited)
+            sendDepositApprovedEmailAction(
+                tx.profiles?.email,
+                tx.profiles?.full_name || tx.profiles?.email,
+                amountUSD.toString(),
+                "USD"
+            ).catch(e => console.error("Email Error:", e));
 
             showToast("Deposit approved successfully.");
             fetchData();
@@ -386,21 +399,33 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
     const handleRejectDeposit = async (tx: any) => {
         try {
+            const reason = "Policy violation or invalid receipt";
             const { error: txError } = await supabase
                 .from('transactions')
-                .update({ 
+                .update({
                     status: 'Rejected',
                     metadata: {
                         ...tx.metadata,
                         processed_by_name: authUser?.user_metadata?.full_name || "Admin",
                         processed_by_id: authUser?.id,
                         processed_by_email: authUser?.email,
-                        reason: "Policy violation or invalid receipt",
+                        reason,
                         approved_at: new Date().toISOString()
                     }
                 })
                 .eq('id', tx.id);
             if (txError) throw txError;
+
+            // Send Email for Deposit Rejected
+            const amountUSD = Number(tx.original_currency_amount ?? (Number(tx.amount || 0) / forexRate));
+            sendDepositRejectedEmailAction(
+                tx.profiles?.email,
+                tx.profiles?.full_name || tx.profiles?.email,
+                amountUSD.toString(),
+                "USD",
+                reason
+            ).catch(e => console.error("Email Error:", e));
+
             showToast("Deposit rejected.");
             fetchData();
         } catch (error: any) {
@@ -552,7 +577,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         try {
             const { error: txError } = await supabase
                 .from('transactions')
-                .update({ 
+                .update({
                     status: 'Completed',
                     metadata: {
                         ...tx.metadata,
@@ -563,8 +588,20 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     }
                 })
                 .eq('id', tx.id);
-            
+
             if (txError) throw txError;
+
+            // Send Email for Withdrawal Completed (funds released)
+            const userProfile = users.find(u => u.id === tx.user_id);
+            if (userProfile?.email) {
+                const amountUSD = Number(tx.original_currency_amount ?? (Math.abs(Number(tx.amount || 0)) / forexRate));
+                sendWithdrawalCompletedEmailAction(
+                    userProfile.email,
+                    userProfile.full_name || userProfile.email,
+                    amountUSD.toString(),
+                    "USD"
+                ).catch(e => console.error("Email Error:", e));
+            }
 
             // Also complete associated penalty if it exists
             // Since it's a JSONB search, we use the specific condition
@@ -607,7 +644,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             // 3. Mark transaction as Rejected
             const { error: txError } = await supabase
                 .from('transactions')
-                .update({ 
+                .update({
                     status: 'Rejected',
                     metadata: {
                         ...tx.metadata,
@@ -620,7 +657,19 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 })
                 .eq('id', tx.id);
             if (txError) throw txError;
-            
+
+            // Send Email for Withdrawal Rejected
+            const userProfile = users.find(u => u.id === tx.user_id);
+            if (userProfile?.email) {
+                sendWithdrawalRejectedEmailAction(
+                    userProfile.email,
+                    userProfile.full_name || userProfile.email,
+                    refundUSD.toString(),
+                    "USD",
+                    reason
+                ).catch(e => console.error("Email Error:", e));
+            }
+
             showToast("Withdrawal rejected and funds refunded to user dividend wallet.");
             fetchData();
         } catch (error: any) {
@@ -717,9 +766,13 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     action_taken: 'KYC Verified'
                 });
 
-            // Send Email for KYC Approval
+            // Send Email for KYC Approval (with referrer notification if applicable)
             if (user) {
-                sendKYCVerificationEmailsAction(user.email, null, user.full_name || user.email, null).catch(e => console.error("Email Error:", e));
+                sendKYCVerificationEmailsAction(
+                    user.email,
+                    user.referred_by || null,
+                    user.full_name || user.email
+                ).catch(e => console.error("Email Error:", e));
             }
 
             showToast(`User successfully verified.`);
@@ -753,6 +806,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                     action_taken: 'KYC Rejected',
                     rejection_reason: reason
                 });
+
+            // Send Email for KYC Rejection
+            if (user?.email) {
+                sendKYCRejectionEmailAction(
+                    user.email,
+                    user.full_name || user.email,
+                    reason
+                ).catch(e => console.error("Email Error:", e));
+            }
 
             showToast(`User successfully rejected.`);
             fetchData();

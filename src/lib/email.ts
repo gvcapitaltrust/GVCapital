@@ -209,9 +209,10 @@ export async function sendRegistrationEmails(adminEmail: string, userEmail: stri
 }
 
 /**
- * 2. KYC Submission
+ * 2. KYC Submission — sends to admin AND confirms to user
  */
 export async function sendKYCSubmissionEmail(adminEmail: string, userName: string, userEmail: string) {
+  // To Admin
   await sendEmail({
     to: adminEmail,
     subject: `📦 KYC Submission Alert: ${userName}`,
@@ -222,6 +223,38 @@ export async function sendKYCSubmissionEmail(adminEmail: string, userName: strin
       <p><strong>Email:</strong> ${userEmail}</p>
       <p>Please review the documents in the admin panel and update their verification status.</p>
       <a href="${link('/admin/kyc')}" class="button">Review KYC</a>
+    `
+  });
+
+  // To User — confirmation
+  await sendEmail({
+    to: userEmail,
+    subject: `KYC Documents Received — Under Review`,
+    content: `
+      <h2>Verification In Progress</h2>
+      <p>Dear ${userName},</p>
+      <p>We've received your KYC documents and they are now <span class="highlight">queued for review</span> by our compliance team.</p>
+      <p>You'll receive another email once verification completes (usually within 24-48 hours). No action is needed from you in the meantime.</p>
+      <div class="divider"></div>
+      <p>Thank you for completing this important step.</p>
+    `
+  });
+}
+
+/**
+ * 2b. KYC Rejection — to user only
+ */
+export async function sendKYCRejectionEmail(userEmail: string, userName: string, reason: string) {
+  await sendEmail({
+    to: userEmail,
+    subject: `Action Required: KYC Verification Update`,
+    content: `
+      <h2>Additional Information Needed</h2>
+      <p>Dear ${userName},</p>
+      <p>Thank you for submitting your verification documents. After review, we are unable to verify your identity at this time.</p>
+      <p><strong>Reason:</strong> ${reason || 'Documents could not be verified.'}</p>
+      <p>Please log in to your dashboard to resubmit the requested documents. If you believe this was in error, contact our support team.</p>
+      <a href="${link('/verify')}" class="button">Resubmit Documents</a>
     `
   });
 }
@@ -294,6 +327,43 @@ export async function sendDepositEmails(adminEmail: string, userEmail: string, u
 }
 
 /**
+ * 4b. Deposit Approved — funds credited
+ */
+export async function sendDepositApprovedEmail(userEmail: string, userName: string, amount: string, currency: string = "USD") {
+  const formattedAmount = `${currency} ${amount}`;
+  await sendEmail({
+    to: userEmail,
+    subject: `✅ Deposit Approved: ${formattedAmount} Credited`,
+    content: `
+      <h2>Deposit Successfully Credited</h2>
+      <p>Dear ${userName},</p>
+      <p>Your deposit of <span class="highlight">${formattedAmount}</span> has been verified and credited to your account.</p>
+      <p>Your funds are now active and being managed under your selected investment tier.</p>
+      <a href="${link('/dashboard')}" class="button">View Dashboard</a>
+    `
+  });
+}
+
+/**
+ * 4c. Deposit Rejected
+ */
+export async function sendDepositRejectedEmail(userEmail: string, userName: string, amount: string, currency: string, reason: string) {
+  const formattedAmount = `${currency} ${amount}`;
+  await sendEmail({
+    to: userEmail,
+    subject: `Deposit Update: Action Required (${formattedAmount})`,
+    content: `
+      <h2>Deposit Could Not Be Verified</h2>
+      <p>Dear ${userName},</p>
+      <p>We were unable to verify your recent deposit request of <span class="highlight">${formattedAmount}</span>.</p>
+      <p><strong>Reason:</strong> ${reason || 'Transaction could not be confirmed against bank records.'}</p>
+      <p>If you have already transferred the funds, please contact our support team with the transfer reference. Otherwise, you can submit a new deposit request.</p>
+      <a href="${link('/dashboard/deposit')}" class="button">Submit New Deposit</a>
+    `
+  });
+}
+
+/**
  * 5. Withdrawal
  */
 export async function sendWithdrawalEmails(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string = "USD") {
@@ -324,6 +394,43 @@ export async function sendWithdrawalEmails(adminEmail: string, userEmail: string
       <p>Your request is currently being processed by our finance team. You will be notified once the funds have been dispatched to your designated account.</p>
       <div class="divider"></div>
       <p>Transaction ID: ${Math.random().toString(36).substring(7).toUpperCase()}</p>
+    `
+  });
+}
+
+/**
+ * 5b. Withdrawal Completed — funds released
+ */
+export async function sendWithdrawalCompletedEmail(userEmail: string, userName: string, amount: string, currency: string = "USD") {
+  const formattedAmount = `${currency} ${amount}`;
+  await sendEmail({
+    to: userEmail,
+    subject: `💵 Withdrawal Completed: ${formattedAmount}`,
+    content: `
+      <h2>Funds Successfully Dispatched</h2>
+      <p>Dear ${userName},</p>
+      <p>Your withdrawal of <span class="highlight">${formattedAmount}</span> has been released and dispatched to your designated account.</p>
+      <p>Please allow your bank up to 1-3 business days to reflect the deposit. USDT transfers typically appear within 30 minutes.</p>
+      <a href="${link('/dashboard/transactions')}" class="button">View Transaction History</a>
+    `
+  });
+}
+
+/**
+ * 5c. Withdrawal Rejected
+ */
+export async function sendWithdrawalRejectedEmail(userEmail: string, userName: string, amount: string, currency: string, reason: string) {
+  const formattedAmount = `${currency} ${amount}`;
+  await sendEmail({
+    to: userEmail,
+    subject: `Withdrawal Request Declined (${formattedAmount})`,
+    content: `
+      <h2>Withdrawal Could Not Be Processed</h2>
+      <p>Dear ${userName},</p>
+      <p>Your recent withdrawal request of <span class="highlight">${formattedAmount}</span> has been declined.</p>
+      <p><strong>Reason:</strong> ${reason || 'Withdrawal could not be processed at this time.'}</p>
+      <p>The reserved amount has been returned to your withdrawable balance. You may submit a new request once the issue is resolved.</p>
+      <a href="${link('/dashboard/withdraw')}" class="button">Manage Withdrawals</a>
     `
   });
 }
