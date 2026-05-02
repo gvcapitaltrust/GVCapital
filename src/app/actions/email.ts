@@ -12,6 +12,7 @@ import {
     sendWithdrawalEmails as libSendWithdrawalEmails,
     sendWithdrawalCompletedEmail as libSendWithdrawalCompletedEmail,
     sendWithdrawalRejectedEmail as libSendWithdrawalRejectedEmail,
+    type WithdrawalBreakdown,
     sendDividendEmail as libSendDividendEmail,
     sendFundAccountAssignmentEmail as libSendFundAccountAssignmentEmail,
     sendFundAccountRemovalEmail as libSendFundAccountRemovalEmail
@@ -102,16 +103,16 @@ export async function sendDepositRejectedEmailAction(userEmail: string, userName
     return await libSendDepositRejectedEmail(userEmail, userName, amount, currency, reason);
 }
 
-export async function sendWithdrawalEmailsAction(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string, userUsername?: string) {
-    return await libSendWithdrawalEmails(adminEmail, userEmail, userName, amount, currency, userUsername || '');
+export async function sendWithdrawalEmailsAction(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string, userUsername?: string, breakdown?: WithdrawalBreakdown) {
+    return await libSendWithdrawalEmails(adminEmail, userEmail, userName, amount, currency, userUsername || '', breakdown || null);
 }
 
-export async function sendWithdrawalCompletedEmailAction(userEmail: string, userName: string, amount: string, currency: string) {
-    return await libSendWithdrawalCompletedEmail(userEmail, userName, amount, currency);
+export async function sendWithdrawalCompletedEmailAction(userEmail: string, userName: string, amount: string, currency: string, breakdown?: WithdrawalBreakdown) {
+    return await libSendWithdrawalCompletedEmail(userEmail, userName, amount, currency, breakdown || null);
 }
 
-export async function sendWithdrawalRejectedEmailAction(userEmail: string, userName: string, amount: string, currency: string, reason: string) {
-    return await libSendWithdrawalRejectedEmail(userEmail, userName, amount, currency, reason);
+export async function sendWithdrawalRejectedEmailAction(userEmail: string, userName: string, amount: string, currency: string, reason: string, breakdown?: WithdrawalBreakdown) {
+    return await libSendWithdrawalRejectedEmail(userEmail, userName, amount, currency, reason, breakdown || null);
 }
 
 export async function sendDividendEmailAction(userEmail: string, userName: string, amount: string, currency: string) {

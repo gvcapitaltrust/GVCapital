@@ -456,7 +456,14 @@ export default function DashboardClient() {
 
             // Send Email Notifications
             const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
-            sendWithdrawalEmailsAction(adminEmail, user.email, user.fullName || user.email, withdrawAmount, "RM", user.username || "").catch(e => console.error("Email Error:", e));
+            const dashWithdrawBreakdown = penaltyInfo?.isApplied
+                ? {
+                    grossAmount: parseFloat(withdrawAmount),
+                    penaltyAmount: penaltyInfo.penalty,
+                    netPayout: penaltyInfo.payout,
+                  }
+                : null;
+            sendWithdrawalEmailsAction(adminEmail, user.email, user.fullName || user.email, withdrawAmount, "RM", user.username || "", dashWithdrawBreakdown).catch(e => console.error("Email Error:", e));
 
             setIsPinModalOpen(false);
             setIsWithdrawModalOpen(false);

@@ -369,22 +369,66 @@ export async function sendDepositRejectedEmail(userEmail: string, userName: stri
 }
 
 /**
- * 5. Withdrawal
+ * Reusable withdrawal breakdown table — renders Gross / Penalty / Net rows
+ * when a penalty applies, or a single amount row when it doesn't.
  */
-export async function sendWithdrawalEmails(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string = "USD", userUsername: string = "") {
+export type WithdrawalBreakdown = {
+  grossAmount: string | number;
+  penaltyAmount: string | number;
+  netPayout: string | number;
+} | null | undefined;
+
+const renderWithdrawalBreakdown = (currency: string, fallbackAmount: string, breakdown: WithdrawalBreakdown): string => {
+  if (!breakdown) {
+    return `<p><strong>Amount:</strong> <span class="highlight">${currency} ${fallbackAmount}</span></p>`;
+  }
+  const fmt = (v: string | number) => Number(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return `
+    <table cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:16px 0;border-collapse:collapse;font-size:14px;">
+      <tr>
+        <td style="padding:10px 12px;color:#4b5563;background:#f9fafb;border-radius:6px 0 0 0;">Gross Amount</td>
+        <td style="padding:10px 12px;text-align:right;font-weight:700;color:#1a1a1a;background:#f9fafb;border-radius:0 6px 0 0;">${currency} ${fmt(breakdown.grossAmount)}</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 12px;color:#dc2626;background:#fef2f2;font-style:italic;">Early Withdrawal Penalty (40%)</td>
+        <td style="padding:10px 12px;text-align:right;font-weight:700;color:#dc2626;background:#fef2f2;">– ${currency} ${fmt(breakdown.penaltyAmount)}</td>
+      </tr>
+      <tr>
+        <td style="padding:14px 12px;color:#059669;background:#ecfdf5;border-top:2px solid #d1fae5;border-radius:0 0 0 6px;font-weight:700;">Net Payout</td>
+        <td style="padding:14px 12px;text-align:right;font-weight:800;color:#059669;background:#ecfdf5;border-top:2px solid #d1fae5;border-radius:0 0 6px 0;font-size:16px;">${currency} ${fmt(breakdown.netPayout)}</td>
+      </tr>
+    </table>
+    <p style="font-size:12px;color:#6b7280;font-style:italic;">A 40% penalty applies because the withdrawal includes capital still within its lock-in period. Profits and matured capital are exempt.</p>
+  `;
+};
+
+/**
+ * 5. Withdrawal — submission
+ */
+export async function sendWithdrawalEmails(
+  adminEmail: string,
+  userEmail: string,
+  userName: string,
+  amount: string,
+  currency: string = "USD",
+  userUsername: string = "",
+  breakdown: WithdrawalBreakdown = null
+) {
   const formattedAmount = `${currency} ${amount}`;
+  const breakdownHtml = renderWithdrawalBreakdown(currency, amount, breakdown);
+  const subjectAmount = breakdown ? `Net ${currency} ${Number(breakdown.netPayout).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : formattedAmount;
 
   // To Admin
   await sendEmail({
     to: adminEmail,
-    subject: `💸 Withdrawal Request: ${formattedAmount}`,
+    subject: `💸 Withdrawal Request: ${subjectAmount}${breakdown ? ' (with penalty)' : ''}`,
     content: `
       <h2>Withdrawal Alert</h2>
       <p>A user has requested a withdrawal.</p>
       <p><strong>Name:</strong> ${userName}</p>
       ${userUsername ? `<p><strong>Username:</strong> ${userUsername}</p>` : ''}
       <p><strong>Email:</strong> ${userEmail}</p>
-      <p><strong>Amount:</strong> <span class="highlight">${formattedAmount}</span></p>
+      ${breakdownHtml}
       <p>Please review the request and proceed with the payout.</p>
       <a href="${link('/admin/withdrawals')}" class="button">Manage Withdrawals</a>
     `
@@ -393,14 +437,14 @@ export async function sendWithdrawalEmails(adminEmail: string, userEmail: string
   // To User
   await sendEmail({
     to: userEmail,
-    subject: `Withdrawal Request Received: ${formattedAmount}`,
+    subject: `Withdrawal Request Received: ${subjectAmount}`,
     content: `
       <h2>Withdrawal Processing</h2>
       <p>Dear ${userName},</p>
-      <p>Your withdrawal request for <span class="highlight">${formattedAmount}</span> has been received.</p>
-      <p>Your request is currently being processed by our finance team. You will be notified once the funds have been dispatched to your designated account.</p>
+      <p>Your withdrawal request has been received and is being processed by our finance team. You will be notified once the funds are dispatched to your designated account.</p>
+      ${breakdownHtml}
       <div class="divider"></div>
-      <p>Transaction ID: ${Math.random().toString(36).substring(7).toUpperCase()}</p>
+      <p style="font-size:12px;color:#6b7280;">If you did not initiate this withdrawal, please contact our support team immediately.</p>
     `
   });
 }
@@ -408,15 +452,25 @@ export async function sendWithdrawalEmails(adminEmail: string, userEmail: string
 /**
  * 5b. Withdrawal Completed — funds released
  */
-export async function sendWithdrawalCompletedEmail(userEmail: string, userName: string, amount: string, currency: string = "USD") {
+export async function sendWithdrawalCompletedEmail(
+  userEmail: string,
+  userName: string,
+  amount: string,
+  currency: string = "USD",
+  breakdown: WithdrawalBreakdown = null
+) {
   const formattedAmount = `${currency} ${amount}`;
+  const breakdownHtml = renderWithdrawalBreakdown(currency, amount, breakdown);
+  const subjectAmount = breakdown ? `Net ${currency} ${Number(breakdown.netPayout).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : formattedAmount;
+
   await sendEmail({
     to: userEmail,
-    subject: `💵 Withdrawal Completed: ${formattedAmount}`,
+    subject: `💵 Withdrawal Completed: ${subjectAmount}`,
     content: `
       <h2>Funds Successfully Dispatched</h2>
       <p>Dear ${userName},</p>
-      <p>Your withdrawal of <span class="highlight">${formattedAmount}</span> has been released and dispatched to your designated account.</p>
+      <p>Your withdrawal has been released and dispatched to your designated account.</p>
+      ${breakdownHtml}
       <p>Please allow your bank up to 1-3 business days to reflect the deposit. USDT transfers typically appear within 30 minutes.</p>
       <a href="${link('/dashboard/transactions')}" class="button">View Transaction History</a>
     `
@@ -426,15 +480,25 @@ export async function sendWithdrawalCompletedEmail(userEmail: string, userName: 
 /**
  * 5c. Withdrawal Rejected
  */
-export async function sendWithdrawalRejectedEmail(userEmail: string, userName: string, amount: string, currency: string, reason: string) {
+export async function sendWithdrawalRejectedEmail(
+  userEmail: string,
+  userName: string,
+  amount: string,
+  currency: string,
+  reason: string,
+  breakdown: WithdrawalBreakdown = null
+) {
   const formattedAmount = `${currency} ${amount}`;
+  const breakdownHtml = renderWithdrawalBreakdown(currency, amount, breakdown);
+
   await sendEmail({
     to: userEmail,
     subject: `Withdrawal Request Declined (${formattedAmount})`,
     content: `
       <h2>Withdrawal Could Not Be Processed</h2>
       <p>Dear ${userName},</p>
-      <p>Your recent withdrawal request of <span class="highlight">${formattedAmount}</span> has been declined.</p>
+      <p>Your recent withdrawal request has been declined.</p>
+      ${breakdownHtml}
       <p><strong>Reason:</strong> ${reason || 'Withdrawal could not be processed at this time.'}</p>
       <p>The reserved amount has been returned to your withdrawable balance. You may submit a new request once the issue is resolved.</p>
       <a href="${link('/dashboard/withdraw')}" class="button">Manage Withdrawals</a>

@@ -596,11 +596,22 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             const userProfile = users.find(u => u.id === tx.user_id);
             if (userProfile?.email) {
                 const amountUSD = Number(tx.original_currency_amount ?? (Math.abs(Number(tx.amount || 0)) / forexRate));
+                const penaltyApplied = !!tx.metadata?.penalty_applied;
+                const penaltyUSD = Number(tx.metadata?.original_usd_penalty)
+                    || Number(tx.metadata?.penalty_amount_usd)
+                    || (tx.metadata?.penalty_amount ? Number(tx.metadata.penalty_amount) / forexRate : 0);
+                const netUSD = Number(tx.metadata?.original_usd_payout)
+                    || Number(tx.metadata?.final_payout_usd)
+                    || Math.max(0, amountUSD - penaltyUSD);
+                const breakdown = penaltyApplied
+                    ? { grossAmount: amountUSD, penaltyAmount: penaltyUSD, netPayout: netUSD }
+                    : null;
                 sendWithdrawalCompletedEmailAction(
                     userProfile.email,
                     userProfile.full_name || userProfile.email,
                     amountUSD.toString(),
-                    "USD"
+                    "USD",
+                    breakdown
                 ).catch(e => console.error("Email Error:", e));
             }
 
@@ -662,12 +673,23 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             // Send Email for Withdrawal Rejected
             const userProfile = users.find(u => u.id === tx.user_id);
             if (userProfile?.email) {
+                const penaltyApplied = !!tx.metadata?.penalty_applied;
+                const penaltyUSD = Number(tx.metadata?.original_usd_penalty)
+                    || Number(tx.metadata?.penalty_amount_usd)
+                    || (tx.metadata?.penalty_amount ? Number(tx.metadata.penalty_amount) / forexRate : 0);
+                const netUSD = Number(tx.metadata?.original_usd_payout)
+                    || Number(tx.metadata?.final_payout_usd)
+                    || Math.max(0, refundUSD - penaltyUSD);
+                const breakdown = penaltyApplied
+                    ? { grossAmount: refundUSD, penaltyAmount: penaltyUSD, netPayout: netUSD }
+                    : null;
                 sendWithdrawalRejectedEmailAction(
                     userProfile.email,
                     userProfile.full_name || userProfile.email,
                     refundUSD.toString(),
                     "USD",
-                    reason
+                    reason,
+                    breakdown
                 ).catch(e => console.error("Email Error:", e));
             }
 

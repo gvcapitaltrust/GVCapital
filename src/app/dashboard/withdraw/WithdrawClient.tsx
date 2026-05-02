@@ -224,13 +224,21 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
 
             // Notify admin and confirm to user
             const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
+            const breakdown = penaltyInfo?.isApplied
+                ? {
+                    grossAmount: amountUSD,
+                    penaltyAmount: penaltyInfo.penalty_usd,
+                    netPayout: penaltyInfo.payout_usd,
+                  }
+                : null;
             sendWithdrawalEmailsAction(
                 adminEmail,
                 String(user.email || ""),
                 String(user.fullName || user.full_name || user.email || "User"),
                 amountUSD.toString(),
                 "USD",
-                String(user.username || "")
+                String(user.username || ""),
+                breakdown
             ).catch(e => console.error("Email Error:", e));
 
             setIsPinModalOpen(false); setSuccessRefId(refId); setShowSuccess(true); refreshData();

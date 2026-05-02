@@ -21,6 +21,28 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
     const [rejectionReason, setRejectionReason] = useState("");
     const [isRejecting, setIsRejecting] = useState(false);
 
+    // Compute net payout in USD, robust to both submission paths:
+    //   - Dedicated /dashboard/withdraw page writes USD fields directly
+    //   - Legacy inline modal in DashboardClient writes only RM fields
+    // Falls back to (gross - penalty) when no explicit net field is stored.
+    const computeNetUsd = (tx: any): number => {
+        const isUsdNative = tx.original_currency === 'USD';
+        const grossUSD = Number(tx.original_currency_amount)
+            || (isUsdNative
+                ? Math.abs(Number(tx.amount))
+                : Math.abs(Number(tx.amount)) / forexRate);
+
+        const penaltyUSD = Number(tx.metadata?.original_usd_penalty)
+            || Number(tx.metadata?.penalty_amount_usd)
+            || (tx.metadata?.penalty_amount
+                ? Number(tx.metadata.penalty_amount) / forexRate
+                : 0);
+
+        return Number(tx.metadata?.original_usd_payout)
+            || Number(tx.metadata?.final_payout_usd)
+            || Math.max(0, grossUSD - penaltyUSD);
+    };
+
     const t = {
         en: {
             title: "Withdrawal Management",
@@ -146,7 +168,7 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {filteredWithdrawals.map((tx, idx) => {
-                                const payoutUSD = Number(tx.metadata?.final_payout_usd || Math.abs(Number(tx.original_currency_amount || (Number(tx.amount) / forexRate))));
+                                const payoutUSD = computeNetUsd(tx);
 
                                 return (
                                     <tr key={tx.id || idx} className="group hover:bg-slate-50/50 transition-all border-b border-slate-50 last:border-0 border-collapse">
@@ -291,24 +313,17 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                         <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Transaction Summary</h4>
                                         <div className="bg-slate-50 border border-slate-100 p-6 rounded-[2rem] space-y-4">
                                             {(() => {
-                                                // Resolve gross / penalty / net in USD, robust to both
-                                                // submission paths (USD-native dedicated page vs. legacy RM modal).
                                                 const isUsdNative = selectedTx.original_currency === 'USD';
                                                 const grossUSD = Number(selectedTx.original_currency_amount)
                                                     || (isUsdNative
                                                         ? Math.abs(Number(selectedTx.amount))
                                                         : Math.abs(Number(selectedTx.amount)) / forexRate);
-
                                                 const penaltyUSD = Number(selectedTx.metadata?.original_usd_penalty)
                                                     || Number(selectedTx.metadata?.penalty_amount_usd)
                                                     || (selectedTx.metadata?.penalty_amount
                                                         ? Number(selectedTx.metadata.penalty_amount) / forexRate
                                                         : 0);
-
-                                                const netUSD = Number(selectedTx.metadata?.original_usd_payout)
-                                                    || Number(selectedTx.metadata?.final_payout_usd)
-                                                    || Math.max(0, grossUSD - penaltyUSD);
-
+                                                const netUSD = computeNetUsd(selectedTx);
                                                 const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
                                                 return (
