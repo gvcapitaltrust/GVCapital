@@ -340,7 +340,7 @@ export default function DashboardClient() {
 
             // Send Email Notifications
             const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
-            sendDepositEmailsAction(adminEmail, user.email, user.fullName || user.email, depositAmount, "RM").catch(e => console.error("Email Error:", e));
+            sendDepositEmailsAction(adminEmail, user.email, user.fullName || user.email, depositAmount, "RM", user.username || "").catch(e => console.error("Email Error:", e));
 
             setIsDepositModalOpen(false);
             setDepositAmount("");
@@ -456,7 +456,7 @@ export default function DashboardClient() {
 
             // Send Email Notifications
             const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
-            sendWithdrawalEmailsAction(adminEmail, user.email, user.fullName || user.email, withdrawAmount, "RM").catch(e => console.error("Email Error:", e));
+            sendWithdrawalEmailsAction(adminEmail, user.email, user.fullName || user.email, withdrawAmount, "RM", user.username || "").catch(e => console.error("Email Error:", e));
 
             setIsPinModalOpen(false);
             setIsWithdrawModalOpen(false);
@@ -636,7 +636,7 @@ export default function DashboardClient() {
 
             // Send Email Notification
             const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
-            sendKYCSubmissionEmailAction(adminEmail, user.fullName || user.email, user.email).catch(e => console.error("Email Error:", e));
+            sendKYCSubmissionEmailAction(adminEmail, user.fullName || user.email, user.email, user.username || "").catch(e => console.error("Email Error:", e));
 
             // 3. Show Success
             setKycShowSuccess(true);

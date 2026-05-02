@@ -132,7 +132,8 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                 String(user.email || ""),
                 String(user.fullName || user.full_name || user.email || "User"),
                 amountUSD.toString(),
-                "USD"
+                "USD",
+                String(user.username || "")
             ).catch(e => console.error("Email Error:", e));
 
             setSuccessRefId(refId);

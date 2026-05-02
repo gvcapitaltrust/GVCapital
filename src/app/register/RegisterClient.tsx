@@ -327,7 +327,7 @@ export default function RegisterPage() {
                 // Send Emails — pass inviterId so the server action can look
                 // up the referrer's email/name and send the third email.
                 const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
-                sendRegistrationEmailsAction(adminEmail, email, resolvedReferralId, fullName).catch(err => console.error("Email Error:", err));
+                sendRegistrationEmailsAction(adminEmail, email, resolvedReferralId, fullName, null, finalUsername).catch(err => console.error("Email Error:", err));
 
                 // Immediate redirect to dashboard
                 router.push(`/dashboard?lang=${lang}`);

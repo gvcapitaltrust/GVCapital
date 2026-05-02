@@ -39,19 +39,41 @@ async function lookupInviter(inviterId: string | null): Promise<{ email: string 
     };
 }
 
+// Look up the user's own username on the server side, given their id.
+// Used to enrich admin notifications without trusting client-supplied data.
+async function lookupUsername(userId: string | null | undefined): Promise<string> {
+    if (!userId) return '';
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !serviceKey) return '';
+
+    const admin = createClient(url, serviceKey, {
+        auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    const { data } = await admin
+        .from('profiles')
+        .select('username')
+        .eq('id', userId)
+        .maybeSingle();
+
+    return data?.username || '';
+}
+
 export async function sendRegistrationEmailsAction(
     adminEmail: string,
     userEmail: string,
     inviterId: string | null,
     userName: string,
-    _legacyReferralName?: string | null
+    _legacyReferralName?: string | null,
+    userUsername?: string
 ) {
     const inviter = await lookupInviter(inviterId);
-    return await libSendRegistrationEmails(adminEmail, userEmail, inviter.email, userName, inviter.name);
+    return await libSendRegistrationEmails(adminEmail, userEmail, inviter.email, userName, inviter.name, userUsername || '');
 }
 
-export async function sendKYCSubmissionEmailAction(adminEmail: string, userName: string, userEmail: string) {
-    return await libSendKYCSubmissionEmail(adminEmail, userName, userEmail);
+export async function sendKYCSubmissionEmailAction(adminEmail: string, userName: string, userEmail: string, userUsername?: string) {
+    return await libSendKYCSubmissionEmail(adminEmail, userName, userEmail, userUsername || '');
 }
 
 export async function sendKYCVerificationEmailsAction(
@@ -68,8 +90,8 @@ export async function sendKYCRejectionEmailAction(userEmail: string, userName: s
     return await libSendKYCRejectionEmail(userEmail, userName, reason);
 }
 
-export async function sendDepositEmailsAction(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string) {
-    return await libSendDepositEmails(adminEmail, userEmail, userName, amount, currency);
+export async function sendDepositEmailsAction(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string, userUsername?: string) {
+    return await libSendDepositEmails(adminEmail, userEmail, userName, amount, currency, userUsername || '');
 }
 
 export async function sendDepositApprovedEmailAction(userEmail: string, userName: string, amount: string, currency: string) {
@@ -80,8 +102,8 @@ export async function sendDepositRejectedEmailAction(userEmail: string, userName
     return await libSendDepositRejectedEmail(userEmail, userName, amount, currency, reason);
 }
 
-export async function sendWithdrawalEmailsAction(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string) {
-    return await libSendWithdrawalEmails(adminEmail, userEmail, userName, amount, currency);
+export async function sendWithdrawalEmailsAction(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string, userUsername?: string) {
+    return await libSendWithdrawalEmails(adminEmail, userEmail, userName, amount, currency, userUsername || '');
 }
 
 export async function sendWithdrawalCompletedEmailAction(userEmail: string, userName: string, amount: string, currency: string) {

@@ -209,7 +209,7 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                                 {t.viewReceipt}
                                             </button>
                                         ) : (
-                                            <span className="text-[10px] text-slate-300 font-black uppercase italic tracking-widest px-4">Audit Finalized</span>
+                                            <span className="text-[10px] text-slate-300 font-black uppercase italic tracking-widest px-4">Approved</span>
                                         )}
                                     </td>
                                 </tr>

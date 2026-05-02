@@ -163,7 +163,7 @@ export async function sendEmail({ to, subject, content, previewText }: { to: str
 /**
  * 1. New user registration
  */
-export async function sendRegistrationEmails(adminEmail: string, userEmail: string, referralEmail: string | null, userName: string, referralName: string | null) {
+export async function sendRegistrationEmails(adminEmail: string, userEmail: string, referralEmail: string | null, userName: string, referralName: string | null, userUsername: string = '') {
   // To Admin
   await sendEmail({
     to: adminEmail,
@@ -172,6 +172,7 @@ export async function sendRegistrationEmails(adminEmail: string, userEmail: stri
       <h2>New Member Joined</h2>
       <p>A new user has registered on the platform.</p>
       <p><strong>Name:</strong> ${userName}</p>
+      ${userUsername ? `<p><strong>Username:</strong> ${userUsername}</p>` : ''}
       <p><strong>Email:</strong> ${userEmail}</p>
       ${referralName ? `<p><strong>Referred by:</strong> ${referralName}</p>` : ''}
       <a href="${link('/admin/users')}" class="button">Review Profile</a>
@@ -212,7 +213,7 @@ export async function sendRegistrationEmails(adminEmail: string, userEmail: stri
 /**
  * 2. KYC Submission — sends to admin AND confirms to user
  */
-export async function sendKYCSubmissionEmail(adminEmail: string, userName: string, userEmail: string) {
+export async function sendKYCSubmissionEmail(adminEmail: string, userName: string, userEmail: string, userUsername: string = '') {
   // To Admin
   await sendEmail({
     to: adminEmail,
@@ -220,7 +221,8 @@ export async function sendKYCSubmissionEmail(adminEmail: string, userName: strin
     content: `
       <h2>KYC Documents Received</h2>
       <p>A user has submitted their KYC documents for review.</p>
-      <p><strong>User:</strong> ${userName}</p>
+      <p><strong>Name:</strong> ${userName}</p>
+      ${userUsername ? `<p><strong>Username:</strong> ${userUsername}</p>` : ''}
       <p><strong>Email:</strong> ${userEmail}</p>
       <p>Please review the documents in the admin panel and update their verification status.</p>
       <a href="${link('/admin/kyc')}" class="button">Review KYC</a>
@@ -295,7 +297,7 @@ export async function sendKYCVerificationEmails(userEmail: string, referralEmail
 /**
  * 4. Deposit
  */
-export async function sendDepositEmails(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string = "USD") {
+export async function sendDepositEmails(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string = "USD", userUsername: string = "") {
   const formattedAmount = `${currency} ${amount}`;
 
   // To Admin
@@ -305,7 +307,9 @@ export async function sendDepositEmails(adminEmail: string, userEmail: string, u
     content: `
       <h2>Deposit Request Received</h2>
       <p>A new deposit has been reported on the platform.</p>
-      <p><strong>User:</strong> ${userName}</p>
+      <p><strong>Name:</strong> ${userName}</p>
+      ${userUsername ? `<p><strong>Username:</strong> ${userUsername}</p>` : ''}
+      <p><strong>Email:</strong> ${userEmail}</p>
       <p><strong>Amount:</strong> <span class="highlight">${formattedAmount}</span></p>
       <p>Please cross-reference with bank records and confirm the transaction.</p>
       <a href="${link('/admin/deposits')}" class="button">Manage Deposits</a>
@@ -367,7 +371,7 @@ export async function sendDepositRejectedEmail(userEmail: string, userName: stri
 /**
  * 5. Withdrawal
  */
-export async function sendWithdrawalEmails(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string = "USD") {
+export async function sendWithdrawalEmails(adminEmail: string, userEmail: string, userName: string, amount: string, currency: string = "USD", userUsername: string = "") {
   const formattedAmount = `${currency} ${amount}`;
 
   // To Admin
@@ -377,7 +381,9 @@ export async function sendWithdrawalEmails(adminEmail: string, userEmail: string
     content: `
       <h2>Withdrawal Alert</h2>
       <p>A user has requested a withdrawal.</p>
-      <p><strong>User:</strong> ${userName}</p>
+      <p><strong>Name:</strong> ${userName}</p>
+      ${userUsername ? `<p><strong>Username:</strong> ${userUsername}</p>` : ''}
+      <p><strong>Email:</strong> ${userEmail}</p>
       <p><strong>Amount:</strong> <span class="highlight">${formattedAmount}</span></p>
       <p>Please review the request and proceed with the payout.</p>
       <a href="${link('/admin/withdrawals')}" class="button">Manage Withdrawals</a>

@@ -290,22 +290,48 @@ export default function WithdrawalsClient({ lang }: { lang: "en" | "zh" }) {
                                     <div className="space-y-4">
                                         <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Transaction Summary</h4>
                                         <div className="bg-slate-50 border border-slate-100 p-6 rounded-[2rem] space-y-4">
-                                            <div className="flex justify-between items-center text-xs font-bold">
-                                                <span className="text-slate-400 uppercase tracking-tighter">Gross Amount</span>
-                                                <span className="text-slate-900 tabular-nums font-black">$ {Number(selectedTx.original_currency_amount || (selectedTx.original_currency === 'USD' ? Math.abs(Number(selectedTx.amount)) : (Math.abs(Number(selectedTx.amount)) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                            </div>
-                                            {selectedTx.metadata?.penalty_applied && (
-                                                <div className="flex justify-between items-center text-xs font-bold">
-                                                    <span className="text-red-400 uppercase italic tracking-tighter">Early Settlement (40%)</span>
-                                                    <span className="text-red-500 tabular-nums font-black">-$ {Number(selectedTx.metadata?.original_usd_penalty || selectedTx.metadata?.penalty_amount_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                </div>
-                                            )}
-                                            <div className="pt-4 border-t border-slate-200 flex flex-col items-end gap-1">
-                                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest self-start">Total Received</span>
-                                                <div className="flex flex-col items-end">
-                                                    <span className="text-3xl font-black text-emerald-500 tabular-nums tracking-tighter leading-none">$ {Number(selectedTx.metadata?.original_usd_payout || selectedTx.metadata?.final_payout_usd || (selectedTx.original_currency === 'USD' ? Math.abs(Number(selectedTx.amount)) : (Number(selectedTx.metadata?.finalized_payout || selectedTx.metadata?.expected_payout || Math.abs(Number(selectedTx.amount))) / forexRate))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                </div>
-                                            </div>
+                                            {(() => {
+                                                // Resolve gross / penalty / net in USD, robust to both
+                                                // submission paths (USD-native dedicated page vs. legacy RM modal).
+                                                const isUsdNative = selectedTx.original_currency === 'USD';
+                                                const grossUSD = Number(selectedTx.original_currency_amount)
+                                                    || (isUsdNative
+                                                        ? Math.abs(Number(selectedTx.amount))
+                                                        : Math.abs(Number(selectedTx.amount)) / forexRate);
+
+                                                const penaltyUSD = Number(selectedTx.metadata?.original_usd_penalty)
+                                                    || Number(selectedTx.metadata?.penalty_amount_usd)
+                                                    || (selectedTx.metadata?.penalty_amount
+                                                        ? Number(selectedTx.metadata.penalty_amount) / forexRate
+                                                        : 0);
+
+                                                const netUSD = Number(selectedTx.metadata?.original_usd_payout)
+                                                    || Number(selectedTx.metadata?.final_payout_usd)
+                                                    || Math.max(0, grossUSD - penaltyUSD);
+
+                                                const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                                                return (
+                                                    <>
+                                                        <div className="flex justify-between items-center text-xs font-bold">
+                                                            <span className="text-slate-400 uppercase tracking-tighter">Gross Amount</span>
+                                                            <span className="text-slate-900 tabular-nums font-black">$ {fmt(grossUSD)}</span>
+                                                        </div>
+                                                        {selectedTx.metadata?.penalty_applied && (
+                                                            <div className="flex justify-between items-center text-xs font-bold">
+                                                                <span className="text-red-400 uppercase italic tracking-tighter">Early Withdrawal Penalty (40%)</span>
+                                                                <span className="text-red-500 tabular-nums font-black">-$ {fmt(penaltyUSD)}</span>
+                                                            </div>
+                                                        )}
+                                                        <div className="pt-4 border-t border-slate-200 flex flex-col items-end gap-1">
+                                                            <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest self-start">Total Received</span>
+                                                            <div className="flex flex-col items-end">
+                                                                <span className="text-3xl font-black text-emerald-500 tabular-nums tracking-tighter leading-none">$ {fmt(netUSD)}</span>
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                     

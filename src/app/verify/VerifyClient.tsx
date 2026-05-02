@@ -383,7 +383,8 @@ export default function VerifyPage() {
                 sendKYCSubmissionEmailAction(
                     adminEmail,
                     String(formData.full_name || user.email || "User"),
-                    String(user.email || "")
+                    String(user.email || ""),
+                    String((user as any).username || (user as any).user_metadata?.username || "")
                 ).catch(e => console.error("Email Error:", e));
 
                 setShowSuccess(true);
