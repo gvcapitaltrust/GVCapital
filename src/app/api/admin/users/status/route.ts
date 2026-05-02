@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sendAccountStatusEmail } from '@/lib/email';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -65,6 +66,21 @@ export async function POST(req: Request) {
                     processed_by_id: adminId,
                 }
             });
+        }
+
+        // Notify user of suspension or reactivation
+        const { data: targetProfile } = await supabaseAdmin
+            .from('profiles')
+            .select('email, full_name')
+            .eq('id', userId)
+            .maybeSingle();
+
+        if (targetProfile?.email) {
+            sendAccountStatusEmail(
+                targetProfile.email,
+                targetProfile.full_name || targetProfile.email,
+                !!isDeactivated
+            ).catch(e => console.error('Email Error:', e));
         }
 
         return NextResponse.json({ success: true, message: `User ${isDeactivated ? 'deactivated' : 'reactivated'} successfully` });

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { supabase } from '@/lib/supabaseClient';
+import { sendDepositApprovedEmail } from '@/lib/email';
 
 function verifySignature(rawBody: string, headers: Headers, payload: any): boolean {
     const secret = process.env.PAYMENT_WEBHOOK_SECRET;
@@ -86,7 +87,7 @@ export async function POST(request: Request) {
             // 3. Update the user's balance_usd and balance (MYR) in the profiles table
             const { data: currentProfile, error: profileError } = await supabase
                 .from('profiles')
-                .select('balance, balance_usd')
+                .select('balance, balance_usd, email, full_name')
                 .eq('id', userId)
                 .single();
 
@@ -119,6 +120,16 @@ export async function POST(request: Request) {
                 }]);
 
             if (txError) throw txError;
+
+            // Notify the user that their auto-deposit was credited
+            if (currentProfile?.email) {
+                sendDepositApprovedEmail(
+                    currentProfile.email,
+                    currentProfile.full_name || currentProfile.email,
+                    amount_usd.toFixed(2),
+                    'USD'
+                ).catch(e => console.error('Email Error:', e));
+            }
 
             return NextResponse.json({ success: true, message: 'Payment processed and credited' });
         }

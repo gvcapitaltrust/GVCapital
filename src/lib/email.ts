@@ -437,6 +437,102 @@ export async function sendWithdrawalRejectedEmail(userEmail: string, userName: s
 }
 
 /**
+ * 7. Account status change (deactivated / reactivated)
+ */
+export async function sendAccountStatusEmail(userEmail: string, userName: string, isDeactivated: boolean) {
+  if (isDeactivated) {
+    await sendEmail({
+      to: userEmail,
+      subject: `⚠️ Account Suspended: GV Capital Trust`,
+      content: `
+        <h2>Account Access Suspended</h2>
+        <p>Dear ${userName},</p>
+        <p>Your GV Capital Trust account has been <span class="highlight">suspended</span> by our compliance team. Login and account actions are temporarily disabled.</p>
+        <p>If you believe this was in error or wish to appeal, please contact our support team immediately.</p>
+        <a href="mailto:support@gvcapital.asia" class="button">Contact Support</a>
+      `
+    });
+  } else {
+    await sendEmail({
+      to: userEmail,
+      subject: `Account Reactivated: GV Capital Trust`,
+      content: `
+        <h2>Welcome Back</h2>
+        <p>Dear ${userName},</p>
+        <p>Your GV Capital Trust account has been <span class="highlight">reactivated</span> and full access has been restored.</p>
+        <p>You can now log in and continue managing your investments as usual.</p>
+        <a href="${link('/login')}" class="button">Sign In</a>
+      `
+    });
+  }
+}
+
+/**
+ * 8. Role change (admin promotion / demotion)
+ */
+export async function sendRoleChangeEmail(userEmail: string, userName: string, isPromotion: boolean) {
+  if (isPromotion) {
+    await sendEmail({
+      to: userEmail,
+      subject: `Administrative Access Granted`,
+      content: `
+        <h2>Account Privileges Updated</h2>
+        <p>Dear ${userName},</p>
+        <p>You have been granted <span class="highlight">administrator privileges</span> on the GV Capital Trust platform.</p>
+        <p>You will now have access to the admin panel on your next login. Please use these privileges responsibly and in accordance with our internal policies.</p>
+        <a href="${link('/admin')}" class="button">Open Admin Panel</a>
+      `
+    });
+  } else {
+    await sendEmail({
+      to: userEmail,
+      subject: `Account Privileges Updated`,
+      content: `
+        <h2>Administrative Access Removed</h2>
+        <p>Dear ${userName},</p>
+        <p>Your administrator privileges on the GV Capital Trust platform have been removed. Standard account access remains unchanged.</p>
+        <p>If you have questions about this change, please contact our support team.</p>
+      `
+    });
+  }
+}
+
+/**
+ * 9. Fund account assignment
+ */
+export async function sendFundAccountAssignmentEmail(userEmail: string, userName: string, fundName: string, allocatedAmountUsd: number) {
+  await sendEmail({
+    to: userEmail,
+    subject: `📊 Enrolled in Investment Fund: ${fundName}`,
+    content: `
+      <h2>Fund Allocation Confirmed</h2>
+      <p>Dear ${userName},</p>
+      <p>You have been enrolled in the <span class="highlight">${fundName}</span> investment fund.</p>
+      <p><strong>Initial allocation:</strong> USD ${allocatedAmountUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+      <p>You can monitor your fund performance and allocation history from your dashboard.</p>
+      <a href="${link('/dashboard/fund-accounts')}" class="button">View Fund Performance</a>
+    `
+  });
+}
+
+/**
+ * 10. Fund account removal
+ */
+export async function sendFundAccountRemovalEmail(userEmail: string, userName: string, fundName: string) {
+  await sendEmail({
+    to: userEmail,
+    subject: `Fund Membership Ended: ${fundName}`,
+    content: `
+      <h2>Fund Allocation Removed</h2>
+      <p>Dear ${userName},</p>
+      <p>Your enrollment in the <span class="highlight">${fundName}</span> fund has been ended. Any allocated capital has been returned to your main investment balance.</p>
+      <p>Please review your dashboard for an updated breakdown of your active funds.</p>
+      <a href="${link('/dashboard')}" class="button">Open Dashboard</a>
+    `
+  });
+}
+
+/**
  * 6. Dividend
  */
 export async function sendDividendEmail(userEmail: string, userName: string, amount: string, currency: string = "USD") {

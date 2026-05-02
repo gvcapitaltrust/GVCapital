@@ -10,9 +10,10 @@ import {
     sendDividendEmailAction,
     sendDepositApprovedEmailAction,
     sendDepositRejectedEmailAction,
-    sendWithdrawalEmailsAction,
     sendWithdrawalCompletedEmailAction,
     sendWithdrawalRejectedEmailAction,
+    sendFundAccountAssignmentEmailAction,
+    sendFundAccountRemovalEmailAction,
 } from "@/app/actions/email";
 
 interface AdminContextType {
@@ -562,9 +563,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             
             if (txUpdateError) throw txUpdateError;
             
-            // Send Email for Withdrawal Success (Accepted)
-            const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
-            sendWithdrawalEmailsAction(adminEmail, profile.email, profile.full_name || profile.email, withdrawAmountUSD.toString(), "USD").catch(e => console.error("Email Error:", e));
+            // No email here — user already received "Withdrawal Processing" at submission
+            // and will receive "Funds Released" at handleCompleteWithdrawal.
+            // Sending another email at admin-accept would be duplicate noise.
 
             showToast("Withdrawal accepted. Awaiting final release.");
             fetchData();
@@ -1050,6 +1051,19 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 allocated_amount_usd: Number(allocatedAmountUsd)
             }, { onConflict: 'fund_account_id,user_id' });
             if (error) throw error;
+
+            // Notify the user
+            const targetUser = users.find(u => u.id === userId);
+            const fund = fundAccounts.find(f => f.id === fundAccountId);
+            if (targetUser?.email && fund) {
+                sendFundAccountAssignmentEmailAction(
+                    targetUser.email,
+                    targetUser.full_name || targetUser.email,
+                    fund.account_name,
+                    Number(allocatedAmountUsd)
+                ).catch(e => console.error('Email Error:', e));
+            }
+
             showToast('User assigned to fund account.');
             fetchData();
         } catch (err: any) {
@@ -1060,8 +1074,23 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const handleRemoveUserFromFundAccount = async (memberId: string) => {
         try {
             if (!confirm('Remove this user from the fund account?')) return;
+
+            // Capture user/fund context BEFORE deletion so we can email
+            const member = fundAccountMembers.find(m => m.id === memberId);
+            const targetUser = member ? users.find(u => u.id === member.user_id) : null;
+            const fund = member ? fundAccounts.find(f => f.id === member.fund_account_id) : null;
+
             const { error } = await supabase.from('fund_account_members').delete().eq('id', memberId);
             if (error) throw error;
+
+            if (targetUser?.email && fund) {
+                sendFundAccountRemovalEmailAction(
+                    targetUser.email,
+                    targetUser.full_name || targetUser.email,
+                    fund.account_name
+                ).catch(e => console.error('Email Error:', e));
+            }
+
             showToast('User removed from fund account.');
             fetchData();
         } catch (err: any) {

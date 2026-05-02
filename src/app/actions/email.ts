@@ -12,7 +12,9 @@ import {
     sendWithdrawalEmails as libSendWithdrawalEmails,
     sendWithdrawalCompletedEmail as libSendWithdrawalCompletedEmail,
     sendWithdrawalRejectedEmail as libSendWithdrawalRejectedEmail,
-    sendDividendEmail as libSendDividendEmail
+    sendDividendEmail as libSendDividendEmail,
+    sendFundAccountAssignmentEmail as libSendFundAccountAssignmentEmail,
+    sendFundAccountRemovalEmail as libSendFundAccountRemovalEmail
 } from "@/lib/email";
 
 async function lookupInviter(inviterId: string | null): Promise<{ email: string | null; name: string | null }> {
@@ -92,4 +94,12 @@ export async function sendWithdrawalRejectedEmailAction(userEmail: string, userN
 
 export async function sendDividendEmailAction(userEmail: string, userName: string, amount: string, currency: string) {
     return await libSendDividendEmail(userEmail, userName, amount, currency);
+}
+
+export async function sendFundAccountAssignmentEmailAction(userEmail: string, userName: string, fundName: string, allocatedAmountUsd: number) {
+    return await libSendFundAccountAssignmentEmail(userEmail, userName, fundName, allocatedAmountUsd);
+}
+
+export async function sendFundAccountRemovalEmailAction(userEmail: string, userName: string, fundName: string) {
+    return await libSendFundAccountRemovalEmail(userEmail, userName, fundName);
 }

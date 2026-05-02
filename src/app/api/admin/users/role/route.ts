@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sendRoleChangeEmail } from '@/lib/email';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -53,6 +54,22 @@ export async function POST(req: Request) {
                 admin_username: adminName || "Admin",
                 action_taken: `Role updated to ${role}`
             });
+        }
+
+        // 4. Notify user of role change
+        const { data: targetProfile } = await supabaseAdmin
+            .from('profiles')
+            .select('email, full_name')
+            .eq('id', userId)
+            .maybeSingle();
+
+        if (targetProfile?.email) {
+            const isPromotion = role.toLowerCase() === 'admin';
+            sendRoleChangeEmail(
+                targetProfile.email,
+                targetProfile.full_name || targetProfile.email,
+                isPromotion
+            ).catch(e => console.error('Email Error:', e));
         }
 
         return NextResponse.json({ success: true, message: `User role updated to ${role} successfully` });
