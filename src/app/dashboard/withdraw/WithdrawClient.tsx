@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { supabase } from "@/lib/supabaseClient";
+import { sendWithdrawalEmailsAction } from "@/app/actions/email";
 import { ArrowLeft, CheckCircle2, ShieldCheck, AlertTriangle, Eye, EyeOff } from "lucide-react";
 import TierMedal from "@/components/TierMedal";
 import { getTierByAmount } from "@/lib/tierUtils";
@@ -220,6 +221,17 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
             }]);
             
             if (error) throw error;
+
+            // Notify admin and confirm to user
+            const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
+            sendWithdrawalEmailsAction(
+                adminEmail,
+                String(user.email || ""),
+                String(user.fullName || user.full_name || user.email || "User"),
+                amountUSD.toString(),
+                "USD"
+            ).catch(e => console.error("Email Error:", e));
+
             setIsPinModalOpen(false); setSuccessRefId(refId); setShowSuccess(true); refreshData();
         } catch (err: any) {
             alert(err.message);

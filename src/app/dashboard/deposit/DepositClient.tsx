@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { supabase } from "@/lib/supabaseClient";
+import { sendDepositEmailsAction } from "@/app/actions/email";
 import { X, ArrowLeft, Upload, CheckCircle2 } from "lucide-react";
 
 export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
@@ -123,6 +124,16 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                     }
                 }]);
             if (insertError) throw insertError;
+
+            // Notify admin and confirm to user
+            const adminEmail = process.env.NEXT_PUBLIC_MASTER_ADMIN_EMAIL || "support@gvcapital.asia";
+            sendDepositEmailsAction(
+                adminEmail,
+                String(user.email || ""),
+                String(user.fullName || user.full_name || user.email || "User"),
+                amountUSD.toString(),
+                "USD"
+            ).catch(e => console.error("Email Error:", e));
 
             setSuccessRefId(refId);
             setShowSuccess(true);
