@@ -8,10 +8,14 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-// Path convention for the canonical master agreement PDF. Upload the file
-// once to this exact path in the `agreements` bucket via the Supabase
-// dashboard. Renaming this constant requires a re-upload to the new path.
-const MASTER_PDF_PATH = `_master/${CURRENT_DEPOSIT_AGREEMENT_VERSION}.pdf`;
+// Path convention for the canonical master agreement PDF. Upload each version
+// at `_master/{VERSION}.pdf` in the `agreements` bucket. Past versions stay
+// accessible so users can revisit any agreement they previously signed.
+const masterPdfPath = (version: string) => `_master/${version}.pdf`;
+
+// Version tokens are restricted to a safe character set; reject anything that
+// could escape the `_master/` prefix.
+const VALID_VERSION = /^[A-Za-z0-9._-]+$/;
 
 // 5 minutes is plenty for a "click → open new tab" flow.
 const SIGNED_URL_TTL_SECONDS = 300;

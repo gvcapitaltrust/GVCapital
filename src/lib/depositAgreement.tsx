@@ -69,10 +69,10 @@ function TierTable({ lang }: { lang: "en" | "zh" }) {
     const rows: Array<[string, string, string, string, string]> = [
         [
             t.amount,
-            "1 – 3,000",
-            "3,001 – 5,000",
-            "5,001 – 10,000",
-            "> 10,001",
+            "1 – 2,999",
+            "3,000 – 4,999",
+            "5,000 – 9,999",
+            "≥ 10,000",
         ],
         [
             t.lockIn,

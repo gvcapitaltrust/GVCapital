@@ -21,7 +21,7 @@ function RiskClient() {
                 },
                 {
                     title: "2. No Guarantee of Returns",
-                    body: "While The Trust establishes target dividend benchmarks (e.g., 5% to 15% monthly yields depending on tier), these are speculative targets based on active trading algorithms and historical performance. Past performance is strictly not indicative of future results."
+                    body: "While The Trust establishes target dividend benchmarks (e.g., 3% to 6% monthly yields depending on tier), these are speculative targets based on active trading algorithms and historical performance. Past performance is strictly not indicative of future results."
                 },
                 {
                     title: "3. Market & Liquidity Risks",
@@ -45,7 +45,7 @@ function RiskClient() {
                 },
                 {
                     title: "2. 无收益保证",
-                    body: "虽然信托设定了目标股息基准（例如，根据层级，每月收益率为 5% 至 15%），但这些都是基于主动交易算法和历史表现的投机性目标。过去的表现绝对不预示未来的结果。"
+                    body: "虽然信托设定了目标股息基准（例如，根据层级，每月收益率为 3% 至 6%），但这些都是基于主动交易算法和历史表现的投机性目标。过去的表现绝对不预示未来的结果。"
                 },
                 {
                     title: "3. 市场与流动性风险",

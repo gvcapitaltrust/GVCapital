@@ -37,7 +37,7 @@ function ServicesClient() {
                 {
                     icon: <BarChart3 className="h-8 w-8" />,
                     title: "Automated Monthly Dividends",
-                    desc: "Access financial freedom through our automated liquidity protocol. We distribute validated monthly dividend yields ranging from 5% to 15% directly to your secure portal based on your strict Tier allocation.",
+                    desc: "Access financial freedom through our automated liquidity protocol. We distribute validated monthly dividend yields ranging from 3% to 6% directly to your secure portal based on your strict Tier allocation.",
                     features: ["Tier-Based Yields", "Direct Fiat/Crypto Output", "Transparent Profit Logging"]
                 },
                 {
@@ -74,7 +74,7 @@ function ServicesClient() {
                 {
                     icon: <BarChart3 className="h-8 w-8" />,
                     title: "自动化月度派息",
-                    desc: "通过我们的自动化流动性协议实现财务自由。我们根据您严格的层级配置，直接向您的安全门户分配经过验证的月度股息收益（通常介于 5% 至 15% 之间）。",
+                    desc: "通过我们的自动化流动性协议实现财务自由。我们根据您严格的层级配置，直接向您的安全门户分配经过验证的月度股息收益（通常介于 3% 至 6% 之间）。",
                     features: ["基于层级的收益", "直接法币/加密货币输出", "透明利润记录"]
                 },
                 {

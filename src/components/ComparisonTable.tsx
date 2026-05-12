@@ -80,8 +80,8 @@ export default function ComparisonTable({ onClose, lang }: ComparisonTableProps)
                 <td className="py-6 px-4 text-gray-500">{t.range}</td>
                 {TIERS.map((tier) => (
                   <td key={tier.id} className="py-6 px-4 text-center text-gray-900 font-bold whitespace-nowrap">
-                    {tier.id === 'vvip' 
-                      ? `> ${formatUSD(tier.minAmount)}` 
+                    {tier.id === 'vvip'
+                      ? `≥ ${formatUSD(tier.minAmount)}`
                       : `${formatUSD(tier.minAmount)} - ${formatUSD(tier.maxAmount)}`}
                   </td>
                 ))}
