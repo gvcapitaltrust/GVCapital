@@ -21,9 +21,14 @@ CREATE TABLE IF NOT EXISTS public.deposit_agreements (
     signed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     ip_address TEXT,
     user_agent TEXT,
+    signature_certificate_path TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (user_id, agreement_version)
 );
+
+-- Idempotent in case the table existed without the certificate column
+ALTER TABLE public.deposit_agreements
+    ADD COLUMN IF NOT EXISTS signature_certificate_path TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_deposit_agreements_user_id
     ON public.deposit_agreements(user_id);

@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { ShieldCheck, AlertTriangle, CheckCircle2, X } from "lucide-react";
+import { ShieldCheck, AlertTriangle, CheckCircle2, FileText, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import {
     CURRENT_DEPOSIT_AGREEMENT_VERSION,
     DEPOSIT_AGREEMENT_TITLE,
     DEPOSIT_AGREEMENT_SUBTITLE,
-    DEPOSIT_AGREEMENT_BODY,
+    DepositAgreementBody,
 } from "@/lib/depositAgreement";
 
 interface DepositAgreementModalProps {
@@ -47,6 +47,9 @@ export default function DepositAgreementModal({
             close: "Close",
             errorGeneric: "Could not record signature. Please try again.",
             errorNoSession: "Your session has expired. Please log in again.",
+            viewOriginal: "View Original PDF",
+            viewOriginalLoading: "Opening…",
+            viewOriginalError: "Original PDF is not available right now.",
         },
         zh: {
             mustScroll: "请滚动至协议底部以继续。",
@@ -61,8 +64,40 @@ export default function DepositAgreementModal({
             close: "关闭",
             errorGeneric: "无法记录签名，请重试。",
             errorNoSession: "登录状态已过期，请重新登录。",
+            viewOriginal: "查看原版 PDF",
+            viewOriginalLoading: "正在打开…",
+            viewOriginalError: "原版 PDF 目前无法读取。",
         },
     }[lang];
+
+    const [viewingPdf, setViewingPdf] = useState(false);
+
+    const handleViewOriginal = async () => {
+        if (viewingPdf) return;
+        setViewingPdf(true);
+        setError(null);
+        try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const accessToken = sessionData?.session?.access_token;
+            if (!accessToken) {
+                setError(t.errorNoSession);
+                return;
+            }
+            const res = await fetch("/api/agreements/pdf-url?type=master", {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok || !json?.url) {
+                setError(json?.error || t.viewOriginalError);
+                return;
+            }
+            window.open(json.url, "_blank", "noopener,noreferrer");
+        } catch (err: any) {
+            setError(err?.message || t.viewOriginalError);
+        } finally {
+            setViewingPdf(false);
+        }
+    };
 
     useEffect(() => {
         if (!open) {
@@ -159,14 +194,26 @@ export default function DepositAgreementModal({
                             {t.mandatoryNotice}
                         </p>
                     </div>
+
+                    <div className="mt-3">
+                        <button
+                            type="button"
+                            onClick={handleViewOriginal}
+                            disabled={viewingPdf}
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-100 transition-all text-[11px] font-black uppercase tracking-widest text-gray-700 disabled:opacity-50"
+                        >
+                            <FileText className="h-3.5 w-3.5 text-gv-gold" />
+                            {viewingPdf ? t.viewOriginalLoading : t.viewOriginal}
+                        </button>
+                    </div>
                 </div>
 
                 <div
                     ref={bodyRef}
                     onScroll={handleScroll}
-                    className="flex-1 overflow-y-auto px-6 sm:px-10 py-6 text-[12px] sm:text-[13px] text-gray-700 leading-relaxed whitespace-pre-line font-serif"
+                    className="flex-1 overflow-y-auto px-6 sm:px-10 py-6 text-gray-700 leading-relaxed"
                 >
-                    {DEPOSIT_AGREEMENT_BODY[lang]}
+                    <DepositAgreementBody lang={lang} />
                 </div>
 
                 <div className="border-t border-gray-200 bg-gray-50 px-6 sm:px-10 py-5 space-y-4">
