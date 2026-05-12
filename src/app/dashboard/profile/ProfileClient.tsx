@@ -1,10 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
 import { supabase } from "@/lib/supabaseClient";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText, Download } from "lucide-react";
+import { formatDateTime } from "@/lib/dateUtils";
+
+interface SignedAgreementRow {
+    id: string;
+    agreement_version: string;
+    signed_name: string;
+    signed_at: string;
+    signature_certificate_path: string | null;
+}
 
 export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
     const router = useRouter();
@@ -21,6 +30,62 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
         is_default: false
     });
     const [isSaving, setIsSaving] = useState(false);
+    const [signedAgreements, setSignedAgreements] = useState<SignedAgreementRow[]>([]);
+    const [agreementPdfLoading, setAgreementPdfLoading] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!user?.id) return;
+        let cancelled = false;
+        (async () => {
+            const { data, error } = await supabase
+                .from("deposit_agreements")
+                .select("id, agreement_version, signed_name, signed_at, signature_certificate_path")
+                .eq("user_id", user.id)
+                .neq("agreement_version", "grandfathered_v0")
+                .order("signed_at", { ascending: false });
+            if (cancelled) return;
+            if (error) {
+                console.error("[profile] fetch agreements:", error);
+                return;
+            }
+            setSignedAgreements((data as SignedAgreementRow[]) || []);
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [user?.id]);
+
+    const openAgreementPdf = async (
+        kind: "master" | "certificate",
+        version: string,
+        rowId: string,
+    ) => {
+        const tag = `${rowId}:${kind}`;
+        if (agreementPdfLoading) return;
+        setAgreementPdfLoading(tag);
+        try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const accessToken = sessionData?.session?.access_token;
+            if (!accessToken) {
+                alert(lang === "en" ? "Session expired. Please log in again." : "登录状态已过期，请重新登录。");
+                return;
+            }
+            const res = await fetch(
+                `/api/agreements/pdf-url?type=${kind}&version=${encodeURIComponent(version)}`,
+                { headers: { Authorization: `Bearer ${accessToken}` } },
+            );
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok || !json?.url) {
+                alert(json?.error || (lang === "en" ? "Could not open document." : "无法打开文件。"));
+                return;
+            }
+            window.open(json.url, "_blank", "noopener,noreferrer");
+        } catch (err: any) {
+            alert(err?.message || (lang === "en" ? "Could not open document." : "无法打开文件。"));
+        } finally {
+            setAgreementPdfLoading(null);
+        }
+    };
 
     const malaysianBanks = [
         "Maybank", "CIMB Bank", "Public Bank", "RHB Bank", "Hong Leong Bank", 
@@ -53,6 +118,15 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
             accHolder: "Account Holder Name",
             bankStatement: "Bank Statement",
             viewStatement: "View Document",
+            signedAgreements: "Signed Agreements",
+            signedAgreementsDesc: "Records of each Client Agreement you have electronically signed.",
+            noAgreements: "No signed agreements on record.",
+            agreementVersion: "Version",
+            signedOn: "Signed on",
+            signedAs: "Signed as",
+            viewOriginal: "View Original PDF",
+            downloadCertificate: "Download Signature Certificate",
+            opening: "Opening…",
         },
         zh: {
             profileTitle: "个人资料",
@@ -77,6 +151,15 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
             accHolder: "开户人姓名",
             bankStatement: "银行账单",
             viewStatement: "查看文档",
+            signedAgreements: "已签署协议",
+            signedAgreementsDesc: "您已电子签署的每一份客户协议记录。",
+            noAgreements: "尚无已签署协议记录。",
+            agreementVersion: "版本",
+            signedOn: "签署日期",
+            signedAs: "签署人",
+            viewOriginal: "查看原版 PDF",
+            downloadCertificate: "下载签名证书",
+            opening: "正在打开…",
         }
     }[lang];
 
@@ -289,6 +372,81 @@ export default function ProfileClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                         )}
                     </div>
+                </div>
+            </div>
+
+            {/* Signed Agreements */}
+            <div className="bg-white border border-gray-200 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gv-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+                <div className="relative z-10 space-y-6">
+                    <div className="space-y-1">
+                        <h3 className="text-lg font-bold uppercase tracking-tight text-gv-gold flex items-center gap-3">
+                            <FileText className="h-6 w-6" />
+                            {t.signedAgreements}
+                        </h3>
+                        <p className="text-xs text-gray-400 font-medium">{t.signedAgreementsDesc}</p>
+                    </div>
+
+                    {signedAgreements.length === 0 ? (
+                        <div className="py-10 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-[24px] bg-gray-50/50">
+                            <div className="h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-300 mb-3">
+                                <FileText className="h-6 w-6" />
+                            </div>
+                            <p className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                                {t.noAgreements}
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {signedAgreements.map((row) => {
+                                const masterTag = `${row.id}:master`;
+                                const certTag = `${row.id}:certificate`;
+                                const isMasterLoading = agreementPdfLoading === masterTag;
+                                const isCertLoading = agreementPdfLoading === certTag;
+                                return (
+                                    <div
+                                        key={row.id}
+                                        className="bg-gray-50 border border-gray-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                                    >
+                                        <div className="space-y-2 min-w-0">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className="bg-gv-gold/10 text-gv-gold text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest">
+                                                    {t.agreementVersion} {row.agreement_version}
+                                                </span>
+                                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                                                    {t.signedOn} {formatDateTime(row.signed_at)}
+                                                </span>
+                                            </div>
+                                            <p className="text-[11px] text-gray-500">
+                                                <span className="font-black uppercase tracking-widest">{t.signedAs}: </span>
+                                                <span className="font-serif italic text-gray-900">{row.signed_name}</span>
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+                                            <button
+                                                onClick={() => openAgreementPdf("master", row.agreement_version, row.id)}
+                                                disabled={!!agreementPdfLoading}
+                                                className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white border border-gray-200 hover:bg-gray-100 transition-all text-[10px] font-black uppercase tracking-widest text-gray-700 disabled:opacity-50 whitespace-nowrap"
+                                            >
+                                                <FileText className="h-3.5 w-3.5 text-gv-gold" />
+                                                {isMasterLoading ? t.opening : t.viewOriginal}
+                                            </button>
+                                            {row.signature_certificate_path && (
+                                                <button
+                                                    onClick={() => openAgreementPdf("certificate", row.agreement_version, row.id)}
+                                                    disabled={!!agreementPdfLoading}
+                                                    className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-slate-900 hover:bg-black transition-all text-[10px] font-black uppercase tracking-widest text-gv-gold disabled:opacity-50 whitespace-nowrap"
+                                                >
+                                                    <Download className="h-3.5 w-3.5" />
+                                                    {isCertLoading ? t.opening : t.downloadCertificate}
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             </div>
 

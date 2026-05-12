@@ -57,19 +57,25 @@ export async function GET(req: Request) {
 
         const { searchParams } = new URL(req.url);
         const kind = (searchParams.get("type") || "master").toLowerCase();
+        const versionParam = searchParams.get("version")?.trim();
+        const version = versionParam || CURRENT_DEPOSIT_AGREEMENT_VERSION;
+
+        if (!VALID_VERSION.test(version)) {
+            return NextResponse.json({ error: "Invalid version." }, { status: 400 });
+        }
 
         let path: string;
 
         if (kind === "master") {
-            path = MASTER_PDF_PATH;
+            path = masterPdfPath(version);
         } else if (kind === "certificate") {
             // Returns the user's most recent signature certificate for the
-            // current agreement version.
+            // requested version (defaults to current).
             const { data: row, error: rowErr } = await admin
                 .from("deposit_agreements")
                 .select("signature_certificate_path")
                 .eq("user_id", userId)
-                .eq("agreement_version", CURRENT_DEPOSIT_AGREEMENT_VERSION)
+                .eq("agreement_version", version)
                 .order("signed_at", { ascending: false })
                 .limit(1)
                 .maybeSingle();
