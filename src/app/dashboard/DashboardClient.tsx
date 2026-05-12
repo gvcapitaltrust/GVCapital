@@ -11,8 +11,10 @@ import autoTable from "jspdf-autotable";
 import CurrencyExchangeTicker from "@/components/CurrencyExchangeTicker";
 import { useAuth } from "@/providers/AuthProvider";
 import { useSettings } from "@/providers/SettingsProvider";
+import { useUser } from "@/providers/UserProvider";
 import ProductSelection from "@/components/ProductSelection";
 import ComparisonTable from "@/components/ComparisonTable";
+import DepositAgreementModal from "@/components/DepositAgreementModal";
 import { TIERS, getTierByAmount, formatUSD } from "@/lib/tierUtils";
 import TierMedal from "@/components/TierMedal";
 import MobileSideMenu from "@/components/MobileSideMenu";
@@ -28,6 +30,8 @@ export default function DashboardClient() {
     const [user, setUser] = useState<any>(null);
     const [transactions, setTransactions] = useState<any[]>([]);
     const { forexRate, monthlyRate, yearlyRate } = useSettings();
+    const { requiresDepositAgreement, refreshData: refreshUserData } = useUser();
+    const [isAgreementModalOpen, setIsAgreementModalOpen] = useState(false);
     const [dividendHistory, setDividendHistory] = useState<any[]>([]);
     const [activeTab, setActiveTab] = useState<"overview" | "products" | "statements" | "profile" | "security" | "transactions" | "referrals">("overview");
     const [isComparisonOpen, setIsComparisonOpen] = useState(false);
@@ -293,6 +297,10 @@ export default function DashboardClient() {
     const handleProtectedAction = (e: React.MouseEvent, onSuccess: () => void) => {
         e.preventDefault();
         if (user?.is_verified) {
+            if (requiresDepositAgreement) {
+                setIsAgreementModalOpen(true);
+                return;
+            }
             onSuccess();
         } else if (user?.kyc_step === 3) {
             setActionToast({
@@ -306,6 +314,13 @@ export default function DashboardClient() {
             });
         }
     };
+
+    // Auto-open the agreement modal the moment the user's first deposit completes.
+    useEffect(() => {
+        if (requiresDepositAgreement) {
+            setIsAgreementModalOpen(true);
+        }
+    }, [requiresDepositAgreement]);
 
     const handleDepositSubmit = async () => {
         if (!depositAmount || !depositReceipt || !user) {
@@ -2041,6 +2056,17 @@ export default function DashboardClient() {
             {isComparisonOpen && (
                 <ComparisonTable lang={lang} onClose={() => setIsComparisonOpen(false)} />
             )}
+
+            <DepositAgreementModal
+                open={isAgreementModalOpen && requiresDepositAgreement}
+                lang={lang}
+                fullName={user?.fullName || user?.full_name || ""}
+                onSigned={() => {
+                    setIsAgreementModalOpen(false);
+                    refreshUserData();
+                }}
+            />
+
 
             {/* Success Overlays */}
             {(showSuccess || kycShowSuccess) && (

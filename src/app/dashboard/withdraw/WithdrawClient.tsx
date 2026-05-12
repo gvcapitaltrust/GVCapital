@@ -1,19 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { sendWithdrawalEmailsAction } from "@/app/actions/email";
+import DepositAgreementModal from "@/components/DepositAgreementModal";
 import { ArrowLeft, CheckCircle2, ShieldCheck, AlertTriangle, Eye, EyeOff } from "lucide-react";
 import TierMedal from "@/components/TierMedal";
 import { getTierByAmount } from "@/lib/tierUtils";
 
 export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
-    const { userProfile: user, withdrawalMethods, refreshData } = useUser();
+    const { userProfile: user, withdrawalMethods, refreshData, requiresDepositAgreement } = useUser();
     const { forexRate, withdrawalRate } = useSettings();
     const router = useRouter();
+    const [isAgreementModalOpen, setIsAgreementModalOpen] = useState(false);
+
+    useEffect(() => {
+        if (requiresDepositAgreement) setIsAgreementModalOpen(true);
+    }, [requiresDepositAgreement]);
 
     const [selectedMethodId, setSelectedMethodId] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -132,6 +138,10 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
         : getTierByAmount(totalCapitalUSD).id;
 
     const handleWithdrawInitiate = () => {
+        if (requiresDepositAgreement) {
+            setIsAgreementModalOpen(true);
+            return;
+        }
         const amountUSD = parseFloat(withdrawAmount);
         if (!amountUSD || amountUSD <= 0) return;
 
@@ -429,6 +439,16 @@ export default function WithdrawClient({ lang }: { lang: "en" | "zh" }) {
                     </div>
                 </div>
             )}
+
+            <DepositAgreementModal
+                open={isAgreementModalOpen && requiresDepositAgreement}
+                lang={lang}
+                fullName={user?.fullName || user?.full_name || ""}
+                onSigned={() => {
+                    setIsAgreementModalOpen(false);
+                    refreshData();
+                }}
+            />
         </div>
     );
 }

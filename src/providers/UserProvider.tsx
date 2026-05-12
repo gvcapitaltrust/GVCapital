@@ -16,6 +16,7 @@ interface UserContextType {
     withdrawalMethods: any[];
     fundAccounts: any[];
     loading: boolean;
+    requiresDepositAgreement: boolean;
     refreshData: () => Promise<void>;
 }
 
@@ -32,6 +33,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [withdrawalMethods, setWithdrawalMethods] = useState<any[]>([]);
     const [fundAccounts, setFundAccounts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [hasSignedAnyDepositAgreement, setHasSignedAnyDepositAgreement] = useState<boolean>(true);
+    const [hasCompletedDeposit, setHasCompletedDeposit] = useState<boolean>(false);
 
     const { forexRate: rawForexRate } = useSettings();
     const forexRate = rawForexRate > 0 ? rawForexRate : 4.4;
@@ -96,6 +99,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
                 const profitUSD = virtualProfit;
                 const lifetimeDividendsUSD = virtualLifetimeDividends;
+
+                // Has any approved/completed Deposit row — used to gate the
+                // first-deposit T&C agreement prompt.
+                const completedDepositExists = txs.some((tx: any) => {
+                    const type = (tx.type || "").toLowerCase();
+                    const category = (tx.metadata?.adjustment_category || "").toLowerCase();
+                    const isInvestmentCapital = type === "deposit" &&
+                                                category !== "dividend" &&
+                                                category !== "profit" &&
+                                                category !== "bonus";
+                    return isInvestmentCapital && ["Approved", "Completed"].includes(tx.status);
+                });
+                setHasCompletedDeposit(completedDepositExists);
 
                 // Approved Deposits for Locked Capital calculation
                 const approvedDeposits = txs.filter((tx: any) => {
@@ -262,6 +278,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 } else {
                     setFundAccounts([]);
                 }
+
+                // 7. Fetch deposit-agreement signing record(s). Any row at all —
+                // including the legacy 'grandfathered_v0' marker — counts as signed
+                // and suppresses the prompt.
+                const { data: agreementRows } = await supabase
+                    .from('deposit_agreements')
+                    .select('agreement_version')
+                    .eq('user_id', user.id)
+                    .limit(1);
+                setHasSignedAnyDepositAgreement((agreementRows?.length || 0) > 0);
             }
 
         } catch (error) {
@@ -292,22 +318,37 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         const txChannel = supabase
             .channel(`tx-updates-${user.id}`)
-            .on('postgres_changes', { 
-                event: '*', 
-                schema: 'public', 
-                table: 'transactions', 
-                filter: `user_id=eq.${user.id}` 
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'transactions',
+                filter: `user_id=eq.${user.id}`
             }, (payload) => {
                 console.log("[USER REALTIME] Transaction change:", payload.eventType);
                 fetchData();
             })
             .subscribe();
 
+        const agreementChannel = supabase
+            .channel(`deposit-agreement-${user.id}`)
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'deposit_agreements',
+                filter: `user_id=eq.${user.id}`
+            }, () => {
+                setHasSignedAnyDepositAgreement(true);
+            })
+            .subscribe();
+
         return () => {
             supabase.removeChannel(profileChannel);
             supabase.removeChannel(txChannel);
+            supabase.removeChannel(agreementChannel);
         };
     }, [user?.id, forexRate]);
+
+    const requiresDepositAgreement = hasCompletedDeposit && !hasSignedAnyDepositAgreement;
 
     return (
         <UserContext.Provider value={{ 
@@ -320,7 +361,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             withdrawalMethods,
             fundAccounts,
             loading,
-            refreshData: fetchData 
+            requiresDepositAgreement,
+            refreshData: fetchData
         }}>
             {children}
         </UserContext.Provider>

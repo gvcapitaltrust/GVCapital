@@ -1,18 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { sendDepositEmailsAction } from "@/app/actions/email";
+import DepositAgreementModal from "@/components/DepositAgreementModal";
 import { X, ArrowLeft, Upload, CheckCircle2 } from "lucide-react";
 
 export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
-    const { userProfile: user, refreshData } = useUser();
+    const { userProfile: user, refreshData, requiresDepositAgreement } = useUser();
     const { depositRate } = useSettings();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const [isAgreementModalOpen, setIsAgreementModalOpen] = useState(false);
+
+    useEffect(() => {
+        if (requiresDepositAgreement) setIsAgreementModalOpen(true);
+    }, [requiresDepositAgreement]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
@@ -93,6 +99,10 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
 
     const handleSubmit = async () => {
         if (!depositAmount || !depositReceipt || !user) return;
+        if (requiresDepositAgreement) {
+            setIsAgreementModalOpen(true);
+            return;
+        }
         setIsSubmitting(true);
         const fileName = `${user.id}_${Date.now()}_${depositReceipt.name}`;
         try {
@@ -384,6 +394,16 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                     Important: Please ensure all fund transfers are made from your registered bank account. Institutional transfers may require additional verification.
                 </p>
             </div>
+
+            <DepositAgreementModal
+                open={isAgreementModalOpen && requiresDepositAgreement}
+                lang={lang}
+                fullName={user?.fullName || user?.full_name || ""}
+                onSigned={() => {
+                    setIsAgreementModalOpen(false);
+                    refreshData();
+                }}
+            />
         </div>
     );
 }

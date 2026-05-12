@@ -10,15 +10,28 @@ import TierMedal from "@/components/TierMedal";
 import { getTierByAmount, TIERS } from "@/lib/tierUtils";
 import ComparisonTable from "@/components/ComparisonTable";
 import ProductSelection from "@/components/ProductSelection";
+import DepositAgreementModal from "@/components/DepositAgreementModal";
 import { X } from "lucide-react";
 
 export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
-    const { userProfile: user, transactions, dividendHistory, loading: isCheckingAuth, refreshData } = useUser();
+    const { userProfile: user, transactions, dividendHistory, loading: isCheckingAuth, refreshData, requiresDepositAgreement } = useUser();
     const { forexRate } = useSettings();
     const router = useRouter();
 
     const [actionToast, setActionToast] = useState<{message: string, actionUrl?: string, actionText?: string} | null>(null);
     const [isProfileExpanded, setIsProfileExpanded] = useState(false);
+    const [isAgreementModalOpen, setIsAgreementModalOpen] = useState(false);
+
+    React.useEffect(() => {
+        if (requiresDepositAgreement) setIsAgreementModalOpen(true);
+    }, [requiresDepositAgreement]);
+
+    const interceptIfAgreementRequired = (e: React.MouseEvent) => {
+        if (requiresDepositAgreement) {
+            e.preventDefault();
+            setIsAgreementModalOpen(true);
+        }
+    };
 
     const t = {
         en: {
@@ -437,6 +450,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                         <section className="flex flex-col sm:flex-row gap-6 mt-10">
                             <Link
                                 href={`/dashboard/deposit?lang=${lang}`}
+                                onClick={interceptIfAgreementRequired}
                                 className="flex-1 bg-gv-gold text-black font-black text-lg py-5 rounded-[24px] hover:bg-gv-gold/90 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 shadow-[0_15px_30px_rgba(212,175,55,0.2)]"
                             >
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M12 4v16m8-8H4" /></svg>
@@ -444,6 +458,7 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                             </Link>
                             <Link
                                 href={`/dashboard/withdraw?lang=${lang}`}
+                                onClick={interceptIfAgreementRequired}
                                 className="flex-1 bg-gray-100 text-gray-900 font-black text-lg py-5 rounded-[24px] hover:bg-gray-200 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 border border-gray-300"
                             >
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
@@ -466,6 +481,16 @@ export default function OverviewClient({ lang }: { lang: "en" | "zh" }) {
                     </div>
                 </div>
             )}
+
+            <DepositAgreementModal
+                open={isAgreementModalOpen && requiresDepositAgreement}
+                lang={lang}
+                fullName={user?.fullName || user?.full_name || ""}
+                onSigned={() => {
+                    setIsAgreementModalOpen(false);
+                    refreshData();
+                }}
+            />
         </div>
     );
 }
