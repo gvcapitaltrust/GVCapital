@@ -10,7 +10,7 @@
 
 import React from "react";
 
-export const CURRENT_DEPOSIT_AGREEMENT_VERSION = "V2026_01";
+export const CURRENT_DEPOSIT_AGREEMENT_VERSION = "V2026_02";
 
 export const DEPOSIT_AGREEMENT_TITLE = {
     en: "GV Capital Client Agreement",
@@ -93,7 +93,7 @@ function TierTable({ lang }: { lang: "en" | "zh" }) {
             "—",
             "—",
             `5% ${t.annually}`,
-            `8% ${t.annually}`,
+            `6% ${t.annually}`,
         ],
         [
             t.risk,

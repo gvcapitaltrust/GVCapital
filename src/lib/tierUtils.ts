@@ -53,7 +53,7 @@ export const TIERS: Tier[] = [
     maxAmount: Number.MAX_SAFE_INTEGER,
     minDividend: 0.06,
     maxDividend: 0.06,
-    yearlyBonus: 0.08,
+    yearlyBonus: 0.06,
     lockInDays: 365,
     color: "amber",
     benefits: [],
