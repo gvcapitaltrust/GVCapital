@@ -7,6 +7,7 @@ import { useSettings } from "@/providers/SettingsProvider";
 import { supabase } from "@/lib/supabaseClient";
 import { sendDepositEmailsAction } from "@/app/actions/email";
 import DepositAgreementModal from "@/components/DepositAgreementModal";
+import { useWalletForNetwork } from "@/hooks/useWalletAddresses";
 import { X, ArrowLeft, Upload, CheckCircle2 } from "lucide-react";
 
 export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
@@ -29,6 +30,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
     const [remark, setRemark] = useState("");
     const [paymentMethod, setPaymentMethod] = useState<"bank" | "usdt">("usdt");
     const [cryptoNetwork, setCryptoNetwork] = useState<"tron" | "bep20" | "erc20" | "sol">("tron");
+    const { address: walletAddress, qrUrl: walletQrUrl } = useWalletForNetwork(cryptoNetwork);
 
     const t = {
         en: {
@@ -130,7 +132,9 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                         remark: remark,
                         forex_rate: depositRate,
                         original_usd_amount: depositAmount,
-                        payment_method: paymentMethod === 'bank' ? 'bank' : `usdt_${cryptoNetwork}`
+                        payment_method: paymentMethod === 'bank' ? 'bank' : `usdt_${cryptoNetwork}`,
+                        payment_address: paymentMethod === 'usdt' ? walletAddress || null : null,
+                        payment_network: paymentMethod === 'usdt' ? cryptoNetwork : null,
                     }
                 }]);
             if (insertError) throw insertError;
@@ -167,7 +171,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                 <div className="bg-white px-8 py-4 rounded-3xl border border-emerald-500/20 text-emerald-500 font-black text-xl mb-12">
                     {t.ref}: {successRefId}
                 </div>
-                <button 
+                <button
                     onClick={() => router.push(`/dashboard?lang=${lang}`)}
                     className="bg-gv-gold text-black font-black py-5 px-12 rounded-2xl uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all"
                 >
@@ -180,7 +184,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
     return (
         <div className="max-w-4xl mx-auto space-y-12 pb-20">
             <div className="flex items-center gap-6">
-                <button 
+                <button
                     onClick={() => router.push(`/dashboard?lang=${lang}`)}
                     className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm hover:shadow-md"
                 >
@@ -212,8 +216,8 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                             <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amount}</label>
                             <div className="relative group/input">
                                 <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 font-black text-xl transition-colors group-focus-within/input:text-gv-gold">$</div>
-                                <input 
-                                    type="number" 
+                                <input
+                                    type="number"
                                     placeholder="0.00"
                                     value={depositAmount}
                                     onChange={(e) => setDepositAmount(e.target.value)}
@@ -231,13 +235,13 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                         <div className="space-y-4">
                             <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.method}</label>
                             <div className="flex p-1 bg-gray-100 rounded-2xl w-fit">
-                                <button 
+                                <button
                                     onClick={() => setPaymentMethod("usdt")}
                                     className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${paymentMethod === "usdt" ? "bg-white text-black shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                                 >
                                     {t.usdt}
                                 </button>
-                                <button 
+                                <button
                                     disabled
                                     className="px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-gray-300 cursor-not-allowed opacity-50"
                                 >
@@ -246,7 +250,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                             </div>
                         </div>
 
-                        <button 
+                        <button
                             disabled={!depositAmount || parseFloat(depositAmount) <= 0}
                             onClick={() => setStep(2)}
                             className="w-full py-6 bg-gv-gold text-black rounded-[24px] font-black uppercase tracking-[0.2em] text-sm shadow-xl shadow-gv-gold/20 hover:-translate-y-1 active:scale-[0.98] transition-all disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none"
@@ -259,25 +263,25 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                         <div className="space-y-6">
                             <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.network}</label>
                             <div className="flex flex-wrap gap-2 p-1 bg-gray-100 rounded-2xl w-fit shrink-0">
-                                <button 
+                                <button
                                     onClick={() => setCryptoNetwork("tron")}
                                     className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "tron" ? "bg-slate-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                                 >
                                     {t.usdtTron}
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setCryptoNetwork("bep20")}
                                     className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "bep20" ? "bg-slate-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                                 >
                                     {t.usdtBep20}
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setCryptoNetwork("erc20")}
                                     className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "erc20" ? "bg-slate-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                                 >
                                     {t.usdtErc20}
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setCryptoNetwork("sol")}
                                     className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "sol" ? "bg-slate-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                                 >
@@ -289,10 +293,10 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2"></div>
                                 <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center text-center md:text-left">
                                     <div className="h-40 w-40 bg-white p-3 rounded-2xl shadow-2xl shrink-0">
-                                        <img 
-                                            src={cryptoNetwork === "tron" ? "/usdt-qr.png" : cryptoNetwork === "bep20" ? "/usdt-bep20-qr.png" : cryptoNetwork === "erc20" ? "/usdt-erc20-qr.png" : "/usdt-sol-qr.png"} 
-                                            alt="USDT QR" 
-                                            className="w-full h-full object-contain" 
+                                        <img
+                                            src={walletQrUrl}
+                                            alt="USDT QR"
+                                            className="w-full h-full object-contain"
                                         />
                                     </div>
                                     <div className="flex-1 space-y-4 w-full">
@@ -306,12 +310,12 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                                             <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest leading-none">{t.address}</p>
                                             <div className="flex items-center gap-3 bg-white/5 border border-white/10 p-4 rounded-2xl group-hover/usdt:border-emerald-500/30 transition-colors">
                                                 <p className="text-sm font-mono font-bold break-all flex-1 text-emerald-50">
-                                                    {cryptoNetwork === "sol" ? "5x786gH4cTUzhoSpa8AD5XiWubNu2bfpR5PjHkYjP9i9" : cryptoNetwork === "tron" ? "TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE" : "0x9b891193b672fd4293a775a0c58f402d256ebd79"}
+                                                    {walletAddress || "—"}
                                                 </p>
-                                                <button 
+                                                <button
                                                     onClick={() => {
-                                                        const addr = cryptoNetwork === "sol" ? "5x786gH4cTUzhoSpa8AD5XiWubNu2bfpR5PjHkYjP9i9" : cryptoNetwork === "tron" ? "TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE" : "0x9b891193b672fd4293a775a0c58f402d256ebd79";
-                                                        navigator.clipboard.writeText(addr);
+                                                        if (!walletAddress) return;
+                                                        navigator.clipboard.writeText(walletAddress);
                                                         alert(t.copied);
                                                     }}
                                                     className="shrink-0 h-10 w-10 bg-emerald-500 text-black rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg shadow-emerald-500/20"
@@ -356,7 +360,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
 
                             <div className="space-y-4">
                                 <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.remarkLabel}</label>
-                                <textarea 
+                                <textarea
                                     placeholder={t.remarkPlaceholder}
                                     value={remark}
                                     onChange={(e) => setRemark(e.target.value)}
@@ -366,13 +370,13 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                            <button 
+                            <button
                                 onClick={() => setStep(1)}
                                 className="flex-1 py-5 bg-gray-100 text-gray-500 rounded-[22px] font-black uppercase tracking-widest text-xs hover:bg-gray-200 transition-all"
                             >
                                 {t.backStep}
                             </button>
-                            <button 
+                            <button
                                 disabled={isSubmitting || !depositReceipt}
                                 onClick={handleSubmit}
                                 className="flex-[2] py-5 bg-gv-gold text-black rounded-[22px] font-black uppercase tracking-[0.2em] text-sm shadow-xl shadow-gv-gold/20 hover:-translate-y-1 active:scale-[0.98] transition-all disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none relative overflow-hidden"
@@ -388,7 +392,7 @@ export default function DepositClient({ lang }: { lang: "en" | "zh" }) {
                     </div>
                 )}
             </div>
-            
+
             <div className="bg-gray-100 border border-gray-200 rounded-[32px] p-8 text-center">
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] max-w-xl mx-auto leading-relaxed">
                     Important: Please ensure all fund transfers are made from your registered bank account. Institutional transfers may require additional verification.

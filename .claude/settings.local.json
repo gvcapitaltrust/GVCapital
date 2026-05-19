@@ -4,7 +4,9 @@
       "Bash(npx tsc *)",
       "Bash(npm install *)",
       "Bash(echo \"EXIT=$?\")",
-      "Bash(node -e \"const {jsPDF}=require\\('jspdf'\\); const d=new jsPDF\\(\\); d.text\\('hi',10,10\\); console.log\\('jspdf ok, bytes:',d.output\\('arraybuffer'\\).byteLength\\);\")"
+      "Bash(node -e \"const {jsPDF}=require\\('jspdf'\\); const d=new jsPDF\\(\\); d.text\\('hi',10,10\\); console.log\\('jspdf ok, bytes:',d.output\\('arraybuffer'\\).byteLength\\);\")",
+      "Bash(grep -iE \"^\\(jsqr|qrcode-reader|qr-scanner\\)$\")",
+      "Bash(echo \"EXIT: $?\")"
     ]
   }
 }

@@ -7,6 +7,7 @@ import GlobalFooter from "@/components/GlobalFooter";
 import { supabase } from "@/lib/supabaseClient";
 import { useSettings } from "@/providers/SettingsProvider";
 import { useAuth } from "@/providers/AuthProvider";
+import { useWalletForNetwork } from "@/hooks/useWalletAddresses";
 
 export default function DepositClient() {
     const router = useRouter();
@@ -26,6 +27,7 @@ export default function DepositClient() {
     const [receipt, setReceipt] = useState<File | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<"bank" | "usdt">("usdt");
     const [cryptoNetwork, setCryptoNetwork] = useState<"tron" | "bep20" | "erc20" | "sol">("tron");
+    const { address: walletAddress, qrUrl: walletQrUrl } = useWalletForNetwork(cryptoNetwork);
 
     useEffect(() => {
         const l = searchParams?.get("lang") || "en";
@@ -61,17 +63,19 @@ export default function DepositClient() {
             const currentAmountRm = depositUSD * forexRate;
             const currentCapitalUSD = Number(user.balance || 0) / forexRate;
 
-            
+
             const { error: insertError } = await supabase
                 .from('transactions')
                 .insert([{
                     user_id: user.id,
                     type: 'Deposit',
                     amount: depositUSD,
-                    metadata: { 
-                        original_usd_amount: amount, 
+                    metadata: {
+                        original_usd_amount: amount,
                         forex_rate: forexRate,
                         payment_method: paymentMethod === 'bank' ? 'bank' : `usdt_${cryptoNetwork}`,
+                        payment_address: paymentMethod === 'usdt' ? walletAddress || null : null,
+                        payment_network: paymentMethod === 'usdt' ? cryptoNetwork : null,
                         remark: remark
                     },
                     original_currency_amount: depositUSD,
@@ -214,8 +218,8 @@ export default function DepositClient() {
                                         <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.amount}</label>
                                         <div className="relative group/input">
                                             <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 font-black text-xl transition-colors group-focus-within/input:text-gray-900">$</div>
-                                            <input 
-                                                type="number" 
+                                            <input
+                                                type="number"
                                                 placeholder="0.00"
                                                 value={amount}
                                                 onChange={(e) => setAmount(e.target.value)}
@@ -233,14 +237,14 @@ export default function DepositClient() {
                                     <div className="space-y-4">
                                         <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.method}</label>
                                         <div className="flex p-1 bg-white border border-gray-100 rounded-2xl w-fit">
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={() => setPaymentMethod("usdt")}
                                                 className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${paymentMethod === "usdt" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                                             >
                                                 {t.usdt}
                                             </button>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 disabled
                                                 className="px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-gray-300 cursor-not-allowed opacity-50"
@@ -250,7 +254,7 @@ export default function DepositClient() {
                                         </div>
                                     </div>
 
-                                    <button 
+                                    <button
                                         type="button"
                                         disabled={!amount || parseFloat(amount) <= 0}
                                         onClick={() => setStep(2)}
@@ -264,28 +268,28 @@ export default function DepositClient() {
                                     <div className="space-y-6">
                                         <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.network}</label>
                                         <div className="flex flex-wrap gap-2 p-1 bg-gray-100 rounded-2xl w-fit">
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={() => setCryptoNetwork("tron")}
                                                 className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "tron" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                                             >
                                                 {t.usdtTron}
                                             </button>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={() => setCryptoNetwork("bep20")}
                                                 className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "bep20" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                                             >
                                                 {t.usdtBep20}
                                             </button>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={() => setCryptoNetwork("erc20")}
                                                 className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "erc20" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
                                             >
                                                 {t.usdtErc20}
                                             </button>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={() => setCryptoNetwork("sol")}
                                                 className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${cryptoNetwork === "sol" ? "bg-gray-900 text-white shadow-md" : "text-gray-400 hover:text-gray-600"}`}
@@ -297,44 +301,35 @@ export default function DepositClient() {
                                         <div className="bg-white border border-gray-100 rounded-3xl p-8 space-y-6 shadow-sm">
                                             <div className="flex flex-col md:flex-row gap-8 items-center">
                                                 <div className="h-40 w-40 bg-white p-3 border border-gray-100 rounded-2xl shrink-0">
-                                                    <img 
-                                                        src={
-                                                            cryptoNetwork === "tron" ? "/usdt-qr.png" : 
-                                                            cryptoNetwork === "bep20" ? "/usdt-bep20-qr.png" : 
-                                                            cryptoNetwork === "erc20" ? "/usdt-erc20-qr.png" : 
-                                                            "/usdt-sol-qr.png"
-                                                        } 
-                                                        alt="USDT QR" 
-                                                        className="w-full h-full object-contain" 
+                                                    <img
+                                                        src={walletQrUrl}
+                                                        alt="USDT QR"
+                                                        className="w-full h-full object-contain"
                                                     />
                                                 </div>
-                                                
+
                                                 <div className="flex-1 space-y-4 w-full text-center md:text-left">
                                                     <div>
                                                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t.network}</p>
                                                         <p className="text-lg font-black tracking-tight text-gray-900">
-                                                            {cryptoNetwork === "tron" ? "TRON (TRC20)" : 
-                                                             cryptoNetwork === "bep20" ? "BEP20 (Binance Smart Chain)" : 
-                                                             cryptoNetwork === "erc20" ? "ERC20 (Ethereum Network)" : 
-                                                             "SOLANA Network"}
+                                                            {cryptoNetwork === "tron" ? "TRON (TRC20)" :
+                                                                cryptoNetwork === "bep20" ? "BEP20 (Binance Smart Chain)" :
+                                                                    cryptoNetwork === "erc20" ? "ERC20 (Ethereum Network)" :
+                                                                        "SOLANA Network"}
                                                         </p>
                                                     </div>
-                                                    
+
                                                     <div className="space-y-2">
                                                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">{t.address}</p>
                                                         <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 p-4 rounded-2xl">
                                                             <p className="text-sm font-mono font-bold break-all flex-1 text-gray-900">
-                                                                {cryptoNetwork === "sol" ? "5x786gH4cTUzhoSpa8AD5XiWubNu2bfpR5PjHkYjP9i9" :
-                                                                 cryptoNetwork === "tron" ? "TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE" : 
-                                                                 "0x9b891193b672fd4293a775a0c58f402d256ebd79"}
+                                                                {walletAddress || "—"}
                                                             </p>
-                                                            <button 
+                                                            <button
                                                                 type="button"
                                                                 onClick={() => {
-                                                                    const addr = cryptoNetwork === "sol" ? "5x786gH4cTUzhoSpa8AD5XiWubNu2bfpR5PjHkYjP9i9" :
-                                                                                cryptoNetwork === "tron" ? "TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE" : 
-                                                                                "0x9b891193b672fd4293a775a0c58f402d256ebd79";
-                                                                    navigator.clipboard.writeText(addr);
+                                                                    if (!walletAddress) return;
+                                                                    navigator.clipboard.writeText(walletAddress);
                                                                     alert(t.copied);
                                                                 }}
                                                                 className="shrink-0 h-10 w-10 bg-gv-gold text-black rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
@@ -379,7 +374,7 @@ export default function DepositClient() {
 
                                         <div className="space-y-4">
                                             <label className="text-gray-400 text-[10px] font-black uppercase tracking-widest px-1">{t.remarkLabel}</label>
-                                            <textarea 
+                                            <textarea
                                                 placeholder={t.remarkPlaceholder}
                                                 value={remark}
                                                 onChange={(e) => setRemark(e.target.value)}
@@ -389,14 +384,14 @@ export default function DepositClient() {
                                     </div>
 
                                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                        <button 
+                                        <button
                                             type="button"
                                             onClick={() => setStep(1)}
                                             className="flex-1 py-5 bg-gray-100 text-gray-500 rounded-[22px] font-black uppercase tracking-widest text-xs hover:bg-gray-200 transition-all"
                                         >
                                             {t.backStep}
                                         </button>
-                                        <button 
+                                        <button
                                             type="submit"
                                             disabled={isSubmitting || !receipt}
                                             className="flex-[2] py-5 bg-gray-900 text-white rounded-[22px] font-black uppercase tracking-[0.2em] text-sm shadow-xl shadow-black/10 hover:-translate-y-1 active:scale-[0.98] transition-all disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none relative overflow-hidden"

@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "@/providers/AdminProvider";
 import { useSettings } from "@/providers/SettingsProvider";
+import { useWalletAddresses } from "@/hooks/useWalletAddresses";
+import { isWalletNetwork } from "@/lib/walletAddresses";
 import { supabase } from "@/lib/supabaseClient";
 import { formatDate, formatDateTime } from "@/lib/dateUtils";
 import { getTierByAmount } from "@/lib/tierUtils";
@@ -14,6 +16,7 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
     const router = useRouter();
     const { deposits, loading, handleApproveDeposit, handleRejectDeposit } = useAdmin();
     const { forexRate } = useSettings();
+    const { map: walletMap } = useWalletAddresses();
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
     const [selectedTx, setSelectedTx] = useState<any>(null);
@@ -93,7 +96,7 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Standard Header */}
             <div className="flex items-center gap-6">
-                <button 
+                <button
                     onClick={() => router.push(`/admin?lang=${lang}`)}
                     className="h-12 w-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gv-gold transition-all shadow-sm hover:shadow-md"
                 >
@@ -186,24 +189,22 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                     </td>
                                     <td className="px-4 py-4">
                                         <div className="flex items-center gap-2.5 px-1">
-                                            <div className={`h-1.5 w-1.5 rounded-full ${
-                                                tx.status === 'Approved' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' :
+                                            <div className={`h-1.5 w-1.5 rounded-full ${tx.status === 'Approved' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' :
                                                 tx.status === 'Rejected' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' :
-                                                'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)] animate-pulse'
-                                            }`} />
-                                            <span className={`text-[9px] font-black uppercase tracking-widest whitespace-nowrap ${
-                                                tx.status === 'Approved' ? 'text-emerald-600' :
+                                                    'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)] animate-pulse'
+                                                }`} />
+                                            <span className={`text-[9px] font-black uppercase tracking-widest whitespace-nowrap ${tx.status === 'Approved' ? 'text-emerald-600' :
                                                 tx.status === 'Rejected' ? 'text-red-500' :
-                                                'text-amber-600'
-                                            }`}>
+                                                    'text-amber-600'
+                                                }`}>
                                                 {tx.status}
                                             </span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-4 pr-8 text-right">
                                         {tx.status === 'Pending' ? (
-                                            <button 
-                                                onClick={() => openReceipt(tx)} 
+                                            <button
+                                                onClick={() => openReceipt(tx)}
                                                 className="bg-slate-900 text-white hover:bg-slate-800 text-[9px] font-black uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0 text-center"
                                             >
                                                 {t.viewReceipt}
@@ -228,7 +229,7 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-3">
                                             <TierMedal tierId={tierName} size="xs" />
-                                             <div className="flex flex-col">
+                                            <div className="flex flex-col">
                                                 <span className="font-black text-slate-900 uppercase tracking-tight text-[10px] truncate max-w-[150px]">{tx.profiles?.full_name}</span>
                                                 <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">@{tx.profiles?.username}</span>
                                             </div>
@@ -240,16 +241,14 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                             </span>
                                             <div className="mt-1 flex justify-end">
                                                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
-                                                    <div className={`h-1.5 w-1.5 rounded-full ${
-                                                        tx.status === 'Approved' ? 'bg-emerald-500' :
+                                                    <div className={`h-1.5 w-1.5 rounded-full ${tx.status === 'Approved' ? 'bg-emerald-500' :
                                                         tx.status === 'Rejected' ? 'bg-red-500' :
-                                                        'bg-amber-500 animate-pulse'
-                                                    }`} />
-                                                    <span className={`text-[8px] font-black uppercase tracking-widest ${
-                                                        tx.status === 'Approved' ? 'text-emerald-500' :
+                                                            'bg-amber-500 animate-pulse'
+                                                        }`} />
+                                                    <span className={`text-[8px] font-black uppercase tracking-widest ${tx.status === 'Approved' ? 'text-emerald-500' :
                                                         tx.status === 'Rejected' ? 'text-red-500' :
-                                                        'text-amber-500'
-                                                    }`}>
+                                                            'text-amber-500'
+                                                        }`}>
                                                         {tx.status}
                                                     </span>
                                                 </div>
@@ -287,10 +286,10 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                 <p className="text-[9px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest">Ref: {selectedTx?.ref_id}</p>
                             </div>
                             <button onClick={() => setIsDrawerOpen(false)} className="h-10 w-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-all border border-gray-100">
-                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
-                        
+
                         <div className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto custom-scrollbar">
                             <div className="h-[280px] md:h-full rounded-2xl border border-gray-100 bg-gray-50 overflow-hidden relative shrink-0">
                                 {receiptUrl ? (
@@ -319,21 +318,28 @@ export default function DepositsClient({ lang }: { lang: "en" | "zh" }) {
                                             <div className="flex flex-col">
                                                 <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{t.paymentTitle}</span>
                                                 <span className="text-sm font-black text-slate-900 uppercase">
-                                                    {selectedTx?.metadata?.payment_method?.startsWith('usdt') 
-                                                        ? `USDT (${selectedTx?.metadata?.payment_method.split('_')[1].toUpperCase()})` 
+                                                    {selectedTx?.metadata?.payment_method?.startsWith('usdt')
+                                                        ? `USDT (${selectedTx?.metadata?.payment_method.split('_')[1].toUpperCase()})`
                                                         : "FPX Online Banking"}
                                                 </span>
                                             </div>
-                                            {selectedTx?.metadata?.payment_method?.startsWith('usdt') && (
-                                                <div className="flex flex-col">
-                                                    <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{t.payTo}</span>
-                                                    <span className="text-[10px] font-mono font-bold text-gv-gold break-all">
-                                                        {selectedTx?.metadata?.payment_method === 'usdt_sol' ? '5x786gH4cTUzhoSpa8AD5XiWubNu2bfpR5PjHkYjP9i9' :
-                                                         selectedTx?.metadata?.payment_method === 'usdt_tron' ? 'TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE' : 
-                                                         '0x9b891193b672fd4293a775a0c58f402d256ebd79'}
-                                                    </span>
-                                                </div>
-                                            )}
+                                            {selectedTx?.metadata?.payment_method?.startsWith('usdt') && (() => {
+                                                const network = String(selectedTx?.metadata?.payment_method || '').split('_')[1];
+                                                const liveAddress = isWalletNetwork(network) ? walletMap[network]?.address : undefined;
+                                                const shownAddress = selectedTx?.metadata?.payment_address || liveAddress || '—';
+                                                const isSnapshot = !!selectedTx?.metadata?.payment_address;
+                                                return (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{t.payTo}</span>
+                                                        <span className="text-[10px] font-mono font-bold text-gv-gold break-all">{shownAddress}</span>
+                                                        {!isSnapshot && (
+                                                            <span className="text-[9px] text-amber-600 font-medium mt-1">
+                                                                Showing current wallet (no snapshot stored at deposit time).
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
                                         </div>
                                         <div className="flex flex-col bg-slate-50 p-4 rounded-2xl border border-slate-100 italic">
                                             <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">{t.remark}</span>

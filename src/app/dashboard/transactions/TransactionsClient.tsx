@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
 import { useSettings } from "@/providers/SettingsProvider";
+import { useWalletAddresses } from "@/hooks/useWalletAddresses";
+import { isWalletNetwork } from "@/lib/walletAddresses";
 import { ArrowLeft, X, Eye } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import jsPDF from "jspdf";
@@ -16,6 +18,7 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
     const router = useRouter();
     const { userProfile: user, transactions, loading } = useUser();
     const { forexRate, withdrawalRate } = useSettings();
+    const { map: walletMap } = useWalletAddresses();
 
     const [typeFilter, setTypeFilter] = useState('all');
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -574,16 +577,17 @@ export default function TransactionsClient({ lang }: { lang: "en" | "zh" }) {
                                                             : "FPX Online Banking"}
                                                     </span>
                                                 </div>
-                                                {selectedTx.metadata?.payment_method?.startsWith('usdt') && (
-                                                    <div className="flex flex-col">
-                                                        <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{t.sentTo}</span>
-                                                        <span className="text-[10px] font-mono font-bold text-gv-gold break-all">
-                                                            {selectedTx.metadata?.payment_method === 'usdt_sol' ? '5x786gH4cTUzhoSpa8AD5XiWubNu2bfpR5PjHkYjP9i9' :
-                                                            selectedTx.metadata?.payment_method === 'usdt_tron' ? 'TErRkQXxTaLBB6VCafeaBjzx9Ji5eUZGgE' : 
-                                                            '0x9b891193b672fd4293a775a0c58f402d256ebd79'}
-                                                        </span>
-                                                    </div>
-                                                )}
+                                                {selectedTx.metadata?.payment_method?.startsWith('usdt') && (() => {
+                                                    const network = String(selectedTx.metadata?.payment_method || '').split('_')[1];
+                                                    const liveAddress = isWalletNetwork(network) ? walletMap[network]?.address : undefined;
+                                                    const shownAddress = selectedTx.metadata?.payment_address || liveAddress || '—';
+                                                    return (
+                                                        <div className="flex flex-col">
+                                                            <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{t.sentTo}</span>
+                                                            <span className="text-[10px] font-mono font-bold text-gv-gold break-all">{shownAddress}</span>
+                                                        </div>
+                                                    );
+                                                })()}
                                                 {selectedTx.metadata?.remark && (
                                                     <div className="flex flex-col bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                                         <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">{t.remark}</span>
